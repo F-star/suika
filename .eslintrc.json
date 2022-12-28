@@ -1,0 +1,77 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    // 缩进
+    "indent": ["error", 2],
+    // 必须使用分号
+    "semi": "error",
+    // 使用单引号
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    // 末尾不能有空格符
+    "no-trailing-spaces": "error",
+    // 不能有多个空格
+    "no-multi-spaces": "error",
+    // 多行空白行
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 2, // 最多两行空白行
+        "maxEOF": 0 // 文件末尾最后一行空白行
+      }
+    ],
+    // 对象里的 key，如果可以不用引号，就尽量不用
+    "quote-props": ["warn", "as-needed"],
+    // 单行允许最大字符数
+    "max-len": [ "warn", { "code": 120 }],
+    // 对象的花括号留一个空格，更美观一些
+    "object-curly-spacing": [ "warn", "always" ],
+    "comma-dangle": ["warn", "always-multiline"],
+
+
+    // --------- TypeScript 相关 ---------------
+    // TS 的一些规则和 ESLint 自身的规则有重复，注意处理（把 ESLint 相同的规则 off）
+    // 不能有未使用的变量
+    "@typescript-eslint/no-unused-vars": "warn",
+    // class、enum 等使用大驼峰风格
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      {
+        "selector": "typeLike",
+        "format": [
+          "PascalCase"
+        ]
+      }
+    ],
+    "@typescript-eslint/no-non-null-assertion": 0,
+
+
+    // -------- React 相关 --------------
+    // jsx 如果有多行，用括号包裹，且括号独自一行
+    "react/jsx-wrap-multilines": ["warn", {
+      "return": "parens-new-line"
+    }],
+    // props 后的 = 左右不能有空格符
+    "react/jsx-equals-spacing": ["error", "never"],
+    // 如果 tag 下没有内容，需要用 <div /> 的形式
+    "react/self-closing-comp": ["error", {
+      "component": true
+    }]
+  }
+}
