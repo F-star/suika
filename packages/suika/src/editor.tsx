@@ -2,7 +2,7 @@ import { FC, useEffect, useRef } from 'react';
 import { Editor as GraphEditor } from './editor/editor';
 
 
-const Editor2: FC = () => {
+const Editor: FC = () => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -10,6 +10,8 @@ const Editor2: FC = () => {
       const editor = new GraphEditor({
         canvasElement: ref.current,
       });
+      (window as any).editor = editor;
+      editor.bindHotkeys();
       editor.canvasElement.width = document.body.clientWidth;
       editor.canvasElement.height = document.body.clientHeight;
       return () => {
@@ -25,4 +27,4 @@ const Editor2: FC = () => {
   );
 };
 
-export default Editor2;
+export default Editor;

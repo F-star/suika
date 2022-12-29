@@ -1,5 +1,7 @@
 import { Rect, SceneGraph } from '../scene-graph';
 
+type ICmdName = 'AddRect'
+
 export class CommandManger {
   redoStack: Command[] = [];
   undoStack: Command[] = [];
@@ -9,22 +11,27 @@ export class CommandManger {
   redo() {
     if (this.redoStack.length > 0) {
       const command = this.redoStack.pop()!;
+      this.undoStack.push(command);
       command.redo();
+      this.sceneGraph.render();
     }
   }
   undo() {
     if (this.undoStack.length > 0) {
       const command = this.undoStack.pop()!;
+      this.redoStack.push(command);
       command.undo();
       this.sceneGraph.render();
     }
   }
-  execCmd(cmdName: string, ...options: any[]) {
+  execCmd(cmdName: ICmdName, ...options: any[]) {
     if (cmdName === AddRectCommand.type) {
       const _options = options[0];
-      this.undoStack.push(
-        new AddRectCommand(this.sceneGraph, _options)
-      );
+      // eslint-disable-next-line no-debugger
+      // debugger;
+      const cmd = new AddRectCommand(this.sceneGraph, _options);
+      this.undoStack.push(cmd);
+      this.redoStack = [];
     }
   }
 }
@@ -46,25 +53,21 @@ type IAddRectCommand = {
  */
 class AddRectCommand implements Command {
   static readonly type = 'AddRect';
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  element!: Rect;
+  element: Rect;
+  idx = -1;
 
-  constructor(private sceneGraph: SceneGraph, {
-    x, y, width, height,
-  }: IAddRectCommand) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+  constructor(
+    private sceneGraph: SceneGraph,
+    rect: Rect
+  ) {
+    this.element = rect;
+    // 不创建 rect
   }
   redo() {
     // 往树中加上矩形对象
-    this.element = this.sceneGraph.addRect(this);
+    this.sceneGraph.appendChild(this.element, this.idx);
   }
   undo() {
-    this.sceneGraph.removeChild(this.element);
+    this.idx = this.sceneGraph.removeChild(this.element);
   }
 }

@@ -16,11 +16,15 @@ export class SceneGraph {
     this.children.push(rectShape);
     return rectShape;
   }
+  appendChild(element: Rect, idx: number) {
+    this.children.splice(idx, 0, element);
+  }
   removeChild(element: Rect) {
-    const idx = this.children.findIndex(element as any);
+    const idx = this.children.indexOf(element as any);
     if (idx !== -1) {
       this.children.splice(idx, 1);
     }
+    return idx;
   }
   // 全局重渲染
   render() {

@@ -5203,6 +5203,11 @@ hosted-git-info@^4.0.1:
   dependencies:
     lru-cache "^6.0.0"
 
+hotkeys-js@^3.10.1:
+  version "3.10.1"
+  resolved "https://registry.npmmirror.com/hotkeys-js/-/hotkeys-js-3.10.1.tgz#0c67e72298f235c9200e421ab112d156dc81356a"
+  integrity sha512-mshqjgTqx8ee0qryHvRgZaZDxTwxam/2yTQmQlqAWS3+twnq1jsY9Yng9zB7lWq6WRrjTbTOc7knNwccXQiAjQ==
+
 hpack.js@^2.1.6:
   version "2.1.6"
   resolved "https://registry.npmmirror.com/hpack.js/-/hpack.js-2.1.6.tgz#87774c0949e513f42e84575b3c45681fade2a0b2"

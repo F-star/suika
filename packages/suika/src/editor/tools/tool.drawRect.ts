@@ -45,7 +45,10 @@ export class DrawRectTool implements ITool {
   }
   end(e: PointerEvent) {
     // 释放
+    if (this.drawingRect === null) {
+      return;
+    }
+    this.editor.commandManger.execCmd('AddRect', this.drawingRect);
     this.drawingRect = null;
-    this.editor.commandManger.execCmd('rect', this.drawingRect);
   }
 }

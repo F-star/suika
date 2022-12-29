@@ -1,3 +1,4 @@
+import hotkeys from 'hotkeys-js';
 import { SceneGraph } from '../scene-graph';
 import { IBox } from '../type.interface';
 import { CommandManger } from './commands';
@@ -36,7 +37,16 @@ export class Editor {
   setViewport(box: IBox) {
     this.viewport = { ...box };
   }
+  bindHotkeys() {
+    hotkeys('ctrl+z, command+z', { keyup: true }, () => {
+      this.commandManger.undo();
+    });
+    hotkeys('ctrl+shift+z, command+shift+z', { keyup: true }, () => {
+      this.commandManger.redo();
+    });
+  }
   destroy() {
     this.toolManage.unbindEvent();
+    hotkeys.unbind();
   }
 }
