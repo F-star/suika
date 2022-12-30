@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from 'react';
-import { Editor as GraphEditor } from './editor/editor';
+import { Editor as GraphEditor } from '../../editor/editor';
 
 
 const Editor: FC = () => {

@@ -1,4 +1,4 @@
-import { IPoint, IRect } from '../type.interface';
+import { IBox, INoEmptyArray, IPoint, IRect } from '../type.interface';
 
 /**
  * 矩形是否相交
@@ -21,5 +21,42 @@ export function getRectByTwoCoord(point1: IPoint, point2: IPoint): IRect {
     y: Math.min(point1.y, point2.y),
     width: Math.abs(point1.x - point2.x),
     height: Math.abs(point1.y - point2.y),
+  };
+}
+
+/**
+ * 求多个矩形组成的包围盒
+ */
+export function getRectsBBox(...rects: IRect[]): IBox {
+  if (rects.length === 0) {
+    throw new Error('矩形数量不能为 0');
+  }
+  const first = rects[0];
+  let x = first.x;
+  let y = first.y;
+  let x2 = x + first.width;
+  let y2 = y + first.height;
+  for (let i = 1, len = rects.length; i < len; i++) {
+    const rect = rects[i];
+    if (rect.x < x) {
+      x = rect.x;
+    }
+    if (rect.y < y) {
+      y = rect.y;
+    }
+    const _x2 = rect.x + rect.width;
+    if (_x2 > x2) {
+      x2 = _x2;
+    }
+    const _y2 = rect.y + rect.height;
+    if (_y2 > y2) {
+      y2 = _y2;
+    }
+  }
+  return {
+    x,
+    y,
+    width: x2 - x,
+    height: y2 - y,
   };
 }

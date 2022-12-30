@@ -1,4 +1,5 @@
 import { Rect, SceneGraph } from '../scene-graph';
+import { Editor } from './editor';
 
 type ICmdName = 'AddRect'
 
@@ -6,14 +7,16 @@ export class CommandManger {
   redoStack: Command[] = [];
   undoStack: Command[] = [];
 
-  constructor(private sceneGraph: SceneGraph) {}
+  constructor(private editor: Editor) {}
 
   redo() {
     if (this.redoStack.length > 0) {
       const command = this.redoStack.pop()!;
       this.undoStack.push(command);
       command.redo();
-      this.sceneGraph.render();
+
+      this.editor.selectedElements.clear();
+      this.editor.sceneGraph.render();
     }
   }
   undo() {
@@ -21,7 +24,9 @@ export class CommandManger {
       const command = this.undoStack.pop()!;
       this.redoStack.push(command);
       command.undo();
-      this.sceneGraph.render();
+
+      this.editor.selectedElements.clear();
+      this.editor.sceneGraph.render();
     }
   }
   execCmd(cmdName: ICmdName, ...options: any[]) {
@@ -29,7 +34,7 @@ export class CommandManger {
       const _options = options[0];
       // eslint-disable-next-line no-debugger
       // debugger;
-      const cmd = new AddRectCommand(this.sceneGraph, _options);
+      const cmd = new AddRectCommand(this.editor.sceneGraph, _options);
       this.undoStack.push(cmd);
       this.redoStack = [];
     }

@@ -34,13 +34,14 @@ export class DrawRectTool implements ITool {
 
     const rect = getRectByTwoCoord(lastPointer, pointer);
     if (this.drawingRect) {
-      this.drawingRect.x(rect.x);
-      this.drawingRect.y(rect.y);
-      this.drawingRect.width(rect.width);
-      this.drawingRect.height(rect.height);
+      this.drawingRect.x = rect.x;
+      this.drawingRect.y = rect.y;
+      this.drawingRect.width = rect.width;
+      this.drawingRect.height = rect.height;
     } else {
       this.drawingRect = sceneGraph.addRect({ ...rect, fill: this.editor.setting.fill });
     }
+    this.editor.selectedElements.setItems([this.drawingRect]);
     sceneGraph.render();
   }
   end(e: PointerEvent) {

@@ -8,6 +8,11 @@ export interface IRect {
 
 export type IBox = IRect;
 
+/**
+ * 数组长度必须大于等于 1 的数组
+ */
+export type INoEmptyArray<T> = [T, ...T[]];
+
 export interface IPoint {
   x: number;
   y: number;

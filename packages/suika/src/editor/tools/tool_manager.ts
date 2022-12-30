@@ -1,6 +1,6 @@
 import { noop } from '../../utils/common';
 import { Editor } from '../editor';
-import { DrawRectTool } from './tool.drawRect';
+import { DrawRectTool } from './tool_draw_rect';
 import { ITool } from './type';
 
 export class ToolManager {

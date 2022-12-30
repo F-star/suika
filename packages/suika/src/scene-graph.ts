@@ -1,7 +1,7 @@
 import { Editor } from './editor/editor';
 import { IBox, IRect } from './type.interface';
 import { genId } from './utils/common';
-import { isRectIntersect } from './utils/graphics';
+import { getRectsBBox, isRectIntersect } from './utils/graphics';
 
 /**
  * 图形树
@@ -45,16 +45,41 @@ export class SceneGraph {
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
       if (element instanceof Rect) {
-        ctx.fillStyle = element._fill;
+        ctx.fillStyle = element.fill;
         // ctx.strokeStyle = element._stroke;
         ctx.fillRect(
-          element.x(),
-          element.y(),
-          element.width(),
-          element.height()
+          element.x,
+          element.y,
+          element.width,
+          element.height
         );
       }
     }
+    // TODO: 3. 绘制辅助线
+    if (this.editor.selectedElements.value.length) {
+      this.highLightSelectedBox();
+    }
+  }
+  private highLightSelectedBox() {
+    console.log('绘制');
+    // 1. 计算选中盒
+    const selectedElements = this.editor.selectedElements.value;
+    const bBoxes = selectedElements.map(element => element.getBBox());
+
+    if (bBoxes.length < 0) {
+      return;
+    }
+
+    const composedBBox = getRectsBBox(...bBoxes);
+
+    // 2. 高亮选中盒
+    const ctx = this.editor.ctx;
+    ctx.save();
+    ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+    ctx.strokeRect(composedBBox.x, composedBBox.y, composedBBox.width, composedBBox.height);
+    ctx.restore();
+
+    // 3. 绘制缩放控制点
   }
 }
 
@@ -72,85 +97,42 @@ interface IGraph {
 interface RectGraph extends IGraph, IRect {}
 
 export class Rect {
-  _id: number;
-  _x: number;
-  _y: number;
-  _width: number;
-  _height: number;
-  _fill: string;
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
   // _bbox: IBox
 
   constructor({ x, y, width, height, fill }: RectGraph) {
-    this._id = genId();
-    this._x = x;
-    this._y = y;
-    this._width = width;
-    this._height = height;
+    this.id = genId();
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
 
-    this._fill = fill || '';
+    this.fill = fill || '';
 
     // TODO: 计算包围盒缓存起来
-  }
-  x(val: number): void;
-  x(): number;
-  x(val?: number) {
-    if (val !== undefined) {
-      this._x = val;
-    } else {
-      return this._x;
-    }
-  }
-  y(val: number): void;
-  y(): number;
-  y(val?: number) {
-    if (val !== undefined) {
-      this._y = val;
-    } else {
-      return this._y;
-    }
-  }
-  width(val: number): void;
-  width(): number;
-  width(val?: number) {
-    if (val !== undefined) {
-      this._width = val;
-    } else {
-      return this._width;
-    }
-  }
-  height(val: number): void;
-  height(): number;
-  height(val?: number) {
-    if (val !== undefined) {
-      this._height = val;
-    } else {
-      return this._height;
-    }
-  }
-  fill(val?: string) {
-    if (val !== undefined) {
-      this._fill = val;
-    } else {
-      return this._fill;
-    }
   }
   getBBox(): IBox {
     // FIXME: 没考虑描边宽度
     return {
-      x: this._x,
-      y: this._y,
-      width: this._width,
-      height: this._height,
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
     };
   }
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = this._fill;
+    ctx.fillStyle = this.fill;
     // ctx.strokeStyle = this._stroke;
     ctx.fillRect(
-      this.x(),
-      this.y(),
-      this.width(),
-      this.height()
+      this.x,
+      this.y,
+      this.width,
+      this.height,
     );
   }
 }

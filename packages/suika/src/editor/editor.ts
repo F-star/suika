@@ -2,8 +2,9 @@ import hotkeys from 'hotkeys-js';
 import { SceneGraph } from '../scene-graph';
 import { IBox } from '../type.interface';
 import { CommandManger } from './commands';
+import SelectedElements from './selected_elements';
 import { Setting } from './setting';
-import { ToolManager } from './tools/toolManager';
+import { ToolManager } from './tools/tool_manager';
 
 interface IEditorOptions {
   canvasElement: HTMLCanvasElement
@@ -21,6 +22,8 @@ export class Editor {
   toolManage: ToolManager;
   commandManger: CommandManger;
 
+  selectedElements: SelectedElements;
+
   constructor(options: IEditorOptions) {
     this.canvasElement = options.canvasElement;
     this.ctx = this.canvasElement.getContext('2d')!;
@@ -29,7 +32,9 @@ export class Editor {
     this.setting = new Setting();
 
     this.toolManage = new ToolManager(this);
-    this.commandManger = new CommandManger(this.sceneGraph);
+    this.commandManger = new CommandManger(this);
+
+    this.selectedElements = new SelectedElements();
 
     // 设置视口
     this.setViewport({ x: 0, y: 0, width: document.body.clientWidth, height: document.body.clientHeight });
