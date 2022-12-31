@@ -1,15 +1,21 @@
 import { noop } from '../../utils/common';
+import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
 import { DrawRectTool } from './tool_draw_rect';
+import { SelectTool } from './tool_select/tool_select';
 import { ITool } from './type';
 
 export class ToolManager {
   toolMap = new Map<string, ITool>();
   currentTool: ITool | null = null;
+  eventEmitter: EventEmitter;
   _unbindEvent: () => void;
   constructor(private editor: Editor) {
+    this.eventEmitter = new EventEmitter();
+
     // 绑定 tool
     this.toolMap.set(DrawRectTool.type, new DrawRectTool(editor));
+    this.toolMap.set(SelectTool.type, new SelectTool(editor));
 
     this.setTool(DrawRectTool.type);
 
@@ -18,29 +24,28 @@ export class ToolManager {
   bindEvent() {
     let isDowning = false;
 
-    const currentTool = this.currentTool;
     const handleDown = (e: PointerEvent) => {
-      if (!currentTool) {
+      if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
       isDowning = true;
-      currentTool.start(e);
+      this.currentTool.start(e);
     };
     const handleMove = (e: PointerEvent) => {
-      if (!currentTool) {
+      if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
       if (isDowning) {
-        currentTool.drag(e);
+        this.currentTool.drag(e);
       }
     };
     const handleUp = (e: PointerEvent) => {
-      if (!currentTool) {
+      if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
       if (isDowning) {
         isDowning = false;
-        currentTool.end(e);
+        this.currentTool.end(e);
       }
     };
     const canvas = this.editor.canvasElement;
@@ -66,5 +71,12 @@ export class ToolManager {
     }
     prevTool && prevTool.inactive();
     currentTool.active();
+    this.eventEmitter.emit('change', currentTool.type);
+  }
+  on(eventName: 'change', handler: (toolName: string) => void) {
+    this.eventEmitter.on(eventName, handler);
+  }
+  off(eventName: 'change', handler: (toolName: string) => void) {
+    this.eventEmitter.off(eventName, handler);
   }
 }

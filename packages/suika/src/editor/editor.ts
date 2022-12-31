@@ -19,7 +19,7 @@ export class Editor {
 
   viewport!: IBox;
 
-  toolManage: ToolManager;
+  toolManager: ToolManager;
   commandManger: CommandManger;
 
   selectedElements: SelectedElements;
@@ -31,7 +31,7 @@ export class Editor {
 
     this.setting = new Setting();
 
-    this.toolManage = new ToolManager(this);
+    this.toolManager = new ToolManager(this);
     this.commandManger = new CommandManger(this);
 
     this.selectedElements = new SelectedElements();
@@ -51,7 +51,7 @@ export class Editor {
     });
   }
   destroy() {
-    this.toolManage.unbindEvent();
+    this.toolManager.unbindEvent();
     hotkeys.unbind();
   }
 }

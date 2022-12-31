@@ -61,7 +61,6 @@ export class SceneGraph {
     }
   }
   private highLightSelectedBox() {
-    console.log('绘制');
     // 1. 计算选中盒
     const selectedElements = this.editor.selectedElements.value;
     const bBoxes = selectedElements.map(element => element.getBBox());
@@ -80,6 +79,7 @@ export class SceneGraph {
     ctx.restore();
 
     // 3. 绘制缩放控制点
+    // TODO:
   }
 }
 

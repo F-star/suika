@@ -1,9 +1,12 @@
-import { FC, useEffect, useRef } from 'react';
-import { Editor as GraphEditor } from '../../editor/editor';
-
+import { FC, useEffect, useRef, useState } from 'react';
+import { EditorContext } from '../context';
+import { Editor as GraphEditor } from '../editor/editor';
+import ToolBar from './Toolbar';
 
 const Editor: FC = () => {
   const ref = useRef<HTMLCanvasElement>(null);
+
+  const [editor, setEditor] = useState<GraphEditor | null>(null);
 
   useEffect(() => {
     if (ref.current) {
@@ -14,6 +17,7 @@ const Editor: FC = () => {
       editor.bindHotkeys();
       editor.canvasElement.width = document.body.clientWidth;
       editor.canvasElement.height = document.body.clientHeight;
+      setEditor(editor);
       return () => {
         editor.destroy(); // 注销事件
       };
@@ -22,7 +26,10 @@ const Editor: FC = () => {
 
   return (
     <div>
-      <canvas ref={ref} />
+      <EditorContext.Provider value={editor}>
+        <ToolBar />
+        <canvas ref={ref} />
+      </EditorContext.Provider>
     </div>
   );
 };

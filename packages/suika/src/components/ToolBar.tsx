@@ -1,13 +1,40 @@
-
+import classNames from 'classnames';
+import { useEffect, useContext, useState } from 'react';
+import { EditorContext } from '../context';
+import './Toolbar.scss';
 
 const ToolBar = () => {
+  const editor = useContext(EditorContext);
+  const [tool, setTool] = useState('drawRect');
+
+  useEffect(() => {
+    if (editor) {
+      editor.toolManager.on('change', (toolName: string) => {
+        setTool(toolName);
+      });
+    }
+  }, [editor]);
+
   return (
     <div className="suika-tool-bar">
-      <div>
+      <button
+        className={classNames({ active: tool === 'drawRect' })}
+        onClick={() => {
+          editor?.toolManager.setTool('drawRect');
+        }}
+      >
         矩形
-      </div>
+      </button>
+      <button
+        className={classNames({ active: tool === 'select' })}
+        onClick={() => {
+          editor?.toolManager.setTool('select');
+        }}
+      >
+        选择
+      </button>
     </div>
   );
 };
 
-export {};
+export default ToolBar;

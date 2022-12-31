@@ -1,0 +1,16 @@
+.suika {
+  .suika-tool-bar {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+
+    button {
+      margin-right: 4px;
+      color: #555;
+      &.active {
+        color: #000;
+        font-weight: bold;
+      }
+    }
+  }
+}

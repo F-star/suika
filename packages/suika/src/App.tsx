@@ -3,7 +3,7 @@ import Editor from './components/Editor';
 
 function App() {
   return (
-    <div className="App">
+    <div className="suika">
       <Editor />
     </div>
   );

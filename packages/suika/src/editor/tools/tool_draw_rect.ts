@@ -7,6 +7,7 @@ import { ITool } from './type';
 
 export class DrawRectTool implements ITool {
   static type = 'drawRect';
+  type = 'drawRect';
   lastPointer: IPoint = { x: -1, y: -1 };
   drawingRect: Rect | null = null;
 

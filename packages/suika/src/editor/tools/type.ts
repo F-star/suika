@@ -1,4 +1,5 @@
 export interface ITool {
+  type: string;
   active: () => void;
   inactive: () => void;
   start: (event: PointerEvent) => void;
