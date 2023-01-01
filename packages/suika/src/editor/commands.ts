@@ -46,13 +46,6 @@ interface Command {
   undo: (...args: any) => any;
 }
 
-type IAddRectCommand = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 /**
  * 创建矩形
  */

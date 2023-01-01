@@ -60,3 +60,15 @@ export function getRectsBBox(...rects: IRect[]): IBox {
     height: y2 - y,
   };
 }
+
+/**
+ * 点是否在矩形中
+ */
+export function isPointInRect(point: IPoint, rect: IRect) {
+  return (
+    point.x >= rect.x &&
+    point.y >= rect.y &&
+    point.x <= rect.x + rect.width &&
+    point.y <= rect.y + rect.height
+  );
+}

@@ -1,7 +1,7 @@
 import { Editor } from './editor/editor';
-import { IBox, IRect } from './type.interface';
+import { IBox, IPoint, IRect } from './type.interface';
 import { genId } from './utils/common';
-import { getRectsBBox, isRectIntersect } from './utils/graphics';
+import { getRectsBBox, isPointInRect, isRectIntersect } from './utils/graphics';
 
 /**
  * 图形树
@@ -80,6 +80,15 @@ export class SceneGraph {
 
     // 3. 绘制缩放控制点
     // TODO:
+  }
+  getTopHitElement(hitPointer: IPoint): Rect | null {
+    for (let i = this.children.length - 1; i >= 0; i--) {
+      const element = this.children[i];
+      if (isPointInRect(hitPointer, element.getBBox())) {
+        return element;
+      }
+    }
+    return null;
   }
 }
 
