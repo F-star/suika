@@ -4,7 +4,6 @@ import { getRectByTwoCoord } from '../../../utils/graphics';
 import { Editor } from '../../editor';
 import { ITool } from '../type';
 
-
 export class SelectTool implements ITool {
   static type = 'select';
   type = 'select';
@@ -31,21 +30,29 @@ export class SelectTool implements ITool {
     };
     // 判断是否选中
     // FIXME: 没考虑描边的情况
-    const topHidElement = this.editor.sceneGraph.getTopHitElement(this.lastPointer);
+    const topHidElement = this.editor.sceneGraph.getTopHitElement(
+      this.lastPointer
+    );
     console.log(topHidElement ? '选中了' : '没选中');
     if (topHidElement) {
       this.editor.selectedElements.setItems([topHidElement]);
       this.editor.sceneGraph.render();
     } else {
-      // 绘制选区
       this.editor.selectedElements.clear();
       this.editor.sceneGraph.render();
+      // 设置选区
+      this.editor.sceneGraph.setSelection(this.lastPointer);
     }
   }
   drag(e: PointerEvent) {
-    //
+    const width = e.clientX - this.lastPointer.x;
+    const height = e.clientY - this.lastPointer.y;
+
+    this.editor.sceneGraph.setSelection({ width, height });
+    this.editor.sceneGraph.render();
   }
   end(e: PointerEvent) {
-    //
+    this.editor.sceneGraph.selection = null;
+    this.editor.sceneGraph.render();
   }
 }

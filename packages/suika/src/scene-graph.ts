@@ -9,6 +9,12 @@ import { getRectsBBox, isPointInRect, isRectIntersect } from './utils/graphics';
 export class SceneGraph {
   // private map = new Map<string, any>();
   children: any[] = [];
+  selection: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null = null;
   constructor(private editor: Editor) {}
   // 添加矩形
   addRect(rect: RectGraph): Rect {
@@ -40,30 +46,36 @@ export class SceneGraph {
         visibleElements.push(shape);
       }
     }
-    // 2. 绘制它们
+    // 2. 绘制选中元素的包围盒
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
       if (element instanceof Rect) {
         ctx.fillStyle = element.fill;
         // ctx.strokeStyle = element._stroke;
-        ctx.fillRect(
-          element.x,
-          element.y,
-          element.width,
-          element.height
-        );
+        ctx.fillRect(element.x, element.y, element.width, element.height);
       }
     }
     // TODO: 3. 绘制辅助线
     if (this.editor.selectedElements.value.length) {
       this.highLightSelectedBox();
     }
+
+    // 绘制选区
+    if (this.selection) {
+      ctx.save();
+      ctx.strokeStyle = this.editor.setting.selectionStroke;
+      ctx.fillStyle = this.editor.setting.selectionFill;
+      const { x, y, width, height } = this.selection;
+      ctx.fillRect(x, y, width, height);
+      ctx.strokeRect(x, y, width, height);
+      ctx.restore();
+    }
   }
   private highLightSelectedBox() {
     // 1. 计算选中盒
     const selectedElements = this.editor.selectedElements.value;
-    const bBoxes = selectedElements.map(element => element.getBBox());
+    const bBoxes = selectedElements.map((element) => element.getBBox());
 
     if (bBoxes.length < 0) {
       return;
@@ -75,7 +87,12 @@ export class SceneGraph {
     const ctx = this.editor.ctx;
     ctx.save();
     ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
-    ctx.strokeRect(composedBBox.x, composedBBox.y, composedBBox.width, composedBBox.height);
+    ctx.strokeRect(
+      composedBBox.x,
+      composedBBox.y,
+      composedBBox.width,
+      composedBBox.height
+    );
     ctx.restore();
 
     // 3. 绘制缩放控制点
@@ -89,6 +106,9 @@ export class SceneGraph {
       }
     }
     return null;
+  }
+  setSelection(partialRect: Partial<IRect>) {
+    this.selection = Object.assign({}, this.selection, partialRect);
   }
 }
 
@@ -137,11 +157,6 @@ export class Rect {
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.fill;
     // ctx.strokeStyle = this._stroke;
-    ctx.fillRect(
-      this.x,
-      this.y,
-      this.width,
-      this.height,
-    );
+    ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }
