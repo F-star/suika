@@ -1,7 +1,7 @@
-import { Editor } from './editor/editor';
-import { IBox, IPoint, IRect } from './type.interface';
-import { genId } from './utils/common';
-import { getRectsBBox, isPointInRect, isRectIntersect } from './utils/graphics';
+import { Editor } from '../editor/editor';
+import { IBox, IPoint, IRect } from '../type.interface';
+import { genId } from '../utils/common';
+import { getRectsBBox, isPointInRect, isRectContain, isRectIntersect } from '../utils/graphics';
 
 /**
  * 图形树
@@ -106,6 +106,9 @@ export class SceneGraph {
     // 3. 绘制缩放控制点
     // TODO:
   }
+  /**
+   * 点是否在选中框中
+   */
   isPointInSelectedBox(point: IPoint) {
     const selectedElements = this.editor.selectedElements.value;
     if (selectedElements.length === 0) {
@@ -126,6 +129,22 @@ export class SceneGraph {
   }
   setSelection(partialRect: Partial<IRect>) {
     this.selection = Object.assign({}, this.selection, partialRect);
+  }
+  getElementsInSelection() {
+    const selection = this.selection;
+    if (selection === null) {
+      console.warn('selection 为 null，请确认在正确的时机调用当前方法');
+      return [];
+    }
+
+    const elements = this.children;
+    const containedElements: Rect[] = [];
+    for (let i = 0, len = elements.length; i < len; i++) {
+      if (isRectContain(selection, elements[i].getBBox())) {
+        containedElements.push(elements[i]);
+      }
+    }
+    return containedElements;
   }
 }
 

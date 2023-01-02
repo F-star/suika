@@ -1,5 +1,5 @@
 import { ICommand } from './type';
-import { Rect, SceneGraph } from '../../scene-graph';
+import { Rect, SceneGraph } from '../../scene/scene-graph';
 
 /**
  * 创建矩形
@@ -14,7 +14,6 @@ export class AddRectCommand implements ICommand {
     rect: Rect
   ) {
     this.element = rect;
-    // 不创建 rect
   }
   redo() {
     // 往树中加上矩形对象

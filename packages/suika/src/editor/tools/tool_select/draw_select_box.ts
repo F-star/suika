@@ -32,6 +32,9 @@ export class DrawSelectionBox implements IBaseTool {
     this.editor.sceneGraph.render();
   }
   end(e: PointerEvent) {
+    const elements = this.editor.sceneGraph.getElementsInSelection();
+
+    this.editor.selectedElements.setItems(elements);
     this.editor.sceneGraph.selection = null;
     this.editor.sceneGraph.render();
   }

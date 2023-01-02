@@ -1,4 +1,4 @@
-import { Rect } from '../scene-graph';
+import { Rect } from '../scene/scene-graph';
 
 
 class SelectedElements {

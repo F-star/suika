@@ -1,5 +1,5 @@
 import hotkeys from 'hotkeys-js';
-import { SceneGraph } from '../scene-graph';
+import { SceneGraph } from '../scene/scene-graph';
 import { IBox } from '../type.interface';
 import { CommandManger } from './commands/commands';
 import SelectedElements from './selected_elements';
