@@ -4,5 +4,5 @@ export class Setting {
   fill = '#D9D9D9';
   guideBBoxStroke = '#1592fe';
   selectionStroke = '#0f8eff';
-  selectionFill = '#0f8eff11';
+  selectionFill = '#0f8eff33';
 }

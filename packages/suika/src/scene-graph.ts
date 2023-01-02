@@ -75,28 +75,45 @@ export class SceneGraph {
   private highLightSelectedBox() {
     // 1. 计算选中盒
     const selectedElements = this.editor.selectedElements.value;
-    const bBoxes = selectedElements.map((element) => element.getBBox());
-
-    if (bBoxes.length < 0) {
+    if (selectedElements.length === 0) {
       return;
     }
+    const bBoxes = selectedElements.map((element) => element.getBBox());
 
-    const composedBBox = getRectsBBox(...bBoxes);
-
-    // 2. 高亮选中盒
     const ctx = this.editor.ctx;
     ctx.save();
-    ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
-    ctx.strokeRect(
-      composedBBox.x,
-      composedBBox.y,
-      composedBBox.width,
-      composedBBox.height
-    );
+    // 高亮元素轮廓
+    for (let i = 0, len = bBoxes.length; i < len; i++) {
+      const bBox = bBoxes[i];
+      ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+      ctx.strokeRect(bBox.x, bBox.y, bBox.width, bBox.height);
+    }
+
+    // 只有单个选中元素，不绘制选中盒
+    if (selectedElements.length > 1) {
+      const composedBBox = getRectsBBox(...bBoxes);
+      // 2. 高亮选中盒
+      ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+      ctx.strokeRect(
+        composedBBox.x,
+        composedBBox.y,
+        composedBBox.width,
+        composedBBox.height
+      );
+    }
     ctx.restore();
 
     // 3. 绘制缩放控制点
     // TODO:
+  }
+  isPointInSelectedBox(point: IPoint) {
+    const selectedElements = this.editor.selectedElements.value;
+    if (selectedElements.length === 0) {
+      return false;
+    }
+    const bBoxes = selectedElements.map((element) => element.getBBox());
+    const composedBBox = getRectsBBox(...bBoxes);
+    return isPointInRect(point, composedBBox);
   }
   getTopHitElement(hitPointer: IPoint): Rect | null {
     for (let i = this.children.length - 1; i >= 0; i--) {

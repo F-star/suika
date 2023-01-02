@@ -2,7 +2,7 @@ import { noop } from '../../utils/common';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
 import { DrawRectTool } from './tool_draw_rect';
-import { SelectTool } from './tool_select/tool_select';
+import { SelectTool } from './tool_select';
 import { ITool } from './type';
 
 export class ToolManager {

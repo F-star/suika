@@ -1,7 +1,7 @@
 import hotkeys from 'hotkeys-js';
 import { SceneGraph } from '../scene-graph';
 import { IBox } from '../type.interface';
-import { CommandManger } from './commands';
+import { CommandManger } from './commands/commands';
 import SelectedElements from './selected_elements';
 import { Setting } from './setting';
 import { ToolManager } from './tools/tool_manager';
