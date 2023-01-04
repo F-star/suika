@@ -1,7 +1,15 @@
 import { Editor } from '../editor/editor';
 import { IBox, IPoint, IRect } from '../type.interface';
+import { drawCircle, rotateTransform } from '../utils/canvas';
 import { genId } from '../utils/common';
-import { getRectsBBox, isPointInRect, isRectContain, isRectIntersect } from '../utils/graphics';
+import {
+  getRectCenterPoint,
+  getRectsBBox,
+  isPointInCircle,
+  isPointInRect,
+  isRectContain,
+  isRectIntersect,
+} from '../utils/graphics';
 
 /**
  * 图形树
@@ -15,6 +23,8 @@ export class SceneGraph {
     width: number;
     height: number;
   } | null = null;
+  handle: { rotation: IPoint } | null = null;
+
   constructor(private editor: Editor) {}
   // 添加矩形
   addRect(rect: RectGraph): Rect {
@@ -35,10 +45,10 @@ export class SceneGraph {
   // 全局重渲染
   render() {
     // 获取视口区域
-    const { viewport, canvasElement: canvas, ctx } = this.editor;
+    const { viewport, canvasElement: canvas, ctx, setting } = this.editor;
 
     const visibleElements: any[] = [];
-    // 1. 找出视口下所有矩形
+    // 1. 找出视口下所有元素
     // 暂时都认为是矩形
     for (let i = 0, len = this.children.length; i < len; i++) {
       const shape = this.children[i];
@@ -46,14 +56,23 @@ export class SceneGraph {
         visibleElements.push(shape);
       }
     }
-    // 2. 绘制选中元素的包围盒
+    // 2. 清空画布，然后绘制所有可见元素
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
       if (element instanceof Rect) {
         ctx.fillStyle = element.fill;
         // ctx.strokeStyle = element._stroke;
+        if (element.rotation) {
+          const cx = element.x + element.width / 2;
+          const cy = element.y + element.height / 2;
+          ctx.save();
+          rotateTransform(ctx, element.rotation, cx, cy);
+        }
         ctx.fillRect(element.x, element.y, element.width, element.height);
+        if (element.rotation) {
+          ctx.restore();
+        }
       }
     }
     // TODO: 3. 绘制辅助线
@@ -64,13 +83,44 @@ export class SceneGraph {
     // 绘制选区
     if (this.selection) {
       ctx.save();
-      ctx.strokeStyle = this.editor.setting.selectionStroke;
-      ctx.fillStyle = this.editor.setting.selectionFill;
+      ctx.strokeStyle = setting.selectionStroke;
+      ctx.fillStyle = setting.selectionFill;
       const { x, y, width, height } = this.selection;
       ctx.fillRect(x, y, width, height);
       ctx.strokeRect(x, y, width, height);
       ctx.restore();
     }
+
+    // 绘制 “旋转” 控制点
+    const handle = (this.handle = this.getTransformHandle());
+    if (handle) {
+      const { rotation } = handle;
+      ctx.save();
+      ctx.strokeStyle = setting.handleRotationStroke;
+      ctx.fillStyle = setting.handleRotationFill;
+      ctx.lineWidth = setting.handleRotationStrokeWidth;
+      const selectedElements = this.editor.selectedElements.value;
+      if (selectedElements.length === 1) {
+        // TODO: 多个元素被选中的情况晚点实现
+        const [cx, cy] = getRectCenterPoint(selectedElements[0]);
+        rotateTransform(ctx, selectedElements[0].rotation, cx, cy);
+      }
+      drawCircle(ctx, rotation.x, rotation.y, setting.handleRotationRadius);
+      ctx.restore();
+    }
+  }
+  /**
+   * 光标落在旋转控制点上
+   */
+  isInRotationHandle(point: IPoint) {
+    if (!this.handle) {
+      return false;
+    }
+    return isPointInCircle(point, {
+      x: this.handle.rotation.x,
+      y: this.handle.rotation.y,
+      radius: this.editor.setting.handleRotationRadius,
+    });
   }
   private highLightSelectedBox() {
     // 1. 计算选中盒
@@ -84,9 +134,13 @@ export class SceneGraph {
     ctx.save();
     // 高亮元素轮廓
     for (let i = 0, len = bBoxes.length; i < len; i++) {
+      ctx.save();
       const bBox = bBoxes[i];
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+      const [cx, cy] = getRectCenterPoint(bBox);
+      rotateTransform(ctx, selectedElements[i].rotation, cx, cy);
       ctx.strokeRect(bBox.x, bBox.y, bBox.width, bBox.height);
+      ctx.restore();
     }
 
     // 只有单个选中元素，不绘制选中盒
@@ -102,9 +156,6 @@ export class SceneGraph {
       );
     }
     ctx.restore();
-
-    // 3. 绘制缩放控制点
-    // TODO:
   }
   /**
    * 点是否在选中框中
@@ -146,6 +197,30 @@ export class SceneGraph {
     }
     return containedElements;
   }
+  getTransformHandle() {
+    /**
+     * rotation: 旋转方向为正北方向
+     *
+     * ne 东北（西：west、北：north、东：east、西：west）
+     * nw 西北
+     * sw 西南 south west（左下）
+     * se
+     */
+
+    // 1. 先考虑 “单个元素” 的 “旋转” 控制点
+    const selectedElements = this.editor.selectedElements.value;
+    if (selectedElements.length === 1) {
+      const { x, y, width, height } = selectedElements[0];
+      return {
+        rotation: {
+          x: x + width / 2,
+          y: y - 14,
+        },
+      };
+    } else {
+      return null;
+    }
+  }
 }
 
 interface IGraph {
@@ -168,6 +243,7 @@ export class Rect {
   width: number;
   height: number;
   fill: string;
+  rotation = 0;
   // _bbox: IBox
 
   constructor({ x, y, width, height, fill }: RectGraph) {

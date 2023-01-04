@@ -1,4 +1,4 @@
-import { IBox, INoEmptyArray, IPoint, IRect } from '../type.interface';
+import { IBox, ICircle, INoEmptyArray, IPoint, IRect } from '../type.interface';
 
 /**
  * 矩形是否相交
@@ -74,6 +74,16 @@ export function isPointInRect(point: IPoint, rect: IRect) {
 }
 
 /**
+ * 点是否在圆形中
+ */
+export function isPointInCircle(point: IPoint, circle: ICircle) {
+  const dx = point.x - circle.x;
+  const dy = point.y - circle.y;
+  const dSquare = dx * dx + dy * dy;
+  return dSquare <= circle.radius * circle.radius;
+}
+
+/**
  * 矩形 1 是否包含矩形 2
  */
 export function isRectContain(rect1: IRect, rect2: IRect) {
@@ -83,4 +93,37 @@ export function isRectContain(rect1: IRect, rect2: IRect) {
     rect1.x + rect1.width >= rect2.x + rect2.width &&
     rect1.y + rect1.height >= rect2.y + rect2.height
   );
+}
+
+export function getRectCenterPoint({
+  x,
+  y,
+  width,
+  height,
+}: IRect): [number, number] {
+  return [x + width / 2, y + height / 2];
+}
+/**
+ * 求向量到右侧轴(x正半轴)的夹角
+ */
+export function calRadian(cx: number, cy: number, x: number, y: number) {
+  const a = [x - cx, y - cy];
+  const b = [0, -1];
+
+  const dotProduct = a[0] * b[0] + a[1] * b[1];
+  const d =
+    Math.sqrt(a[0] * a[0] + a[1] * a[1]) * Math.sqrt(b[0] * b[0] + b[1] * b[1]);
+  let radian = Math.acos(dotProduct / d);
+
+  if (x < cx) {
+    radian = -radian;
+  }
+  return radian;
+}
+
+/**
+ * 弧度转角度
+ */
+export function radian2Degree(radian: number) {
+  return (radian * 180) / Math.PI;
 }

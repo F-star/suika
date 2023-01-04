@@ -8,6 +8,12 @@ export interface IRect {
 
 export type IBox = IRect;
 
+export interface ICircle {
+  x: number;
+  y: number;
+  radius: number;
+}
+
 /**
  * 数组长度必须大于等于 1 的数组
  */
