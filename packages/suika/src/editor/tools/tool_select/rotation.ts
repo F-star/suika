@@ -45,6 +45,6 @@ export class SelectRotationTool implements IBaseTool {
     }
   }
   end(e: PointerEvent) {
-    //
+    // TODO: 保存到历史记录中
   }
 }

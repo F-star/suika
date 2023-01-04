@@ -175,8 +175,16 @@ export class SceneGraph {
   }
   getTopHitElement(hitPointer: IPoint): Rect | null {
     for (let i = this.children.length - 1; i >= 0; i--) {
-      const element = this.children[i];
-      if (isPointInRect(hitPointer, element.getBBox())) {
+      const element: Rect = this.children[i];
+      const bBox = element.getBBox();
+
+      // "点击点" 根据图形进行 反旋转旋转
+      const [cx, cy] = getRectCenterPoint(bBox);
+      const rotatedHitPointer = element.rotation
+        ? transformRotate(hitPointer, -element.rotation, cx, cy)
+        : hitPointer;
+
+      if (isPointInRect(rotatedHitPointer, bBox)) {
         return element;
       }
     }
