@@ -36,7 +36,7 @@ export function transformRotate(
   radian: number,
   cx: number,
   cy: number
-) {
+): [number, number] {
   return [
     (x - cx) * Math.cos(radian) - (y - cy) * Math.sin(radian) + cx,
     (x - cx) * Math.sin(radian) + (y - cy) * Math.cos(radian) + cy,

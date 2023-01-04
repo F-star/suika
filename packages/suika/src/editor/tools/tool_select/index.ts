@@ -38,6 +38,7 @@ export class SelectTool implements ITool {
     // 2. 没选中，拖拽，产生选区
     // 3. 选中缩放或旋转控制点
     // 4. 选中 选中框 内部
+
     this.lastPointer = {
       x: e.clientX,
       y: e.clientY,

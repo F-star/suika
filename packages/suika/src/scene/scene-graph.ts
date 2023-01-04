@@ -150,7 +150,9 @@ export class SceneGraph {
     // 只有单个选中元素，不绘制选中盒
     // 多个选中元素时，才绘制选中盒
     if (selectedElements.length > 1) {
-      const bBoxesWithRotation = selectedElements.map((element) => element.getBBox({ withRotation: true }));
+      const bBoxesWithRotation = selectedElements.map((element) =>
+        element.getBBox({ withRotation: true })
+      );
       const composedBBox = getRectsBBox(...bBoxesWithRotation);
       // 2. 高亮选中盒
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
@@ -164,16 +166,29 @@ export class SceneGraph {
     ctx.restore();
   }
   /**
-   * 点是否在选中框中
+   * 点是否在选中框（selectedBox）中
    */
   isPointInSelectedBox(point: IPoint) {
     const selectedElements = this.editor.selectedElements.value;
     if (selectedElements.length === 0) {
       return false;
     }
-    const bBoxes = selectedElements.map((element) => element.getBBox({ withRotation: true }));
+
+    // selectedElements.length === 1
+    //   ? [selectedElements[0].getBBox()] // 单个元素的情况比较特殊，会发生旋转
+    // :
+    const bBoxes = selectedElements.map((element) =>
+      element.getBBox({ withRotation: true })
+    );
     const composedBBox = getRectsBBox(...bBoxes);
-    return isPointInRect(point, composedBBox);
+    if (selectedElements.length === 1) {
+      // 单个元素，要考虑旋转
+      const element = selectedElements[0];
+      const [cx, cy] = getRectCenterPoint(element);
+      point = arr2point(transformRotate(point.x, point.y, element.rotation, cx, cy));
+    } else {
+      return isPointInRect(point, composedBBox);
+    }
   }
   getTopHitElement(hitPointer: IPoint): Rect | null {
     for (let i = this.children.length - 1; i >= 0; i--) {
@@ -293,7 +308,7 @@ export class Rect {
    * 计算包围盒（不考虑 strokeWidth）
    * 默认不考虑旋转，但可以通过 withRotation 开启
    */
-  getBBox(options?: { withRotation: boolean } ): IBox {
+  getBBox(options?: { withRotation: boolean }): IBox {
     const withRotation = options ? options.withRotation : false; // 是否考虑旋转
     if (!withRotation || !this.rotation) {
       return {
