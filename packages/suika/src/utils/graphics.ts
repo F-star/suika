@@ -131,3 +131,23 @@ export function calRadian(cx: number, cy: number, x: number, y: number) {
 export function radian2Degree(radian: number) {
   return (radian * 180) / Math.PI;
 }
+
+/**
+ * 计算绝对坐标
+ */
+export function getAbsoluteCoords(
+  rect: IRect
+): [x: number, y: number, x2: number, y2: number, cx: number, cy: number] {
+  return [
+    rect.x,
+    rect.y,
+    rect.x + rect.width,
+    rect.y + rect.height,
+    rect.x + rect.width / 2,
+    rect.y + rect.height / 2,
+  ];
+}
+
+export function arr2point([x, y]: number[]): IPoint {
+  return { x, y };
+}

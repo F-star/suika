@@ -3,6 +3,8 @@ import { IBox, IPoint, IRect } from '../type.interface';
 import { drawCircle, rotateInCanvas } from '../utils/canvas';
 import { genId } from '../utils/common';
 import {
+  arr2point,
+  getAbsoluteCoords,
   getRectCenterPoint,
   getRectsBBox,
   isPointInCircle,
@@ -76,12 +78,10 @@ export class SceneGraph {
         }
       }
     }
-    // TODO: 3. 绘制辅助线
-    if (this.editor.selectedElements.value.length) {
-      this.highLightSelectedBox();
-    }
+    // 3. 绘制 选中框
+    this.highLightSelectedBox();
 
-    // 绘制选区
+    // 绘制选区（使用选区工具时用到）
     if (this.selection) {
       ctx.save();
       ctx.strokeStyle = setting.selectionStroke;
@@ -148,8 +148,10 @@ export class SceneGraph {
     }
 
     // 只有单个选中元素，不绘制选中盒
+    // 多个选中元素时，才绘制选中盒
     if (selectedElements.length > 1) {
-      const composedBBox = getRectsBBox(...bBoxes);
+      const bBoxesWithRotation = selectedElements.map((element) => element.getBBox({ withRotation: true }));
+      const composedBBox = getRectsBBox(...bBoxesWithRotation);
       // 2. 高亮选中盒
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
       ctx.strokeRect(
@@ -169,7 +171,7 @@ export class SceneGraph {
     if (selectedElements.length === 0) {
       return false;
     }
-    const bBoxes = selectedElements.map((element) => element.getBBox());
+    const bBoxes = selectedElements.map((element) => element.getBBox({ withRotation: true }));
     const composedBBox = getRectsBBox(...bBoxes);
     return isPointInRect(point, composedBBox);
   }
@@ -181,7 +183,15 @@ export class SceneGraph {
       // "点击点" 根据图形进行 反旋转旋转
       const [cx, cy] = getRectCenterPoint(bBox);
       const rotatedHitPointer = element.rotation
-        ? transformRotate(hitPointer, -element.rotation, cx, cy)
+        ? arr2point(
+          transformRotate(
+            hitPointer.x,
+            hitPointer.y,
+            -element.rotation,
+            cx,
+            cy
+          )
+        )
         : hitPointer;
 
       if (isPointInRect(rotatedHitPointer, bBox)) {
@@ -227,11 +237,14 @@ export class SceneGraph {
         y: y - 14,
       };
       const [cx, cy] = this.editor.selectedElements.getCenterPoint();
-      rotation = transformRotate(
-        rotation,
-        this.editor.selectedElements.value[0].rotation,
-        cx,
-        cy
+      rotation = arr2point(
+        transformRotate(
+          rotation.x,
+          rotation.y,
+          this.editor.selectedElements.value[0].rotation,
+          cx,
+          cy
+        )
       );
       return {
         rotation,
@@ -276,13 +289,37 @@ export class Rect {
 
     // TODO: 计算包围盒缓存起来
   }
-  getBBox(): IBox {
-    // FIXME: 没考虑描边宽度
+  /**
+   * 计算包围盒（不考虑 strokeWidth）
+   * 默认不考虑旋转，但可以通过 withRotation 开启
+   */
+  getBBox(options?: { withRotation: boolean } ): IBox {
+    const withRotation = options ? options.withRotation : false; // 是否考虑旋转
+    if (!withRotation || !this.rotation) {
+      return {
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height,
+      };
+    }
+    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
+    const rotation = this.rotation;
+
+    const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
+    const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const [brX, brY] = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const [blX, blY] = transformRotate(x, y2, rotation, cx, cy); // 右下
+
+    const minX = Math.min(tlX, trX, brX, blX);
+    const minY = Math.min(tlY, trY, brY, blY);
+    const maxX = Math.max(tlX, trX, brX, blX);
+    const maxY = Math.max(tlY, trY, brY, blY);
     return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
     };
   }
   draw(ctx: CanvasRenderingContext2D) {

@@ -31,13 +31,14 @@ export function transform(
  * 旋转
  */
 export function transformRotate(
-  { x, y }: IVector,
+  x: number,
+  y: number,
   radian: number,
   cx: number,
   cy: number
 ) {
-  return {
-    x: (x - cx) * Math.cos(radian) - (y - cy) * Math.sin(radian) + cx,
-    y: (x - cx) * Math.sin(radian) + (y - cy) * Math.cos(radian) + cy,
-  };
+  return [
+    (x - cx) * Math.cos(radian) - (y - cy) * Math.sin(radian) + cx,
+    (x - cx) * Math.sin(radian) + (y - cy) * Math.cos(radian) + cy,
+  ];
 }
