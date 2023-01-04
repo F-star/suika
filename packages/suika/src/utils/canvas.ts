@@ -16,7 +16,7 @@ export const drawCircle = (ctx: CanvasRenderingContext2D, cx: number, cy: number
 /**
  * 绘制时应用旋转
  */
-export const rotateTransform = (ctx: CanvasRenderingContext2D, angle: number, cx?: number, cy?: number) => {
+export const rotateInCanvas = (ctx: CanvasRenderingContext2D, angle: number, cx?: number, cy?: number) => {
   const hasCenterParam = cx !== undefined && cy !== undefined;
   if (hasCenterParam) {
     ctx.translate(cx, cy);

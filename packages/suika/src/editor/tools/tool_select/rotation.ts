@@ -36,16 +36,10 @@ export class SelectRotationTool implements IBaseTool {
       const cx = x + width / 2;
       const cy = y + height / 2;
 
+      // 计算向量夹角
+      // https://blog.fstars.wang/posts/calc-vector-angle/
       const radian = calRadian(cx, cy, pointer.x, pointer.y);
-
-      // let radian = (5 * Math.PI) / 2 + Math.atan2(pointer.x - cy, pointer.y - cx);
-      // if (radian >= 2 * Math.PI) {
-      //   radian = radian - 2 * Math.PI;
-      // }
-
-
-      // console.log(radian);
-      element.rotation = radian; // 随便赋一个值，方便测试
+      element.rotation = radian;
 
       this.editor.sceneGraph.render();
     }

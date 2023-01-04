@@ -95,6 +95,9 @@ export function isRectContain(rect1: IRect, rect2: IRect) {
   );
 }
 
+/**
+ * rect 中心点
+ */
 export function getRectCenterPoint({
   x,
   y,
@@ -103,6 +106,7 @@ export function getRectCenterPoint({
 }: IRect): [number, number] {
   return [x + width / 2, y + height / 2];
 }
+
 /**
  * 求向量到右侧轴(x正半轴)的夹角
  */

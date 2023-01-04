@@ -1,6 +1,6 @@
 import { Editor } from '../editor/editor';
 import { IBox, IPoint, IRect } from '../type.interface';
-import { drawCircle, rotateTransform } from '../utils/canvas';
+import { drawCircle, rotateInCanvas } from '../utils/canvas';
 import { genId } from '../utils/common';
 import {
   getRectCenterPoint,
@@ -10,6 +10,7 @@ import {
   isRectContain,
   isRectIntersect,
 } from '../utils/graphics';
+import { transformRotate } from '../utils/transform';
 
 /**
  * 图形树
@@ -67,7 +68,7 @@ export class SceneGraph {
           const cx = element.x + element.width / 2;
           const cy = element.y + element.height / 2;
           ctx.save();
-          rotateTransform(ctx, element.rotation, cx, cy);
+          rotateInCanvas(ctx, element.rotation, cx, cy);
         }
         ctx.fillRect(element.x, element.y, element.width, element.height);
         if (element.rotation) {
@@ -99,26 +100,29 @@ export class SceneGraph {
       ctx.strokeStyle = setting.handleRotationStroke;
       ctx.fillStyle = setting.handleRotationFill;
       ctx.lineWidth = setting.handleRotationStrokeWidth;
-      const selectedElements = this.editor.selectedElements.value;
-      if (selectedElements.length === 1) {
-        // TODO: 多个元素被选中的情况晚点实现
-        const [cx, cy] = getRectCenterPoint(selectedElements[0]);
-        rotateTransform(ctx, selectedElements[0].rotation, cx, cy);
-      }
-      drawCircle(ctx, rotation.x, rotation.y, setting.handleRotationRadius);
+
+      drawCircle(
+        ctx,
+        handle.rotation.x,
+        handle.rotation.y,
+        setting.handleRotationRadius
+      );
       ctx.restore();
     }
   }
   /**
-   * 光标落在旋转控制点上
+   * 光标是否落在旋转控制点上
    */
   isInRotationHandle(point: IPoint) {
     if (!this.handle) {
       return false;
     }
+    // 计算旋转后的 x 和 y
+    const rotationPoint = this.handle.rotation;
+
     return isPointInCircle(point, {
-      x: this.handle.rotation.x,
-      y: this.handle.rotation.y,
+      x: rotationPoint.x,
+      y: rotationPoint.y,
       radius: this.editor.setting.handleRotationRadius,
     });
   }
@@ -138,7 +142,7 @@ export class SceneGraph {
       const bBox = bBoxes[i];
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
       const [cx, cy] = getRectCenterPoint(bBox);
-      rotateTransform(ctx, selectedElements[i].rotation, cx, cy);
+      rotateInCanvas(ctx, selectedElements[i].rotation, cx, cy);
       ctx.strokeRect(bBox.x, bBox.y, bBox.width, bBox.height);
       ctx.restore();
     }
@@ -200,22 +204,29 @@ export class SceneGraph {
   getTransformHandle() {
     /**
      * rotation: 旋转方向为正北方向
-     *
      * ne 东北（西：west、北：north、东：east、西：west）
      * nw 西北
      * sw 西南 south west（左下）
      * se
      */
-
     // 1. 先考虑 “单个元素” 的 “旋转” 控制点
     const selectedElements = this.editor.selectedElements.value;
     if (selectedElements.length === 1) {
       const { x, y, width, height } = selectedElements[0];
+      // 旋转位置
+      let rotation = {
+        x: x + width / 2,
+        y: y - 14,
+      };
+      const [cx, cy] = this.editor.selectedElements.getCenterPoint();
+      rotation = transformRotate(
+        rotation,
+        this.editor.selectedElements.value[0].rotation,
+        cx,
+        cy
+      );
       return {
-        rotation: {
-          x: x + width / 2,
-          y: y - 14,
-        },
+        rotation,
       };
     } else {
       return null;
