@@ -21,7 +21,6 @@ export class Graph {
   // transform 相关
   rotation?: number;
   constructor(options: IGraph) {
-    console.log(options);
     this.x = options.x;
     this.y = options.y;
     if (options.fill) {
