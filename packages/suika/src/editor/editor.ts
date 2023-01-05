@@ -7,7 +7,7 @@ import { Setting } from './setting';
 import { ToolManager } from './tools/tool_manager';
 
 interface IEditorOptions {
-  canvasElement: HTMLCanvasElement
+  canvasElement: HTMLCanvasElement;
 }
 
 export class Editor {
@@ -24,6 +24,8 @@ export class Editor {
 
   selectedElements: SelectedElements;
 
+  isShiftPressing = false;
+
   constructor(options: IEditorOptions) {
     this.canvasElement = options.canvasElement;
     this.ctx = this.canvasElement.getContext('2d')!;
@@ -37,17 +39,31 @@ export class Editor {
     this.selectedElements = new SelectedElements();
 
     // 设置视口
-    this.setViewport({ x: 0, y: 0, width: document.body.clientWidth, height: document.body.clientHeight });
+    this.setViewport({
+      x: 0,
+      y: 0,
+      width: document.body.clientWidth,
+      height: document.body.clientHeight,
+    });
   }
   setViewport(box: IBox) {
     this.viewport = { ...box };
   }
   bindHotkeys() {
-    hotkeys('ctrl+z, command+z', { keyup: true }, () => {
+    hotkeys('ctrl+z, command+z', { keydown: true }, () => {
       this.commandManger.undo();
     });
-    hotkeys('ctrl+shift+z, command+shift+z', { keyup: true }, () => {
+    hotkeys('ctrl+shift+z, command+shift+z', { keydown: true }, () => {
       this.commandManger.redo();
+    });
+    hotkeys('*', { keydown: true, keyup: true }, (event) => {
+      if (hotkeys.shift) {
+        if (event.type === 'keydown') {
+          this.isShiftPressing = true;
+        } else if (event.type === 'keyup') {
+          this.isShiftPressing = false;
+        }
+      }
     });
   }
   destroy() {

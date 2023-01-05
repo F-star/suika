@@ -24,3 +24,13 @@ export const shallowCompare = (a: IObject, b: IObject) => {
   for (const i in b) if (a[i] !== b[i]) return true;
   return false;
 };
+
+/**
+ * 找出离 value 最近的 segment 的倍数值
+ */
+export const getClosestVal = (value: number, segment: number) => {
+  const n = Math.floor(value / segment);
+  const left = segment * n;
+  const right = segment * (n + 1);
+  return value - left <= right - value ? left : right;
+};

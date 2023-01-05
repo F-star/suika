@@ -10,4 +10,6 @@ export class Setting {
   handleRotationFill = '#fff';
   handleRotationStrokeWidth = 2;
   handleRotationRadius = 4;
+
+  lockRotation = Math.PI / 12; // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
 }

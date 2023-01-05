@@ -11,6 +11,12 @@ export class DrawSelectionBox implements IBaseTool {
   startPoints: IPoint[] = [];
 
   constructor(private editor: Editor) {}
+  active() {
+    // do nothing
+  }
+  inactive() {
+    // do nothing
+  }
   start(e: PointerEvent) {
     this.lastPointer = {
       x: e.clientX,

@@ -69,6 +69,7 @@ export class SelectTool implements ITool {
     if (!this.currStrategy) {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
+    this.currStrategy.active();
     this.currStrategy.start(e);
   }
   drag(e: PointerEvent) {
@@ -82,5 +83,6 @@ export class SelectTool implements ITool {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
     this.currStrategy.end(e);
+    this.currStrategy.inactive();
   }
 }

@@ -1,36 +1,57 @@
+import hotkeys from 'hotkeys-js';
 import { IPoint } from '../../../type.interface';
-import { shallowCompare } from '../../../utils/common';
+import { getClosestVal, shallowCompare } from '../../../utils/common';
 import { calRadian } from '../../../utils/graphics';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 
+
 /**
  * 选中工具的
- *
- * 移动元素场景
+ * 旋转元素场景
  */
 export class SelectRotationTool implements IBaseTool {
-  lastPointer: IPoint = { x: -1, y: -1 };
-  startPoints: IPoint[] = [];
+  startPointer: IPoint = { x: -1, y: -1 }; // 暂时用不上
+  lastPointer: IPoint | null = null;
   prevRotation: Array<number | undefined> = [];
   rotation?: number;
+  private shiftPressHandler = () => {
+    if (hotkeys.shift) {
+      this.rotateSelectedElements();
+    }
+  };
 
   constructor(private editor: Editor) {}
+
+  active() {
+    // do nothing
+    hotkeys('*', { keydown: true, keyup: true }, this.shiftPressHandler);
+  }
+  inactive() {
+    hotkeys.unbind('*', this.shiftPressHandler);
+  }
   start(e: PointerEvent) {
-    this.lastPointer = {
+    this.startPointer = {
       x: e.clientX,
       y: e.clientY,
     };
+    this.lastPointer = null;
 
     const selectedElements = this.editor.selectedElements.value;
     this.prevRotation = selectedElements.map((el) => el.rotation || 0);
   }
   drag(e: PointerEvent) {
-    const pointer = {
+    this.lastPointer = {
       x: e.clientX,
       y: e.clientY,
     };
+
+    this.rotateSelectedElements();
+  }
+  private rotateSelectedElements() {
+    const lastPointer = this.lastPointer;
+    if (!lastPointer) return;
 
     const selectedElements = this.editor.selectedElements.value;
     // TODO: 多个元素旋转比较复杂，晚点再实现
@@ -43,7 +64,13 @@ export class SelectRotationTool implements IBaseTool {
 
       // 计算向量夹角
       // https://blog.fstars.wang/posts/calc-vector-angle/
-      const rotation = calRadian(cx, cy, pointer.x, pointer.y);
+      let rotation = calRadian(cx, cy, lastPointer.x, lastPointer.y);
+
+      if (this.editor.isShiftPressing) {
+        const lockRotation = this.editor.setting.lockRotation;
+        rotation = getClosestVal(rotation, lockRotation);
+      }
+
       element.rotation = rotation;
       this.rotation = rotation;
 
@@ -51,10 +78,10 @@ export class SelectRotationTool implements IBaseTool {
     } else if (selectedElements.length > 1) {
       throw new Error('选中的元素为多个的情况，还没实现');
     } else {
-      throw new Error('选中的元素只有一个');
+      throw new Error('选中的元素只有一个，请确认代码实现没有错误');
     }
   }
-  end(e: PointerEvent) {
+  end() {
     const selectedElements = this.editor.selectedElements.value;
     const finalRotation = selectedElements.map((el) => el.rotation || 0);
     if (
