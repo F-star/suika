@@ -109,6 +109,7 @@ export function getRectCenterPoint({
 
 /**
  * 求向量到右侧轴(x正半轴)的夹角
+ * 范围在 [0, Math.PI * 2)
  */
 export function calRadian(cx: number, cy: number, x: number, y: number) {
   const a = [x - cx, y - cy];
@@ -120,7 +121,7 @@ export function calRadian(cx: number, cy: number, x: number, y: number) {
   let radian = Math.acos(dotProduct / d);
 
   if (x < cx) {
-    radian = -radian;
+    radian = Math.PI * 2 - radian;
   }
   return radian;
 }
