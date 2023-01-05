@@ -27,20 +27,14 @@ export class Rect extends Graph {
   }
   /**
    * 计算包围盒（不考虑 strokeWidth）
-   * 默认不考虑旋转，但可以通过 withRotation 开启
+   * 考虑旋转
    */
-  getBBox(options?: { withRotation: boolean }): IBox {
-    const withRotation = options ? options.withRotation : false; // 是否考虑旋转
-    if (!withRotation || !this.rotation) {
-      return {
-        x: this.x,
-        y: this.y,
-        width: this.width,
-        height: this.height,
-      };
-    }
+  getBBox(): IBox {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
     const rotation = this.rotation;
+    if (!rotation) {
+      return this.getBBoxWithoutRotation();
+    }
 
     const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
     const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
@@ -56,6 +50,14 @@ export class Rect extends Graph {
       y: minY,
       width: maxX - minX,
       height: maxY - minY,
+    };
+  }
+  getBBoxWithoutRotation() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
     };
   }
   draw(ctx: CanvasRenderingContext2D) {

@@ -95,7 +95,6 @@ export class SceneGraph {
     // 绘制 “旋转” 控制点
     const handle = (this.handle = this.getTransformHandle());
     if (handle) {
-      const { rotation } = handle;
       ctx.save();
       ctx.strokeStyle = setting.handleRotationStroke;
       ctx.fillStyle = setting.handleRotationFill;
@@ -132,7 +131,7 @@ export class SceneGraph {
     if (selectedElements.length === 0) {
       return;
     }
-    const bBoxes = selectedElements.map((element) => element.getBBox());
+    const bBoxes = selectedElements.map((element) => element.getBBoxWithoutRotation());
 
     const ctx = this.editor.ctx;
     ctx.save();
@@ -154,7 +153,7 @@ export class SceneGraph {
     // 多个选中元素时，才绘制选中盒
     if (selectedElements.length > 1) {
       const bBoxesWithRotation = selectedElements.map((element) =>
-        element.getBBox({ withRotation: true })
+        element.getBBox()
       );
       const composedBBox = getRectsBBox(...bBoxesWithRotation);
       // 2. 高亮选中盒
@@ -177,28 +176,32 @@ export class SceneGraph {
       return false;
     }
 
-    // selectedElements.length === 1
-    //   ? [selectedElements[0].getBBox()] // 单个元素的情况比较特殊，会发生旋转
-    // :
-    const bBoxes = selectedElements.map((element) =>
-      element.getBBox({ withRotation: true })
-    );
-    const composedBBox = getRectsBBox(...bBoxes);
+    let bBoxes: IBox[];
+    // 【单个元素被选中】求不考虑旋转的 bBox，将其和旋转后的角度比较
     if (selectedElements.length === 1) {
+      bBoxes = selectedElements.map((element) =>
+        element.getBBoxWithoutRotation()
+      );
       // 单个元素，要考虑旋转
       const element = selectedElements[0];
       const [cx, cy] = getRectCenterPoint(element);
       if (element.rotation) {
-        point = arr2point(transformRotate(point.x, point.y, element.rotation, cx, cy));
+        point = arr2point(transformRotate(point.x, point.y, -element.rotation, cx, cy));
       }
-    } else {
-      return isPointInRect(point, composedBBox);
     }
+    // 【多个元素被选中】
+    else {
+      bBoxes = selectedElements.map((element) =>
+        element.getBBox()
+      );
+    }
+    const composedBBox = getRectsBBox(...bBoxes);
+    return isPointInRect(point, composedBBox);
   }
   getTopHitElement(hitPointer: IPoint): Rect | null {
     for (let i = this.children.length - 1; i >= 0; i--) {
       const element: Rect = this.children[i];
-      const bBox = element.getBBox();
+      const bBox = element.getBBoxWithoutRotation();
 
       // "点击点" 根据图形进行 反旋转旋转
       const [cx, cy] = getRectCenterPoint(bBox);
@@ -249,9 +252,12 @@ export class SceneGraph {
      */
     // 1. 先考虑 “单个元素” 的 “旋转” 控制点
     const selectedElements = this.editor.selectedElements.value;
+    if (selectedElements.length === 0) {
+      return null;
+    }
     if (selectedElements.length === 1) {
       const singleSelectElement = this.editor.selectedElements.value[0];
-      const { x, y, width } = singleSelectElement;
+      const { x, y, width } = singleSelectElement.getBBoxWithoutRotation();
       // 旋转位置
       let rotation = {
         x: x + width / 2,
