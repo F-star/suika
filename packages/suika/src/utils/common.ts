@@ -13,3 +13,14 @@ export const genId = (() => {
     return id++;
   };
 })();
+
+/**
+ * 浅比较
+ */
+type IObject = Record<string | symbol, any>;
+
+export const shallowCompare = (a: IObject, b: IObject) => {
+  for (const i in a) if (!(i in b)) return true;
+  for (const i in b) if (a[i] !== b[i]) return true;
+  return false;
+};

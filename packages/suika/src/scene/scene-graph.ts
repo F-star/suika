@@ -1,10 +1,8 @@
 import { Editor } from '../editor/editor';
 import { IBox, IPoint, IRect } from '../type.interface';
 import { drawCircle, rotateInCanvas } from '../utils/canvas';
-import { genId } from '../utils/common';
 import {
   arr2point,
-  getAbsoluteCoords,
   getRectCenterPoint,
   getRectsBBox,
   isPointInCircle,
@@ -13,6 +11,8 @@ import {
   isRectIntersect,
 } from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
+import { getFill } from './graph';
+import { Rect, RectGraph } from './rect';
 
 /**
  * 图形树
@@ -64,7 +64,7 @@ export class SceneGraph {
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
       if (element instanceof Rect) {
-        ctx.fillStyle = element.fill;
+        ctx.fillStyle = getFill(element);
         // ctx.strokeStyle = element._stroke;
         if (element.rotation) {
           const cx = element.x + element.width / 2;
@@ -142,7 +142,10 @@ export class SceneGraph {
       const bBox = bBoxes[i];
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
       const [cx, cy] = getRectCenterPoint(bBox);
-      rotateInCanvas(ctx, selectedElements[i].rotation, cx, cy);
+      const currElement = selectedElements[i];
+      if (currElement.rotation) {
+        rotateInCanvas(ctx, currElement.rotation, cx, cy);
+      }
       ctx.strokeRect(bBox.x, bBox.y, bBox.width, bBox.height);
       ctx.restore();
     }
@@ -185,7 +188,9 @@ export class SceneGraph {
       // 单个元素，要考虑旋转
       const element = selectedElements[0];
       const [cx, cy] = getRectCenterPoint(element);
-      point = arr2point(transformRotate(point.x, point.y, element.rotation, cx, cy));
+      if (element.rotation) {
+        point = arr2point(transformRotate(point.x, point.y, element.rotation, cx, cy));
+      }
     } else {
       return isPointInRect(point, composedBBox);
     }
@@ -245,101 +250,30 @@ export class SceneGraph {
     // 1. 先考虑 “单个元素” 的 “旋转” 控制点
     const selectedElements = this.editor.selectedElements.value;
     if (selectedElements.length === 1) {
-      const { x, y, width, height } = selectedElements[0];
+      const singleSelectElement = this.editor.selectedElements.value[0];
+      const { x, y, width } = singleSelectElement;
       // 旋转位置
       let rotation = {
         x: x + width / 2,
         y: y - 14,
       };
       const [cx, cy] = this.editor.selectedElements.getCenterPoint();
-      rotation = arr2point(
-        transformRotate(
-          rotation.x,
-          rotation.y,
-          this.editor.selectedElements.value[0].rotation,
-          cx,
-          cy
-        )
-      );
+      if (singleSelectElement.rotation) {
+        rotation = arr2point(
+          transformRotate(
+            rotation.x,
+            rotation.y,
+            singleSelectElement.rotation,
+            cx,
+            cy
+          )
+        );
+      }
       return {
         rotation,
       };
     } else {
       return null;
     }
-  }
-}
-
-interface IGraph {
-  x: number;
-  y: number;
-  // 颜色
-  fill?: string;
-  stroke?: string;
-  strokeWidth?: number;
-  // transform 相关
-  rotate?: number;
-}
-
-interface RectGraph extends IGraph, IRect {}
-
-export class Rect {
-  id: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fill: string;
-  rotation = 0;
-  // _bbox: IBox
-
-  constructor({ x, y, width, height, fill }: RectGraph) {
-    this.id = genId();
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-
-    this.fill = fill || '';
-
-    // TODO: 计算包围盒缓存起来
-  }
-  /**
-   * 计算包围盒（不考虑 strokeWidth）
-   * 默认不考虑旋转，但可以通过 withRotation 开启
-   */
-  getBBox(options?: { withRotation: boolean }): IBox {
-    const withRotation = options ? options.withRotation : false; // 是否考虑旋转
-    if (!withRotation || !this.rotation) {
-      return {
-        x: this.x,
-        y: this.y,
-        width: this.width,
-        height: this.height,
-      };
-    }
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
-    const rotation = this.rotation;
-
-    const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
-    const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const [brX, brY] = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const [blX, blY] = transformRotate(x, y2, rotation, cx, cy); // 右下
-
-    const minX = Math.min(tlX, trX, brX, blX);
-    const minY = Math.min(tlY, trY, brY, blY);
-    const maxX = Math.max(tlX, trX, brX, blX);
-    const maxY = Math.max(tlY, trY, brY, blY);
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
-  }
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = this.fill;
-    // ctx.strokeStyle = this._stroke;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }

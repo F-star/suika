@@ -1,5 +1,7 @@
 import { IPoint } from '../../../type.interface';
+import { shallowCompare } from '../../../utils/common';
 import { calRadian } from '../../../utils/graphics';
+import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 
@@ -11,8 +13,8 @@ import { IBaseTool } from '../type';
 export class SelectRotationTool implements IBaseTool {
   lastPointer: IPoint = { x: -1, y: -1 };
   startPoints: IPoint[] = [];
-  dx = 0;
-  dy = 0;
+  prevRotation: Array<number | undefined> = [];
+  rotation?: number;
 
   constructor(private editor: Editor) {}
   start(e: PointerEvent) {
@@ -20,13 +22,16 @@ export class SelectRotationTool implements IBaseTool {
       x: e.clientX,
       y: e.clientY,
     };
+
+    const selectedElements = this.editor.selectedElements.value;
+    this.prevRotation = selectedElements.map((el) => el.rotation || 0);
   }
   drag(e: PointerEvent) {
     const pointer = {
       x: e.clientX,
       y: e.clientY,
     };
-    // 计算旋转角度
+
     const selectedElements = this.editor.selectedElements.value;
     // TODO: 多个元素旋转比较复杂，晚点再实现
     // 单个元素旋转
@@ -38,13 +43,33 @@ export class SelectRotationTool implements IBaseTool {
 
       // 计算向量夹角
       // https://blog.fstars.wang/posts/calc-vector-angle/
-      const radian = calRadian(cx, cy, pointer.x, pointer.y);
-      element.rotation = radian;
+      const rotation = calRadian(cx, cy, pointer.x, pointer.y);
+      element.rotation = rotation;
+      this.rotation = rotation;
 
       this.editor.sceneGraph.render();
+    } else if (selectedElements.length > 1) {
+      throw new Error('选中的元素为多个的情况，还没实现');
+    } else {
+      throw new Error('选中的元素只有一个');
     }
   }
   end(e: PointerEvent) {
-    // TODO: 保存到历史记录中
+    const selectedElements = this.editor.selectedElements.value;
+    const finalRotation = selectedElements.map((el) => el.rotation || 0);
+    if (
+      this.rotation !== undefined &&
+      shallowCompare(this.prevRotation, finalRotation)
+    ) {
+      this.editor.commandManger.pushCommand(
+        new SetElementsAttrs(
+          selectedElements,
+          {
+            rotation: this.rotation,
+          },
+          this.prevRotation.map((rotation) => ({ rotation }))
+        )
+      );
+    }
   }
 }

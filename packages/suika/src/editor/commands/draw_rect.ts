@@ -1,5 +1,6 @@
+import { Rect } from '../../scene/rect';
+import { SceneGraph } from '../../scene/scene-graph';
 import { ICommand } from './type';
-import { Rect, SceneGraph } from '../../scene/scene-graph';
 
 /**
  * 创建矩形

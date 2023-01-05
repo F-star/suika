@@ -1,4 +1,4 @@
-import { Rect } from '../../scene/scene-graph';
+import { Rect } from '../../scene/rect';
 import { IPoint } from '../../type.interface';
 import { getRectByTwoCoord } from '../../utils/graphics';
 import { Editor } from '../editor';

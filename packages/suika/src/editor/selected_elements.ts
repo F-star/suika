@@ -1,4 +1,4 @@
-import { Rect } from '../scene/scene-graph';
+import { Rect } from '../scene/rect';
 import { getRectCenterPoint } from '../utils/graphics';
 
 
