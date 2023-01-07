@@ -4,7 +4,6 @@ import { getRectByTwoCoord } from '../../utils/graphics';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
-
 export class DrawRectTool implements ITool {
   static type = 'drawRect';
   type = 'drawRect';
@@ -19,16 +18,16 @@ export class DrawRectTool implements ITool {
     this.editor.canvasElement.style.cursor = '';
   }
   start(e: PointerEvent) {
-    this.lastPointer = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.lastPointer = this.editor.viewportCoordsToSceneCoords(
+      e.clientX,
+      e.clientY
+    );
   }
   drag(e: PointerEvent) {
-    const pointer: IPoint = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    const pointer: IPoint = this.editor.viewportCoordsToSceneCoords(
+      e.clientX,
+      e.clientY,
+    );
     // 拖拽
     const sceneGraph = this.editor.sceneGraph;
     const lastPointer = this.lastPointer;
@@ -40,7 +39,10 @@ export class DrawRectTool implements ITool {
       this.drawingRect.width = rect.width;
       this.drawingRect.height = rect.height;
     } else {
-      this.drawingRect = sceneGraph.addRect({ ...rect, fill: this.editor.setting.fill });
+      this.drawingRect = sceneGraph.addRect({
+        ...rect,
+        fill: this.editor.setting.fill,
+      });
     }
     this.editor.selectedElements.setItems([this.drawingRect]);
     sceneGraph.render();

@@ -47,8 +47,11 @@ export class SceneGraph {
   }
   // 全局重渲染
   render() {
+
     // 获取视口区域
-    const { viewport, canvasElement: canvas, ctx, setting } = this.editor;
+    const { viewportManager, canvasElement: canvas, ctx, setting } = this.editor;
+    const viewport = viewportManager.getViewport();
+    const zoom = this.editor.zoomManager.getZoom();
 
     const visibleElements: any[] = [];
     // 1. 找出视口下所有元素
@@ -61,11 +64,18 @@ export class SceneGraph {
     }
     // 2. 清空画布，然后绘制所有可见元素
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.save();
+
+    // 场景坐标转换为视口坐标
+    ctx.translate(-viewport.x, -viewport.y);
+    ctx.scale(zoom, zoom);
+
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
       if (element instanceof Rect) {
         ctx.fillStyle = getFill(element);
-        // ctx.strokeStyle = element._stroke;
         if (element.rotation) {
           const cx = element.x + element.width / 2;
           const cy = element.y + element.height / 2;
@@ -108,6 +118,7 @@ export class SceneGraph {
       );
       ctx.restore();
     }
+    ctx.restore();
   }
   /**
    * 光标是否落在旋转控制点上

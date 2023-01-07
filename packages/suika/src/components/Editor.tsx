@@ -14,7 +14,6 @@ const Editor: FC = () => {
         canvasElement: ref.current,
       });
       (window as any).editor = editor;
-      editor.bindHotkeys();
       editor.canvasElement.width = document.body.clientWidth;
       editor.canvasElement.height = document.body.clientHeight;
       setEditor(editor);

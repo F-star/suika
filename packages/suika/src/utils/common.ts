@@ -34,3 +34,10 @@ export const getClosestVal = (value: number, segment: number) => {
   const right = segment * (n + 1);
   return value - left <= right - value ? left : right;
 };
+
+/**
+ * 保留小数
+ */
+export const ceil = (n: number, digit = 1) => {
+  return Number(n.toFixed(digit));
+};

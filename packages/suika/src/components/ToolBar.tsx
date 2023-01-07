@@ -33,6 +33,14 @@ const ToolBar = () => {
       >
         选择
       </button>
+      <button
+        className={classNames({ active: tool === 'dragCanvas' })}
+        onClick={() => {
+          editor?.toolManager.setTool('dragCanvas');
+        }}
+      >
+        拖拽画布
+      </button>
     </div>
   );
 };

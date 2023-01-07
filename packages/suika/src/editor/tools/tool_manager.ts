@@ -1,6 +1,7 @@
 import { noop } from '../../utils/common';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
+import { DragCanvasTool } from './drag_canvas';
 import { DrawRectTool } from './tool_draw_rect';
 import { SelectTool } from './tool_select';
 import { ITool } from './type';
@@ -16,6 +17,7 @@ export class ToolManager {
     // 绑定 tool
     this.toolMap.set(DrawRectTool.type, new DrawRectTool(editor));
     this.toolMap.set(SelectTool.type, new SelectTool(editor));
+    this.toolMap.set(DragCanvasTool.type, new DragCanvasTool(editor));
 
     this.setTool(DrawRectTool.type);
 

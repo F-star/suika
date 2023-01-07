@@ -12,4 +12,8 @@ export class Setting {
   handleRotationRadius = 4;
 
   lockRotation = Math.PI / 12; // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
+
+  zoomStep = 0.27; // 缩放比例步长
+  zoomMax = 256;
+  zoomMin = 0.2;
 }
