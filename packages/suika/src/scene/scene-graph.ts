@@ -139,11 +139,12 @@ export class SceneGraph {
     }
     // 计算旋转后的 x 和 y
     const rotationPoint = this.handle.rotation;
+    const zoom = this.editor.zoomManager.getZoom();
 
     return isPointInCircle(point, {
       x: rotationPoint.x,
       y: rotationPoint.y,
-      radius: this.editor.setting.handleRotationRadius,
+      radius: this.editor.setting.handleRotationRadius / zoom,
     });
   }
   private highLightSelectedBox() {
