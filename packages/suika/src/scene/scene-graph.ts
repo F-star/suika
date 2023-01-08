@@ -47,9 +47,13 @@ export class SceneGraph {
   }
   // 全局重渲染
   render() {
-
     // 获取视口区域
-    const { viewportManager, canvasElement: canvas, ctx, setting } = this.editor;
+    const {
+      viewportManager,
+      canvasElement: canvas,
+      ctx,
+      setting,
+    } = this.editor;
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
 
@@ -58,19 +62,19 @@ export class SceneGraph {
     // 暂时都认为是矩形
     for (let i = 0, len = this.children.length; i < len; i++) {
       const shape = this.children[i];
-      if (isRectIntersect(shape.getBBox(), viewport)) {
-        visibleElements.push(shape);
-      }
+      // FIXME: 还没修复 viewport 不对的情况，因为引入 zoom 因素
+      // if (isRectIntersect(shape.getBBox(), viewport)) {
+      visibleElements.push(shape);
+      // }
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
     // 2. 清空画布，然后绘制所有可见元素
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.save();
-
     // 场景坐标转换为视口坐标
-    ctx.translate(-viewport.x, -viewport.y);
     ctx.scale(zoom, zoom);
+    ctx.translate(-viewport.x, -viewport.y);
 
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
@@ -118,7 +122,6 @@ export class SceneGraph {
       );
       ctx.restore();
     }
-    ctx.restore();
   }
   /**
    * 光标是否落在旋转控制点上
@@ -142,7 +145,9 @@ export class SceneGraph {
     if (selectedElements.length === 0) {
       return;
     }
-    const bBoxes = selectedElements.map((element) => element.getBBoxWithoutRotation());
+    const bBoxes = selectedElements.map((element) =>
+      element.getBBoxWithoutRotation()
+    );
 
     const ctx = this.editor.ctx;
     ctx.save();
@@ -197,14 +202,14 @@ export class SceneGraph {
       const element = selectedElements[0];
       const [cx, cy] = getRectCenterPoint(element);
       if (element.rotation) {
-        point = arr2point(transformRotate(point.x, point.y, -element.rotation, cx, cy));
+        point = arr2point(
+          transformRotate(point.x, point.y, -element.rotation, cx, cy)
+        );
       }
     }
     // 【多个元素被选中】
     else {
-      bBoxes = selectedElements.map((element) =>
-        element.getBBox()
-      );
+      bBoxes = selectedElements.map((element) => element.getBBox());
     }
     const composedBBox = getRectsBBox(...bBoxes);
     return isPointInRect(point, composedBBox);

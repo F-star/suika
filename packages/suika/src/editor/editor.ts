@@ -1,6 +1,6 @@
 import hotkeys from 'hotkeys-js';
 import { SceneGraph } from '../scene/scene-graph';
-import { noop } from '../utils/common';
+import { noop, sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
 import { CommandManger } from './commands/commands';
 import SelectedElements from './selected_elements';
 import { Setting } from './setting';
@@ -122,20 +122,14 @@ export class Editor {
   /**
    * 视口坐标 转 场景坐标
    */
-  viewportCoordsToSceneCoords(x: number, y: number) {
+  viewportCoordsToScene(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return {
-      x: scrollX + x / zoom,
-      y: scrollY + y / zoom,
-    };
+    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY);
   }
   sceneCoordsToViewport(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return {
-      x: (x - scrollX) * zoom,
-      y: (y - scrollY) * zoom,
-    };
+    return sceneCoordsToViewportUtil(x, y, zoom, scrollX, scrollY);
   }
 }

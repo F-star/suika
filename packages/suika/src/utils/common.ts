@@ -41,3 +41,29 @@ export const getClosestVal = (value: number, segment: number) => {
 export const ceil = (n: number, digit = 1) => {
   return Number(n.toFixed(digit));
 };
+
+export const viewportCoordsToSceneUtil = (
+  x: number,
+  y: number,
+  zoom: number,
+  scrollX: number,
+  scrollY: number
+) => {
+  return {
+    x: scrollX + x / zoom,
+    y: scrollY + y / zoom,
+  };
+};
+
+export const sceneCoordsToViewportUtil = (
+  x: number,
+  y: number,
+  zoom: number,
+  scrollX: number,
+  scrollY: number
+) => {
+  return {
+    x: (x - scrollX) * zoom,
+    y: (y - scrollY) * zoom,
+  };
+};

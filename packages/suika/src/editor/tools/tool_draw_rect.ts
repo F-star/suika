@@ -18,13 +18,13 @@ export class DrawRectTool implements ITool {
     this.editor.canvasElement.style.cursor = '';
   }
   start(e: PointerEvent) {
-    this.lastPointer = this.editor.viewportCoordsToSceneCoords(
+    this.lastPointer = this.editor.viewportCoordsToScene(
       e.clientX,
       e.clientY
     );
   }
   drag(e: PointerEvent) {
-    const pointer: IPoint = this.editor.viewportCoordsToSceneCoords(
+    const pointer: IPoint = this.editor.viewportCoordsToScene(
       e.clientX,
       e.clientY,
     );

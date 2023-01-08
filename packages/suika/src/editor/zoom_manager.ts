@@ -1,5 +1,5 @@
 
-import { ceil } from '../utils/common';
+import { ceil, viewportCoordsToSceneUtil } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
@@ -11,7 +11,6 @@ export class ZoomManager {
     return this.zoom;
   }
   setZoom(zoom: number) {
-    console.log('zoom:', zoom);
     const prevZoom = this.zoom;
     this.zoom = zoom;
     Promise.resolve(() => { // 异步通知
@@ -67,14 +66,10 @@ export class ZoomManager {
       _cx = cx;
       _cy = cy;
     }
-    // (cx, cy) 是视口坐标系中的坐标
-    // 计算缩放前 (cx, cy) 离视口左上角的 “场景坐标距离”
-    const dx = _cx * prevZoom - scrollX;
-    const dy = _cy * prevZoom - scrollY;
-    // 计算缩放后的 (cx * zoom, cy * zoom)，将它们减去 dx dy
-    // 这样就能减回去了，dx dy 保持不变的
-    const newScrollX = _cx * zoom - dx;
-    const newScrollY = _cy * zoom - dy;
+
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneUtil(_cx, _cy, prevZoom, scrollX, scrollY);
+    const newScrollX = sceneX - _cx / zoom;
+    const newScrollY = sceneY - _cy / zoom;
 
     viewportManager.setViewport({
       x: newScrollX,
