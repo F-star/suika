@@ -103,7 +103,8 @@ export class Editor {
           this.sceneGraph.render();
         }
       } else {
-        this.viewportManager.translate(event.deltaX, event.deltaY);
+        const zoom = this.zoomManager.getZoom();
+        this.viewportManager.translate(event.deltaX / zoom, event.deltaY / zoom);
         this.sceneGraph.render();
       }
     };
