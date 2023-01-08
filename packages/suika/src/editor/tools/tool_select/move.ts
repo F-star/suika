@@ -35,8 +35,9 @@ export class SelectMoveTool implements IBaseTool {
   drag(e: PointerEvent) {
     const x = e.clientX;
     const y = e.clientY;
-    const dx = (this.dx = x - this.startPointer.x);
-    const dy = (this.dy = y - this.startPointer.y);
+    const zoom = this.editor.zoomManager.getZoom();
+    const dx = (this.dx = (x - this.startPointer.x) / zoom);
+    const dy = (this.dy = (y - this.startPointer.y) / zoom);
     const selectedElements = this.editor.selectedElements.value;
     const startPoints = this.startPoints;
     for (let i = 0, len = selectedElements.length; i < len; i++) {

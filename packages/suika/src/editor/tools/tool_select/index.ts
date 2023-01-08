@@ -9,7 +9,7 @@ import { SelectRotationTool } from './rotation';
 export class SelectTool implements ITool {
   static type = 'select';
   type = 'select';
-  lastPointer: IPoint = { x: -1, y: -1 };
+  startPointer: IPoint = { x: -1, y: -1 };
   drawingRect: Rect | null = null;
   currStrategy: IBaseTool | null;
   // 策略
@@ -39,23 +39,20 @@ export class SelectTool implements ITool {
     // 3. 选中缩放或旋转控制点
     // 4. 选中 选中框 内部
 
-    this.lastPointer = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
 
     this.currStrategy = null;
 
     const sceneGraph = this.editor.sceneGraph;
     // 0. 点中 handle（旋转点）
-    if (sceneGraph.isInRotationHandle(this.lastPointer)) {
+    if (sceneGraph.isInRotationHandle(this.startPointer)) {
       this.currStrategy = this.strategySelectRotation;
     }
     // 1. 点击落在选中盒中
-    else if (sceneGraph.isPointInSelectedBox(this.lastPointer)) {
+    else if (sceneGraph.isPointInSelectedBox(this.startPointer)) {
       this.currStrategy = this.strategyMove;
     } else {
-      const topHidElement = sceneGraph.getTopHitElement(this.lastPointer);
+      const topHidElement = sceneGraph.getTopHitElement(this.startPointer);
       // 2. 点中一个元素 （FIXME: 没考虑描边的情况）
       if (topHidElement) {
         this.editor.selectedElements.setItems([topHidElement]);

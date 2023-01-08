@@ -6,7 +6,6 @@ import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 
-
 /**
  * 选中工具的
  * 旋转元素场景
@@ -25,27 +24,20 @@ export class SelectRotationTool implements IBaseTool {
   constructor(private editor: Editor) {}
 
   active() {
-    // do nothing
     hotkeys('*', { keydown: true, keyup: true }, this.shiftPressHandler);
   }
   inactive() {
     hotkeys.unbind('*', this.shiftPressHandler);
   }
   start(e: PointerEvent) {
-    this.startPointer = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     this.lastPointer = null;
 
     const selectedElements = this.editor.selectedElements.value;
     this.prevRotation = selectedElements.map((el) => el.rotation || 0);
   }
   drag(e: PointerEvent) {
-    this.lastPointer = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.lastPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
 
     this.rotateSelectedElements();
   }
