@@ -2,6 +2,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
 import ToolBar from './Toolbar';
+import ZoomActions from './ZoomActions';
 
 const Editor: FC = () => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -27,6 +28,7 @@ const Editor: FC = () => {
     <div>
       <EditorContext.Provider value={editor}>
         <ToolBar />
+        <ZoomActions />
         <canvas ref={ref} />
       </EditorContext.Provider>
     </div>

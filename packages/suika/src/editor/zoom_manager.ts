@@ -13,7 +13,7 @@ export class ZoomManager {
   setZoom(zoom: number) {
     const prevZoom = this.zoom;
     this.zoom = zoom;
-    Promise.resolve(() => { // 异步通知
+    Promise.resolve().then(() => { // 异步通知
       this.eventEmitter.emit('zoomChange', zoom, prevZoom);
     });
   }
