@@ -18,10 +18,8 @@ export class DrawRectTool implements ITool {
     this.editor.canvasElement.style.cursor = '';
   }
   start(e: PointerEvent) {
-    this.lastPointer = this.editor.viewportCoordsToScene(
-      e.clientX,
-      e.clientY
-    );
+    this.lastPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    this.drawingRect = null;
   }
   drag(e: PointerEvent) {
     const pointer: IPoint = this.editor.viewportCoordsToScene(
@@ -48,11 +46,23 @@ export class DrawRectTool implements ITool {
     sceneGraph.render();
   }
   end(e: PointerEvent) {
-    // 释放
+    const endPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     if (this.drawingRect === null) {
-      return;
+      const { x: cx, y: cy } = endPointer;
+      const width = this.editor.setting.drawRectDefaultWidth;
+      const height = this.editor.setting.drawRectDefaultHeight;
+
+      this.drawingRect = this.editor.sceneGraph.addRect({
+        x: cx - width / 2,
+        y: cy - height / 2,
+        width,
+        height,
+        fill: this.editor.setting.fill,
+      });
+      this.editor.selectedElements.setItems([this.drawingRect]);
+      this.editor.sceneGraph.render();
     }
+
     this.editor.commandManger.execCmd('AddRect', this.drawingRect);
-    this.drawingRect = null;
   }
 }
