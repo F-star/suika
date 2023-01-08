@@ -92,36 +92,43 @@ export class SceneGraph {
         }
       }
     }
+
+    /******************* 绘制辅助线层 ********************/
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
     // 3. 绘制 选中框
     this.highLightSelectedBox();
 
     // 绘制选区（使用选区工具时用到）
     if (this.selection) {
-      ctx.save();
       ctx.strokeStyle = setting.selectionStroke;
       ctx.fillStyle = setting.selectionFill;
       const { x, y, width, height } = this.selection;
-      ctx.fillRect(x, y, width, height);
-      ctx.strokeRect(x, y, width, height);
-      ctx.restore();
+
+      const { x: xInViewport, y: yInViewport } =
+        this.editor.sceneCoordsToViewport(x, y);
+
+      const widthInViewport = width * zoom;
+      const heightInViewport = height * zoom;
+
+      ctx.fillRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
+      ctx.strokeRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
     }
 
     // 绘制 “旋转” 控制点
     const handle = (this.handle = this.getTransformHandle());
     if (handle) {
-      ctx.save();
       ctx.strokeStyle = setting.handleRotationStroke;
       ctx.fillStyle = setting.handleRotationFill;
       ctx.lineWidth = setting.handleRotationStrokeWidth;
 
-      drawCircle(
-        ctx,
-        handle.rotation.x,
-        handle.rotation.y,
-        setting.handleRotationRadius
-      );
-      ctx.restore();
+      const { x: xInViewport, y: yInViewport } =
+        this.editor.sceneCoordsToViewport(handle.rotation.x, handle.rotation.y);
+      drawCircle(ctx, xInViewport, yInViewport, setting.handleRotationRadius);
     }
+
+    ctx.restore();
   }
   /**
    * 光标是否落在旋转控制点上
@@ -149,19 +156,30 @@ export class SceneGraph {
       element.getBBoxWithoutRotation()
     );
 
+    const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
-    ctx.save();
+
     // 高亮元素轮廓
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
       const bBox = bBoxes[i];
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
-      const [cx, cy] = getRectCenterPoint(bBox);
+
       const currElement = selectedElements[i];
       if (currElement.rotation) {
-        rotateInCanvas(ctx, currElement.rotation, cx, cy);
+        const [cx, cy] = getRectCenterPoint(bBox);
+        const { x: cxInViewport, y: cyInViewport } =
+          this.editor.sceneCoordsToViewport(cx, cy);
+        rotateInCanvas(ctx, currElement.rotation, cxInViewport, cyInViewport);
       }
-      ctx.strokeRect(bBox.x, bBox.y, bBox.width, bBox.height);
+      const { x: xInViewport, y: yInViewport } =
+        this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
+      ctx.strokeRect(
+        xInViewport,
+        yInViewport,
+        bBox.width * zoom,
+        bBox.height * zoom
+      );
       ctx.restore();
     }
 
@@ -174,14 +192,15 @@ export class SceneGraph {
       const composedBBox = getRectsBBox(...bBoxesWithRotation);
       // 2. 高亮选中盒
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+      const { x: xInViewport, y: yInViewport } =
+        this.editor.sceneCoordsToViewport(composedBBox.x, composedBBox.y);
       ctx.strokeRect(
-        composedBBox.x,
-        composedBBox.y,
-        composedBBox.width,
-        composedBBox.height
+        xInViewport,
+        yInViewport,
+        composedBBox.width * zoom,
+        composedBBox.height * zoom
       );
     }
-    ctx.restore();
   }
   /**
    * 点是否在选中框（selectedBox）中
@@ -268,6 +287,8 @@ export class SceneGraph {
      */
     // 1. 先考虑 “单个元素” 的 “旋转” 控制点
     const selectedElements = this.editor.selectedElements.value;
+    const zoom = this.editor.zoomManager.getZoom();
+
     if (selectedElements.length === 0) {
       return null;
     }
@@ -277,7 +298,7 @@ export class SceneGraph {
       // 旋转位置
       let rotation = {
         x: x + width / 2,
-        y: y - 14,
+        y: y - 14 / zoom,
       };
       const [cx, cy] = this.editor.selectedElements.getCenterPoint();
       if (singleSelectElement.rotation) {
