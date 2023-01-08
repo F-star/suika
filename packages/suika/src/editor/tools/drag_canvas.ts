@@ -34,10 +34,10 @@ export class DragCanvasTool implements ITool {
     const startPointer = this.startPointer;
     const dx = pointer.x - startPointer.x;
     const dy = pointer.y - startPointer.y;
-
+    const zoom = this.editor.zoomManager.getZoom();
     // 类似苹果笔记本触控板的 “自然滚动”，所以他要反向，即加上 "-dx"
-    const viewportX = this.prevViewport.x - dx;
-    const viewportY = this.prevViewport.y - dy;
+    const viewportX = this.prevViewport.x - dx / zoom;
+    const viewportY = this.prevViewport.y - dy / zoom;
 
     this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
     this.editor.sceneGraph.render();
