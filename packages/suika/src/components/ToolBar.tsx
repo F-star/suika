@@ -9,6 +9,7 @@ const ToolBar = () => {
 
   useEffect(() => {
     if (editor) {
+      setTool(editor.toolManager.getToolName() || 'drawRect');
       editor.toolManager.on('change', (toolName: string) => {
         setTool(toolName);
       });

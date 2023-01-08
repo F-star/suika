@@ -23,6 +23,9 @@ export class ToolManager {
 
     this._unbindEvent = this.bindEvent();
   }
+  getToolName() {
+    return this.currentTool?.type;
+  }
   bindEvent() {
     let isDowning = false;
 
