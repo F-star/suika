@@ -29,4 +29,8 @@ export class ViewportManager {
       this.editor.canvasElement.height = height;
     }
   }
+  translate(dx: number, dy: number) {
+    this.scrollX += dx;
+    this.scrollY += dy;
+  }
 }

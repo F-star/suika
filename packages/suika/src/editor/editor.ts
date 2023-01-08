@@ -102,6 +102,9 @@ export class Editor {
           this.zoomManager.zoomIn(cx, cy);
           this.sceneGraph.render();
         }
+      } else {
+        this.viewportManager.translate(event.deltaX, event.deltaY);
+        this.sceneGraph.render();
       }
     };
     this.canvasElement.addEventListener('wheel', handler);
