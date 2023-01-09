@@ -67,7 +67,12 @@ export class SelectTool implements ITool {
         this.currStrategy = this.strategyMove;
       } else {
         // 点击到空白区域
-        this.currStrategy = this.strategyDrawSelectionBox;
+        // 但是存在选中元素，且按下了 shift 键，就进入连选元素并移动分支
+        if (!this.editor.selectedElements.isEmpty() && isShiftPressing) {
+          this.currStrategy = this.strategyMove;
+        } else {
+          this.currStrategy = this.strategyDrawSelectionBox;
+        }
       }
     }
     if (!this.currStrategy) {

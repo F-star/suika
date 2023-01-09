@@ -28,6 +28,9 @@ class SelectedElements {
       throw new Error('还没实现，敬请期待');
     }
   }
+  isEmpty() {
+    return this.value.length === 0;
+  }
 }
 
 export default SelectedElements;
