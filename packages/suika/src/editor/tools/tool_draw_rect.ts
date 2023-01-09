@@ -18,6 +18,9 @@ export class DrawRectTool implements ITool {
   unbindEvent: () => void = noop;
 
   updateRectWhenViewportTranslate = () => {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     if (this.isDragging) {
       this.lastDragPointer = this.editor.viewportCoordsToScene(
         this.lastDragPointerInViewport.x,
@@ -49,11 +52,17 @@ export class DrawRectTool implements ITool {
     this.editor.viewportManager.off('xOrYChange', this.updateRectWhenViewportTranslate);
   }
   start(e: PointerEvent) {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     this.drawingRect = null;
     this.isDragging = false;
   }
   drag(e: PointerEvent) {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     this.isDragging = true;
     this.lastDragPointerInViewport = {
       x: e.clientX,
@@ -81,7 +90,7 @@ export class DrawRectTool implements ITool {
     };
 
     // 按住 shift 绘制正方形
-    if (this.editor.isShiftPressing) {
+    if (this.editor.hotkeysManager.isShiftPressing) {
       if (Math.abs(width) > Math.abs(height)) {
         rect.height = Math.sign(height) * Math.abs(width);
       } else {
@@ -106,6 +115,9 @@ export class DrawRectTool implements ITool {
     sceneGraph.render();
   }
   end(e: PointerEvent) {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     this.isDragging = false;
 
     const endPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);

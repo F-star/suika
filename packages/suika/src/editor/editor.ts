@@ -1,7 +1,7 @@
-import hotkeys from 'hotkeys-js';
 import { SceneGraph } from '../scene/scene-graph';
-import { noop, sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
+import { sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
 import { CommandManger } from './commands/commands';
+import HotkeysManager from './hotkeys_manager';
 import SelectedElements from './selected_elements';
 import { Setting } from './setting';
 import { ToolManager } from './tools/tool_manager';
@@ -25,21 +25,17 @@ export class Editor {
   commandManger: CommandManger;
   zoomManager: ZoomManager;
 
+  hotkeysManager: HotkeysManager;
+
   selectedElements: SelectedElements;
-
-  isShiftPressing = false;
-  isCtrlPressing = false;
-  isCommandPressing = false;
-
-  unbindScrollEventToZoom: () => void = noop;
 
   constructor(options: IEditorOptions) {
     this.canvasElement = options.canvasElement;
     this.ctx = this.canvasElement.getContext('2d')!;
     this.sceneGraph = new SceneGraph(this);
 
-    this.bindHotkeys();
-    this.bindWheelEventToZoom();
+    this.hotkeysManager = new HotkeysManager(this);
+    this.hotkeysManager.bindHotkeys();
 
     this.setting = new Setting();
 
@@ -59,66 +55,16 @@ export class Editor {
       height: document.body.clientHeight,
     });
   }
-  private bindHotkeys() {
-    hotkeys('ctrl+z, command+z', { keydown: true }, () => {
-      this.commandManger.undo();
-    });
-    hotkeys('ctrl+shift+z, command+shift+z', { keydown: true }, () => {
-      this.commandManger.redo();
-    });
-    hotkeys('*', { keydown: true, keyup: true }, (event) => {
-      if (hotkeys.shift) {
-        if (event.type === 'keydown') {
-          this.isShiftPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isShiftPressing = false;
-        }
-      }
-      if (hotkeys.ctrl) {
-        if (event.type === 'keydown') {
-          this.isCtrlPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isCtrlPressing = false;
-        }
-      }
-      if (hotkeys.command) {
-        if (event.type === 'keydown') {
-          this.isCommandPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isCommandPressing = false;
-        }
-      }
-    });
-  }
-  private bindWheelEventToZoom() {
-    const handler = (event: WheelEvent) => {
-      if (this.isCtrlPressing || this.isCommandPressing) {
-        const cx = event.clientX;
-        const cy = event.clientY;
-        if (event.deltaY > 0) {
-          this.zoomManager.zoomOut(cx, cy);
-          this.sceneGraph.render();
-        } else if (event.deltaY < 0) {
-          this.zoomManager.zoomIn(cx, cy);
-          this.sceneGraph.render();
-        }
-      } else {
-        const zoom = this.zoomManager.getZoom();
-        this.viewportManager.translate(event.deltaX / zoom, event.deltaY / zoom);
-        this.sceneGraph.render();
-      }
-    };
-    this.canvasElement.addEventListener('wheel', handler);
-
-    this.unbindScrollEventToZoom = () => {
-      this.canvasElement.removeEventListener('wheel', handler);
-    };
-  }
   destroy() {
+    this.hotkeysManager.destroy();
     this.toolManager.unbindEvent();
-    hotkeys.unbind();
-    this.unbindScrollEventToZoom();
     this.toolManager.destroy();
+  }
+  setCursor(cursor: string) {
+    this.canvasElement.style.cursor = cursor;
+  }
+  getCursor() {
+    return this.canvasElement.style.cursor;
   }
   /**
    * 视口坐标 转 场景坐标

@@ -27,20 +27,21 @@ export class ToolManager {
     return this.currentTool?.type;
   }
   bindEvent() {
-    let isDowning = false;
+    let isPressing = false;
 
     const handleDown = (e: PointerEvent) => {
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      isDowning = true;
+      isPressing = true;
       this.currentTool.start(e);
     };
     const handleMove = (e: PointerEvent) => {
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      if (isDowning) {
+      if (isPressing) {
+        this.editor.hotkeysManager.disableDragBySpace();
         this.currentTool.drag(e);
       }
     };
@@ -48,8 +49,9 @@ export class ToolManager {
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      if (isDowning) {
-        isDowning = false;
+      if (isPressing) {
+        this.editor.hotkeysManager.enableDragBySpace();
+        isPressing = false;
         this.currentTool.end(e);
       }
     };
