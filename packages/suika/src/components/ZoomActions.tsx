@@ -29,7 +29,10 @@ const ZoomActions: FC = () => {
       >
         -
       </button>
-      <span className="value">{Math.floor(zoom * 100)}%</span>
+      <span className="value" onClick={() => {
+        editor?.zoomManager.setZoomAndAdjustScroll(1);
+        editor?.sceneGraph.render();
+      }}>{Math.floor(zoom * 100)}%</span>
       <button
         onClick={() => {
           editor?.zoomManager.zoomIn();
