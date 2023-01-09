@@ -13,6 +13,14 @@ class SelectedElements {
   clear() {
     this.value = [];
   }
+  toggleElement(item: Rect) {
+    const idx = this.value.indexOf(item);
+    if (idx !== -1) {
+      this.value.splice(idx, 1);
+    } else {
+      this.value.push(item);
+    }
+  }
   getCenterPoint() {
     if (this.value.length === 1) {
       return getRectCenterPoint(this.value[0]);

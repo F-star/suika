@@ -39,23 +39,30 @@ export class SelectTool implements ITool {
     // 3. 选中缩放或旋转控制点
     // 4. 选中 选中框 内部
 
-    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
-
-    this.currStrategy = null;
-
     const sceneGraph = this.editor.sceneGraph;
+    const isShiftPressing = this.editor.hotkeysManager.isShiftPressing;
+
+    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    this.currStrategy = null;
     // 0. 点中 handle（旋转点）
     if (sceneGraph.isInRotationHandle(this.startPointer)) {
       this.currStrategy = this.strategySelectRotation;
     }
+
     // 1. 点击落在选中盒中
-    else if (sceneGraph.isPointInSelectedBox(this.startPointer)) {
+    else if (!isShiftPressing && sceneGraph.isPointInSelectedBox(this.startPointer)) {
       this.currStrategy = this.strategyMove;
     } else {
       const topHidElement = sceneGraph.getTopHitElement(this.startPointer);
       // 2. 点中一个元素 （FIXME: 没考虑描边的情况）
       if (topHidElement) {
-        this.editor.selectedElements.setItems([topHidElement]);
+        // 按住 shift 键的选中，添加或移除一个选中元素
+        if (isShiftPressing) {
+          this.editor.selectedElements.toggleElement(topHidElement);
+        } else {
+          this.editor.selectedElements.setItems([topHidElement]);
+        }
+
         this.editor.sceneGraph.render();
         this.currStrategy = this.strategyMove;
       } else {

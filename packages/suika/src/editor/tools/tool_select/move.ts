@@ -4,9 +4,9 @@ import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 
 /**
- * 选中工具的
+ * 选中工具的一个分支
  *
- * 移动元素场景
+ * 移动元素
  */
 export class SelectMoveTool implements IBaseTool {
   startPointer: IPoint = { x: -1, y: -1 };
