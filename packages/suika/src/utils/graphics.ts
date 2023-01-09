@@ -25,6 +25,16 @@ export function getRectByTwoCoord(point1: IPoint, point2: IPoint): IRect {
 }
 
 /**
+ * 标准化 rect
+ * 处理可能为负数的 width 和 height
+ */
+export const normalizeRect = ({ x, y, width, height }: IRect) => {
+  const x2 = x + width;
+  const y2 = y + height;
+  return getRectByTwoCoord({ x, y }, { x: x2, y: y2 });
+};
+
+/**
  * 求多个矩形组成的包围盒
  */
 export function getRectsBBox(...rects: IRect[]): IBox {

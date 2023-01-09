@@ -1,36 +1,96 @@
+import hotkeys from 'hotkeys-js';
 import { Rect } from '../../scene/rect';
 import { IPoint } from '../../type.interface';
-import { getRectByTwoCoord } from '../../utils/graphics';
+import { noop } from '../../utils/common';
+import { normalizeRect } from '../../utils/graphics';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
 export class DrawRectTool implements ITool {
   static type = 'drawRect';
   type = 'drawRect';
-  lastPointer: IPoint = { x: -1, y: -1 };
+  startPointer: IPoint = { x: -1, y: -1 };
+  lastDragPointer!: IPoint;
+  lastDragPointerInViewport!: IPoint;
   drawingRect: Rect | null = null;
+
+  isDragging = false;
+  unbindEvent: () => void = noop;
+
+  updateRectWhenViewportTranslate = () => {
+    if (this.isDragging) {
+      this.lastDragPointer = this.editor.viewportCoordsToScene(
+        this.lastDragPointerInViewport.x,
+        this.lastDragPointerInViewport.y
+      );
+      this.updateRect();
+    }
+  };
 
   constructor(private editor: Editor) {}
   active() {
     this.editor.canvasElement.style.cursor = 'crosshair';
+
+    const handler = () => {
+      if (this.isDragging && hotkeys.shift) {
+        this.updateRect();
+      }
+    };
+    hotkeys('*', { keydown: true, keyup: true }, handler);
+    this.unbindEvent = () => {
+      hotkeys.unbind('*', handler);
+    };
+
+    this.editor.viewportManager.on('xOrYChange', this.updateRectWhenViewportTranslate);
   }
   inactive() {
     this.editor.canvasElement.style.cursor = '';
+    this.unbindEvent();
+    this.editor.viewportManager.off('xOrYChange', this.updateRectWhenViewportTranslate);
   }
   start(e: PointerEvent) {
-    this.lastPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     this.drawingRect = null;
+    this.isDragging = false;
   }
   drag(e: PointerEvent) {
-    const pointer: IPoint = this.editor.viewportCoordsToScene(
+    this.isDragging = true;
+    this.lastDragPointerInViewport = {
+      x: e.clientX,
+      y: e.clientY,
+    };
+    this.lastDragPointer = this.editor.viewportCoordsToScene(
       e.clientX,
-      e.clientY,
+      e.clientY
     );
-    // 拖拽
+    this.updateRect();
+  }
+  updateRect() {
+    const { x, y } = this.lastDragPointer;
     const sceneGraph = this.editor.sceneGraph;
-    const lastPointer = this.lastPointer;
+    const { x: startX, y: startY } = this.startPointer;
 
-    const rect = getRectByTwoCoord(lastPointer, pointer);
+    const width = x - startX;
+    const height = y - startY;
+
+    let rect = {
+      x: startX,
+      y: startY,
+      width,
+      height,
+    };
+
+    // 按住 shift 绘制正方形
+    if (this.editor.isShiftPressing) {
+      if (Math.abs(width) > Math.abs(height)) {
+        rect.height = Math.sign(height) * Math.abs(width);
+      } else {
+        rect.width = Math.sign(width) * Math.abs(height);
+      }
+    }
+
+    rect = normalizeRect(rect);
+
     if (this.drawingRect) {
       this.drawingRect.x = rect.x;
       this.drawingRect.y = rect.y;
@@ -46,6 +106,8 @@ export class DrawRectTool implements ITool {
     sceneGraph.render();
   }
   end(e: PointerEvent) {
+    this.isDragging = false;
+
     const endPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     if (this.drawingRect === null) {
       const { x: cx, y: cy } = endPointer;

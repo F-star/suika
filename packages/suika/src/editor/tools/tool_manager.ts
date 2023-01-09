@@ -84,4 +84,7 @@ export class ToolManager {
   off(eventName: 'change', handler: (toolName: string) => void) {
     this.eventEmitter.off(eventName, handler);
   }
+  destroy() {
+    this.currentTool?.inactive();
+  }
 }

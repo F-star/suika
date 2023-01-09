@@ -38,6 +38,9 @@ export class Editor {
     this.ctx = this.canvasElement.getContext('2d')!;
     this.sceneGraph = new SceneGraph(this);
 
+    this.bindHotkeys();
+    this.bindWheelEventToZoom();
+
     this.setting = new Setting();
 
     this.viewportManager = new ViewportManager(this);
@@ -55,9 +58,6 @@ export class Editor {
       width: document.body.clientWidth,
       height: document.body.clientHeight,
     });
-
-    this.bindHotkeys();
-    this.bindWheelEventToZoom();
   }
   private bindHotkeys() {
     hotkeys('ctrl+z, command+z', { keydown: true }, () => {
@@ -118,6 +118,7 @@ export class Editor {
     this.toolManager.unbindEvent();
     hotkeys.unbind();
     this.unbindScrollEventToZoom();
+    this.toolManager.destroy();
   }
   /**
    * 视口坐标 转 场景坐标
