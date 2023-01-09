@@ -3,9 +3,12 @@ import { getRectCenterPoint } from '../utils/graphics';
 
 
 class SelectedElements {
-  value: Rect[] = [];
+  private value: Rect[] = [];
   setItems(items: Rect[]) {
     this.value = items;
+  }
+  getItems() {
+    return [...this.value];
   }
   clear() {
     this.value = [];

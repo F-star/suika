@@ -33,7 +33,7 @@ export class SelectRotationTool implements IBaseTool {
     this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     this.lastPointer = null;
 
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     this.prevRotation = selectedElements.map((el) => el.rotation || 0);
   }
   drag(e: PointerEvent) {
@@ -45,7 +45,7 @@ export class SelectRotationTool implements IBaseTool {
     const lastPointer = this.lastPointer;
     if (!lastPointer) return;
 
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     // TODO: 多个元素旋转比较复杂，晚点再实现
     // 单个元素旋转
     if (selectedElements.length === 1) {
@@ -74,7 +74,7 @@ export class SelectRotationTool implements IBaseTool {
     }
   }
   end() {
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     const finalRotation = selectedElements.map((el) => el.rotation || 0);
     if (
       this.rotation !== undefined &&

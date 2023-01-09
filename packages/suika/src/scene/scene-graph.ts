@@ -149,7 +149,7 @@ export class SceneGraph {
   }
   private highLightSelectedBox() {
     // 1. 计算选中盒
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     if (selectedElements.length === 0) {
       return;
     }
@@ -207,7 +207,7 @@ export class SceneGraph {
    * 点是否在选中框（selectedBox）中
    */
   isPointInSelectedBox(point: IPoint) {
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     if (selectedElements.length === 0) {
       return false;
     }
@@ -287,14 +287,14 @@ export class SceneGraph {
      * se
      */
     // 1. 先考虑 “单个元素” 的 “旋转” 控制点
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     const zoom = this.editor.zoomManager.getZoom();
 
     if (selectedElements.length === 0) {
       return null;
     }
     if (selectedElements.length === 1) {
-      const singleSelectElement = this.editor.selectedElements.value[0];
+      const singleSelectElement = selectedElements[0];
       const { x, y, width } = singleSelectElement.getBBoxWithoutRotation();
       // 旋转位置
       let rotation = {

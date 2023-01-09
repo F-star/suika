@@ -26,7 +26,7 @@ export class SelectMoveTool implements IBaseTool {
       x: e.clientX,
       y: e.clientY,
     };
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     this.startPoints = selectedElements.map((element) => ({
       x: element.x,
       y: element.y,
@@ -38,7 +38,7 @@ export class SelectMoveTool implements IBaseTool {
     const zoom = this.editor.zoomManager.getZoom();
     const dx = (this.dx = (x - this.startPointer.x) / zoom);
     const dy = (this.dy = (y - this.startPointer.y) / zoom);
-    const selectedElements = this.editor.selectedElements.value;
+    const selectedElements = this.editor.selectedElements.getItems();
     const startPoints = this.startPoints;
     for (let i = 0, len = selectedElements.length; i < len; i++) {
       selectedElements[i].x = startPoints[i].x + dx;
@@ -49,7 +49,7 @@ export class SelectMoveTool implements IBaseTool {
   end() {
     this.editor.commandManger.pushCommand(
       new MoveElementsCommand(
-        this.editor.selectedElements.value,
+        this.editor.selectedElements.getItems(),
         this.dx,
         this.dy
       )
