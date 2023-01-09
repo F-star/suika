@@ -19,6 +19,7 @@ export class DragCanvasTool implements ITool {
     this.editor.canvasElement.style.cursor = '';
   }
   start(e: PointerEvent) {
+    this.editor.canvasElement.style.cursor = 'grabbing';
     this.startPointer = {
       x: e.clientX,
       y: e.clientY,
@@ -26,7 +27,6 @@ export class DragCanvasTool implements ITool {
     this.prevViewport = this.editor.viewportManager.getViewport();
   }
   drag(e: PointerEvent) {
-    this.editor.canvasElement.style.cursor = 'grabbing';
     const pointer: IPoint = {
       x: e.clientX,
       y: e.clientY,
