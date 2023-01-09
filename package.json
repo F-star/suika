@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "start": "yarn workspace @suika/suika start",
-    "build": "react-scripts build",
+    "build": "yarn workspace @suika/suika build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install"
