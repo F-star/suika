@@ -19,6 +19,14 @@ const ToolBar = () => {
   return (
     <div className="suika-tool-bar">
       <button
+        className={classNames({ active: tool === 'select' })}
+        onClick={() => {
+          editor?.toolManager.setTool('select');
+        }}
+      >
+        选择
+      </button>
+      <button
         className={classNames({ active: tool === 'drawRect' })}
         onClick={() => {
           editor?.toolManager.setTool('drawRect');
@@ -33,14 +41,6 @@ const ToolBar = () => {
         }}
       >
         椭圆
-      </button>
-      <button
-        className={classNames({ active: tool === 'select' })}
-        onClick={() => {
-          editor?.toolManager.setTool('select');
-        }}
-      >
-        选择
       </button>
       <button
         className={classNames({ active: tool === 'dragCanvas' })}
