@@ -5,6 +5,7 @@
 import hotkeys from 'hotkeys-js';
 import { IBox, IPoint } from '../type.interface';
 import { noop } from '../utils/common';
+import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
 class HotkeysManager {
@@ -21,6 +22,8 @@ class HotkeysManager {
   private unbindScrollEventToZoom: () => void = noop;
   private unbindDragCanvasEvent: () => void = noop;
 
+  private eventEmitter = new EventEmitter();
+
   constructor(private editor: Editor) {}
   bindHotkeys() {
     this.bindModifiersRecordEvent(); // 记录 isShiftPressing 等值
@@ -31,10 +34,15 @@ class HotkeysManager {
   private bindModifiersRecordEvent() {
     hotkeys('*', { keydown: true, keyup: true }, (event) => {
       if (hotkeys.shift) {
+        const prev = this.isShiftPressing;
         if (event.type === 'keydown') {
           this.isShiftPressing = true;
         } else if (event.type === 'keyup') {
           this.isShiftPressing = false;
+        }
+
+        if (prev !== this.isShiftPressing) {
+          this.eventEmitter.emit('shiftToggle', { type: this.isShiftPressing ? 'down' : 'up' });
         }
       }
       if (hotkeys.ctrl) {
@@ -73,6 +81,15 @@ class HotkeysManager {
         }
       }
     });
+  }
+  /**
+   * shiftToggle 会在切换时触发。按住 shift 不放，只会触发一次
+   */
+  on(eventName: 'shiftToggle', handler: (event: { type: 'down' | 'up'}) => void) {
+    this.eventEmitter.on(eventName, handler);
+  }
+  off(eventName: 'shiftToggle', handler: (event: { type: 'down' | 'up'}) => void) {
+    this.eventEmitter.off(eventName, handler);
   }
   private bindActionHotkeys() {
     hotkeys('ctrl+z, command+z', { keydown: true }, () => {

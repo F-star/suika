@@ -17,39 +17,42 @@ export class DrawRectTool implements ITool {
   isDragging = false;
   unbindEvent: () => void = noop;
 
-  updateRectWhenViewportTranslate = () => {
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
-      return;
-    }
-    if (this.isDragging) {
-      this.lastDragPointer = this.editor.viewportCoordsToScene(
-        this.lastDragPointerInViewport.x,
-        this.lastDragPointerInViewport.y
-      );
-      this.updateRect();
-    }
-  };
-
   constructor(private editor: Editor) {}
   active() {
-    this.editor.canvasElement.style.cursor = 'crosshair';
+    const editor = this.editor;
+    editor.setCursor('crosshair');
 
-    const handler = () => {
-      if (this.isDragging && hotkeys.shift) {
+    const hotkeysManager = editor.hotkeysManager;
+    const updateRectWhenShiftToggle = () => {
+      if (this.isDragging) {
         this.updateRect();
       }
     };
-    hotkeys('*', { keydown: true, keyup: true }, handler);
-    this.unbindEvent = () => {
-      hotkeys.unbind('*', handler);
-    };
+    hotkeysManager.on('shiftToggle', updateRectWhenShiftToggle);
 
-    this.editor.viewportManager.on('xOrYChange', this.updateRectWhenViewportTranslate);
+    const updateRectWhenViewportTranslate = () => {
+      if (editor.hotkeysManager.isDraggingCanvasBySpace) {
+        return;
+      }
+      if (this.isDragging) {
+        this.lastDragPointer = editor.viewportCoordsToScene(
+          this.lastDragPointerInViewport.x,
+          this.lastDragPointerInViewport.y
+        );
+        this.updateRect();
+      }
+    };
+    editor.viewportManager.on('xOrYChange', updateRectWhenViewportTranslate);
+
+    this.unbindEvent = () => {
+      hotkeysManager.off('shiftToggle', updateRectWhenShiftToggle);
+      editor.viewportManager.off('xOrYChange', updateRectWhenViewportTranslate);
+    };
   }
   inactive() {
-    this.editor.canvasElement.style.cursor = '';
+    this.editor.setCursor('');
+
     this.unbindEvent();
-    this.editor.viewportManager.off('xOrYChange', this.updateRectWhenViewportTranslate);
   }
   start(e: PointerEvent) {
     if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
