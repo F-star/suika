@@ -33,6 +33,9 @@ export class SelectTool implements ITool {
     this.editor.sceneGraph.render();
   }
   start(e: PointerEvent) {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     // 有几种情况
     // 1. 直接选中一个元素
     // 2. 没选中，拖拽，产生选区
@@ -82,12 +85,18 @@ export class SelectTool implements ITool {
     this.currStrategy.start(e);
   }
   drag(e: PointerEvent) {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     if (!this.currStrategy) {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
     this.currStrategy.drag(e);
   }
   end(e: PointerEvent) {
+    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+      return;
+    }
     if (!this.currStrategy) {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
