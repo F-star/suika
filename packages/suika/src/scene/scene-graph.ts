@@ -8,18 +8,19 @@ import {
   isPointInCircle,
   isPointInRect,
   isRectContain,
-  isRectIntersect,
 } from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
-import { getFill } from './graph';
-import { Rect, RectGraph } from './rect';
+import { Ellipse } from './ellipse';
+import { getFill, Graph } from './graph';
+import { Rect } from './rect';
+
+const DOUBLE_PI = Math.PI * 2;
 
 /**
  * 图形树
  */
 export class SceneGraph {
-  // private map = new Map<string, any>();
-  children: any[] = [];
+  children: Graph[] = [];
   selection: {
     x: number;
     y: number;
@@ -29,17 +30,15 @@ export class SceneGraph {
   handle: { rotation: IPoint } | null = null;
 
   constructor(private editor: Editor) {}
-  // 添加矩形
-  addRect(rect: RectGraph): Rect {
-    const rectShape = new Rect(rect);
-    this.children.push(rectShape);
-    return rectShape;
+  appendChild(element: Graph, idx?: number) {
+    if (idx === undefined) {
+      this.children.push(element);
+    } else {
+      this.children.splice(idx, 0, element);
+    }
   }
-  appendChild(element: Rect, idx: number) {
-    this.children.splice(idx, 0, element);
-  }
-  removeChild(element: Rect) {
-    const idx = this.children.indexOf(element as any);
+  removeChild(element: Graph) {
+    const idx = this.children.indexOf(element);
     if (idx !== -1) {
       this.children.splice(idx, 1);
     }
@@ -57,7 +56,7 @@ export class SceneGraph {
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
 
-    const visibleElements: any[] = [];
+    const visibleElements: Graph[] = [];
     // 1. 找出视口下所有元素
     // 暂时都认为是矩形
     for (let i = 0, len = this.children.length; i < len; i++) {
@@ -78,8 +77,8 @@ export class SceneGraph {
 
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
+      ctx.fillStyle = getFill(element);
       if (element instanceof Rect) {
-        ctx.fillStyle = getFill(element);
         if (element.rotation) {
           const cx = element.x + element.width / 2;
           const cy = element.y + element.height / 2;
@@ -90,6 +89,22 @@ export class SceneGraph {
         if (element.rotation) {
           ctx.restore();
         }
+      } else if (element instanceof Ellipse) {
+        const cx = element.x + element.width / 2;
+        const cy = element.y + element.height / 2;
+
+        ctx.beginPath();
+        ctx.ellipse(
+          cx,
+          cy,
+          element.width / 2,
+          element.height / 2,
+          element.rotation || 0,
+          0,
+          DOUBLE_PI
+        );
+        ctx.fill();
+        ctx.closePath();
       }
     }
 
@@ -113,7 +128,12 @@ export class SceneGraph {
       const heightInViewport = height * zoom;
 
       ctx.fillRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
-      ctx.strokeRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
+      ctx.strokeRect(
+        xInViewport,
+        yInViewport,
+        widthInViewport,
+        heightInViewport
+      );
     }
 
     // 绘制 “旋转” 控制点

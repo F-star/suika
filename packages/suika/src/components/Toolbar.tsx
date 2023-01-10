@@ -5,11 +5,11 @@ import './Toolbar.scss';
 
 const ToolBar = () => {
   const editor = useContext(EditorContext);
-  const [tool, setTool] = useState('drawRect');
+  const [tool, setTool] = useState('');
 
   useEffect(() => {
     if (editor) {
-      setTool(editor.toolManager.getToolName() || 'drawRect');
+      setTool(editor.toolManager.getToolName() || '');
       editor.toolManager.on('change', (toolName: string) => {
         setTool(toolName);
       });
@@ -25,6 +25,14 @@ const ToolBar = () => {
         }}
       >
         矩形
+      </button>
+      <button
+        className={classNames({ active: tool === 'drawEllipse' })}
+        onClick={() => {
+          editor?.toolManager.setTool('drawEllipse');
+        }}
+      >
+        椭圆
       </button>
       <button
         className={classNames({ active: tool === 'select' })}

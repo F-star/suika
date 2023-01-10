@@ -1,9 +1,9 @@
 import { Editor } from '../editor';
-import { AddRectCommand } from './draw_rect';
+import { AddShapeCommand } from './draw_shape';
 import { MoveElementsCommand } from './move_elements';
 import { ICommand } from './type';
 
-type ICmdName = 'AddRect';
+type ICmdName = 'AddShape';
 
 export class CommandManger {
   redoStack: ICommand[] = [];
@@ -12,7 +12,7 @@ export class CommandManger {
 
   constructor(private editor: Editor) {
     this.map = {
-      [AddRectCommand.type]: AddRectCommand,
+      [AddShapeCommand.type]: AddShapeCommand,
       [MoveElementsCommand.type]: MoveElementsCommand,
     };
   }

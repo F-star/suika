@@ -1,29 +1,13 @@
 import { IBox, IRect } from '../type.interface';
-import { genId } from '../utils/common';
 import { getAbsoluteCoords } from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
-import { getFill, Graph, IGraph } from './graph';
+import { Graph, IGraph } from './graph';
 
 export interface RectGraph extends IGraph, IRect {}
 
 export class Rect extends Graph {
-  id: number;
-  // x: number;
-  // y: number;
-  width: number;
-  height: number;
-  // fill?: string;
-  // rotation?: number = 0;
-
   constructor(options: RectGraph) {
     super(options);
-    const { width, height } = options;
-    this.id = genId();
-    this.width = width;
-    this.height = height;
-
-    // this.fill = fill || '';
-    // TODO: 计算包围盒缓存起来
   }
   /**
    * 计算包围盒（不考虑 strokeWidth）
@@ -59,10 +43,5 @@ export class Rect extends Graph {
       width: this.width,
       height: this.height,
     };
-  }
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = getFill(this);
-    // ctx.strokeStyle = this._stroke;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }
