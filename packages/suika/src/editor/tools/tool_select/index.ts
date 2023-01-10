@@ -1,3 +1,4 @@
+import { Graph } from '../../../scene/graph';
 import { Rect } from '../../../scene/rect';
 import { IPoint } from '../../../type.interface';
 import { Editor } from '../../editor';
@@ -17,6 +18,10 @@ export class SelectTool implements ITool {
   strategyDrawSelectionBox: DrawSelectionBox;
   strategySelectRotation: SelectRotationTool;
 
+  // 鼠标按下时选中的元素，在鼠标释放时可能会用到。shift 取消一个元素时需要使用
+  topHitElementWhenStart: Graph | null = null;
+  isDragHappened = false; // 发生过拖拽
+
   constructor(private editor: Editor) {
     this.strategyMove = new SelectMoveTool(editor);
     this.strategyDrawSelectionBox = new DrawSelectionBox(editor);
@@ -33,6 +38,8 @@ export class SelectTool implements ITool {
   }
   start(e: PointerEvent) {
     this.currStrategy = null;
+    this.topHitElementWhenStart = null;
+    this.isDragHappened = false;
 
     if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
       return;
@@ -45,6 +52,7 @@ export class SelectTool implements ITool {
     // 5. 按住 shift 键，可进行连选
 
     const sceneGraph = this.editor.sceneGraph;
+    const selectedElements = this.editor.selectedElements;
     const isShiftPressing = this.editor.hotkeysManager.isShiftPressing;
 
     this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
@@ -61,37 +69,48 @@ export class SelectTool implements ITool {
     ) {
       this.currStrategy = this.strategyMove;
     } else {
-      const topHidElement = sceneGraph.getTopHitElement(this.startPointer);
+      const topHitElement = sceneGraph.getTopHitElement(this.startPointer);
       // 2. 点中一个元素 （FIXME: 没考虑描边的情况）
-      if (topHidElement) {
+      if (topHitElement) {
         // 按住 shift 键的选中，添加或移除一个选中元素
         if (isShiftPressing) {
-          this.editor.selectedElements.toggleElement([topHidElement]);
+          // 延迟到鼠标释放时才将元素从选中元素中移出
+          if (selectedElements.getItems().includes(topHitElement)) {
+            this.topHitElementWhenStart = topHitElement;
+          } else {
+            selectedElements.toggleElement([topHitElement]);
+          }
         } else {
-          this.editor.selectedElements.setItems([topHidElement]);
+          selectedElements.setItems([topHitElement]);
         }
 
-        this.editor.sceneGraph.render();
+        sceneGraph.render();
         this.currStrategy = this.strategyMove;
       } else {
         // 3. 点击到空白区域
         this.currStrategy = this.strategyDrawSelectionBox;
       }
     }
-    if (!this.currStrategy) {
+
+    if (this.currStrategy) {
+      this.currStrategy.active();
+      this.currStrategy.start(e);
+    } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
-    this.currStrategy.active();
-    this.currStrategy.start(e);
   }
   drag(e: PointerEvent) {
+    this.isDragHappened = true;
+
     if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
       return;
     }
-    if (!this.currStrategy) {
+
+    if (this.currStrategy) {
+      this.currStrategy.drag(e);
+    } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
-    this.currStrategy.drag(e);
   }
   end(e: PointerEvent) {
     const currStrategy = this.currStrategy;
@@ -100,10 +119,21 @@ export class SelectTool implements ITool {
     if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
       return;
     }
-    if (!currStrategy) {
+
+    if (this.topHitElementWhenStart && !this.isDragHappened) {
+      console.log('延迟更新');
+      this.editor.selectedElements.toggleElement([this.topHitElementWhenStart]);
+      this.editor.sceneGraph.render();
+    }
+
+    this.topHitElementWhenStart = null;
+    this.isDragHappened = false;
+
+    if (currStrategy) {
+      currStrategy.end(e);
+      currStrategy.inactive();
+    } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
-    currStrategy.end(e);
-    currStrategy.inactive();
   }
 }
