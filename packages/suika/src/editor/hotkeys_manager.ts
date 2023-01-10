@@ -42,7 +42,7 @@ class HotkeysManager {
         }
 
         if (prev !== this.isShiftPressing) {
-          this.eventEmitter.emit('shiftToggle', { type: this.isShiftPressing ? 'down' : 'up' });
+          this.eventEmitter.emit('shiftToggle');
         }
       }
       if (hotkeys.ctrl) {
@@ -85,10 +85,10 @@ class HotkeysManager {
   /**
    * shiftToggle 会在切换时触发。按住 shift 不放，只会触发一次
    */
-  on(eventName: 'shiftToggle', handler: (event: { type: 'down' | 'up'}) => void) {
+  on(eventName: 'shiftToggle', handler: () => void) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'shiftToggle', handler: (event: { type: 'down' | 'up'}) => void) {
+  off(eventName: 'shiftToggle', handler: () => void) {
     this.eventEmitter.off(eventName, handler);
   }
   private bindActionHotkeys() {
