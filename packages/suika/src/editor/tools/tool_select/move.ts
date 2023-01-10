@@ -35,10 +35,7 @@ export class SelectMoveTool implements IBaseTool {
     this.unbindEvents();
   }
   start(e: PointerEvent) {
-    this.startPointer = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
     const selectedElements = this.editor.selectedElements.getItems();
     this.startPoints = selectedElements.map((element) => ({
       x: element.x,
@@ -54,10 +51,13 @@ export class SelectMoveTool implements IBaseTool {
     this.move();
   }
   private move() {
-    const { x, y } = this.dragPointer;
-    const zoom = this.editor.zoomManager.getZoom();
-    let dx = (this.dx = (x - this.startPointer.x) / zoom);
-    let dy = (this.dy = (y - this.startPointer.y) / zoom);
+    const { x, y } = this.editor.viewportCoordsToScene(
+      this.dragPointer.x,
+      this.dragPointer.y
+    );
+
+    let dx = (this.dx = x - this.startPointer.x);
+    let dy = (this.dy = y - this.startPointer.y);
 
     if (this.editor.hotkeysManager.isShiftPressing) {
       if (Math.abs(dx) > Math.abs(dy)) {
