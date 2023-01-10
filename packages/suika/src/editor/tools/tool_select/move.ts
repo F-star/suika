@@ -1,4 +1,5 @@
 import { IPoint } from '../../../type.interface';
+import { noop } from '../../../utils/common';
 import { MoveElementsCommand } from '../../commands/move_elements';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
@@ -11,15 +12,27 @@ import { IBaseTool } from '../type';
 export class SelectMoveTool implements IBaseTool {
   startPointer: IPoint = { x: -1, y: -1 };
   startPoints: IPoint[] = [];
+  dragPointer!: IPoint;
   dx = 0;
   dy = 0;
 
+  unbindEvents = noop;
+
   constructor(private editor: Editor) {}
   active() {
-    // do nothing
+    const hotkeysManager = this.editor.hotkeysManager;
+    const moveWhenToggleShift = () => {
+      if (this.dragPointer) {
+        this.move();
+      }
+    };
+    hotkeysManager.on('shiftToggle', moveWhenToggleShift);
+    this.unbindEvents = () => {
+      hotkeysManager.off('shiftToggle', moveWhenToggleShift);
+    };
   }
   inactive() {
-    // do nothing
+    this.unbindEvents();
   }
   start(e: PointerEvent) {
     this.startPointer = {
@@ -33,11 +46,27 @@ export class SelectMoveTool implements IBaseTool {
     }));
   }
   drag(e: PointerEvent) {
-    const x = e.clientX;
-    const y = e.clientY;
+    this.dragPointer = {
+      x: e.clientX,
+      y: e.clientY,
+    };
+
+    this.move();
+  }
+  private move() {
+    const { x, y } = this.dragPointer;
     const zoom = this.editor.zoomManager.getZoom();
-    const dx = (this.dx = (x - this.startPointer.x) / zoom);
-    const dy = (this.dy = (y - this.startPointer.y) / zoom);
+    let dx = (this.dx = (x - this.startPointer.x) / zoom);
+    let dy = (this.dy = (y - this.startPointer.y) / zoom);
+
+    if (this.editor.hotkeysManager.isShiftPressing) {
+      if (Math.abs(dx) > Math.abs(dy)) {
+        dy = 0;
+      } else {
+        dx = 0;
+      }
+    }
+
     const selectedElements = this.editor.selectedElements.getItems();
     const startPoints = this.startPoints;
     for (let i = 0, len = selectedElements.length; i < len; i++) {
