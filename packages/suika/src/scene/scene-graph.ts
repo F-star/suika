@@ -71,6 +71,12 @@ export class SceneGraph {
     // 2. 清空画布，然后绘制所有可见元素
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // 绘制背景色
+    ctx.save();
+    ctx.fillStyle = setting.canvasBgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
     // 场景坐标转换为视口坐标
     ctx.scale(zoom, zoom);
     ctx.translate(-viewport.x, -viewport.y);

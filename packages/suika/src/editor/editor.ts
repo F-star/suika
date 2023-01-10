@@ -54,6 +54,13 @@ export class Editor {
       width: document.body.clientWidth,
       height: document.body.clientHeight,
     });
+    /**
+     * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
+     * 所以下面的 render 要异步执行
+     */
+    Promise.resolve().then(() => {
+      this.sceneGraph.render();
+    });
   }
   destroy() {
     this.hotkeysManager.destroy();

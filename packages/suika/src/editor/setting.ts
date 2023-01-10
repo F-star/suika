@@ -1,5 +1,6 @@
 
 export class Setting {
+  canvasBgColor = '#f4f4f4';
   stroke = '';
   fill = '#D9D9D9';
   guideBBoxStroke = '#1592fe';
