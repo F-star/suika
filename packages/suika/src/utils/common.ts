@@ -38,7 +38,7 @@ export const getClosestVal = (value: number, segment: number) => {
 /**
  * 保留小数
  */
-export const ceil = (n: number, digit = 1) => {
+export const ceil = (n: number, digit = 2) => {
   return Number(n.toFixed(digit));
 };
 
