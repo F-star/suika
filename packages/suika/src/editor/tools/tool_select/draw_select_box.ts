@@ -7,8 +7,8 @@ import { IBaseTool } from '../type';
  * 绘制选区
  */
 export class DrawSelectionBox implements IBaseTool {
-  lastPointer: IPoint = { x: -1, y: -1 };
-  startPoints: IPoint[] = [];
+  private lastPointer: IPoint = { x: -1, y: -1 };
+  private isShiftPressingWhenStart = false;
 
   constructor(private editor: Editor) {}
   active() {
@@ -18,9 +18,16 @@ export class DrawSelectionBox implements IBaseTool {
     // do nothing
   }
   start(e: PointerEvent) {
+    this.isShiftPressingWhenStart = false;
+
+    if (this.editor.hotkeysManager.isShiftPressing) {
+      this.isShiftPressingWhenStart = true;
+    } else {
+      this.editor.selectedElements.clear();
+    }
+
     this.lastPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
 
-    this.editor.selectedElements.clear();
     this.editor.sceneGraph.render();
     // 设置选区
     this.editor.sceneGraph.setSelection(this.lastPointer);
@@ -36,8 +43,15 @@ export class DrawSelectionBox implements IBaseTool {
   end() {
     const elements = this.editor.sceneGraph.getElementsInSelection();
 
-    this.editor.selectedElements.setItems(elements);
+    if (this.isShiftPressingWhenStart) {
+      this.editor.selectedElements.toggleElement(elements);
+    } else {
+      this.editor.selectedElements.setItems(elements);
+    }
+
     this.editor.sceneGraph.selection = null;
     this.editor.sceneGraph.render();
+
+    this.isShiftPressingWhenStart = false;
   }
 }

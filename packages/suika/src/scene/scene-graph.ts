@@ -290,7 +290,7 @@ export class SceneGraph {
     }
 
     const elements = this.children;
-    const containedElements: Rect[] = [];
+    const containedElements: Graph[] = [];
     for (let i = 0, len = elements.length; i < len; i++) {
       if (isRectContain(selection, elements[i].getBBox())) {
         containedElements.push(elements[i]);

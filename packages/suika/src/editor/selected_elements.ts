@@ -1,35 +1,45 @@
-import { Rect } from '../scene/rect';
+import { Graph } from '../scene/graph';
 import { getRectCenterPoint } from '../utils/graphics';
 
 
 class SelectedElements {
-  private value: Rect[] = [];
-  setItems(items: Rect[]) {
-    this.value = items;
+  private items: Graph[] = [];
+  setItems(items: Graph[]) {
+    this.items = items;
   }
   getItems() {
-    return [...this.value];
+    return [...this.items];
   }
   clear() {
-    this.value = [];
+    this.items = [];
   }
-  toggleElement(item: Rect) {
-    const idx = this.value.indexOf(item);
-    if (idx !== -1) {
-      this.value.splice(idx, 1);
-    } else {
-      this.value.push(item);
+  /**
+   * “追加” 多个元素
+   * 如果已选中元素中存在追加元素，将其从已选中元素中取出，否则添加进去
+   */
+  toggleElement(addedElements: Graph[]) {
+    const retItems: Graph[] = [];
+    for (let i = 0, len = this.items.length; i < len; i++) {
+      const item = this.items[i];
+      const idx = addedElements.indexOf(item);
+      if (idx === -1) {
+        retItems.push(item);
+      } else {
+        addedElements.splice(idx, 1);
+      }
     }
+    retItems.push(...addedElements);
+    this.items = retItems;
   }
   getCenterPoint() {
-    if (this.value.length === 1) {
-      return getRectCenterPoint(this.value[0]);
+    if (this.items.length === 1) {
+      return getRectCenterPoint(this.items[0]);
     } else {
       throw new Error('还没实现，敬请期待');
     }
   }
   isEmpty() {
-    return this.value.length === 0;
+    return this.items.length === 0;
   }
 }
 
