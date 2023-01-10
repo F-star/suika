@@ -121,7 +121,6 @@ export class SelectTool implements ITool {
     }
 
     if (this.topHitElementWhenStart && !this.isDragHappened) {
-      console.log('延迟更新');
       this.editor.selectedElements.toggleElement([this.topHitElementWhenStart]);
       this.editor.sceneGraph.render();
     }
