@@ -50,7 +50,7 @@ export class Graph {
   setAttrs(attrs: Partial<IGraph>) {
     let key: keyof Partial<IGraph>;
     for (key in attrs) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       const self: any = this;
       self[key] = attrs[key];
     }
@@ -59,6 +59,7 @@ export class Graph {
     const attrs: Partial<IGraph> = {};
     for (let i = 0, len = attrKeys.length; i < len; i++) {
       const key = attrKeys[i];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (attrs as any)[key] = this[key];
     }
     return attrs;
