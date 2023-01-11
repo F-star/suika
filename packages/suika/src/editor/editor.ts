@@ -2,6 +2,7 @@ import { SceneGraph } from '../scene/scene-graph';
 import { sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
 import { CommandManger } from './commands/commands';
 import HotkeysManager from './hotkeys_manager';
+import Ruler from './ruler';
 import SelectedElements from './selected_elements';
 import { Setting } from './setting';
 import { ToolManager } from './tools/tool_manager';
@@ -28,6 +29,7 @@ export class Editor {
   hotkeysManager: HotkeysManager;
 
   selectedElements: SelectedElements;
+  ruler: Ruler;
 
   constructor(options: IEditorOptions) {
     this.canvasElement = options.canvasElement;
@@ -46,6 +48,7 @@ export class Editor {
     this.zoomManager = new ZoomManager(this);
 
     this.selectedElements = new SelectedElements();
+    this.ruler = new Ruler(this);
 
     // 设置视口
     this.viewportManager.setViewport({

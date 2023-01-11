@@ -123,6 +123,7 @@ export class SceneGraph {
 
     // 绘制选区（使用选区工具时用到）
     if (this.selection) {
+      ctx.save();
       ctx.strokeStyle = setting.selectionStroke;
       ctx.fillStyle = setting.selectionFill;
       const { x, y, width, height } = this.selection;
@@ -140,11 +141,13 @@ export class SceneGraph {
         widthInViewport,
         heightInViewport
       );
+      ctx.restore();
     }
 
     // 绘制 “旋转” 控制点
     const handle = (this.handle = this.getTransformHandle());
     if (handle) {
+      ctx.save();
       ctx.strokeStyle = setting.handleRotationStroke;
       ctx.fillStyle = setting.handleRotationFill;
       ctx.lineWidth = setting.handleRotationStrokeWidth;
@@ -152,7 +155,11 @@ export class SceneGraph {
       const { x: xInViewport, y: yInViewport } =
         this.editor.sceneCoordsToViewport(handle.rotation.x, handle.rotation.y);
       drawCircle(ctx, xInViewport, yInViewport, setting.handleRotationRadius);
+      ctx.restore();
     }
+
+    // 绘制标尺
+    this.editor.ruler.draw();
 
     ctx.restore();
   }
@@ -186,6 +193,7 @@ export class SceneGraph {
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
 
+    ctx.save();
     // 高亮元素轮廓
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
@@ -228,6 +236,7 @@ export class SceneGraph {
         composedBBox.height * zoom
       );
     }
+    ctx.restore();
   }
   /**
    * 点是否在选中框（selectedBox）中

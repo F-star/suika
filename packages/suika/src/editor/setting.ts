@@ -20,4 +20,12 @@ export class Setting {
 
   drawRectDefaultWidth = 100; // 绘制矩形工具，如果不拖拽就不会产生宽高。此时提供矩形的宽度
   drawRectDefaultHeight = 100; // 高度，同上
+
+  /**** 标尺相关 ****/
+  minStepInViewport = 50; // 视口区域下的最小步长
+  rulerBgColor = '#fff';
+  rulerStroke = '#e6e6e6';
+  rulerMarkStroke = '#c1c1c1';
+  rulerWidth = 20; // 宽度
+  rulerMarkSize = 4; // 刻度高度
 }
