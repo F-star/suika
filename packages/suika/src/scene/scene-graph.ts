@@ -8,6 +8,7 @@ import {
   isPointInCircle,
   isPointInRect,
   isRectContain,
+  isRectIntersect,
 } from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
 import { Ellipse } from './ellipse';
@@ -55,16 +56,22 @@ export class SceneGraph {
     } = this.editor;
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
+    const viewportBoxInScene = { // TODO: 考虑外扩一个 padding
+      x: viewport.x,
+      y: viewport.y,
+      width: viewport.width / zoom,
+      height: viewport.height / zoom,
+    };
 
     const visibleElements: Graph[] = [];
     // 1. 找出视口下所有元素
     // 暂时都认为是矩形
     for (let i = 0, len = this.children.length; i < len; i++) {
       const shape = this.children[i];
-      // FIXME: 还没修复 viewport 不对的情况，因为引入 zoom 因素
-      // if (isRectIntersect(shape.getBBox(), viewport)) {
-      visibleElements.push(shape);
-      // }
+
+      if (isRectIntersect(shape.getBBox(), viewportBoxInScene)) {
+        visibleElements.push(shape);
+      }
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
