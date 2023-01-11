@@ -10,6 +10,7 @@ import {
   isRectContain,
   isRectIntersect,
 } from '../utils/graphics';
+import rafThrottle from '../utils/raf_throttle';
 import { transformRotate } from '../utils/transform';
 import { Ellipse } from './ellipse';
 import { getFill, Graph } from './graph';
@@ -46,7 +47,7 @@ export class SceneGraph {
     return idx;
   }
   // 全局重渲染
-  render() {
+  render = rafThrottle(() => {
     // 获取视口区域
     const {
       viewportManager,
@@ -169,7 +170,7 @@ export class SceneGraph {
     this.editor.ruler.draw();
 
     ctx.restore();
-  }
+  });
   /**
    * 光标是否落在旋转控制点上
    */
