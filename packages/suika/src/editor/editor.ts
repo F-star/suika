@@ -50,12 +50,14 @@ export class Editor {
     this.selectedElements = new SelectedElements();
     this.ruler = new Ruler(this);
 
-    // 设置视口
+    // 设置初始视口
+    const width = document.body.clientWidth;
+    const height = document.body.clientHeight;
     this.viewportManager.setViewport({
-      x: 0,
-      y: 0,
-      width: document.body.clientWidth,
-      height: document.body.clientHeight,
+      x: -width / 2,
+      y: -height / 2,
+      width,
+      height,
     });
     /**
      * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
