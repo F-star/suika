@@ -11,8 +11,7 @@ export class CommandManger {
   map: { [cmdName: string]: new (...args: any) => any };
 
   constructor(private editor: Editor) {
-    this.map = Object.create(null);
-    Object.assign(this.map, {
+    this.map = Object.assign(Object.create(null), {
       [AddShapeCommand.type]: AddShapeCommand,
       [MoveElementsCommand.type]: MoveElementsCommand,
     });
