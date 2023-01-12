@@ -1,5 +1,6 @@
 import { Graph } from '../scene/graph';
-import { getRectCenterPoint } from '../utils/graphics';
+import { IBox } from '../type.interface';
+import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
 
 
 class SelectedElements {
@@ -40,6 +41,15 @@ class SelectedElements {
   }
   isEmpty() {
     return this.items.length === 0;
+  }
+  getBBox(): IBox | null {
+    if (this.isEmpty()) {
+      return null;
+    }
+    const bBoxesWithRotation = this.items.map((element) =>
+      element.getBBox()
+    );
+    return getRectsBBox(...bBoxesWithRotation);
   }
 }
 

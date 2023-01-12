@@ -1,4 +1,4 @@
-import { IBox, ICircle, INoEmptyArray, IPoint, IRect } from '../type.interface';
+import { IBox, ICircle, IPoint, IRect } from '../type.interface';
 
 /**
  * 矩形是否相交
@@ -32,6 +32,17 @@ export const normalizeRect = ({ x, y, width, height }: IRect) => {
   const x2 = x + width;
   const y2 = y + height;
   return getRectByTwoCoord({ x, y }, { x: x2, y: y2 });
+};
+
+/**
+ * 标准化角度
+ */
+const PI_DOUBLE = 2 * Math.PI;
+export const normalizeAngle = (angle: number): number => {
+  if (angle >= PI_DOUBLE) {
+    return angle % PI_DOUBLE;
+  }
+  return angle;
 };
 
 /**
@@ -121,7 +132,7 @@ export function getRectCenterPoint({
  * 求向量到右侧轴(x正半轴)的夹角
  * 范围在 [0, Math.PI * 2)
  */
-export function calRadian(cx: number, cy: number, x: number, y: number) {
+export function calcVectorRadian(cx: number, cy: number, x: number, y: number) {
   const a = [x - cx, y - cy];
   const b = [0, -1];
 

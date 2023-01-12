@@ -57,7 +57,8 @@ export class SceneGraph {
     } = this.editor;
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
-    const viewportBoxInScene = { // TODO: 考虑外扩一个 padding
+    const viewportBoxInScene = {
+      // TODO: 考虑外扩一个 padding
       x: viewport.x,
       y: viewport.y,
       width: viewport.width / zoom,
@@ -126,8 +127,10 @@ export class SceneGraph {
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
+    const selectedElementsBBox = this.editor.selectedElements.getBBox();
+
     // 3. 绘制 选中框
-    this.highLightSelectedBox();
+    this.highLightSelectedBox(selectedElementsBBox);
 
     // 绘制选区（使用选区工具时用到）
     if (this.selection) {
@@ -153,7 +156,7 @@ export class SceneGraph {
     }
 
     // 绘制 “旋转” 控制点
-    const handle = (this.handle = this.getTransformHandle());
+    const handle = (this.handle = this.getTransformHandle(selectedElementsBBox));
     if (handle) {
       ctx.save();
       ctx.strokeStyle = setting.handleRotationStroke;
@@ -188,12 +191,16 @@ export class SceneGraph {
       radius: this.editor.setting.handleRotationRadius / zoom,
     });
   }
-  private highLightSelectedBox() {
-    // 1. 计算选中盒
-    const selectedElements = this.editor.selectedElements.getItems();
-    if (selectedElements.length === 0) {
+  /**
+   * 绘制每个元素的轮廓，以及包围它们的包围盒
+   */
+  private highLightSelectedBox(selectedElementsBBox: IBox | null) {
+    /******* 绘制每个元素的包围盒（FIXME: 改为绘制轮廓） *******/
+    if (selectedElementsBBox === null) {
       return;
     }
+    const selectedElements = this.editor.selectedElements.getItems();
+
     const bBoxes = selectedElements.map((element) =>
       element.getBBoxWithoutRotation()
     );
@@ -202,7 +209,7 @@ export class SceneGraph {
     const ctx = this.editor.ctx;
 
     ctx.save();
-    // 高亮元素轮廓
+    // TODO: 椭圆图形，要绘制圆形轮廓
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
       const bBox = bBoxes[i];
@@ -226,22 +233,22 @@ export class SceneGraph {
       ctx.restore();
     }
 
+    /********** 绘制多个图形组成的包围盒 *********/
     // 只有单个选中元素，不绘制选中盒
+
     // 多个选中元素时，才绘制选中盒
     if (selectedElements.length > 1) {
-      const bBoxesWithRotation = selectedElements.map((element) =>
-        element.getBBox()
-      );
-      const composedBBox = getRectsBBox(...bBoxesWithRotation);
-      // 2. 高亮选中盒
       ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
       const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(composedBBox.x, composedBBox.y);
+        this.editor.sceneCoordsToViewport(
+          selectedElementsBBox.x,
+          selectedElementsBBox.y
+        );
       ctx.strokeRect(
         xInViewport,
         yInViewport,
-        composedBBox.width * zoom,
-        composedBBox.height * zoom
+        selectedElementsBBox.width * zoom,
+        selectedElementsBBox.height * zoom
       );
     }
     ctx.restore();
@@ -321,7 +328,10 @@ export class SceneGraph {
     }
     return containedElements;
   }
-  getTransformHandle() {
+  getTransformHandle(selectedElementsBBox: IBox | null) {
+    if (selectedElementsBBox === null) {
+      return null;
+    }
     /**
      * rotation: 旋转方向为正北方向
      * ne 东北（西：west、北：north、东：east、西：west）
@@ -332,8 +342,10 @@ export class SceneGraph {
     // 1. 先考虑 “单个元素” 的 “旋转” 控制点
     const selectedElements = this.editor.selectedElements.getItems();
     const zoom = this.editor.zoomManager.getZoom();
+    const setting = this.editor.setting;
 
     if (selectedElements.length === 0) {
+      console.error('根据逻辑分支，代码走到这里 selectedElements.length 不可能为 0，请给我提 issue');
       return null;
     }
     if (selectedElements.length === 1) {
@@ -342,7 +354,7 @@ export class SceneGraph {
       // 旋转位置
       let rotation = {
         x: x + width / 2,
-        y: y - 14 / zoom,
+        y: y - setting.handleRotationLineLength / zoom,
       };
       const [cx, cy] = this.editor.selectedElements.getCenterPoint();
       if (singleSelectElement.rotation) {
@@ -359,8 +371,18 @@ export class SceneGraph {
       return {
         rotation,
       };
-    } else {
-      return null;
+    }
+    // 多个图形被选中
+    else {
+      const { x, y, width } = selectedElementsBBox;
+      const rotation = {
+        x: x + width / 2,
+        y: y - setting.handleRotationLineLength / zoom,
+      };
+
+      return {
+        rotation,
+      };
     }
   }
 }

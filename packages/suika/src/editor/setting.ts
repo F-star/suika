@@ -7,10 +7,12 @@ export class Setting {
   selectionStroke = '#0f8eff';
   selectionFill = '#0f8eff33';
 
+  /**** 变形相关 ****/
   handleRotationStroke = '#1592fe';
   handleRotationFill = '#fff';
   handleRotationStrokeWidth = 2;
   handleRotationRadius = 4;
+  handleRotationLineLength = 14;
 
   lockRotation = Math.PI / 12; // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
 
