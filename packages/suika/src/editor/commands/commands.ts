@@ -11,10 +11,11 @@ export class CommandManger {
   map: { [cmdName: string]: new (...args: any) => any };
 
   constructor(private editor: Editor) {
-    this.map = {
+    this.map = Object.create(null);
+    Object.assign(this.map, {
       [AddShapeCommand.type]: AddShapeCommand,
       [MoveElementsCommand.type]: MoveElementsCommand,
-    };
+    });
   }
 
   redo() {
