@@ -31,6 +31,9 @@ export class ToolManager {
     let isPressing = false;
 
     const handleDown = (e: PointerEvent) => {
+      if (e.button !== 0) { // 必须是鼠标左键
+        return;
+      }
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
@@ -47,6 +50,9 @@ export class ToolManager {
       }
     };
     const handleUp = (e: PointerEvent) => {
+      if (e.button !== 0) { // 必须是鼠标左键
+        return;
+      }
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
