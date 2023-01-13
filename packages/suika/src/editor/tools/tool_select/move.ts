@@ -20,7 +20,7 @@ export class SelectMoveTool implements IBaseTool {
 
   constructor(private editor: Editor) {}
   active() {
-    const hotkeysManager = this.editor.hotkeysManager;
+    const hotkeysManager = this.editor.hostEventManager;
     const moveWhenToggleShift = () => {
       if (this.dragPointer) {
         this.move();
@@ -59,7 +59,7 @@ export class SelectMoveTool implements IBaseTool {
     let dx = (this.dx = x - this.startPointer.x);
     let dy = (this.dy = y - this.startPointer.y);
 
-    if (this.editor.hotkeysManager.isShiftPressing) {
+    if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(dx) > Math.abs(dy)) {
         dy = 0;
       } else {

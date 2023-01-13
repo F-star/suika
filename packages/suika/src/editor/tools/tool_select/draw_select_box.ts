@@ -20,7 +20,7 @@ export class DrawSelectionBox implements IBaseTool {
   start(e: PointerEvent) {
     this.isShiftPressingWhenStart = false;
 
-    if (this.editor.hotkeysManager.isShiftPressing) {
+    if (this.editor.hostEventManager.isShiftPressing) {
       this.isShiftPressingWhenStart = true;
     } else {
       this.editor.selectedElements.clear();

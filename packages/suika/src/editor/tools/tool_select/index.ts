@@ -41,7 +41,7 @@ export class SelectTool implements ITool {
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
 
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
     // 有几种情况
@@ -53,7 +53,7 @@ export class SelectTool implements ITool {
 
     const sceneGraph = this.editor.sceneGraph;
     const selectedElements = this.editor.selectedElements;
-    const isShiftPressing = this.editor.hotkeysManager.isShiftPressing;
+    const isShiftPressing = this.editor.hostEventManager.isShiftPressing;
 
     this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
 
@@ -102,7 +102,7 @@ export class SelectTool implements ITool {
   drag(e: PointerEvent) {
     this.isDragHappened = true;
 
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
 
@@ -116,7 +116,7 @@ export class SelectTool implements ITool {
     const currStrategy = this.currStrategy;
     this.currStrategy = null;
 
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
 

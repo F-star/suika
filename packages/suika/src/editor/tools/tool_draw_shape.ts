@@ -23,7 +23,7 @@ export abstract class DrawShapeTool implements ITool {
     const editor = this.editor;
     editor.setCursor('crosshair');
 
-    const hotkeysManager = editor.hotkeysManager;
+    const hotkeysManager = editor.hostEventManager;
     const updateRectWhenShiftToggle = () => {
       if (this.isDragging) {
         this.updateRect();
@@ -32,7 +32,7 @@ export abstract class DrawShapeTool implements ITool {
     hotkeysManager.on('shiftToggle', updateRectWhenShiftToggle);
 
     const updateRectWhenViewportTranslate = () => {
-      if (editor.hotkeysManager.isDraggingCanvasBySpace) {
+      if (editor.hostEventManager.isDraggingCanvasBySpace) {
         return;
       }
       if (this.isDragging) {
@@ -56,7 +56,7 @@ export abstract class DrawShapeTool implements ITool {
     this.unbindEvent();
   }
   start(e: PointerEvent) {
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
     this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
@@ -64,7 +64,7 @@ export abstract class DrawShapeTool implements ITool {
     this.isDragging = false;
   }
   drag(e: PointerEvent) {
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
     this.isDragging = true;
@@ -94,7 +94,7 @@ export abstract class DrawShapeTool implements ITool {
     };
 
     // 按住 shift 绘制正方形
-    if (this.editor.hotkeysManager.isShiftPressing) {
+    if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(width) > Math.abs(height)) {
         rect.height = Math.sign(height) * Math.abs(width);
       } else {
@@ -122,7 +122,7 @@ export abstract class DrawShapeTool implements ITool {
     sceneGraph.render();
   }
   end(e: PointerEvent) {
-    if (this.editor.hotkeysManager.isDraggingCanvasBySpace) {
+    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
     this.isDragging = false;

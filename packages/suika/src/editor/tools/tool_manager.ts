@@ -45,7 +45,7 @@ export class ToolManager {
         throw new Error('未设置当前使用工具');
       }
       if (isPressing) {
-        this.editor.hotkeysManager.disableDragBySpace();
+        this.editor.hostEventManager.disableDragBySpace();
         this.currentTool.drag(e);
       }
     };
@@ -57,7 +57,7 @@ export class ToolManager {
         throw new Error('未设置当前使用工具');
       }
       if (isPressing) {
-        this.editor.hotkeysManager.enableDragBySpace();
+        this.editor.hostEventManager.enableDragBySpace();
         isPressing = false;
         this.currentTool.end(e);
       }

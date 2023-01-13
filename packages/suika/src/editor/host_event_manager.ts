@@ -8,7 +8,7 @@ import { noop } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
-class HotkeysManager {
+class HostEventManager {
   isShiftPressing = false;
   isCtrlPressing = false;
   isCommandPressing = false;
@@ -196,4 +196,4 @@ class HotkeysManager {
   }
 }
 
-export default HotkeysManager;
+export default HostEventManager;

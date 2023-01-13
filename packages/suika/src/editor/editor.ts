@@ -1,7 +1,7 @@
 import { SceneGraph } from '../scene/scene-graph';
 import { sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
 import { CommandManger } from './commands/commands';
-import HotkeysManager from './hotkeys_manager';
+import HostEventManager from './host_event_manager';
 import Ruler from './ruler';
 import SelectedElements from './selected_elements';
 import { Setting } from './setting';
@@ -26,7 +26,7 @@ export class Editor {
   commandManger: CommandManger;
   zoomManager: ZoomManager;
 
-  hotkeysManager: HotkeysManager;
+  hostEventManager: HostEventManager;
 
   selectedElements: SelectedElements;
   ruler: Ruler;
@@ -36,8 +36,8 @@ export class Editor {
     this.ctx = this.canvasElement.getContext('2d')!;
     this.sceneGraph = new SceneGraph(this);
 
-    this.hotkeysManager = new HotkeysManager(this);
-    this.hotkeysManager.bindHotkeys();
+    this.hostEventManager = new HostEventManager(this);
+    this.hostEventManager.bindHotkeys();
 
     this.setting = new Setting();
 
@@ -68,7 +68,7 @@ export class Editor {
     });
   }
   destroy() {
-    this.hotkeysManager.destroy();
+    this.hostEventManager.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
   }
