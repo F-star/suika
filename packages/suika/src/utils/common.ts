@@ -79,3 +79,22 @@ export const nearestPixelVal = (n: number) => {
   const right = Math.ceil(n);
   return (n - left < right - n ? left : right) + 0.5;
 };
+
+/**
+ * 两个数组是否 “相同”，当作集合一样来对比，元素相同即可。
+ * （数组中不会出现相同元素）
+ */
+
+export const isSameArray = (a1: unknown[], a2: unknown[]) => {
+  if (a1.length !== a2.length) return false;
+  const map = new Map<unknown, true>();
+  for (let i = 0, len = a1.length; i < len; i++) {
+    map.set(a1[i], true);
+  }
+  for (let i = 0, len = a2.length; i < len; i++) {
+    if (!map.get(a2[i])) {
+      return false;
+    }
+  }
+  return true;
+};

@@ -1,4 +1,5 @@
 import { IBox, ICircle, IPoint, IRect } from '../type.interface';
+import { transformRotate } from './transform';
 
 /**
  * 矩形是否相交
@@ -124,7 +125,7 @@ export function getRectCenterPoint({
   y,
   width,
   height,
-}: IRect): [number, number] {
+}: IRect): [cx: number, cy: number] {
   return [x + width / 2, y + height / 2];
 }
 
@@ -172,4 +173,24 @@ export function getAbsoluteCoords(
 
 export function arr2point([x, y]: number[]): IPoint {
   return { x, y };
+}
+
+/**
+ * 计算一个形状左上角的坐标，考虑旋转
+ */
+export function getElementRotatedXY(element: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation?: number;
+}) {
+  const [cx, cy] = getRectCenterPoint(element);
+  return transformRotate(
+    element.x,
+    element.y,
+    element.rotation || 0,
+    cx,
+    cy
+  );
 }

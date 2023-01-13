@@ -1,6 +1,7 @@
 import { Editor } from '../editor/editor';
 import { IBox, IPoint, IRect } from '../type.interface';
 import { drawCircle, rotateInCanvas } from '../utils/canvas';
+import EventEmitter from '../utils/event_emitter';
 import {
   arr2point,
   getRectCenterPoint,
@@ -22,14 +23,15 @@ const DOUBLE_PI = Math.PI * 2;
  * 图形树
  */
 export class SceneGraph {
-  children: Graph[] = [];
+  private children: Graph[] = [];
   selection: {
     x: number;
     y: number;
     width: number;
     height: number;
   } | null = null;
-  handle: { rotation: IPoint } | null = null;
+  private handle: { rotation: IPoint } | null = null;
+  private eventEmitter = new EventEmitter();
 
   constructor(private editor: Editor) {}
   appendChild(element: Graph, idx?: number) {
@@ -169,11 +171,18 @@ export class SceneGraph {
       ctx.restore();
     }
 
+    // TODO: 在画布缩放比大于 800% 时，绘制以像素点为单位的网格
+
     // 绘制标尺
     this.editor.ruler.draw();
 
     ctx.restore();
+
+    this.eventEmitter.emit('render');
   });
+  private drawPixelGrid() {
+    //
+  }
   /**
    * 光标是否落在旋转控制点上
    */
@@ -328,7 +337,7 @@ export class SceneGraph {
     }
     return containedElements;
   }
-  getTransformHandle(selectedElementsBBox: IBox | null) {
+  private getTransformHandle(selectedElementsBBox: IBox | null) {
     if (selectedElementsBBox === null) {
       return null;
     }
@@ -384,5 +393,11 @@ export class SceneGraph {
         rotation,
       };
     }
+  }
+  on(eventName: 'render', handler: () => void) {
+    this.eventEmitter.on(eventName, handler);
+  }
+  off(eventName: 'render', handler: () => void) {
+    this.eventEmitter.off(eventName, handler);
   }
 }

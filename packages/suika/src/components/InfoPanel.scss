@@ -1,0 +1,35 @@
+.suika {
+  .info-panel {
+    position: fixed;
+    right: 4px;
+    top: 24px;
+
+    padding: 8px;
+    border: 1px solid #e6e6e6;
+    width: 160px;
+    min-height: 200px;
+
+    font-size: 12px;
+    background-color: #fff;
+    user-select: none;
+
+    .empty-text {
+      color: #b3b3b3;
+      padding-left: 8px;
+    }
+
+    .field {
+      display: flex;
+      line-height: 32px;
+      text-align: center;
+      span {
+        display: block;
+        height: 32px;
+        width: 32px;
+        line-height: 32px;
+        text-align: center;
+        color: #b3b3b3;
+      }
+    }
+  }
+}
