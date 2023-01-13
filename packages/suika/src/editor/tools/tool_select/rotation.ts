@@ -18,6 +18,7 @@ export class SelectRotationTool implements IBaseTool {
 
   private selectedElementsBBoxCenter: [x: number, y: number] | null = null;
   private prevRotations: number[] = [];
+  private prevElementXYs: [x: number, y: number][] = [];
   private prevElementCenters: [x: number, y: number][] = [];
   private prevElementHalfSizes: [width: number, height: number][] = [];
 
@@ -50,6 +51,7 @@ export class SelectRotationTool implements IBaseTool {
       const el = selectedElements[i];
       this.prevRotations[i] = el.rotation || 0;
       const bBox = el.getBBoxWithoutRotation();
+      this.prevElementXYs[i] = [bBox.x, bBox.y];
       this.prevElementCenters[i] = getRectCenterPoint(bBox);
       this.prevElementHalfSizes[i] = [bBox.width / 2, bBox.height / 2];
     }
@@ -77,15 +79,14 @@ export class SelectRotationTool implements IBaseTool {
 
       // 计算向量夹角
       // https://blog.fstars.wang/posts/calc-vector-angle/
-      let rotation = calcVectorRadian(cx, cy, lastPointer.x, lastPointer.y);
-
+      let dRotation = calcVectorRadian(cx, cy, lastPointer.x, lastPointer.y);
       if (this.editor.hotkeysManager.isShiftPressing) {
         const lockRotation = this.editor.setting.lockRotation;
-        rotation = getClosestVal(rotation, lockRotation);
+        dRotation = getClosestVal(dRotation, lockRotation);
       }
+      this.dRotation = dRotation;
 
-      element.rotation = rotation;
-      this.dRotation = rotation;
+      element.rotation = dRotation;
     }
     /**** 旋转多个元素 ****/
     else if (selectedElements.length > 1) {
@@ -100,11 +101,11 @@ export class SelectRotationTool implements IBaseTool {
           lastPointer.x,
           lastPointer.y
         );
-
         if (this.editor.hotkeysManager.isShiftPressing) {
           const lockRotation = this.editor.setting.lockRotation;
           dRotation = getClosestVal(dRotation, lockRotation);
         }
+        this.dRotation = dRotation;
 
         const prevElementCenters = this.prevElementCenters;
         const prevElementHalfSizes = this.prevElementHalfSizes;
@@ -137,15 +138,33 @@ export class SelectRotationTool implements IBaseTool {
   end() {
     const selectedElements = this.editor.selectedElements.getItems();
     if (this.dRotation !== 0) {
-      this.editor.commandManger.pushCommand(
-        new SetElementsAttrs(
-          selectedElements,
-          {
-            rotation: this.dRotation,
-          },
-          this.prevRotations.map((rotation) => ({ rotation }))
-        )
-      );
+      if (selectedElements.length === 0) {
+        this.editor.commandManger.pushCommand(
+          new SetElementsAttrs(
+            selectedElements,
+            {
+              rotation: this.dRotation,
+            },
+            this.prevRotations.map((rotation) => ({ rotation }))
+          )
+        );
+      } else {
+        this.editor.commandManger.pushCommand(
+          new SetElementsAttrs(
+            selectedElements,
+            selectedElements.map((el) => ({
+              rotation: el.rotation,
+              x: el.x,
+              y: el.y,
+            })),
+            this.prevRotations.map((rotation, index) => ({
+              rotation,
+              x: this.prevElementXYs[index][0],
+              y: this.prevElementXYs[index][1],
+            }))
+          )
+        );
+      }
       // TODO: 多选的历史记录实现
     }
   }

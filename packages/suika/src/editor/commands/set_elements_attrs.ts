@@ -16,10 +16,10 @@ export class SetElementsAttrs implements ICommand {
   static readonly type = 'SetElementsAttrs';
   elements: Rect[];
   prevAttrs: IAttrs[] = [];
-  attrs: IAttrs;
+  attrs: IAttrs | IAttrs[];
   constructor(
     elements: Rect[],
-    attrs: IAttrs,
+    attrs: IAttrs | IAttrs[],
     preAttrs: IAttrs[],
   ) {
     if (elements.length !== preAttrs.length) {
@@ -32,7 +32,11 @@ export class SetElementsAttrs implements ICommand {
   redo() {
     const { elements, attrs } = this;
     for (let i = 0, len = this.elements.length; i < len; i++) {
-      elements[i].setAttrs(attrs);
+      if (Array.isArray(attrs)) {
+        elements[i].setAttrs(attrs[i]);
+      } else {
+        elements[i].setAttrs(attrs);
+      }
     }
   }
   undo() {
