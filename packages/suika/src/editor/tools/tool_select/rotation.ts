@@ -111,7 +111,7 @@ export class SelectRotationTool implements IBaseTool {
         for (let i = 0, len = selectedElements.length; i < len; i++) {
           const el = selectedElements[i];
           // 计算新的旋转角度
-          el.rotation = normalizeAngle(this.prevRotations[i] + dRotation); // 这里要 标准化吗？
+          el.rotation = normalizeAngle(this.prevRotations[i] + dRotation);
 
           const [cx, cy] = prevElementCenters[i];
           const [newCx, newCy] = transformRotate(
