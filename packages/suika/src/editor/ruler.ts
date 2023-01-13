@@ -1,5 +1,5 @@
 import { rotateInCanvas } from '../utils/canvas';
-import { getClosestVal } from '../utils/common';
+import { getClosestVal, nearestPixelVal } from '../utils/common';
 import { Editor } from './editor';
 
 const HALF_PI = Math.PI / 2;
@@ -94,14 +94,14 @@ class Ruler {
     ctx.textAlign = 'center';
     const y = setting.rulerWidth - setting.rulerMarkSize;
     while (startXInScene <= endXInScene) {
+      ctx.strokeStyle = setting.rulerMarkStroke;
       ctx.fillStyle = setting.rulerMarkStroke;
-      const x = (startXInScene - viewport.x) * zoom;
-      ctx.fillRect(
-        x,
-        y,
-        1,
-        setting.rulerMarkSize + 0.5
-      );
+      const x = nearestPixelVal((startXInScene - viewport.x) * zoom);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + setting.rulerMarkSize);
+      ctx.stroke();
+      ctx.closePath();
       ctx.fillText(String(startXInScene), x, y - 4);
       startXInScene += stepInScene;
     }
@@ -126,13 +126,12 @@ class Ruler {
     ctx.textAlign = 'center';
     while (startYInScene <= endYInScene) {
       ctx.fillStyle = setting.rulerMarkStroke;
-      const y = (startYInScene - viewport.y) * zoom;
-      ctx.fillRect(
-        x,
-        y,
-        setting.rulerMarkSize + 0.5,
-        1,
-      );
+      const y = nearestPixelVal((startYInScene - viewport.y) * zoom);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + setting.rulerMarkSize, y);
+      ctx.stroke();
+      ctx.closePath();
       rotateInCanvas(ctx, -HALF_PI, x, y);
       ctx.fillText(String(startYInScene), x, y - 3);
       ctx.setTransform(1, 0, 0, 1, 0, 0);

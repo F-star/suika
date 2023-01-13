@@ -67,3 +67,15 @@ export const sceneCoordsToViewportUtil = (
     y: (y - scrollY) * zoom,
   };
 };
+
+/**
+ * Canvas 中绘制，必须为 x.5 才能绘制一列单独像素，
+ * 否则会因为抗锯齿，绘制两列像素，且一个为半透明，导致一种模糊的效果
+ *
+ * 这个方法会得到值最接近的 x.5 值。
+ */
+export const nearestPixelVal = (n: number) => {
+  const left = Math.floor(n);
+  const right = Math.ceil(n);
+  return (n - left < right - n ? left : right) + 0.5;
+};
