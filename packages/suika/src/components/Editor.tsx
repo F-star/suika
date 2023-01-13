@@ -1,3 +1,4 @@
+import throttle from 'lodash.throttle';
 import { FC, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
@@ -6,24 +7,36 @@ import ToolBar from './Toolbar';
 import ZoomActions from './ZoomActions';
 
 const Editor: FC = () => {
-  const ref = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [editor, setEditor] = useState<GraphEditor | null>(null);
 
   useEffect(() => {
-    if (ref.current) {
+    if (canvasRef.current) {
       const editor = new GraphEditor({
-        canvasElement: ref.current,
+        canvasElement: canvasRef.current,
+        width: document.body.clientWidth,
+        height: document.body.clientHeight,
       });
       (window as any).editor = editor;
-      editor.canvasElement.width = document.body.clientWidth;
-      editor.canvasElement.height = document.body.clientHeight;
+
+      const changeViewport = throttle(() => {
+        editor.viewportManager.setViewport({
+          width: document.body.clientWidth,
+          height: document.body.clientHeight,
+        });
+        editor.sceneGraph.render();
+      }, 150, { leading: false });
+      window.addEventListener('resize', changeViewport);
       setEditor(editor);
+
       return () => {
         editor.destroy(); // 注销事件
+        window.removeEventListener('resize', changeViewport);
+        changeViewport.cancel();
       };
     }
-  }, [ref]);
+  }, [canvasRef]);
 
   return (
     <div>
@@ -31,7 +44,7 @@ const Editor: FC = () => {
         <ToolBar />
         <ZoomActions />
         <InfoPanel />
-        <canvas ref={ref} />
+        <canvas ref={canvasRef} />
       </EditorContext.Provider>
     </div>
   );

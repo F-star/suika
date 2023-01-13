@@ -11,6 +11,8 @@ import { ZoomManager } from './zoom_manager';
 
 interface IEditorOptions {
   canvasElement: HTMLCanvasElement;
+  width: number;
+  height: number;
 }
 
 export class Editor {
@@ -51,13 +53,11 @@ export class Editor {
     this.ruler = new Ruler(this);
 
     // 设置初始视口
-    const width = document.body.clientWidth;
-    const height = document.body.clientHeight;
     this.viewportManager.setViewport({
-      x: -width / 2,
-      y: -height / 2,
-      width,
-      height,
+      x: -options.width / 2,
+      y: -options.height / 2,
+      width: options.width,
+      height: options.height,
     });
     /**
      * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
