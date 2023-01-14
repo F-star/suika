@@ -103,8 +103,7 @@ class HostEventManager {
     const editor = this.editor;
     const handler = (event: WheelEvent) => {
       if (this.isCtrlPressing || this.isCommandPressing) {
-        const cx = event.clientX;
-        const cy = event.clientY;
+        const { x: cx, y: cy } = this.editor.getPointerXY(event);
         if (event.deltaY > 0) {
           editor.zoomManager.zoomOut(cx, cy);
           editor.sceneGraph.render();
@@ -140,10 +139,7 @@ class HostEventManager {
       if (this.isEnableDragCanvasBySpace && this.isSpacePressing) {
         this.editor.setCursor('grabbing');
         this.isDraggingCanvasBySpace = true;
-        startPointer = {
-          x: event.clientX,
-          y: event.clientY,
-        };
+        startPointer = this.editor.getPointerXY(event);
         prevViewport = this.editor.viewportManager.getViewport();
       }
     };
@@ -152,8 +148,9 @@ class HostEventManager {
     // 鼠标移动
     const pointermoveHandler = (event: PointerEvent) => {
       if (startPointer) {
-        const dx = event.clientX - startPointer.x;
-        const dy = event.clientY - startPointer.y;
+        const viewportPos = this.editor.getPointerXY(event);
+        const dx = viewportPos.x - startPointer.x;
+        const dy = viewportPos.y - startPointer.y;
 
         const zoom = this.editor.zoomManager.getZoom();
         const viewportX = prevViewport.x - dx / zoom;

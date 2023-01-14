@@ -13,6 +13,8 @@ interface IEditorOptions {
   canvasElement: HTMLCanvasElement;
   width: number;
   height: number;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 export class Editor {
@@ -36,12 +38,20 @@ export class Editor {
   constructor(options: IEditorOptions) {
     this.canvasElement = options.canvasElement;
     this.ctx = this.canvasElement.getContext('2d')!;
+
+    this.setting = new Setting();
+    if (options.offsetX) {
+      this.setting.offsetX = options.offsetX;
+    }
+    if (options.offsetY) {
+      this.setting.offsetY = options.offsetY;
+    }
+
     this.sceneGraph = new SceneGraph(this);
 
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
 
-    this.setting = new Setting();
 
     this.viewportManager = new ViewportManager(this);
 
@@ -90,5 +100,11 @@ export class Editor {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
     return sceneCoordsToViewportUtil(x, y, zoom, scrollX, scrollY);
+  }
+  getPointerXY(event: PointerEvent | WheelEvent) {
+    return {
+      x: event.clientX - this.setting.offsetX,
+      y: event.clientY - this.setting.offsetY,
+    };
   }
 }

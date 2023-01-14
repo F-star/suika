@@ -37,7 +37,8 @@ export class SelectRotationTool implements IBaseTool {
     hotkeys.unbind('*', this.shiftPressHandler);
   }
   start(e: PointerEvent) {
-    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const viewportPos = this.editor.getPointerXY(e);
+    this.startPointer = this.editor.viewportCoordsToScene(viewportPos.x, viewportPos.y);
     this.lastPointer = null;
     this.dRotation = 0;
 
@@ -61,7 +62,8 @@ export class SelectRotationTool implements IBaseTool {
     this.selectedElementsBBoxCenter = selectedElementsBBox ? getRectCenterPoint(selectedElementsBBox) : null;
   }
   drag(e: PointerEvent) {
-    this.lastPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const viewportPos = this.editor.getPointerXY(e);
+    this.lastPointer = this.editor.viewportCoordsToScene(viewportPos.x, viewportPos.y);
 
     this.rotateSelectedElements();
   }

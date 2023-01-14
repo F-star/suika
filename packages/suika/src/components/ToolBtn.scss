@@ -1,0 +1,28 @@
+.suika {
+  .tool-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0 2px;
+    border-radius: 4px;
+    width: 36px;
+    height: 32px;
+    cursor: pointer;
+
+    // svg {
+    //   width: 32px;
+    //   height: 32px;
+    // }
+
+    &:hover {
+      background-color: #f2f2f2;
+    }
+    &.active {
+      background-color: #0f8fff;
+      svg * {
+        stroke: #fff;
+      }
+    }
+  }
+}

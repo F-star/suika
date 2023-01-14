@@ -55,7 +55,8 @@ export class SelectTool implements ITool {
     const selectedElements = this.editor.selectedElements;
     const isShiftPressing = this.editor.hostEventManager.isShiftPressing;
 
-    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const pos = this.editor.getPointerXY(e);
+    this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     // 0. 点中 handle（旋转点）
     if (sceneGraph.isInRotationHandle(this.startPointer)) {

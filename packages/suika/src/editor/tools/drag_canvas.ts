@@ -20,17 +20,11 @@ export class DragCanvasTool implements ITool {
   }
   start(e: PointerEvent) {
     this.editor.canvasElement.style.cursor = 'grabbing';
-    this.startPointer = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.startPointer = this.editor.getPointerXY(e);
     this.prevViewport = this.editor.viewportManager.getViewport();
   }
   drag(e: PointerEvent) {
-    const pointer: IPoint = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    const pointer: IPoint = this.editor.getPointerXY(e);
     const startPointer = this.startPointer;
     const dx = pointer.x - startPointer.x;
     const dy = pointer.y - startPointer.y;

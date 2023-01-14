@@ -26,14 +26,16 @@ export class DrawSelectionBox implements IBaseTool {
       this.editor.selectedElements.clear();
     }
 
-    this.lastPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const pos = this.editor.getPointerXY(e);
+    this.lastPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     this.editor.sceneGraph.render();
     // 设置选区
     this.editor.sceneGraph.setSelection(this.lastPointer);
   }
   drag(e: PointerEvent) {
-    const pointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const pos = this.editor.getPointerXY(e);
+    const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     const box = getRectByTwoCoord(this.lastPointer, pointer);
 

@@ -59,7 +59,8 @@ export abstract class DrawShapeTool implements ITool {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
-    this.startPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const pos = this.editor.getPointerXY(e);
+    this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
     this.drawingShape = null;
     this.isDragging = false;
   }
@@ -68,13 +69,11 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
     this.isDragging = true;
-    this.lastDragPointerInViewport = {
-      x: e.clientX,
-      y: e.clientY,
-    };
+    this.lastDragPointerInViewport = this.editor.getPointerXY(e);
+    const pos = this.editor.getPointerXY(e);
     this.lastDragPointer = this.editor.viewportCoordsToScene(
-      e.clientX,
-      e.clientY
+      pos.x,
+      pos.y,
     );
     this.updateRect();
   }
@@ -127,7 +126,8 @@ export abstract class DrawShapeTool implements ITool {
     }
     this.isDragging = false;
 
-    const endPointer = this.editor.viewportCoordsToScene(e.clientX, e.clientY);
+    const pos = this.editor.getPointerXY(e);
+    const endPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
     if (this.drawingShape === null) {
       const { x: cx, y: cy } = endPointer;
       const width = this.editor.setting.drawRectDefaultWidth;

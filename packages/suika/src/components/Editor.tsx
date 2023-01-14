@@ -2,8 +2,8 @@ import throttle from 'lodash.throttle';
 import { FC, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
+import Header from './Header';
 import InfoPanel from './InfoPanel';
-import ToolBar from './Toolbar';
 import ZoomActions from './ZoomActions';
 
 const Editor: FC = () => {
@@ -17,6 +17,7 @@ const Editor: FC = () => {
         canvasElement: canvasRef.current,
         width: document.body.clientWidth,
         height: document.body.clientHeight,
+        offsetY: 49,
       });
       (window as any).editor = editor;
 
@@ -41,7 +42,7 @@ const Editor: FC = () => {
   return (
     <div>
       <EditorContext.Provider value={editor}>
-        <ToolBar />
+        <Header />
         <ZoomActions />
         <InfoPanel />
         <canvas ref={canvasRef} />
