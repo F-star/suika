@@ -1,8 +1,8 @@
 import { FC, useContext, useEffect, useState } from 'react';
-import { EditorContext } from '../context';
-import { Graph } from '../scene/graph';
-import { getElementRotatedXY, radian2Degree } from '../utils/graphics';
-import './InfoPanel.scss';
+import { EditorContext } from '../../../../context';
+import { Graph } from '../../../../scene/graph';
+import { getElementRotatedXY, radian2Degree } from '../../../../utils/graphics';
+import './style.scss';
 
 const InfoPanel: FC = () => {
   const editor = useContext(EditorContext);

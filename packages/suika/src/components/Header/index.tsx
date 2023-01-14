@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import ToolBar from './Toolbar';
-import './Header.scss';
+import ToolBar from './components/Toolbar';
+import './style.scss';
 
 const Header: FC = () => {
   return (

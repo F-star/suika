@@ -3,7 +3,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
 import Header from './Header';
-import InfoPanel from './InfoPanel';
+import InfoPanel from './Header/components/InfoPanel';
 import ZoomActions from './ZoomActions';
 
 const Editor: FC = () => {

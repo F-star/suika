@@ -1,8 +1,10 @@
 import classNames from 'classnames';
 import { useEffect, useContext, useState } from 'react';
-import { EditorContext } from '../context';
-import './Toolbar.scss';
-import ToolBtn from './ToolBtn';
+import { EditorContext } from '../../../../context';
+import ToolBtn from './components/ToolBtn';
+
+import './style.scss';
+
 
 const ToolBar = () => {
   const editor = useContext(EditorContext);
