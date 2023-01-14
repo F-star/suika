@@ -1,0 +1,18 @@
+.suika {
+  .title {
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg * {
+      fill: #0f8fff;
+    }
+    a {
+      margin-left: 4px;
+      text-decoration: none;
+      color: #0f8fff;
+    }
+  }
+}
