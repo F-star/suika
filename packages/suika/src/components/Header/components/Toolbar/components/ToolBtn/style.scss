@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 
     margin: 0 2px;
     border-radius: 4px;
@@ -14,9 +15,24 @@
     //   width: 32px;
     //   height: 32px;
     // }
+    .tooltip {
+      display: none;
+      position: absolute;
+      bottom: -40px;
+
+      border-radius: 4px;
+      padding: 8px 12px;
+
+      color: #fff;
+      font-size: 12px;
+      background-color: #333333ee;
+    }
 
     &:hover {
       background-color: #f2f2f2;
+      .tooltip {
+        display: block;
+      }
     }
     &.active {
       background-color: #0f8fff;

@@ -23,6 +23,7 @@ const ToolBar = () => {
     <div className="suika-tool-bar">
       <ToolBtn
         className={classNames({ active: tool === 'select' })}
+        tooltipContent='Select'
         onClick={() => {
           editor?.toolManager.setTool('select');
         }}
@@ -43,6 +44,7 @@ const ToolBar = () => {
       </ToolBtn>
       <ToolBtn
         className={classNames({ active: tool === 'drawRect' })}
+        tooltipContent='Rectangle'
         onClick={() => {
           editor?.toolManager.setTool('drawRect');
         }}
@@ -59,6 +61,7 @@ const ToolBar = () => {
       </ToolBtn>
       <ToolBtn
         className={classNames({ active: tool === 'drawEllipse' })}
+        tooltipContent='Ellipse'
         onClick={() => {
           editor?.toolManager.setTool('drawEllipse');
         }}
@@ -75,6 +78,7 @@ const ToolBar = () => {
       </ToolBtn>
       <ToolBtn
         className={classNames({ active: tool === 'dragCanvas' })}
+        tooltipContent='Hand'
         onClick={() => {
           editor?.toolManager.setTool('dragCanvas');
         }}

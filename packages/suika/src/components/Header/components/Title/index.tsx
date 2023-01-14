@@ -12,7 +12,7 @@ const Title: FC = () => {
         fill="none"
       >
         <path
-          fill-rule="evenodd"
+          fillRule="evenodd"
           fill="#C4C4C4"
           transform="translate(0.25 0.25)  rotate(0 7.75 7.556366182551985)"
           opacity="1"
