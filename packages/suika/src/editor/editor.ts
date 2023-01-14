@@ -84,7 +84,7 @@ export class Editor {
   viewportCoordsToScene(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY);
+    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, this.setting.snapToPixelGrid);
   }
   sceneCoordsToViewport(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();

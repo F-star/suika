@@ -30,4 +30,9 @@ export class Setting {
   rulerMarkStroke = '#c1c1c1';
   rulerWidth = 20; // 宽度
   rulerMarkSize = 4; // 刻度高度
+
+  /**** 网格相关 ****/
+  snapToPixelGrid = true; // 是否吸附到像素网格
+  minPixelGridZoom = 8; // 大于该 zoom 菜绘制网格
+  pixelStroke = '#e0e0e055'; // 提供透明度
 }
