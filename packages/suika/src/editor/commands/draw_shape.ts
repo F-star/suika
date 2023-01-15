@@ -1,5 +1,5 @@
 import { Graph } from '../../scene/graph';
-import { SceneGraph } from '../../scene/scene-graph';
+import { SceneGraph } from '../../scene/scene_graph';
 import { ICommand } from './type';
 
 /**

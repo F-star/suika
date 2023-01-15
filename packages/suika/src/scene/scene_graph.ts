@@ -1,6 +1,6 @@
 import { Editor } from '../editor/editor';
 import { IBox, IPoint, IRect } from '../type.interface';
-import { drawCircle, rotateInCanvas } from '../utils/canvas';
+import { rotateInCanvas } from '../utils/canvas';
 import EventEmitter from '../utils/event_emitter';
 import {
   arr2point,
@@ -16,6 +16,7 @@ import { transformRotate } from '../utils/transform';
 import { Ellipse } from './ellipse';
 import { getFill, Graph } from './graph';
 import { Rect } from './rect';
+import { TransformHandle } from './transform_handle';
 
 const DOUBLE_PI = Math.PI * 2;
 
@@ -30,10 +31,13 @@ export class SceneGraph {
     width: number;
     height: number;
   } | null = null;
-  private handle: { rotation: IPoint } | null = null;
+  // private handle: { rotation: IPoint } | null = null;
   private eventEmitter = new EventEmitter();
+  private transformHandle: TransformHandle;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: Editor) {
+    this.transformHandle = new TransformHandle(editor);
+  }
   appendChild(element: Graph, idx?: number) {
     if (idx === undefined) {
       this.children.push(element);
@@ -157,19 +161,7 @@ export class SceneGraph {
       ctx.restore();
     }
 
-    // 绘制 “旋转” 控制点
-    const handle = (this.handle = this.getTransformHandle(selectedElementsBBox));
-    if (handle) {
-      ctx.save();
-      ctx.strokeStyle = setting.handleRotationStroke;
-      ctx.fillStyle = setting.handleRotationFill;
-      ctx.lineWidth = setting.handleRotationStrokeWidth;
-
-      const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(handle.rotation.x, handle.rotation.y);
-      drawCircle(ctx, xInViewport, yInViewport, setting.handleRotationRadius);
-      ctx.restore();
-    }
+    this.transformHandle.draw(selectedElementsBBox);
 
     // TODO: 在画布缩放比大于 800% 时，绘制以像素点为单位的网格
 
@@ -187,11 +179,12 @@ export class SceneGraph {
    * 光标是否落在旋转控制点上
    */
   isInRotationHandle(point: IPoint) {
-    if (!this.handle) {
+    const transformHandle = this.transformHandle.handle;
+    if (!transformHandle) {
       return false;
     }
     // 计算旋转后的 x 和 y
-    const rotationPoint = this.handle.rotation;
+    const rotationPoint = transformHandle.rotation;
     const zoom = this.editor.zoomManager.getZoom();
 
     return isPointInCircle(point, {
