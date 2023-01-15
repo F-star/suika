@@ -40,14 +40,15 @@ export class TransformHandle {
         handle.rotation.x,
         handle.rotation.y
       );
+
+      const size = setting.handleSize;
       drawCircle(
         ctx,
         rotationPos.x,
         rotationPos.y,
-        setting.handleRotationRadius
+        size / 2
       );
 
-      const size = setting.handleRotationRadius * 2;
       // nw（左上）
       const nwPos = this.editor.sceneCoordsToViewport(handle.nw.x, handle.nw.y);
       rotateInCanvas(ctx, elementsRotation, nwPos.x, nwPos.y);
@@ -189,11 +190,12 @@ export class TransformHandle {
     const rotationPoint = transformHandle.rotation;
     const zoom = this.editor.zoomManager.getZoom();
 
+    const size = this.editor.setting.handleSize;
     const padding = 4;
     return isPointInCircle(point, {
       x: rotationPoint.x,
       y: rotationPoint.y,
-      radius: (this.editor.setting.handleRotationRadius + padding) / zoom,
+      radius: (size / 2 + padding) / zoom,
     });
   }
 }

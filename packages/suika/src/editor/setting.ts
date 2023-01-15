@@ -11,8 +11,8 @@ export class Setting {
   handleRotationStroke = '#1592fe';
   handleRotationFill = '#fff';
   handleRotationStrokeWidth = 2;
-  handleRotationRadius = 4;
-  handleRotationLineLength = 14;
+  handleSize = 6;
+  handleRotationLineLength = 15;
 
   lockRotation = Math.PI / 12; // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
 
