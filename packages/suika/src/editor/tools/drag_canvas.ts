@@ -18,6 +18,9 @@ export class DragCanvasTool implements ITool {
   inactive() {
     this.editor.canvasElement.style.cursor = '';
   }
+  moveExcludeDrag() {
+    // do nothing;
+  }
   start(e: PointerEvent) {
     this.editor.canvasElement.style.cursor = 'grabbing';
     this.startPointer = this.editor.getPointerXY(e);

@@ -1,3 +1,4 @@
+import throttle from 'lodash.throttle';
 import { Graph } from '../../../scene/graph';
 import { Rect } from '../../../scene/rect';
 import { IPoint } from '../../../type.interface';
@@ -36,6 +37,19 @@ export class SelectTool implements ITool {
     this.editor.selectedElements.clear();
     this.editor.sceneGraph.render();
   }
+  moveExcludeDrag = throttle((e: PointerEvent) => {
+    if (this.editor.hostEventManager.isSpacePressing) {
+      return;
+    }
+    const pos = this.editor.getPointerXY(e);
+    const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
+
+    if (this.editor.sceneGraph.transformHandle.isInRotationHandle(pointer)) {
+      this.editor.setCursor('grab');
+    } else {
+      this.editor.setCursor('');
+    }
+  }, 50);
   start(e: PointerEvent) {
     this.currStrategy = null;
     this.topHitElementWhenStart = null;
@@ -59,7 +73,7 @@ export class SelectTool implements ITool {
     this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     // 0. 点中 handle（旋转点）
-    if (sceneGraph.isInRotationHandle(this.startPointer)) {
+    if (sceneGraph.transformHandle.isInRotationHandle(this.startPointer)) {
       this.currStrategy = this.strategySelectRotation;
     }
 
@@ -135,5 +149,7 @@ export class SelectTool implements ITool {
     } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
+
+    this.editor.setCursor('');
   }
 }

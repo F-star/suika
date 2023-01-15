@@ -5,7 +5,7 @@ import {
   drawSquareWithCenter,
   rotateInCanvas,
 } from '../utils/canvas';
-import { arr2point } from '../utils/graphics';
+import { arr2point, isPointInCircle } from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
 
 export class TransformHandle {
@@ -179,5 +179,21 @@ export class TransformHandle {
         sw,
       };
     }
+  }
+  isInRotationHandle(point: IPoint) {
+    const transformHandle = this.handle;
+    if (!transformHandle) {
+      return false;
+    }
+    // 计算旋转后的 x 和 y
+    const rotationPoint = transformHandle.rotation;
+    const zoom = this.editor.zoomManager.getZoom();
+
+    const padding = 4;
+    return isPointInCircle(point, {
+      x: rotationPoint.x,
+      y: rotationPoint.y,
+      radius: (this.editor.setting.handleRotationRadius + padding) / zoom,
+    });
   }
 }

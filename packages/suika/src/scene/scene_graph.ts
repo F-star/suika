@@ -6,7 +6,6 @@ import {
   arr2point,
   getRectCenterPoint,
   getRectsBBox,
-  isPointInCircle,
   isPointInRect,
   isRectContain,
   isRectIntersect,
@@ -33,7 +32,7 @@ export class SceneGraph {
   } | null = null;
   // private handle: { rotation: IPoint } | null = null;
   private eventEmitter = new EventEmitter();
-  private transformHandle: TransformHandle;
+  transformHandle: TransformHandle;
 
   constructor(private editor: Editor) {
     this.transformHandle = new TransformHandle(editor);
@@ -178,21 +177,7 @@ export class SceneGraph {
   /**
    * 光标是否落在旋转控制点上
    */
-  isInRotationHandle(point: IPoint) {
-    const transformHandle = this.transformHandle.handle;
-    if (!transformHandle) {
-      return false;
-    }
-    // 计算旋转后的 x 和 y
-    const rotationPoint = transformHandle.rotation;
-    const zoom = this.editor.zoomManager.getZoom();
 
-    return isPointInCircle(point, {
-      x: rotationPoint.x,
-      y: rotationPoint.y,
-      radius: this.editor.setting.handleRotationRadius / zoom,
-    });
-  }
   /**
    * 绘制每个元素的轮廓，以及包围它们的包围盒
    */
@@ -329,63 +314,6 @@ export class SceneGraph {
       }
     }
     return containedElements;
-  }
-  private getTransformHandle(selectedElementsBBox: IBox | null) {
-    if (selectedElementsBBox === null) {
-      return null;
-    }
-    /**
-     * rotation: 旋转方向为正北方向
-     * ne 东北（西：west、北：north、东：east、西：west）
-     * nw 西北
-     * sw 西南 south west（左下）
-     * se
-     */
-    // 1. 先考虑 “单个元素” 的 “旋转” 控制点
-    const selectedElements = this.editor.selectedElements.getItems();
-    const zoom = this.editor.zoomManager.getZoom();
-    const setting = this.editor.setting;
-
-    if (selectedElements.length === 0) {
-      console.error('根据逻辑分支，代码走到这里 selectedElements.length 不可能为 0，请给我提 issue');
-      return null;
-    }
-    if (selectedElements.length === 1) {
-      const singleSelectElement = selectedElements[0];
-      const { x, y, width } = singleSelectElement.getBBoxWithoutRotation();
-      // 旋转位置
-      let rotation = {
-        x: x + width / 2,
-        y: y - setting.handleRotationLineLength / zoom,
-      };
-      const [cx, cy] = this.editor.selectedElements.getCenterPoint();
-      if (singleSelectElement.rotation) {
-        rotation = arr2point(
-          transformRotate(
-            rotation.x,
-            rotation.y,
-            singleSelectElement.rotation,
-            cx,
-            cy
-          )
-        );
-      }
-      return {
-        rotation,
-      };
-    }
-    // 多个图形被选中
-    else {
-      const { x, y, width } = selectedElementsBBox;
-      const rotation = {
-        x: x + width / 2,
-        y: y - setting.handleRotationLineLength / zoom,
-      };
-
-      return {
-        rotation,
-      };
-    }
   }
   on(eventName: 'render', handler: () => void) {
     this.eventEmitter.on(eventName, handler);

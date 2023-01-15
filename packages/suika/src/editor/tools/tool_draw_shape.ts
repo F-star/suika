@@ -55,6 +55,9 @@ export abstract class DrawShapeTool implements ITool {
 
     this.unbindEvent();
   }
+  moveExcludeDrag() {
+    // do nothing;
+  }
   start(e: PointerEvent) {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;

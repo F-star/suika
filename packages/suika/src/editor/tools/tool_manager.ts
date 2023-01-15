@@ -47,6 +47,8 @@ export class ToolManager {
       if (isPressing) {
         this.editor.hostEventManager.disableDragBySpace();
         this.currentTool.drag(e);
+      } else {
+        this.currentTool.moveExcludeDrag(e);
       }
     };
     const handleUp = (e: PointerEvent) => {
