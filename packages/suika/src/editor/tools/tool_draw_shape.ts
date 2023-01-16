@@ -149,7 +149,7 @@ export abstract class DrawShapeTool implements ITool {
       this.editor.sceneGraph.render();
     }
 
-    this.editor.commandManger.execCmd('AddShape', this.drawingShape);
+    this.editor.commandManager.execCmd('AddShape', this.drawingShape);
     this.editor.toolManager.setTool('select');
   }
 }

@@ -93,10 +93,10 @@ class HostEventManager {
   }
   private bindActionHotkeys() {
     hotkeys('ctrl+z, command+z', { keydown: true }, () => {
-      this.editor.commandManger.undo();
+      this.editor.commandManager.undo();
     });
     hotkeys('ctrl+shift+z, command+shift+z', { keydown: true }, () => {
-      this.editor.commandManger.redo();
+      this.editor.commandManager.redo();
     });
   }
   private bindWheelEventToZoom() {

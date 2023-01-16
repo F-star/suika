@@ -5,7 +5,7 @@ import { ICommand } from './type';
 
 type ICmdName = 'AddShape';
 
-export class CommandManger {
+export class CommandManager {
   redoStack: ICommand[] = [];
   undoStack: ICommand[] = [];
   map: { [cmdName: string]: new (...args: any) => any };

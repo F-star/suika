@@ -74,7 +74,7 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.render();
   }
   end() {
-    this.editor.commandManger.pushCommand(
+    this.editor.commandManager.pushCommand(
       new MoveElementsCommand(
         this.editor.selectedElements.getItems(),
         this.dx,

@@ -1,6 +1,6 @@
 import { SceneGraph } from '../scene/scene_graph';
 import { sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
-import { CommandManger } from './commands/commands';
+import { CommandManager } from './commands/command_manager';
 import HostEventManager from './host_event_manager';
 import Ruler from './ruler';
 import SelectedElements from './selected_elements';
@@ -27,7 +27,7 @@ export class Editor {
   viewportManager: ViewportManager;
 
   toolManager: ToolManager;
-  commandManger: CommandManger;
+  commandManager: CommandManager;
   zoomManager: ZoomManager;
 
   hostEventManager: HostEventManager;
@@ -56,7 +56,7 @@ export class Editor {
     this.viewportManager = new ViewportManager(this);
 
     this.toolManager = new ToolManager(this);
-    this.commandManger = new CommandManger(this);
+    this.commandManager = new CommandManager(this);
     this.zoomManager = new ZoomManager(this);
 
     this.selectedElements = new SelectedElements();
