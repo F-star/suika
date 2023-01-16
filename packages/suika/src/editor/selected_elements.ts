@@ -65,6 +65,12 @@ class SelectedElements {
     );
     return getRectsBBox(...bBoxesWithRotation);
   }
+  getRotation() {
+    if (this.items.length === 0 || this.items.length > 1) {
+      return 0;
+    }
+    return this.items[0].rotation || 0;
+  }
   on(eventName: 'itemsChange', handler: (items: Graph[]) => void) {
     this.eventEmitter.on(eventName, handler);
   }

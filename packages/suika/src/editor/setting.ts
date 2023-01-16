@@ -10,7 +10,7 @@ export class Setting {
   /**** 变形相关 ****/
   handleRotationStroke = '#1592fe';
   handleRotationFill = '#fff';
-  handleRotationStrokeWidth = 2;
+  handleStrokeWidth = 2;
   handleSize = 6;
   handleRotationLineLength = 15;
 

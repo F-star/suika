@@ -95,6 +95,7 @@ export class SceneGraph {
     ctx.scale(zoom, zoom);
     ctx.translate(-viewport.x, -viewport.y);
 
+    ctx.save();
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
       ctx.fillStyle = getFill(element);
@@ -105,7 +106,10 @@ export class SceneGraph {
           ctx.save();
           rotateInCanvas(ctx, element.rotation, cx, cy);
         }
-        ctx.fillRect(element.x, element.y, element.width, element.height);
+        ctx.beginPath();
+        ctx.rect(element.x, element.y, element.width, element.height);
+        ctx.fill();
+        ctx.closePath();
         if (element.rotation) {
           ctx.restore();
         }
@@ -127,6 +131,7 @@ export class SceneGraph {
         ctx.closePath();
       }
     }
+    ctx.restore();
 
     /******************* 绘制辅助线层 ********************/
     ctx.save();

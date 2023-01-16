@@ -44,7 +44,8 @@ export class SelectTool implements ITool {
     const pos = this.editor.getPointerXY(e);
     const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
-    if (this.editor.sceneGraph.transformHandle.isInRotationHandle(pointer)) {
+    const transformHandle = this.editor.sceneGraph.transformHandle;
+    if (transformHandle.getTransformHandleByPoint(pointer) === 'rotation') {
       this.editor.setCursor('grab');
     } else {
       this.editor.setCursor('');
@@ -73,7 +74,7 @@ export class SelectTool implements ITool {
     this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     // 0. 点中 handle（旋转点）
-    if (sceneGraph.transformHandle.isInRotationHandle(this.startPointer)) {
+    if (sceneGraph.transformHandle.getTransformHandleByPoint(this.startPointer) === 'rotation') {
       this.currStrategy = this.strategySelectRotation;
     }
 

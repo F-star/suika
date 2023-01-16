@@ -5,7 +5,7 @@ import {
   drawSquareWithCenter,
   rotateInCanvas,
 } from '../utils/canvas';
-import { arr2point, isPointInCircle } from '../utils/graphics';
+import { arr2point, isPointInCircle, isPointInRect } from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
 
 export class TransformHandle {
@@ -33,7 +33,7 @@ export class TransformHandle {
       ctx.save();
       ctx.strokeStyle = setting.handleRotationStroke;
       ctx.fillStyle = setting.handleRotationFill;
-      ctx.lineWidth = setting.handleRotationStrokeWidth;
+      ctx.lineWidth = setting.handleStrokeWidth;
 
       // 绘制旋转控制点
       const rotationPos = this.editor.sceneCoordsToViewport(
@@ -42,31 +42,22 @@ export class TransformHandle {
       );
 
       const size = setting.handleSize;
-      drawCircle(
-        ctx,
-        rotationPos.x,
-        rotationPos.y,
-        size / 2
-      );
-
+      drawCircle(ctx, rotationPos.x, rotationPos.y, size / 2);
       // nw（左上）
       const nwPos = this.editor.sceneCoordsToViewport(handle.nw.x, handle.nw.y);
       rotateInCanvas(ctx, elementsRotation, nwPos.x, nwPos.y);
       drawSquareWithCenter(ctx, nwPos.x, nwPos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-
       // ne（右上）
       const nePos = this.editor.sceneCoordsToViewport(handle.ne.x, handle.ne.y);
       rotateInCanvas(ctx, elementsRotation, nePos.x, nePos.y);
       drawSquareWithCenter(ctx, nePos.x, nePos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-
       // se（右下）
       const sePos = this.editor.sceneCoordsToViewport(handle.se.x, handle.se.y);
       rotateInCanvas(ctx, elementsRotation, sePos.x, sePos.y);
       drawSquareWithCenter(ctx, sePos.x, sePos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-
       // sw（左下）
       const swPos = this.editor.sceneCoordsToViewport(handle.sw.x, handle.sw.y);
       rotateInCanvas(ctx, elementsRotation, swPos.x, swPos.y);
@@ -109,24 +100,12 @@ export class TransformHandle {
         y: y - setting.handleRotationLineLength / zoom,
       };
       // 左上
-      let nw = {
-        x,
-        y,
-      };
+      let nw = { x, y };
       // 右上
-      let ne = {
-        x: x + width,
-        y,
-      };
+      let ne = { x: x + width, y };
       // se（右下）
-      let se = {
-        x: x + width,
-        y: y + height,
-      };
-      let sw = {
-        x,
-        y: y + height,
-      };
+      let se = { x: x + width, y: y + height };
+      let sw = { x, y: y + height };
       const [cx, cy] = this.editor.selectedElements.getCenterPoint();
       if (singleSelectedElement.rotation) {
         rotation = arr2point(
@@ -181,7 +160,56 @@ export class TransformHandle {
       };
     }
   }
-  isInRotationHandle(point: IPoint) {
+  getTransformHandleByPoint(point: IPoint) {
+    const handle = this.handle;
+    if (!handle) {
+      return undefined;
+    }
+    if (this.isInRotationHandle(point)) {
+      return 'rotation';
+    }
+
+    // 选中图形的旋转角度。。
+    const elRotation = this.editor.selectedElements.getRotation();
+    const setting = this.editor.setting;
+    const size = setting.handleSize + setting.handleStrokeWidth;
+
+    // 是否在缩放控制点上
+    let key: keyof typeof handle;
+    for (key in handle) {
+      if (key === 'rotation' && this.isInRotationHandle(point)) {
+        return key;
+      }
+
+      const scalePoint = handle[key];
+
+      let rotatedX = point.x;
+      let rotatedY = point.y;
+      if (elRotation) {
+        [rotatedX, rotatedY] = transformRotate(
+          point.x,
+          point.y,
+          elRotation,
+          scalePoint.x,
+          scalePoint.y
+        );
+      }
+      if (
+        isPointInRect(
+          { x: rotatedX, y: rotatedY },
+          {
+            x: scalePoint.x - size / 2,
+            y: scalePoint.y - size / 2,
+            width: size,
+            height: size,
+          }
+        )
+      ) {
+        return key;
+      }
+    }
+  }
+  private isInRotationHandle(point: IPoint) {
     const transformHandle = this.handle;
     if (!transformHandle) {
       return false;
