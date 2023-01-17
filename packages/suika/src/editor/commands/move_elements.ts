@@ -5,7 +5,6 @@ import { Rect } from '../../scene/rect';
  * 创建矩形
  */
 export class MoveElementsCommand implements ICommand {
-  static readonly type = 'MoveElements';
   elements: Rect[];
   dx: number;
   dy: number;

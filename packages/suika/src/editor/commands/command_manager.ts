@@ -1,21 +1,12 @@
 import { Editor } from '../editor';
-import { AddShapeCommand } from './draw_shape';
-import { MoveElementsCommand } from './move_elements';
 import { ICommand } from './type';
 
-type ICmdName = 'AddShape';
 
 export class CommandManager {
   redoStack: ICommand[] = [];
   undoStack: ICommand[] = [];
-  map: { [cmdName: string]: new (...args: any) => any };
 
-  constructor(private editor: Editor) {
-    this.map = Object.assign(Object.create(null), {
-      [AddShapeCommand.type]: AddShapeCommand,
-      [MoveElementsCommand.type]: MoveElementsCommand,
-    });
-  }
+  constructor(private editor: Editor) {}
 
   redo() {
     if (this.redoStack.length > 0) {
@@ -38,13 +29,6 @@ export class CommandManager {
     }
   }
   pushCommand(cmd: ICommand) {
-    this.undoStack.push(cmd);
-    this.redoStack = [];
-  }
-  execCmd(cmdName: ICmdName, ...options: any[]) {
-    const Ctor = this.map[cmdName];
-
-    const cmd = new Ctor(this.editor.sceneGraph, ...options);
     this.undoStack.push(cmd);
     this.redoStack = [];
   }

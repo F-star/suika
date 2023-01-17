@@ -2,6 +2,7 @@ import { Graph } from '../../scene/graph';
 import { IPoint } from '../../type.interface';
 import { noop } from '../../utils/common';
 import { normalizeRect } from '../../utils/graphics';
+import { AddShapeCommand } from '../commands/add_shape';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
@@ -149,7 +150,12 @@ export abstract class DrawShapeTool implements ITool {
       this.editor.sceneGraph.render();
     }
 
-    this.editor.commandManager.execCmd('AddShape', this.drawingShape);
+    this.editor.commandManager.pushCommand(
+      new AddShapeCommand(
+        this.editor,
+        this.drawingShape
+      )
+    );
     this.editor.toolManager.setTool('select');
   }
 }
