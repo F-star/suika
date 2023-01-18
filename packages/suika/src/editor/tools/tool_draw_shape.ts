@@ -69,6 +69,7 @@ export abstract class DrawShapeTool implements ITool {
     this.isDragging = false;
   }
   drag(e: PointerEvent) {
+    this.editor.hostEventManager.disableDelete();
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
@@ -125,6 +126,7 @@ export abstract class DrawShapeTool implements ITool {
     sceneGraph.render();
   }
   end(e: PointerEvent) {
+    this.editor.hostEventManager.enableDelete();
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }

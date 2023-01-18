@@ -23,7 +23,7 @@ const DOUBLE_PI = Math.PI * 2;
  * 图形树
  */
 export class SceneGraph {
-  private children: Graph[] = [];
+  children: Graph[] = [];
   selection: {
     x: number;
     y: number;

@@ -16,6 +16,7 @@ class HostEventManager {
 
   isDraggingCanvasBySpace = false;
   isEnableDragCanvasBySpace = true;
+  isEnableDelete = true;
 
   private prevCursor = '';
 
@@ -97,6 +98,16 @@ class HostEventManager {
     });
     hotkeys('ctrl+shift+z, command+shift+z', { keydown: true }, () => {
       this.editor.commandManager.redo();
+    });
+    hotkeys('backspace, delete', { keydown: true }, () => {
+      // TODO: 一些情况下是不能删除的
+      // 1. 绘制图形过程中
+      //
+      // 可以删除但要特殊处理的情况
+      // 2. 对图形旋转或缩放时，可以删除，注意处理绘制矩形。
+      if (this.isEnableDelete) {
+        this.editor.selectedElements.removeFromScene();
+      }
     });
   }
   private bindWheelEventToZoom() {
@@ -185,6 +196,12 @@ class HostEventManager {
   }
   disableDragBySpace() {
     this.isEnableDragCanvasBySpace = false;
+  }
+  enableDelete() {
+    this.isEnableDelete = true;
+  }
+  disableDelete() {
+    this.isEnableDelete = false;
   }
   destroy() {
     hotkeys.unbind();

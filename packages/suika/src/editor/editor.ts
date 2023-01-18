@@ -59,7 +59,7 @@ export class Editor {
     this.commandManager = new CommandManager(this);
     this.zoomManager = new ZoomManager(this);
 
-    this.selectedElements = new SelectedElements();
+    this.selectedElements = new SelectedElements(this);
     this.ruler = new Ruler(this);
 
     // 设置初始视口

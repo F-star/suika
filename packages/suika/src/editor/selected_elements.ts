@@ -3,12 +3,15 @@ import { IBox } from '../type.interface';
 import { isSameArray } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
+import { RemoveElement } from './commands/remove_element';
+import { Editor } from './editor';
 
 
 class SelectedElements {
   private items: Graph[] = [];
   private eventEmitter = new EventEmitter();
 
+  constructor(private editor: Editor) {}
   setItems(items: Graph[]) {
     const prevItems = this.items;
     this.items = items;
@@ -76,6 +79,18 @@ class SelectedElements {
   }
   off(eventName: 'itemsChange', handler: (items: Graph[]) => void) {
     this.eventEmitter.off(eventName, handler);
+  }
+  removeFromScene() {
+    if (this.isEmpty()) {
+      return;
+    }
+    this.editor.commandManager.pushCommand(
+      new RemoveElement(
+        this.editor,
+        this.items,
+      )
+    );
+    this.editor.sceneGraph.render();
   }
 }
 

@@ -74,6 +74,11 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.render();
   }
   end() {
+    const selectedElements = this.editor.selectedElements.getItems();
+    if (selectedElements.length === 0) { // 移动的时候元素被删除了，或者撤销导致为空
+      // TODO: 属性复原
+      return;
+    }
     this.editor.commandManager.pushCommand(
       new MoveElementsCommand(
         this.editor.selectedElements.getItems(),
