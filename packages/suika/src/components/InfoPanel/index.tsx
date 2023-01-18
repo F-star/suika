@@ -1,8 +1,16 @@
 import { FC, useContext, useEffect, useState } from 'react';
-import { EditorContext } from '../../../../context';
-import { Graph } from '../../../../scene/graph';
-import { getElementRotatedXY, radian2Degree } from '../../../../utils/graphics';
+import { EditorContext } from '../../context';
+import { Graph } from '../../scene/graph';
+import { getElementRotatedXY, radian2Degree } from '../../utils/graphics';
 import './style.scss';
+
+/**
+ * 保留两位小数
+ * 如果是 0，丢弃 0
+ */
+const remainTwoDecimal = (n: number) => {
+  return Number(n.toFixed(2));
+};
 
 const InfoPanel: FC = () => {
   const editor = useContext(EditorContext);
@@ -42,24 +50,24 @@ const InfoPanel: FC = () => {
           {/* TODO: 如果多个元素的某个属性相同，则不显示 'Mixed'，显示具体属性值 */}
           <div className="field">
             <span>X</span>
-            {items.length === 1 ? rotatedX.toFixed(2) : 'Mixed'}
+            {items.length === 1 ? remainTwoDecimal(rotatedX): 'Mixed'}
           </div>
           <div className="field">
             <span>Y</span>
-            {items.length === 1 ? rotatedY.toFixed(2) : 'Mixed'}
+            {items.length === 1 ? remainTwoDecimal(rotatedY) : 'Mixed'}
           </div>
           <div className="field">
             <span>W</span>
-            {items.length === 1 ? items[0].width.toFixed(2) : 'Mixed'}
+            {items.length === 1 ? remainTwoDecimal(items[0].width) : 'Mixed'}
           </div>
           <div className="field">
             <span>H</span>
-            {items.length === 1 ? items[0].height.toFixed(2) : 'Mixed'}
+            {items.length === 1 ? remainTwoDecimal(items[0].height) : 'Mixed'}
           </div>
           <div className="field">
             <span>R</span>
             {items.length === 1
-              ? radian2Degree(items[0].rotation || 0).toFixed(2) + '°'
+              ? remainTwoDecimal(radian2Degree(items[0].rotation || 0)) + '°'
               : 'Mixed'}
           </div>
         </>
