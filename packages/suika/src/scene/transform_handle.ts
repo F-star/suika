@@ -2,7 +2,7 @@ import { Editor } from '../editor/editor';
 import { IBox, IPoint, IRect } from '../type.interface';
 import {
   drawCircle,
-  drawSquareWithCenter,
+  // drawSquareWithCenter,
   rotateInCanvas,
 } from '../utils/canvas';
 import { arr2point, isPointInCircle, isPointInRect } from '../utils/graphics';
@@ -46,22 +46,22 @@ export class TransformHandle {
       // nw（左上）
       const nwPos = this.editor.sceneCoordsToViewport(handle.nw.x, handle.nw.y);
       rotateInCanvas(ctx, elementsRotation, nwPos.x, nwPos.y);
-      drawSquareWithCenter(ctx, nwPos.x, nwPos.y, size);
+      // drawSquareWithCenter(ctx, nwPos.x, nwPos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // ne（右上）
       const nePos = this.editor.sceneCoordsToViewport(handle.ne.x, handle.ne.y);
       rotateInCanvas(ctx, elementsRotation, nePos.x, nePos.y);
-      drawSquareWithCenter(ctx, nePos.x, nePos.y, size);
+      // drawSquareWithCenter(ctx, nePos.x, nePos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // se（右下）
       const sePos = this.editor.sceneCoordsToViewport(handle.se.x, handle.se.y);
       rotateInCanvas(ctx, elementsRotation, sePos.x, sePos.y);
-      drawSquareWithCenter(ctx, sePos.x, sePos.y, size);
+      // drawSquareWithCenter(ctx, sePos.x, sePos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // sw（左下）
       const swPos = this.editor.sceneCoordsToViewport(handle.sw.x, handle.sw.y);
       rotateInCanvas(ctx, elementsRotation, swPos.x, swPos.y);
-      drawSquareWithCenter(ctx, swPos.x, swPos.y, size);
+      // drawSquareWithCenter(ctx, swPos.x, swPos.y, size);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
 
       ctx.restore();
