@@ -1,5 +1,3 @@
-import { IRect } from '../type.interface';
-
 export const noop = () => {
   // do nothing
 };
