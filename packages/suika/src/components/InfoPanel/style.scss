@@ -1,13 +1,12 @@
 .suika {
   .info-panel {
     position: fixed;
-    right: 4px;
-    top: 80px;
+    right: 0;
+    top: 29;
 
-    padding: 8px;
-    border: 1px solid #e6e6e6;
-    width: 160px;
-    min-height: 200px;
+    border-left: 1px solid #e6e6e6;
+    width: 240px;
+    height: calc(100vh - 29px);
 
     font-size: 12px;
     background-color: #fff;
@@ -15,21 +14,8 @@
 
     .empty-text {
       color: #b3b3b3;
-      padding-left: 8px;
+      padding: 16px;
     }
-
-    .field {
-      display: flex;
-      line-height: 32px;
-      text-align: center;
-      span {
-        display: block;
-        height: 32px;
-        width: 32px;
-        line-height: 32px;
-        text-align: center;
-        color: #b3b3b3;
-      }
-    }
+  
   }
 }

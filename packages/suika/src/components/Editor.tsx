@@ -6,6 +6,8 @@ import Header from './Header';
 import InfoPanel from './InfoPanel';
 import ZoomActions from './ZoomActions';
 
+const rightPadding = 241;
+
 const Editor: FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -15,15 +17,15 @@ const Editor: FC = () => {
     if (canvasRef.current) {
       const editor = new GraphEditor({
         canvasElement: canvasRef.current,
-        width: document.body.clientWidth,
+        width: document.body.clientWidth - rightPadding,
         height: document.body.clientHeight,
-        offsetY: 49,
+        offsetY: 48,
       });
       (window as any).editor = editor;
 
       const changeViewport = throttle(() => {
         editor.viewportManager.setViewport({
-          width: document.body.clientWidth,
+          width: document.body.clientWidth - rightPadding,
           height: document.body.clientHeight,
         });
         editor.sceneGraph.render();

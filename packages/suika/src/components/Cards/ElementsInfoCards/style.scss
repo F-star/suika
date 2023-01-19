@@ -1,0 +1,19 @@
+.suika {
+  .element-info-attrs-row {
+    display: flex;
+  }
+  .field {
+    display: flex;
+    width: 100px;
+    line-height: 32px;
+    text-align: center;
+    span {
+      display: block;
+      height: 32px;
+      width: 32px;
+      line-height: 32px;
+      text-align: center;
+      color: #b3b3b3;
+    }
+  }
+}

@@ -1,76 +1,37 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
-import { Graph } from '../../scene/graph';
-import { getElementRotatedXY, radian2Degree } from '../../utils/graphics';
+import { IGraph } from '../../scene/graph';
+import ElementsInfoCards from '../Cards/ElementsInfoCards';
 import './style.scss';
 
-/**
- * 保留两位小数
- * 如果是 0，丢弃 0
- */
-const remainTwoDecimal = (n: number) => {
-  return Number(n.toFixed(2));
-};
+enum PanelType {
+  Global = 'Global',
+  SelectedElements = 'SelectedElements',
+}
 
 const InfoPanel: FC = () => {
   const editor = useContext(EditorContext);
-  const [items, setItems] = useState<Graph[]>([]);
-
-  let rotatedX = 0;
-  let rotatedY = 0;
-  if (items.length === 1) {
-    [rotatedX, rotatedY] = getElementRotatedXY(items[0]);
-  }
+  const [type, setType] = useState(PanelType.Global);
+  // 根据是否选中元素，来决定面板类型
 
   useEffect(() => {
     if (editor) {
-      const handler = () => {
-        setItems((prevItems) => {
-          const items = editor.selectedElements.getItems();
-          // 如果变化前后数组长度都是 0，就不更新
-          return prevItems.length === 0 && items.length === 0
-            ? prevItems
-            : items;
-        });
+      const handler = (items: IGraph[]) => {
+        setType(items.length ? PanelType.SelectedElements : PanelType.Global);
       };
-      editor.sceneGraph.on('render', handler);
+      editor.selectedElements.on('itemsChange', handler);
 
       return () => {
-        editor.sceneGraph.off('render', handler);
+        editor.selectedElements.off('itemsChange', handler);
       };
     }
   }, [editor]);
 
   return (
     <div className="info-panel">
-      {items.length === 0 ? (
-        <div className='empty-text'>No Selected Shapes</div>
-      ) : (
-        <>
-          {/* TODO: 如果多个元素的某个属性相同，则不显示 'Mixed'，显示具体属性值 */}
-          <div className="field">
-            <span>X</span>
-            {items.length === 1 ? remainTwoDecimal(rotatedX): 'Mixed'}
-          </div>
-          <div className="field">
-            <span>Y</span>
-            {items.length === 1 ? remainTwoDecimal(rotatedY) : 'Mixed'}
-          </div>
-          <div className="field">
-            <span>W</span>
-            {items.length === 1 ? remainTwoDecimal(items[0].width) : 'Mixed'}
-          </div>
-          <div className="field">
-            <span>H</span>
-            {items.length === 1 ? remainTwoDecimal(items[0].height) : 'Mixed'}
-          </div>
-          <div className="field">
-            <span>R</span>
-            {items.length === 1
-              ? remainTwoDecimal(radian2Degree(items[0].rotation || 0)) + '°'
-              : 'Mixed'}
-          </div>
-        </>
+      {type === PanelType.SelectedElements && <ElementsInfoCards />}
+      {type === PanelType.Global && (
+        <div className="empty-text">No Selected Shapes</div>
       )}
     </div>
   );
