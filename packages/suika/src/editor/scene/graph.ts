@@ -7,7 +7,7 @@ import {
   getElementRotatedXY,
   getRectCenterPoint,
 } from '../../utils/graphics';
-import { transformRotate } from '../../utils/transform';
+import { getOriginXY, transformRotate } from '../../utils/transform';
 
 export interface IGraph {
   x: number;
@@ -184,6 +184,81 @@ export const MutateElementsAndRecord = {
         elements.map((el) => ({ y: el.y })),
         prevXs
       )
+    );
+  },
+  setWidth(editor: Editor, elements: Graph[], width: number) {
+    if (elements.length === 0) {
+      return;
+    }
+
+    const prevAttrs = elements.map((el) => ({
+      x: el.x,
+      y: el.y,
+      width: el.width,
+    }));
+    elements.forEach((el) => {
+      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      el.width = width;
+      const [x, y] = getOriginXY(
+        rotatedX,
+        rotatedY,
+        el.rotation || 0,
+        width,
+        el.height
+      );
+      el.x = x;
+      el.y = y;
+    });
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        elements,
+        elements.map((el) => ({ width: el.width, x: el.x, y: el.y })),
+        prevAttrs
+      )
+    );
+  },
+  setHeight(editor: Editor, elements: Graph[], height: number) {
+    if (elements.length === 0) {
+      return;
+    }
+
+    const prevAttrs = elements.map((el) => ({
+      x: el.x,
+      y: el.y,
+      height: el.height,
+    }));
+    elements.forEach((el) => {
+      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      el.height = height;
+      const [x, y] = getOriginXY(
+        rotatedX,
+        rotatedY,
+        el.rotation || 0,
+        el.width,
+        height
+      );
+      el.x = x;
+      el.y = y;
+    });
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        elements,
+        elements.map((el) => ({ height: el.height, x: el.x, y: el.y })),
+        prevAttrs
+      )
+    );
+  },
+  setRotation(editor: Editor, elements: Graph[], rotation: number) {
+    if (elements.length === 0) {
+      return;
+    }
+
+    const prevAttrs = elements.map((el) => ({ rotation: el.rotation || 0 }));
+    elements.forEach((el) => {
+      el.rotation = rotation;
+    });
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(elements, { rotation: rotation }, prevAttrs)
     );
   },
 };

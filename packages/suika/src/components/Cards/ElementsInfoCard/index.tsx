@@ -2,7 +2,12 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
 import { MutateElementsAndRecord } from '../../../editor/scene/graph';
 import { remainTwoDecimal } from '../../../utils/common';
-import { getElementRotatedXY } from '../../../utils/graphics';
+import {
+  degree2Radian,
+  getElementRotatedXY,
+  normalizeAngle,
+  radian2Degree,
+} from '../../../utils/graphics';
 import { BaseCard } from '../BaseCard';
 import NumberInput from './components/NumberInput';
 import './style.scss';
@@ -70,7 +75,9 @@ const ElementsInfoCards: FC = () => {
           setWidth(newWidth);
           setHeight(newHeight);
           setRotation(
-            newRotation === MIXED ? newRotation : remainTwoDecimal(newRotation)
+            newRotation === MIXED
+              ? newRotation
+              : remainTwoDecimal(radian2Degree(newRotation))
           );
         }
       };
@@ -123,17 +130,56 @@ const ElementsInfoCards: FC = () => {
       <div className="element-info-attrs-row">
         <div className="field">
           <span>W</span>
-          {width}
+          <NumberInput
+            value={width}
+            onBlur={(newWidth) => {
+              if (editor) {
+                if (newWidth <= 0) {
+                  newWidth = 1;
+                }
+                const elements = editor.selectedElements.getItems();
+                MutateElementsAndRecord.setWidth(editor, elements, newWidth);
+                editor.sceneGraph.render();
+              }
+            }}
+          />
         </div>
         <div className="field">
           <span>H</span>
-          {height}
+          <NumberInput
+            value={height}
+            onBlur={(newHeight) => {
+              if (editor) {
+                if (newHeight <= 0) {
+                  newHeight = 1;
+                }
+                const elements = editor.selectedElements.getItems();
+                MutateElementsAndRecord.setHeight(editor, elements, newHeight);
+                editor.sceneGraph.render();
+              }
+            }}
+          />
         </div>
       </div>
       <div className="element-info-attrs-row">
         <div className="field">
           <span>R</span>
-          {rotation}
+          <NumberInput
+            value={rotation}
+            onBlur={(newRotation) => {
+              if (editor) {
+                newRotation = normalizeAngle(degree2Radian(newRotation));
+
+                const elements = editor.selectedElements.getItems();
+                MutateElementsAndRecord.setRotation(
+                  editor,
+                  elements,
+                  newRotation
+                );
+                editor.sceneGraph.render();
+              }
+            }}
+          />
         </div>
       </div>
     </BaseCard>

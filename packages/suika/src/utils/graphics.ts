@@ -156,6 +156,13 @@ export function radian2Degree(radian: number) {
 }
 
 /**
+ * 角度转弧度
+ */
+export function degree2Radian(degree: number) {
+  return degree * Math.PI / 180;
+}
+
+/**
  * 计算绝对坐标
  */
 export function getAbsoluteCoords(
