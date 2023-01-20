@@ -40,8 +40,10 @@ export function transformRotate(
   if (!radian) {
     return [x, y];
   }
+  const cos = Math.cos(radian);
+  const sin = Math.sin(radian);
   return [
-    (x - cx) * Math.cos(radian) - (y - cy) * Math.sin(radian) + cx,
-    (x - cx) * Math.sin(radian) + (y - cy) * Math.cos(radian) + cy,
+    (x - cx) * cos - (y - cy) * sin + cx,
+    (x - cx) * sin + (y - cy) * cos + cy,
   ];
 }
