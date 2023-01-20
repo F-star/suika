@@ -113,16 +113,15 @@ export class Graph {
   }
   setRotateX(rotatedX: number) {
     const [cx, cy] = getRectCenterPoint(this);
-    const [, rotatedY] = getElementRotatedXY(this);
-    const [x, y] = transformRotate(
+    const [prevRotatedX, prevRotatedY] = getElementRotatedXY(this);
+    const [x] = transformRotate(
       rotatedX,
-      rotatedY,
+      prevRotatedY,
       -(this.rotation || 0),
-      cx,
+      cx + (rotatedX - prevRotatedX),
       cy
     );
     this.x = x;
-    this.y = y;
   }
 }
 
