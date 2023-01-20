@@ -16,7 +16,7 @@ const MIXED = 'Mixed';
  */
 const isEqual = (a: number | string, b: number) => {
   if (typeof a === 'string') return false;
-  return Math.abs(a - b) <= 0.00000001;
+  return Math.abs(a - b) < 0.00000001;
 };
 
 const ElementsInfoCards: FC = () => {
@@ -44,16 +44,16 @@ const ElementsInfoCards: FC = () => {
             const element = items[i];
             const [currentRotatedX, currentRotatedY] =
               getElementRotatedXY(element);
-            if (isEqual(newRotatedX, currentRotatedX)) {
+            if (!isEqual(newRotatedX, currentRotatedX)) {
               newRotatedX = MIXED;
             }
-            if (isEqual(newRotatedY, currentRotatedY)) {
+            if (!isEqual(newRotatedY, currentRotatedY)) {
               newRotatedY = MIXED;
             }
-            if (isEqual(newWidth, element.width)) {
+            if (!isEqual(newWidth, element.width)) {
               newWidth = MIXED;
             }
-            if (isEqual(newHeight, element.height)) {
+            if (!isEqual(newHeight, element.height)) {
               newHeight = MIXED;
             }
             if (isEqual(newRotation, element.rotation || 0)) {
