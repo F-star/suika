@@ -104,7 +104,20 @@ const ElementsInfoCards: FC = () => {
         </div>
         <div className="field">
           <span>Y</span>
-          {rotatedY}
+          <NumberInput
+            value={rotatedY}
+            onBlur={(newRotatedY) => {
+              if (editor) {
+                const elements = editor.selectedElements.getItems();
+                MutateElementsAndRecord.setRotateY(
+                  editor,
+                  elements,
+                  newRotatedY
+                );
+                editor.sceneGraph.render();
+              }
+            }}
+          />
         </div>
       </div>
       <div className="element-info-attrs-row">

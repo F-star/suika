@@ -123,6 +123,18 @@ export class Graph {
     );
     this.x = x;
   }
+  setRotateY(rotatedY: number) {
+    const [cx, cy] = getRectCenterPoint(this);
+    const [prevRotatedX, prevRotatedY] = getElementRotatedXY(this);
+    const [, y] = transformRotate(
+      prevRotatedX,
+      rotatedY,
+      -(this.rotation || 0),
+      cx,
+      cy + (rotatedY - prevRotatedY)
+    );
+    this.y = y;
+  }
 }
 
 export const getFill = (obj: Pick<IGraph, 'fill'>) => {
@@ -150,6 +162,26 @@ export const MutateElementsAndRecord = {
       new SetElementsAttrs(
         elements,
         elements.map((el) => ({ x: el.x })),
+        prevXs
+      )
+    );
+  },
+  setRotateY(editor: Editor, elements: Graph[], rotatedY: number) {
+    if (elements.length === 0) {
+      return;
+    }
+    // 1. 计算新的 x
+    const prevXs: { y: number }[] = new Array(elements.length);
+    for (let i = 0, len = elements.length; i < len; i++) {
+      const element = elements[i];
+      prevXs[i] = { y: element.y };
+      element.setRotateY(rotatedY);
+    }
+    // 2. 保存到历史记录
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        elements,
+        elements.map((el) => ({ y: el.y })),
         prevXs
       )
     );
