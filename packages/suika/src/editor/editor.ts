@@ -1,4 +1,4 @@
-import { SceneGraph } from '../scene/scene_graph';
+import { SceneGraph } from './scene/scene_graph';
 import { sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
 import { CommandManager } from './commands/command_manager';
 import HostEventManager from './host_event_manager';

@@ -1,6 +1,6 @@
-import { IBox, IRect } from '../type.interface';
-import { getAbsoluteCoords } from '../utils/graphics';
-import { transformRotate } from '../utils/transform';
+import { IBox, IRect } from '../../type.interface';
+import { getAbsoluteCoords } from '../../utils/graphics';
+import { transformRotate } from '../../utils/transform';
 import { Graph, IGraph } from './graph';
 
 export interface RectGraph extends IGraph, IRect {}

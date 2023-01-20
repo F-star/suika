@@ -1,4 +1,4 @@
-import { Rect } from '../../scene/rect';
+import { Rect } from '../scene/rect';
 import { ICommand } from './type';
 
 type IAttrs = Partial<{

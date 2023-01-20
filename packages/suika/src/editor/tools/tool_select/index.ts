@@ -1,6 +1,6 @@
 import throttle from 'lodash.throttle';
-import { Graph } from '../../../scene/graph';
-import { Rect } from '../../../scene/rect';
+import { Graph } from '../../scene/graph';
+import { Rect } from '../../scene/rect';
 import { IPoint } from '../../../type.interface';
 import { Editor } from '../../editor';
 import { IBaseTool, ITool } from '../type';

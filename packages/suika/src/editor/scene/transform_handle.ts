@@ -1,12 +1,12 @@
-import { Editor } from '../editor/editor';
-import { IBox, IPoint, IRect } from '../type.interface';
+import { Editor } from '../editor';
+import { IBox, IPoint, IRect } from '../../type.interface';
 import {
   drawCircle,
   // drawSquareWithCenter,
   rotateInCanvas,
-} from '../utils/canvas';
-import { arr2point, isPointInCircle, isPointInRect } from '../utils/graphics';
-import { transformRotate } from '../utils/transform';
+} from '../../utils/canvas';
+import { arr2point, isPointInCircle, isPointInRect } from '../../utils/graphics';
+import { transformRotate } from '../../utils/transform';
 
 export class TransformHandle {
   handle: {

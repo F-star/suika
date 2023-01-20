@@ -1,4 +1,4 @@
-import { Rect } from '../../scene/rect';
+import { Rect } from '../scene/rect';
 import { Editor } from '../editor';
 import { DrawShapeTool } from './tool_draw_shape';
 import { ITool } from './type';

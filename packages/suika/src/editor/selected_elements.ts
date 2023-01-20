@@ -1,4 +1,4 @@
-import { Graph } from '../scene/graph';
+import { Graph } from './scene/graph';
 import { IBox } from '../type.interface';
 import { isSameArray } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';

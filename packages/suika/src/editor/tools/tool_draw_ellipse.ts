@@ -1,4 +1,4 @@
-import { Ellipse } from '../../scene/ellipse';
+import { Ellipse } from '../scene/ellipse';
 import { Editor } from '../editor';
 import { DrawShapeTool } from './tool_draw_shape';
 import { ITool } from './type';

@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
-import { MutateElementsAndRecord } from '../../../scene/graph';
+import { MutateElementsAndRecord } from '../../../editor/scene/graph';
 import { remainTwoDecimal } from '../../../utils/common';
 import { getElementRotatedXY } from '../../../utils/graphics';
 import { BaseCard } from '../BaseCard';

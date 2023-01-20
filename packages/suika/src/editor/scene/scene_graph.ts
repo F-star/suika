@@ -1,7 +1,7 @@
-import { Editor } from '../editor/editor';
-import { IBox, IPoint, IRect } from '../type.interface';
-import { rotateInCanvas } from '../utils/canvas';
-import EventEmitter from '../utils/event_emitter';
+import { Editor } from '../editor';
+import { IBox, IPoint, IRect } from '../../type.interface';
+import { rotateInCanvas } from '../../utils/canvas';
+import EventEmitter from '../../utils/event_emitter';
 import {
   arr2point,
   getRectCenterPoint,
@@ -9,9 +9,9 @@ import {
   isPointInRect,
   isRectContain,
   isRectIntersect,
-} from '../utils/graphics';
-import rafThrottle from '../utils/raf_throttle';
-import { transformRotate } from '../utils/transform';
+} from '../../utils/graphics';
+import rafThrottle from '../../utils/raf_throttle';
+import { transformRotate } from '../../utils/transform';
 import { Ellipse } from './ellipse';
 import { getFill, Graph } from './graph';
 import { Rect } from './rect';

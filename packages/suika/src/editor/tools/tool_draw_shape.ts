@@ -1,4 +1,4 @@
-import { Graph } from '../../scene/graph';
+import { Graph } from '../scene/graph';
 import { IPoint } from '../../type.interface';
 import { noop } from '../../utils/common';
 import { normalizeRect } from '../../utils/graphics';

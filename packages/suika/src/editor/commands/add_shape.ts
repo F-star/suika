@@ -1,4 +1,4 @@
-import { Graph } from '../../scene/graph';
+import { Graph } from '../scene/graph';
 import { Editor } from '../editor';
 import { ICommand } from './type';
 

@@ -1,13 +1,13 @@
-import { SetElementsAttrs } from '../editor/commands/set_elements_attrs';
-import { Editor } from '../editor/editor';
-import { IBox } from '../type.interface';
-import { genId } from '../utils/common';
+import { SetElementsAttrs } from '../commands/set_elements_attrs';
+import { Editor } from '../editor';
+import { IBox } from '../../type.interface';
+import { genId } from '../../utils/common';
 import {
   getAbsoluteCoords,
   getElementRotatedXY,
   getRectCenterPoint,
-} from '../utils/graphics';
-import { transformRotate } from '../utils/transform';
+} from '../../utils/graphics';
+import { transformRotate } from '../../utils/transform';
 
 export interface IGraph {
   x: number;

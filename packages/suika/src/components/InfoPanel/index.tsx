@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
-import { IGraph } from '../../scene/graph';
+import { IGraph } from '../../editor/scene/graph';
 import ElementsInfoCards from '../Cards/ElementsInfoCard';
 import './style.scss';
 
