@@ -9,6 +9,16 @@ import './style.scss';
 
 const MIXED = 'Mixed';
 
+/**
+ * 因为运算中会丢失精度
+ * 如果两个数距离非常非常小，我们认为它相等
+ *
+ */
+const isEqual = (a: number | string, b: number) => {
+  if (typeof a === 'string') return false;
+  return Math.abs(a - b) <= 0.00000001;
+};
+
 const ElementsInfoCards: FC = () => {
   const editor = useContext(EditorContext);
   const [rotatedX, setRotatedX] = useState<number | typeof MIXED>(MIXED);
@@ -34,19 +44,19 @@ const ElementsInfoCards: FC = () => {
             const element = items[i];
             const [currentRotatedX, currentRotatedY] =
               getElementRotatedXY(element);
-            if (newRotatedX !== currentRotatedX) {
+            if (isEqual(newRotatedX, currentRotatedX)) {
               newRotatedX = MIXED;
             }
-            if (newRotatedY !== currentRotatedY) {
+            if (isEqual(newRotatedY, currentRotatedY)) {
               newRotatedY = MIXED;
             }
-            if (newWidth !== element.width) {
+            if (isEqual(newWidth, element.width)) {
               newWidth = MIXED;
             }
-            if (newHeight !== element.height) {
+            if (isEqual(newHeight, element.height)) {
               newHeight = MIXED;
             }
-            if (newRotation !== (element.rotation || 0)) {
+            if (isEqual(newRotation, element.rotation || 0)) {
               newRotation = MIXED;
             }
           }
