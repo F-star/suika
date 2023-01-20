@@ -51,11 +51,17 @@ const ElementsInfoCards: FC = () => {
             }
           }
 
-          if (newRotatedX !== MIXED) setRotatedX(remainTwoDecimal(newRotatedX));
-          if (newRotatedY !== MIXED) setRotatedY(remainTwoDecimal(newRotatedY));
-          if (newWidth !== MIXED) setWidth(newWidth);
-          if (newHeight !== MIXED) setHeight(newHeight);
-          if (newRotation !== MIXED) setRotation(remainTwoDecimal(newRotation));
+          setRotatedX(
+            newRotatedX === MIXED ? newRotatedX : remainTwoDecimal(newRotatedX)
+          );
+          setRotatedY(
+            newRotatedY === MIXED ? newRotatedY : remainTwoDecimal(newRotatedY)
+          );
+          setWidth(newWidth);
+          setHeight(newHeight);
+          setRotation(
+            newRotation === MIXED ? newRotation : remainTwoDecimal(newRotation)
+          );
         }
       };
       editor.sceneGraph.on('render', handler);
