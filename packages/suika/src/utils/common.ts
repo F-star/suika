@@ -106,3 +106,22 @@ export const isSameArray = (a1: unknown[], a2: unknown[]) => {
   }
   return true;
 };
+
+/**
+ * 保留两位小数
+ * 如果是 0，丢弃 0
+ */
+export const remainTwoDecimal = (n: number) => {
+  return Number(n.toFixed(2));
+};
+
+/**
+ * 字符串转换为数字，并保留两位小数
+ */
+export const parseToNumber = (str: string) => {
+  const num = Number(str);
+  if (Number.isNaN(num)) {
+    return NaN;
+  }
+  return remainTwoDecimal(num);
+};

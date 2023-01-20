@@ -1,6 +1,12 @@
+import { SetElementsAttrs } from '../editor/commands/set_elements_attrs';
+import { Editor } from '../editor/editor';
 import { IBox } from '../type.interface';
 import { genId } from '../utils/common';
-import { getAbsoluteCoords } from '../utils/graphics';
+import {
+  getAbsoluteCoords,
+  getElementRotatedXY,
+  getRectCenterPoint,
+} from '../utils/graphics';
 import { transformRotate } from '../utils/transform';
 
 export interface IGraph {
@@ -15,7 +21,6 @@ export interface IGraph {
   // transform 相关
   rotation?: number;
 }
-
 
 export class Graph {
   id: number;
@@ -45,7 +50,6 @@ export class Graph {
     if (options.rotation) {
       this.rotation = options.rotation;
     }
-
   }
   setAttrs(attrs: Partial<IGraph>) {
     let key: keyof Partial<IGraph>;
@@ -95,8 +99,60 @@ export class Graph {
       height: this.height,
     };
   }
+  setRotateXY(rotatedX: number, rotatedY: number) {
+    const [cx, cy] = getRectCenterPoint(this);
+    const [x, y] = transformRotate(
+      rotatedX,
+      rotatedY,
+      -(this.rotation || 0),
+      cx,
+      cy
+    );
+    this.x = x;
+    this.y = y;
+  }
+  setRotateX(rotatedX: number) {
+    const [cx, cy] = getRectCenterPoint(this);
+    const [, rotatedY] = getElementRotatedXY(this);
+    const [x, y] = transformRotate(
+      rotatedX,
+      rotatedY,
+      -(this.rotation || 0),
+      cx,
+      cy
+    );
+    this.x = x;
+    this.y = y;
+  }
 }
 
 export const getFill = (obj: Pick<IGraph, 'fill'>) => {
   return obj.fill || '';
+};
+
+/**
+ * 修改元素并保存到历史记录
+ */
+
+export const MutateElementsAndRecord = {
+  setRotateX(editor: Editor, elements: Graph[], rotatedX: number) {
+    if (elements.length === 0) {
+      return;
+    }
+    // 1. 计算新的 x
+    const prevXs: { x: number }[] = new Array(elements.length);
+    for (let i = 0, len = elements.length; i < len; i++) {
+      const element = elements[i];
+      prevXs[i] = { x: element.x };
+      element.setRotateX(rotatedX);
+    }
+    // 2. 保存到历史记录
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        elements,
+        elements.map((el) => ({ x: el.x })),
+        prevXs
+      )
+    );
+  },
 };

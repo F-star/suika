@@ -1,0 +1,32 @@
+.suika {
+  .element-info-attrs-row {
+    display: flex;
+    margin-left: 8px;
+    .field {
+      display: flex;
+
+      box-sizing: border-box;
+      border: 1px solid transparent;
+      margin: 2px 4px;
+      border-radius: 4px;
+      width: 100px;
+      line-height: 32px;
+      text-align: center;
+      &:hover {
+        border-color: #e6e6e6;
+      }
+      &:focus-within {
+        border-color: #0d99ff;
+        outline: 1px solid #0d99ff;
+      }
+      span {
+        display: block;
+        height: 32px;
+        width: 32px;
+        line-height: 32px;
+        text-align: center;
+        color: #b3b3b3;
+      }
+    }
+  }
+}

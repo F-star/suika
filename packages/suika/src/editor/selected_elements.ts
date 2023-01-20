@@ -6,7 +6,6 @@ import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
 
-
 class SelectedElements {
   private items: Graph[] = [];
   private eventEmitter = new EventEmitter();
@@ -63,9 +62,7 @@ class SelectedElements {
     if (this.isEmpty()) {
       return null;
     }
-    const bBoxesWithRotation = this.items.map((element) =>
-      element.getBBox()
-    );
+    const bBoxesWithRotation = this.items.map((element) => element.getBBox());
     return getRectsBBox(...bBoxesWithRotation);
   }
   getRotation() {
@@ -85,12 +82,16 @@ class SelectedElements {
       return;
     }
     this.editor.commandManager.pushCommand(
-      new RemoveElement(
-        this.editor,
-        this.items,
-      )
+      new RemoveElement(this.editor, this.items)
     );
     this.editor.sceneGraph.render();
+  }
+  setRotateXY(rotatedX: number, rotatedY: number) {
+    const items = this.items;
+    for (let i = 0, len = items.length; i < len; i++) {
+      const element = items[i];
+      element.setRotateXY(rotatedX, rotatedY);
+    }
   }
 }
 

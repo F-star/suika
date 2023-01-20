@@ -1,15 +1,15 @@
 import React, { FC } from 'react';
 import './style.scss';
 
-interface IInfoCardProps {
+interface IBaseCardProps {
   title?: string;
   children: React.ReactNode;
 }
 
-export const InfoCard: FC<IInfoCardProps> = ({ title, children }) => {
+export const BaseCard: FC<IBaseCardProps> = ({ title, children }) => {
   return (
     <div className="info-card">
-      <div className="info-card-title">{title}</div>
+      {title && <div className="info-card-title">{title}</div>}
       {children}
     </div>
   );

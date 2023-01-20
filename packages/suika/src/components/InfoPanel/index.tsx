@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
 import { IGraph } from '../../scene/graph';
-import ElementsInfoCards from '../Cards/ElementsInfoCards';
+import ElementsInfoCards from '../Cards/ElementsInfoCard';
 import './style.scss';
 
 enum PanelType {
@@ -28,7 +28,7 @@ const InfoPanel: FC = () => {
   }, [editor]);
 
   return (
-    <div className="info-panel">
+    <div className="info-panel" onKeyDown={(e) => e.stopPropagation()}>
       {type === PanelType.SelectedElements && <ElementsInfoCards />}
       {type === PanelType.Global && (
         <div className="empty-text">No Selected Shapes</div>
