@@ -56,7 +56,7 @@ const ElementsInfoCards: FC = () => {
             if (!isEqual(newHeight, element.height)) {
               newHeight = MIXED;
             }
-            if (isEqual(newRotation, element.rotation || 0)) {
+            if (!isEqual(newRotation, element.rotation || 0)) {
               newRotation = MIXED;
             }
           }
