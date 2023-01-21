@@ -2,6 +2,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
 import { IGraph } from '../../editor/scene/graph';
 import ElementsInfoCards from '../Cards/ElementsInfoCard';
+import FillCard from '../Cards/FillCard';
 import './style.scss';
 
 enum PanelType {
@@ -29,7 +30,12 @@ const InfoPanel: FC = () => {
 
   return (
     <div className="info-panel" onKeyDown={(e) => e.stopPropagation()}>
-      {type === PanelType.SelectedElements && <ElementsInfoCards />}
+      {type === PanelType.SelectedElements && (
+        <>
+          <ElementsInfoCards />
+          <FillCard />
+        </>
+      )}
       {type === PanelType.Global && (
         <div className="empty-text">No Selected Shapes</div>
       )}
