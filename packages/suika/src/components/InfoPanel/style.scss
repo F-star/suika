@@ -2,11 +2,11 @@
   .info-panel {
     position: fixed;
     right: 0;
-    top: 29;
+    bottom: 0;
 
     border-left: 1px solid #e6e6e6;
     width: 240px;
-    height: calc(100vh - 29px);
+    height: calc(100vh - 48px);
 
     font-size: 12px;
     background-color: #fff;
