@@ -30,7 +30,7 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
           e.currentTarget.blur();
         }
       }}
-      onBlur={() => {
+      onBlur={(e) => {
         if (inputRef.current) {
           const str = inputRef.current.value.trim();
           const number = parseToNumber(str);
