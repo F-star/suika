@@ -25,12 +25,12 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
         const el = e.currentTarget;
         el.setSelectionRange(0, el.value.length);
       }}
-      onKeyPress={(e) => {
-        if (e.key === 'Enter') {
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
           e.currentTarget.blur();
         }
       }}
-      onBlur={(e) => {
+      onBlur={() => {
         if (inputRef.current) {
           const str = inputRef.current.value.trim();
           const number = parseToNumber(str);
