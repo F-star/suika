@@ -159,7 +159,7 @@ export function radian2Degree(radian: number) {
  * 角度转弧度
  */
 export function degree2Radian(degree: number) {
-  return degree * Math.PI / 180;
+  return (degree * Math.PI) / 180;
 }
 
 /**
@@ -193,11 +193,5 @@ export function getElementRotatedXY(element: {
   rotation?: number;
 }) {
   const [cx, cy] = getRectCenterPoint(element);
-  return transformRotate(
-    element.x,
-    element.y,
-    element.rotation || 0,
-    cx,
-    cy
-  );
+  return transformRotate(element.x, element.y, element.rotation || 0, cx, cy);
 }

@@ -7,7 +7,7 @@ import {
   getElementRotatedXY,
   getRectCenterPoint,
 } from '../../utils/graphics';
-import { getOriginXY, transformRotate } from '../../utils/transform';
+import { transformRotate } from '../../utils/transform';
 
 export interface IGraph {
   x: number;
@@ -111,29 +111,13 @@ export class Graph {
     this.x = x;
     this.y = y;
   }
-  setRotateX(rotatedX: number) {
-    const [cx, cy] = getRectCenterPoint(this);
-    const [prevRotatedX, prevRotatedY] = getElementRotatedXY(this);
-    const [x] = transformRotate(
-      rotatedX,
-      prevRotatedY,
-      -(this.rotation || 0),
-      cx + (rotatedX - prevRotatedX),
-      cy
-    );
-    this.x = x;
+  setRotatedX(rotatedX: number) {
+    const [prevRotatedX] = getElementRotatedXY(this);
+    this.x = this.x + rotatedX - prevRotatedX;
   }
-  setRotateY(rotatedY: number) {
-    const [cx, cy] = getRectCenterPoint(this);
-    const [prevRotatedX, prevRotatedY] = getElementRotatedXY(this);
-    const [, y] = transformRotate(
-      prevRotatedX,
-      rotatedY,
-      -(this.rotation || 0),
-      cx,
-      cy + (rotatedY - prevRotatedY)
-    );
-    this.y = y;
+  setRotatedY(rotatedY: number) {
+    const [, prevRotatedY] = getElementRotatedXY(this);
+    this.y = this.y + rotatedY - prevRotatedY;
   }
 }
 
@@ -155,7 +139,7 @@ export const MutateElementsAndRecord = {
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
       prevXs[i] = { x: element.x };
-      element.setRotateX(rotatedX);
+      element.setRotatedX(rotatedX);
     }
     // 2. 保存到历史记录
     editor.commandManager.pushCommand(
@@ -175,7 +159,7 @@ export const MutateElementsAndRecord = {
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
       prevXs[i] = { y: element.y };
-      element.setRotateY(rotatedY);
+      element.setRotatedY(rotatedY);
     }
     // 2. 保存到历史记录
     editor.commandManager.pushCommand(
@@ -197,17 +181,13 @@ export const MutateElementsAndRecord = {
       width: el.width,
     }));
     elements.forEach((el) => {
-      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      const [preRotatedX, preRotatedY] = getElementRotatedXY(el);
       el.width = width;
-      const [x, y] = getOriginXY(
-        rotatedX,
-        rotatedY,
-        el.rotation || 0,
-        width,
-        el.height
-      );
-      el.x = x;
-      el.y = y;
+      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      const dx = rotatedX - preRotatedX;
+      const dy = rotatedY - preRotatedY;
+      el.x -= dx;
+      el.y -= dy;
     });
     editor.commandManager.pushCommand(
       new SetElementsAttrs(
@@ -228,17 +208,13 @@ export const MutateElementsAndRecord = {
       height: el.height,
     }));
     elements.forEach((el) => {
-      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      const [preRotatedX, preRotatedY] = getElementRotatedXY(el);
       el.height = height;
-      const [x, y] = getOriginXY(
-        rotatedX,
-        rotatedY,
-        el.rotation || 0,
-        el.width,
-        height
-      );
-      el.x = x;
-      el.y = y;
+      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      const dx = rotatedX - preRotatedX;
+      const dy = rotatedY - preRotatedY;
+      el.x -= dx;
+      el.y -= dy;
     });
     editor.commandManager.pushCommand(
       new SetElementsAttrs(
