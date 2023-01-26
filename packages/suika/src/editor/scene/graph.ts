@@ -15,11 +15,18 @@ export interface IGraph {
   width: number;
   height: number;
   // 颜色
-  fill?: string;
+  fill?: IRGBA[];
   stroke?: string;
   strokeWidth?: number;
   // transform 相关
   rotation?: number;
+}
+
+export interface IRGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
 }
 
 export class Graph {
@@ -28,11 +35,11 @@ export class Graph {
   y: number;
   width: number;
   height: number;
-  // 颜色
-  fill?: string;
+  // color
+  fill: IRGBA[] = [];
   stroke?: string;
   strokeWidth?: number;
-  // transform 相关
+  // transform
   rotation?: number;
   constructor(options: IGraph) {
     this.id = genId();
@@ -120,10 +127,6 @@ export class Graph {
     this.y = this.y + rotatedY - prevRotatedY;
   }
 }
-
-export const getFill = (obj: Pick<IGraph, 'fill'>) => {
-  return obj.fill || '';
-};
 
 /**
  * 修改元素并保存到历史记录
@@ -234,7 +237,7 @@ export const MutateElementsAndRecord = {
       el.rotation = rotation;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(elements, { rotation: rotation }, prevAttrs)
+      new SetElementsAttrs(elements, { rotation }, prevAttrs)
     );
   },
 };

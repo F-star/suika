@@ -13,9 +13,11 @@ import {
 import rafThrottle from '../../utils/raf_throttle';
 import { transformRotate } from '../../utils/transform';
 import { Ellipse } from './ellipse';
-import { getFill, Graph } from './graph';
+import { Graph } from './graph';
 import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
+import { forEach } from '../../utils/array_util';
+import { parseRGBAStr } from '../../utils/color';
 
 const DOUBLE_PI = Math.PI * 2;
 
@@ -98,7 +100,6 @@ export class SceneGraph {
     ctx.save();
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
-      ctx.fillStyle = getFill(element);
       if (element instanceof Rect) {
         if (element.rotation) {
           const cx = element.x + element.width / 2;
@@ -108,7 +109,10 @@ export class SceneGraph {
         }
         ctx.beginPath();
         ctx.rect(element.x, element.y, element.width, element.height);
-        ctx.fill();
+        forEach(element.fill, val => {
+          ctx.fillStyle = parseRGBAStr(val);
+          ctx.fill();
+        });
         ctx.closePath();
         if (element.rotation) {
           ctx.restore();
@@ -127,7 +131,10 @@ export class SceneGraph {
           0,
           DOUBLE_PI
         );
-        ctx.fill();
+        forEach(element.fill, val => {
+          ctx.fillStyle = parseRGBAStr(val);
+          ctx.fill();
+        });
         ctx.closePath();
       }
     }

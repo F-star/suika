@@ -9,7 +9,7 @@ import {
   radian2Degree,
 } from '../../../utils/graphics';
 import { BaseCard } from '../BaseCard';
-import NumberInput from './components/NumberInput';
+import NumberInput from '../../input/NumberInput';
 import './style.scss';
 
 const MIXED = 'Mixed';

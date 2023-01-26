@@ -1,13 +1,13 @@
 import { FC, useEffect, useRef } from 'react';
-import { parseToNumber } from '../../../../../utils/common';
 import './style.scss';
 
-interface INumberInputProps {
+interface ICustomRuleInputProps {
+  parser: (newValue: string) => string | false;
   value: string | number;
-  onBlur: (newValue: number) => void;
+  onBlur: (newValue: string) => void;
 }
 
-const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
+const CustomRuleInput: FC<ICustomRuleInputProps> = ({ value, onBlur, parser }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
   return (
     <input
       ref={inputRef}
-      className="number-input"
+      className="custom-rule-input"
       defaultValue={value}
       onMouseUp={(e) => {
         const el = e.currentTarget;
@@ -33,9 +33,9 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
       onBlur={(e) => {
         if (inputRef.current) {
           const str = inputRef.current.value.trim();
-          const number = parseToNumber(str);
-          if (!Number.isNaN(number) && number !== value) {
-            onBlur(number);
+          const newValue = parser(str);
+          if (newValue !== false) {
+            onBlur(newValue);
           } else {
             e.target.value = String(value);
           }
@@ -45,4 +45,4 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
   );
 };
 
-export default NumberInput;
+export default CustomRuleInput;

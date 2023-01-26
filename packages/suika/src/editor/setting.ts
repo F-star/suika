@@ -1,8 +1,7 @@
-
 export class Setting {
   canvasBgColor = '#f4f4f4';
   stroke = '';
-  fill = '#D9D9D9';
+  fill = [{ r: 217, g: 217, b: 217, a: 1 }]; // '#D9D9D9';
   guideBBoxStroke = '#1592fe';
   selectionStroke = '#0f8eff';
   selectionFill = '#0f8eff33';

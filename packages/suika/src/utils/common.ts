@@ -125,3 +125,16 @@ export const parseToNumber = (str: string) => {
   }
   return remainTwoDecimal(num);
 };
+
+/**
+ * compare two arrays
+ */
+export const shallowCompareArrays = (a1: unknown[], a2: unknown[]) => {
+  if (a1.length !== a2.length) {
+    return false;
+  }
+  for (let i = 0, len = a1.length; i < len; i++) {
+    if (a1[i] !== a2[i]) return false;
+  }
+  return true;
+};

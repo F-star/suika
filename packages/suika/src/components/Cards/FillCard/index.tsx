@@ -1,44 +1,54 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import isEqual from 'lodash.isequal';
+import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../../context';
+import { IRGBA } from '../../../editor/scene/graph';
+import { parseRGBAStr } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
-import NumberInput from '../ElementsInfoCard/components/NumberInput';
+import { SketchPicker } from 'react-color';
+import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
+import { forEach } from '../../../utils/array_util';
+import { useClickAway } from 'ahooks';
 import './style.scss';
 
 const FillCard: FC = () => {
   const editor = useContext(EditorContext);
-  const [fill, setFill] = useState<string>('');
+  const [fill, setFill] = useState<IRGBA[]>([]);
+  const prevFills = useRef<IRGBA[][]>([]);
+  const colorPickerPopoverRef = useRef<HTMLDivElement>(null);
+  const [colorPickIdx, setColorPickIdx] = useState(-1);
+
+  useClickAway(() => {
+    setColorPickIdx(-1);
+  }, [
+    () => {
+      return document.querySelector('.color-picker-popover');
+    },
+    () => {
+      return document.querySelector('.color-block');
+    },
+  ]);
 
   useEffect(() => {
     if (editor) {
       const handler = () => {
-        const elements = editor.selectedElements.getItems();
-        if (elements.length > 0) {
+        const selectedElements = editor.selectedElements.getItems();
+        if (selectedElements.length > 0) {
           /**
            * 目前一个图形只支持一个 fill
-           *
-           *  显示 fill 值时，如果有的图形没有 fill，将其排除。
-           *
+           * 显示 fill 值时，如果有的图形没有 fill，将其排除。
            * 添加颜色时，如果有的图形不存在 fill，赋值给它。
            */
 
-          // 遍历，找出有 fill 的元素。
-          const elementsHasFill = elements.filter((el) => el.fill);
-          if (elementsHasFill.length === 0) {
-            setFill('');
-          } else {
-            let newFill = elementsHasFill[0].fill!;
-            for (let i = 1, len = elementsHasFill.length; i < len; i++) {
-              const currentFill = elementsHasFill[i].fill!;
-              if (newFill !== currentFill) {
-                newFill = '';
-                break;
-              }
+          let newFill = selectedElements[0].fill;
+          for (let i = 1, len = selectedElements.length; i < len; i++) {
+            const currentFill = selectedElements[i].fill;
+            if (!isEqual(newFill, currentFill)) {
+              // TODO: 标记为不相同
+              newFill = [];
+              break;
             }
-            if (newFill[0] === '#') {
-              newFill = newFill.slice(1);
-            }
-            setFill(newFill);
           }
+          setFill(newFill);
         }
       };
       editor.sceneGraph.on('render', handler);
@@ -50,15 +60,69 @@ const FillCard: FC = () => {
 
   return (
     <BaseCard title="Fill">
-      <div className="fill-card">
-        <div className="color-block" style={{ backgroundColor: '#' + fill }} />
-        <NumberInput
-          value={fill}
-          onBlur={() => {
-            //
-          }}
-        />
-      </div>
+      {fill.length > 0 ? (
+        fill.map((rgba, index) => {
+          const rgbaStr = parseRGBAStr(rgba);
+          return (
+            <div key={index} className="fill-item">
+              {index === colorPickIdx && (
+                <div
+                  ref={colorPickerPopoverRef}
+                  className="color-picker-popover"
+                >
+                  <SketchPicker
+                    color={rgba}
+                    onChange={(color, event) => {
+                      if (!editor) {
+                        return;
+                      }
+
+                      const elements = editor.selectedElements.getItems();
+                      if (editor && event.type !== 'mousemove') {
+                        // 记录颜色变化前的颜色
+                        prevFills.current = elements.map((el) => el.fill);
+                      }
+                      forEach(elements, (el) => {
+                        el.fill = [{ ...color.rgb, a: color.rgb.a || 1 }];
+                      });
+                      editor.sceneGraph.render();
+                    }}
+                    onChangeComplete={(color) => {
+                      if (!editor) {
+                        return;
+                      }
+
+                      const elements = editor.selectedElements.getItems();
+                      const newFill = [{ ...color.rgb, a: color.rgb.a || 1 }];
+                      editor.commandManager.pushCommand(
+                        new SetElementsAttrs(
+                          elements,
+                          { fill: newFill },
+                          elements.map((item, index) => ({
+                            fill: prevFills.current[index],
+                          }))
+                        )
+                      );
+
+                      editor.sceneGraph.render();
+                    }}
+                  />
+                </div>
+              )}
+
+              <div
+                className="color-block"
+                style={{ backgroundColor: rgbaStr }}
+                onClick={() => {
+                  setColorPickIdx(index);
+                }}
+              />
+            </div>
+          );
+        })
+      ) : (
+        <div style={{ marginLeft: 16 }}>Mixed</div>
+      )}
     </BaseCard>
   );
 };

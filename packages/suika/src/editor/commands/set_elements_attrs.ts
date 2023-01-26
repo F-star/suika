@@ -1,13 +1,15 @@
+import { IRGBA } from '../scene/graph';
 import { Rect } from '../scene/rect';
 import { ICommand } from './type';
 
 type IAttrs = Partial<{
-  x: number,
-  y: number,
-  width: number,
-  height: number
-  rotation: number
-}>
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  fill: IRGBA[];
+}>;
 
 /**
  * 创建矩形

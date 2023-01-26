@@ -1,7 +1,13 @@
 .suika {
-  .fill-card {
+  .fill-item {
+    position: relative;
     display: flex;
-    margin-left: 8px;
+    margin-left: 16px;
+    .color-picker-popover {
+      position: absolute;
+      left: -238px;
+      top: -30px;
+    }
     .color-block {
       width: 16px;
       height: 16px;

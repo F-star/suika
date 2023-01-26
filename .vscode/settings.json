@@ -3,6 +3,8 @@
     "source.fixAll.eslint": true
   },
   "cSpell.words": [
+    "IRGBA",
+    "isequal",
     "suika"
   ]
 }
