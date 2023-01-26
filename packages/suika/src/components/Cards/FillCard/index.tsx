@@ -17,16 +17,20 @@ const FillCard: FC = () => {
   const colorPickerPopoverRef = useRef<HTMLDivElement>(null);
   const [colorPickIdx, setColorPickIdx] = useState(-1);
 
-  useClickAway(() => {
-    setColorPickIdx(-1);
-  }, [
+  useClickAway(
     () => {
-      return document.querySelector('.color-picker-popover');
+      setColorPickIdx(-1);
     },
-    () => {
-      return document.querySelector('.color-block');
-    },
-  ]);
+    [
+      () => {
+        return document.querySelector('.color-picker-popover');
+      },
+      () => {
+        return document.querySelector('.color-block');
+      },
+    ],
+    'mousedown'
+  );
 
   useEffect(() => {
     if (editor) {
