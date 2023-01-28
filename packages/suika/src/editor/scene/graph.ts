@@ -147,6 +147,7 @@ export const MutateElementsAndRecord = {
     // 2. 保存到历史记录
     editor.commandManager.pushCommand(
       new SetElementsAttrs(
+        'Update X of Elements',
         elements,
         elements.map((el) => ({ x: el.x })),
         prevXs
@@ -167,6 +168,7 @@ export const MutateElementsAndRecord = {
     // 2. 保存到历史记录
     editor.commandManager.pushCommand(
       new SetElementsAttrs(
+        'Update Y of Elements',
         elements,
         elements.map((el) => ({ y: el.y })),
         prevXs
@@ -194,6 +196,7 @@ export const MutateElementsAndRecord = {
     });
     editor.commandManager.pushCommand(
       new SetElementsAttrs(
+        'Update Width of Elements',
         elements,
         elements.map((el) => ({ width: el.width, x: el.x, y: el.y })),
         prevAttrs
@@ -221,6 +224,7 @@ export const MutateElementsAndRecord = {
     });
     editor.commandManager.pushCommand(
       new SetElementsAttrs(
+        'update Height of Elements',
         elements,
         elements.map((el) => ({ height: el.height, x: el.x, y: el.y })),
         prevAttrs
@@ -237,7 +241,7 @@ export const MutateElementsAndRecord = {
       el.rotation = rotation;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(elements, { rotation }, prevAttrs)
+      new SetElementsAttrs('update Rotation', elements, { rotation }, prevAttrs)
     );
   },
 };

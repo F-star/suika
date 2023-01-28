@@ -81,6 +81,7 @@ export class SelectMoveTool implements IBaseTool {
     }
     this.editor.commandManager.pushCommand(
       new MoveElementsCommand(
+        'Move Elements',
         this.editor.selectedElements.getItems(),
         this.dx,
         this.dy

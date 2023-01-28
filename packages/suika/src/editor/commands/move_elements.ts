@@ -1,23 +1,16 @@
 import { ICommand } from './type';
-import { Rect } from '../scene/rect';
+import { Graph } from '../scene/graph';
 
 /**
  * 创建矩形
  */
 export class MoveElementsCommand implements ICommand {
-  elements: Rect[];
-  dx: number;
-  dy: number;
-
   constructor(
-    rects: Rect[],
-    dx: number,
-    dy: number
-  ) {
-    this.elements = rects;
-    this.dx = dx;
-    this.dy = dy;
-  }
+    public desc: string,
+    private elements: Graph[],
+    private dx: number,
+    private dy: number
+  ) {}
   redo() {
     const { dx, dy } = this;
     for (let i = 0, len = this.elements.length; i < len; i++) {

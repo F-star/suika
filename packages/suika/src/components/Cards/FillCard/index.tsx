@@ -100,6 +100,7 @@ const FillCard: FC = () => {
                       const newFill = [{ ...color.rgb, a: color.rgb.a || 1 }];
                       editor.commandManager.pushCommand(
                         new SetElementsAttrs(
+                          'Update Fill',
                           elements,
                           { fill: newFill },
                           elements.map((item, index) => ({

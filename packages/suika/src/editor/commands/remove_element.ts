@@ -5,7 +5,11 @@ import { ICommand } from './type';
 export class RemoveElement implements ICommand {
   private removedIndexes: number[] = [];
 
-  constructor(private editor: Editor, private removedElements: Graph[]) {
+  constructor(
+    public desc: string,
+    private editor: Editor,
+    private removedElements: Graph[]
+  ) {
     this.do();
   }
   private do() {
@@ -37,7 +41,9 @@ export class RemoveElement implements ICommand {
     const removedElements = this.removedElements;
     const elements = sceneGraph.children;
     const removedIndexes = this.removedIndexes;
-    const nextElements: Graph[] = new Array(elements.length + removedIndexes.length);
+    const nextElements: Graph[] = new Array(
+      elements.length + removedIndexes.length
+    );
 
     let i = 0; // nextElements 的指针
     let j = 0; // elements

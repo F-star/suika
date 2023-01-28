@@ -10,5 +10,6 @@ export class DrawEllipseTool extends DrawShapeTool implements ITool {
   constructor(editor: Editor) {
     super(editor);
     this.ShapeCtor = Ellipse;
+    this.commandDesc = 'Add Ellipse';
   }
 }

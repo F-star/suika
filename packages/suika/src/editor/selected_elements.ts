@@ -82,7 +82,7 @@ class SelectedElements {
       return;
     }
     this.editor.commandManager.pushCommand(
-      new RemoveElement(this.editor, this.items)
+      new RemoveElement('Remove Elements', this.editor, this.items)
     );
     this.editor.sceneGraph.render();
   }

@@ -10,5 +10,6 @@ export class DrawRectTool extends DrawShapeTool implements ITool {
   constructor(editor: Editor) {
     super(editor);
     this.ShapeCtor = Rect;
+    this.commandDesc = 'Add Rect';
   }
 }

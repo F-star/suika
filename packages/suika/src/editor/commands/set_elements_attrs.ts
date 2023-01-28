@@ -16,20 +16,15 @@ type IAttrs = Partial<{
  */
 export class SetElementsAttrs implements ICommand {
   static readonly type = 'SetElementsAttrs';
-  elements: Rect[];
-  prevAttrs: IAttrs[] = [];
-  attrs: IAttrs | IAttrs[];
   constructor(
-    elements: Rect[],
-    attrs: IAttrs | IAttrs[],
-    preAttrs: IAttrs[],
+    public desc: string,
+    private elements: Rect[],
+    private attrs: IAttrs | IAttrs[],
+    private prevAttrs: IAttrs[]
   ) {
-    if (elements.length !== preAttrs.length) {
+    if (elements.length !== prevAttrs.length) {
       throw new Error('elements 和 preAttrs 数量不匹配');
     }
-    this.elements = elements;
-    this.attrs = attrs;
-    this.prevAttrs = preAttrs;
   }
   redo() {
     const { elements, attrs } = this;

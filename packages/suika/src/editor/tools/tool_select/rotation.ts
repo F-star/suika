@@ -139,10 +139,12 @@ export class SelectRotationTool implements IBaseTool {
   }
   end() {
     const selectedElements = this.editor.selectedElements.getItems();
+    const commandDesc = 'Rotate Elements';
     if (this.dRotation !== 0) {
       if (selectedElements.length === 0) {
         this.editor.commandManager.pushCommand(
           new SetElementsAttrs(
+            commandDesc,
             selectedElements,
             {
               rotation: this.dRotation,
@@ -153,6 +155,7 @@ export class SelectRotationTool implements IBaseTool {
       } else {
         this.editor.commandManager.pushCommand(
           new SetElementsAttrs(
+            commandDesc,
             selectedElements,
             selectedElements.map((el) => ({
               rotation: el.rotation,

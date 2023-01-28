@@ -8,7 +8,9 @@ import { ITool } from './type';
 
 export abstract class DrawShapeTool implements ITool {
   static type = 'drawShape';
-  type = 'drawRect';
+  type = 'drawShape';
+  commandDesc = 'Add Shape';
+
   ShapeCtor: typeof Graph = Graph;
 
   startPointer: IPoint = { x: -1, y: -1 };
@@ -154,6 +156,7 @@ export abstract class DrawShapeTool implements ITool {
 
     this.editor.commandManager.pushCommand(
       new AddShapeCommand(
+        this.commandDesc,
         this.editor,
         this.drawingShape
       )
