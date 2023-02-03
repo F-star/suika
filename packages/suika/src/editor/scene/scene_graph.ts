@@ -18,6 +18,7 @@ import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
 import { forEach } from '../../utils/array_util';
 import { parseRGBAStr } from '../../utils/color';
+import Grid from '../grid';
 
 const DOUBLE_PI = Math.PI * 2;
 
@@ -35,9 +36,11 @@ export class SceneGraph {
   // private handle: { rotation: IPoint } | null = null;
   private eventEmitter = new EventEmitter();
   transformHandle: TransformHandle;
+  grid: Grid;
 
   constructor(private editor: Editor) {
     this.transformHandle = new TransformHandle(editor);
+    this.grid = new Grid(editor);
   }
   appendChild(element: Graph, idx?: number) {
     if (idx === undefined) {
@@ -146,6 +149,11 @@ export class SceneGraph {
 
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
 
+    // draw pixel grid
+    if (zoom >= this.editor.setting.minPixelGridZoom) {
+      this.grid.draw();
+    }
+
     // 3. 绘制 选中框
     this.highLightSelectedBox(selectedElementsBBox);
 
@@ -174,8 +182,6 @@ export class SceneGraph {
 
     this.transformHandle.draw(selectedElementsBBox);
 
-    // TODO: 在画布缩放比大于 800% 时，绘制以像素点为单位的网格
-
     // 绘制标尺
     this.editor.ruler.draw();
 
@@ -183,9 +189,6 @@ export class SceneGraph {
 
     this.eventEmitter.emit('render');
   });
-  private drawPixelGrid() {
-    //
-  }
   /**
    * 光标是否落在旋转控制点上
    */
