@@ -33,7 +33,7 @@ export class Setting {
   /**** 网格相关 ****/
   snapToPixelGrid = true; // 是否吸附到像素网格
   minPixelGridZoom = 8; // draw pixel grid When zoom reach this value
-  pixelGridLineColor = '#ccccccee'; // pixel grid line color
+  pixelGridLineColor = '#cccccc55'; // pixel grid line color
 
   offsetX = 0; // 鼠标坐标位置的修正值
   offsetY = 0;
