@@ -134,7 +134,7 @@ class Ruler {
       ctx.closePath();
       rotateInCanvas(ctx, -HALF_PI, x, y);
       ctx.fillText(String(startYInScene), x, y - 3);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      rotateInCanvas(ctx, HALF_PI, x, y);
       startYInScene += stepInScene;
     }
   }

@@ -138,3 +138,7 @@ export const shallowCompareArrays = (a1: unknown[], a2: unknown[]) => {
   }
   return true;
 };
+
+export const getDevicePixelRatio = () => {
+  return window.devicePixelRatio || 1;
+};

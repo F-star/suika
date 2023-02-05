@@ -1,4 +1,5 @@
 import { IBox } from '../type.interface';
+import { getDevicePixelRatio } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
@@ -12,13 +13,14 @@ export class ViewportManager {
     return {
       x: this.scrollX,
       y: this.scrollY,
-      width: this.editor.canvasElement.width,
-      height: this.editor.canvasElement.height,
+      width: parseFloat(this.editor.canvasElement.style.width),
+      height: parseFloat(this.editor.canvasElement.style.height),
     };
   }
   setViewport({ x, y, width, height }: Partial<IBox>) {
     const prevX = this.scrollX;
     const prevY = this.scrollY;
+    const dpr = getDevicePixelRatio();
     if (x !== undefined) {
       this.scrollX = x;
     }
@@ -26,10 +28,12 @@ export class ViewportManager {
       this.scrollY = y;
     }
     if (width !== undefined) {
-      this.editor.canvasElement.width = width;
+      this.editor.canvasElement.width = width * dpr;
+      this.editor.canvasElement.style.width = width + 'px';
     }
     if (height !== undefined) {
-      this.editor.canvasElement.height = height;
+      this.editor.canvasElement.height = height * dpr;
+      this.editor.canvasElement.style.height = height + 'px';
     }
 
     if (prevX !== x || prevY !== y) {

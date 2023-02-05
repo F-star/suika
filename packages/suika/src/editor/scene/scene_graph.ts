@@ -19,6 +19,7 @@ import { TransformHandle } from './transform_handle';
 import { forEach } from '../../utils/array_util';
 import { parseRGBAStr } from '../../utils/color';
 import Grid from '../grid';
+import { getDevicePixelRatio } from '../../utils/common';
 
 const DOUBLE_PI = Math.PI * 2;
 
@@ -97,7 +98,9 @@ export class SceneGraph {
     ctx.restore();
 
     // 场景坐标转换为视口坐标
-    ctx.scale(zoom, zoom);
+    const dpr = getDevicePixelRatio();
+
+    ctx.scale(dpr * zoom, dpr * zoom);
     ctx.translate(-viewport.x, -viewport.y);
 
     ctx.save();
@@ -112,7 +115,7 @@ export class SceneGraph {
         }
         ctx.beginPath();
         ctx.rect(element.x, element.y, element.width, element.height);
-        forEach(element.fill, val => {
+        forEach(element.fill, (val) => {
           ctx.fillStyle = parseRGBAStr(val);
           ctx.fill();
         });
@@ -134,7 +137,7 @@ export class SceneGraph {
           0,
           DOUBLE_PI
         );
-        forEach(element.fill, val => {
+        forEach(element.fill, (val) => {
           ctx.fillStyle = parseRGBAStr(val);
           ctx.fill();
         });
@@ -146,6 +149,7 @@ export class SceneGraph {
     /******************* 绘制辅助线层 ********************/
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
 
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
 
