@@ -1,5 +1,4 @@
-import { IRGBA } from '../scene/graph';
-import { Rect } from '../scene/rect';
+import { Graph, IRGBA } from '../scene/graph';
 import { ICommand } from './type';
 
 type IAttrs = Partial<{
@@ -18,7 +17,7 @@ export class SetElementsAttrs implements ICommand {
   static readonly type = 'SetElementsAttrs';
   constructor(
     public desc: string,
-    private elements: Rect[],
+    private elements: Graph[],
     private attrs: IAttrs | IAttrs[],
     private prevAttrs: IAttrs[]
   ) {

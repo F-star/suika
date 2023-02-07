@@ -12,16 +12,10 @@ import {
 } from '../../utils/graphics';
 import rafThrottle from '../../utils/raf_throttle';
 import { transformRotate } from '../../utils/transform';
-import { Ellipse } from './ellipse';
 import { Graph } from './graph';
-import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
-import { forEach } from '../../utils/array_util';
-import { parseRGBAStr } from '../../utils/color';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
-
-const DOUBLE_PI = Math.PI * 2;
 
 /**
  * 图形树
@@ -106,43 +100,7 @@ export class SceneGraph {
     ctx.save();
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       const element = visibleElements[i];
-      if (element instanceof Rect) {
-        if (element.rotation) {
-          const cx = element.x + element.width / 2;
-          const cy = element.y + element.height / 2;
-          ctx.save();
-          rotateInCanvas(ctx, element.rotation, cx, cy);
-        }
-        ctx.beginPath();
-        ctx.rect(element.x, element.y, element.width, element.height);
-        forEach(element.fill, (val) => {
-          ctx.fillStyle = parseRGBAStr(val);
-          ctx.fill();
-        });
-        ctx.closePath();
-        if (element.rotation) {
-          ctx.restore();
-        }
-      } else if (element instanceof Ellipse) {
-        const cx = element.x + element.width / 2;
-        const cy = element.y + element.height / 2;
-
-        ctx.beginPath();
-        ctx.ellipse(
-          cx,
-          cy,
-          element.width / 2,
-          element.height / 2,
-          element.rotation || 0,
-          0,
-          DOUBLE_PI
-        );
-        forEach(element.fill, (val) => {
-          ctx.fillStyle = parseRGBAStr(val);
-          ctx.fill();
-        });
-        ctx.closePath();
-      }
+      element.draw(ctx);
     }
     ctx.restore();
 
@@ -290,9 +248,9 @@ export class SceneGraph {
     const composedBBox = getRectsBBox(...bBoxes);
     return isPointInRect(point, composedBBox);
   }
-  getTopHitElement(hitPointer: IPoint): Rect | null {
+  getTopHitElement(hitPointer: IPoint): Graph | null {
     for (let i = this.children.length - 1; i >= 0; i--) {
-      const element: Rect = this.children[i];
+      const element: Graph = this.children[i];
       const bBox = element.getBBoxWithoutRotation();
 
       // "点击点" 根据图形进行 反旋转旋转
