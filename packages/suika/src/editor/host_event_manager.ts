@@ -114,6 +114,7 @@ class HostEventManager {
     const editor = this.editor;
     const handler = (event: WheelEvent) => {
       if (this.isCtrlPressing || this.isCommandPressing) {
+        event.preventDefault();
         const { x: cx, y: cy } = this.editor.getPointerXY(event);
         if (event.deltaY > 0) {
           editor.zoomManager.zoomOut(cx, cy);
