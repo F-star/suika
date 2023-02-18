@@ -1,11 +1,6 @@
-export interface ITool {
+export interface ITool extends IBaseTool {
   type: string;
-  active: () => void;
-  inactive: () => void;
   moveExcludeDrag: (event: PointerEvent) => void;
-  start: (event: PointerEvent) => void;
-  drag: (event: PointerEvent) => void;
-  end: (event: PointerEvent) => void;
 }
 
 export interface IBaseTool {
@@ -14,7 +9,11 @@ export interface IBaseTool {
   // moveExcludeDrag: (event: PointerEvent) => void;
   start: (event: PointerEvent) => void;
   drag: (event: PointerEvent) => void;
-  end: (event: PointerEvent) => void;
+  end: (event: PointerEvent, isEnableDrag: boolean) => void;
+  /**
+   * init state when finish a drag loop
+   */
+  afterEnd: () => void;
 }
 
 // import { DrawRectTool } from './tool.drawRect';

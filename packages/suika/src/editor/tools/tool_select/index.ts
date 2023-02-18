@@ -128,9 +128,8 @@ export class SelectTool implements ITool {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
   }
-  end(e: PointerEvent) {
+  end(e: PointerEvent, isEnableDrag: boolean) {
     const currStrategy = this.currStrategy;
-    this.currStrategy = null;
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
@@ -141,16 +140,18 @@ export class SelectTool implements ITool {
       this.editor.sceneGraph.render();
     }
 
-    this.topHitElementWhenStart = null;
-    this.isDragHappened = false;
-
     if (currStrategy) {
-      currStrategy.end(e);
+      currStrategy.end(e, isEnableDrag);
       currStrategy.inactive();
     } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
-
+  }
+  afterEnd() {
     this.editor.setCursor('');
+    this.topHitElementWhenStart = null;
+    this.isDragHappened = false;
+    this.currStrategy?.afterEnd();
+    this.currStrategy = null;
   }
 }

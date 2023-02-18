@@ -45,7 +45,6 @@ export class SelectMoveTool implements IBaseTool {
   }
   drag(e: PointerEvent) {
     this.dragPointer = this.editor.getPointerXY(e);
-
     this.move();
   }
   private move() {
@@ -73,19 +72,25 @@ export class SelectMoveTool implements IBaseTool {
     }
     this.editor.sceneGraph.render();
   }
-  end() {
+  end(e: PointerEvent, isEnableDrag: boolean) {
     const selectedElements = this.editor.selectedElements.getItems();
     if (selectedElements.length === 0) { // 移动的时候元素被删除了，或者撤销导致为空
       // TODO: 属性复原
       return;
     }
-    this.editor.commandManager.pushCommand(
-      new MoveElementsCommand(
-        'Move Elements',
-        this.editor.selectedElements.getItems(),
-        this.dx,
-        this.dy
-      )
-    );
+
+    if (isEnableDrag && (this.dx !== 0 || this.dy !== 0)) {
+      this.editor.commandManager.pushCommand(
+        new MoveElementsCommand(
+          'Move Elements',
+          selectedElements,
+          this.dx,
+          this.dy
+        )
+      );
+    }
+  }
+  afterEnd() {
+    // do nothing
   }
 }

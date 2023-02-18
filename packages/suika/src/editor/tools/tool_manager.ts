@@ -29,15 +29,20 @@ export class ToolManager {
   }
   bindEvent() {
     let isPressing = false;
+    let startPos: [x: number, y: number] = [0, 0];
+    let isEnableDrag = false;
 
     const handleDown = (e: PointerEvent) => {
-      if (e.button !== 0) { // 必须是鼠标左键
+      if (e.button !== 0) {
+        // must to be left mouse button
         return;
       }
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
       isPressing = true;
+      isEnableDrag = false;
+      startPos = [e.clientX, e.clientY];
       this.currentTool.start(e);
     };
     const handleMove = (e: PointerEvent) => {
@@ -45,24 +50,36 @@ export class ToolManager {
         throw new Error('未设置当前使用工具');
       }
       if (isPressing) {
-        this.editor.hostEventManager.disableDragBySpace();
-        this.currentTool.drag(e);
+        const currentPos = [e.clientX, e.clientY];
+        const dragBlockStep = this.editor.setting.dragBlockStep;
+        if (
+          !isEnableDrag &&
+          (Math.abs(currentPos[0] - startPos[0]) > dragBlockStep ||
+            Math.abs(currentPos[1] - startPos[1]) > dragBlockStep)
+        ) {
+          isEnableDrag = true;
+        }
+        if (isEnableDrag) {
+          this.editor.hostEventManager.disableDragBySpace();
+          this.currentTool.drag(e);
+        }
       } else {
         this.currentTool.moveExcludeDrag(e);
       }
     };
     const handleUp = (e: PointerEvent) => {
-      if (e.button !== 0) { // 必须是鼠标左键
-        return;
-      }
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      if (isPressing) {
-        this.editor.hostEventManager.enableDragBySpace();
-        isPressing = false;
-        this.currentTool.end(e);
+      if (e.button === 0) { // 必须是鼠标左键
+        if (isPressing) {
+          this.editor.hostEventManager.enableDragBySpace();
+          isPressing = false;
+          this.currentTool.end(e, isEnableDrag);
+          this.currentTool.afterEnd();
+        }
       }
+      isEnableDrag = false;
     };
     const canvas = this.editor.canvasElement;
     canvas.addEventListener('pointerdown', handleDown);
@@ -81,7 +98,7 @@ export class ToolManager {
   }
   setTool(toolName: string) {
     const prevTool = this.currentTool;
-    const currentTool = this.currentTool = this.toolMap.get(toolName) || null;
+    const currentTool = (this.currentTool = this.toolMap.get(toolName) || null);
     if (!currentTool) {
       throw new Error(`没有 ${toolName} 对应的工具对象`);
     }
