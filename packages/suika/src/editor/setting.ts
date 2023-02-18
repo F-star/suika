@@ -35,6 +35,8 @@ export class Setting {
   minPixelGridZoom = 8; // draw pixel grid When zoom reach this value
   pixelGridLineColor = '#cccccc55'; // pixel grid line color
 
+  dragBlockStep = 4; // drag handler will not happen if move distance less this value
+
   offsetX = 0; // 鼠标坐标位置的修正值
   offsetY = 0;
 }

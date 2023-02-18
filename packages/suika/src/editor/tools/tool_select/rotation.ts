@@ -173,4 +173,7 @@ export class SelectRotationTool implements IBaseTool {
       // TODO: 多选的历史记录实现
     }
   }
+  afterEnd() {
+    // do nothing
+  }
 }

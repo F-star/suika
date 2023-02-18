@@ -84,7 +84,7 @@ export abstract class DrawShapeTool implements ITool {
     );
     this.updateRect();
   }
-  updateRect() {
+  private updateRect() {
     const { x, y } = this.lastDragPointer;
     const sceneGraph = this.editor.sceneGraph;
     const { x: startX, y: startY } = this.startPointer;
@@ -128,11 +128,9 @@ export abstract class DrawShapeTool implements ITool {
     sceneGraph.render();
   }
   end(e: PointerEvent) {
-    this.editor.hostEventManager.enableDelete();
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
-    this.isDragging = false;
 
     const pos = this.editor.getPointerXY(e);
     const endPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
@@ -162,5 +160,10 @@ export abstract class DrawShapeTool implements ITool {
       )
     );
     this.editor.toolManager.setTool('select');
+  }
+
+  afterEnd() {
+    this.isDragging = false;
+    this.editor.hostEventManager.enableDelete();
   }
 }

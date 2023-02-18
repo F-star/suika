@@ -40,7 +40,9 @@ export class DragCanvasTool implements ITool {
     this.editor.sceneGraph.render();
   }
   end() {
+    // do nothing
+  }
+  afterEnd() {
     this.editor.canvasElement.style.cursor = 'grab';
-    //
   }
 }

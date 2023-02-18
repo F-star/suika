@@ -114,6 +114,7 @@ class HostEventManager {
     const editor = this.editor;
     const handler = (event: WheelEvent) => {
       if (this.isCtrlPressing || this.isCommandPressing) {
+        event.preventDefault();
         const { x: cx, y: cy } = this.editor.getPointerXY(event);
         if (event.deltaY > 0) {
           editor.zoomManager.zoomOut(cx, cy);
@@ -156,19 +157,22 @@ class HostEventManager {
     };
     this.editor.canvasElement.addEventListener('pointerdown', pointerdownHandler);
 
-    // 鼠标移动
+    // drag canvas when mouse move
     const pointermoveHandler = (event: PointerEvent) => {
       if (startPointer) {
         const viewportPos = this.editor.getPointerXY(event);
         const dx = viewportPos.x - startPointer.x;
         const dy = viewportPos.y - startPointer.y;
+        const dragBlockStep = this.editor.setting.dragBlockStep;
 
-        const zoom = this.editor.zoomManager.getZoom();
-        const viewportX = prevViewport.x - dx / zoom;
-        const viewportY = prevViewport.y - dy / zoom;
+        if (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep) {
+          const zoom = this.editor.zoomManager.getZoom();
+          const viewportX = prevViewport.x - dx / zoom;
+          const viewportY = prevViewport.y - dy / zoom;
 
-        this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
-        this.editor.sceneGraph.render();
+          this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
+          this.editor.sceneGraph.render();
+        }
       }
     };
     window.addEventListener('pointermove', pointermoveHandler);
@@ -179,6 +183,7 @@ class HostEventManager {
         this.editor.setCursor(this.isSpacePressing ? 'grab' : this.prevCursor);
       }
       startPointer = null;
+      // we hope reset isDraggingCanvasBySpace after exec tool.end()
       setTimeout(() => {
         this.isDraggingCanvasBySpace = false;
       });
