@@ -33,6 +33,8 @@ export class ToolManager {
     let isEnableDrag = false;
 
     const handleDown = (e: PointerEvent) => {
+      isPressing = true;
+      isEnableDrag = false;
       if (e.button !== 0) {
         // must to be left mouse button
         return;
@@ -40,8 +42,6 @@ export class ToolManager {
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      isPressing = true;
-      isEnableDrag = false;
       startPos = [e.clientX, e.clientY];
       this.currentTool.start(e);
     };
@@ -50,12 +50,12 @@ export class ToolManager {
         throw new Error('未设置当前使用工具');
       }
       if (isPressing) {
-        const currentPos = [e.clientX, e.clientY];
+        const dx = e.clientX - startPos[0];
+        const dy = e.clientY - startPos[1];
         const dragBlockStep = this.editor.setting.dragBlockStep;
         if (
           !isEnableDrag &&
-          (Math.abs(currentPos[0] - startPos[0]) > dragBlockStep ||
-            Math.abs(currentPos[1] - startPos[1]) > dragBlockStep)
+          (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep)
         ) {
           isEnableDrag = true;
         }
@@ -71,7 +71,8 @@ export class ToolManager {
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      if (e.button === 0) { // 必须是鼠标左键
+      if (e.button === 0) {
+        // 必须是鼠标左键
         if (isPressing) {
           this.editor.hostEventManager.enableDragBySpace();
           isPressing = false;
