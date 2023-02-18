@@ -4,7 +4,6 @@ import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
 import Header from './Header';
 import InfoPanel from './InfoPanel';
-import ZoomActions from './ZoomActions';
 
 const rightPadding = 241;
 
@@ -45,7 +44,6 @@ const Editor: FC = () => {
     <div>
       <EditorContext.Provider value={editor}>
         <Header />
-        <ZoomActions />
         <InfoPanel />
         <canvas ref={canvasRef} />
       </EditorContext.Provider>
