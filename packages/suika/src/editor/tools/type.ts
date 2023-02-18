@@ -15,7 +15,3 @@ export interface IBaseTool {
    */
   afterEnd: () => void;
 }
-
-// import { DrawRectTool } from './tool.drawRect';
-
-// export type Tool = DrawRectTool
