@@ -148,7 +148,9 @@ export class SelectTool implements ITool {
     }
   }
   afterEnd() {
-    this.editor.setCursor('');
+    if (!this.editor.hostEventManager.isDraggingCanvasBySpace) {
+      this.editor.setCursor('');
+    }
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
     this.currStrategy?.afterEnd();
