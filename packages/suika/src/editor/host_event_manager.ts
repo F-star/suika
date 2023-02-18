@@ -140,11 +140,13 @@ class HostEventManager {
   }
 
   private bindDragCanvasEvent() {
+    let isEnableDrag = false;
     let startPointer: IPoint | null = null;
     let prevViewport: IBox;
 
     // 鼠标按下
     const pointerdownHandler = (event: PointerEvent) => {
+      isEnableDrag = false;
       startPointer = null;
       this.isDraggingCanvasBySpace = false;
 
@@ -164,8 +166,10 @@ class HostEventManager {
         const dx = viewportPos.x - startPointer.x;
         const dy = viewportPos.y - startPointer.y;
         const dragBlockStep = this.editor.setting.dragBlockStep;
-
-        if (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep) {
+        if (!isEnableDrag && Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep) {
+          isEnableDrag = true;
+        }
+        if (isEnableDrag) {
           const zoom = this.editor.zoomManager.getZoom();
           const viewportX = prevViewport.x - dx / zoom;
           const viewportY = prevViewport.y - dy / zoom;
@@ -182,6 +186,7 @@ class HostEventManager {
       if (this.isDraggingCanvasBySpace) {
         this.editor.setCursor(this.isSpacePressing ? 'grab' : this.prevCursor);
       }
+      isEnableDrag = false;
       startPointer = null;
       // we hope reset isDraggingCanvasBySpace after exec tool.end()
       setTimeout(() => {
