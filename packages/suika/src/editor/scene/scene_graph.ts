@@ -1,5 +1,5 @@
 import { Editor } from '../editor';
-import { IBox, IPoint, IRect } from '../../type.interface';
+import { IBox, IObject, IPoint, IRect } from '../../type.interface';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
 import {
@@ -334,6 +334,19 @@ export class SceneGraph {
     }
     return containedElements;
   }
+
+  /**
+   * get simple info (for layer panel)
+   */
+  getObjects() {
+    const children = this.children;
+    const objects: IObject[] = [];
+    forEach(children, item => {
+      objects.push({ id: item.id, name: item.objectName });
+    });
+    return objects;
+  }
+
   on(eventName: 'render', handler: () => void) {
     this.eventEmitter.on(eventName, handler);
   }

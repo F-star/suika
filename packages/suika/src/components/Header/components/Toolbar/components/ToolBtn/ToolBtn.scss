@@ -11,10 +11,6 @@
     height: 32px;
     cursor: pointer;
 
-    // svg {
-    //   width: 32px;
-    //   height: 32px;
-    // }
     .tooltip {
       display: none;
       position: absolute;
@@ -26,6 +22,7 @@
       color: #fff;
       font-size: 12px;
       background-color: #333333ee;
+      z-index: 2;
     }
 
     &:hover {

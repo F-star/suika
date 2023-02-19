@@ -21,6 +21,9 @@ class SelectedElements {
   getItems() {
     return [...this.items];
   }
+  getIdSet() {
+    return new Set(this.items.map(item => item.id));
+  }
   clear() {
     this.items = [];
     this.eventEmitter.emit('itemsChange', this.items);

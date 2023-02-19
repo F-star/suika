@@ -1,0 +1,14 @@
+.suika {
+  .layer-panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    box-sizing: border-box;
+    border-right: 1px solid #e6e6e6;
+    width: 240px;
+    height: calc(100vh - 48px);
+
+    user-select: none;
+  }
+}

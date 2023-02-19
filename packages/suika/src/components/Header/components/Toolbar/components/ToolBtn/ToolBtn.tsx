@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { FC } from 'react';
-import './style.scss';
+import './ToolBtn.scss';
 
 interface IToolBtn {
   className?: string;
@@ -9,7 +9,7 @@ interface IToolBtn {
   onClick: () => void;
 }
 
-const ToolBtn: FC<IToolBtn> = ({
+export const ToolBtn: FC<IToolBtn> = ({
   children,
   onClick,
   className,
@@ -27,5 +27,3 @@ const ToolBtn: FC<IToolBtn> = ({
     </div>
   );
 };
-
-export default ToolBtn;

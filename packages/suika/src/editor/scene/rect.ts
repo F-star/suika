@@ -8,6 +8,7 @@ export interface RectGraph extends IGraph, IRect {}
 export class Rect extends Graph {
   constructor(options: RectGraph) {
     super(options);
+    this.objectName = 'Rectangle ' + this.id;
   }
   /**
    * 计算包围盒（不考虑 strokeWidth）
