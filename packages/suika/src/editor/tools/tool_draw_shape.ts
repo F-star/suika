@@ -159,11 +159,11 @@ export abstract class DrawShapeTool implements ITool {
         this.drawingShape
       )
     );
-    this.editor.toolManager.setTool('select');
   }
 
   afterEnd() {
     this.isDragging = false;
     this.editor.hostEventManager.enableDelete();
+    this.editor.toolManager.setTool('select');
   }
 }
