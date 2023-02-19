@@ -4,6 +4,8 @@ import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
 import Header from './Header';
 import InfoPanel from './InfoPanel';
+import { LayerPanel } from './LayerPanel';
+import './Editor.scss';
 
 const rightPadding = 241;
 
@@ -19,16 +21,21 @@ const Editor: FC = () => {
         width: document.body.clientWidth - rightPadding,
         height: document.body.clientHeight,
         offsetY: 48,
+        offsetX: 240,
       });
       (window as any).editor = editor;
 
-      const changeViewport = throttle(() => {
-        editor.viewportManager.setViewport({
-          width: document.body.clientWidth - rightPadding,
-          height: document.body.clientHeight,
-        });
-        editor.sceneGraph.render();
-      }, 150, { leading: false });
+      const changeViewport = throttle(
+        () => {
+          editor.viewportManager.setViewport({
+            width: document.body.clientWidth - rightPadding,
+            height: document.body.clientHeight,
+          });
+          editor.sceneGraph.render();
+        },
+        150,
+        { leading: false }
+      );
       window.addEventListener('resize', changeViewport);
       setEditor(editor);
 
@@ -44,8 +51,15 @@ const Editor: FC = () => {
     <div>
       <EditorContext.Provider value={editor}>
         <Header />
-        <InfoPanel />
-        <canvas ref={canvasRef} />
+        {/* body */}
+        <div className="body">
+          <LayerPanel />
+          <canvas
+            style={{ position: 'absolute', left: 240, top: 0 }}
+            ref={canvasRef}
+          />
+          <InfoPanel />
+        </div>
       </EditorContext.Provider>
     </div>
   );

@@ -30,7 +30,8 @@ export interface IRGBA {
 }
 
 export class Graph {
-  id: number;
+  id: string;
+  objectName: string;
   x: number;
   y: number;
   width: number;
@@ -43,6 +44,7 @@ export class Graph {
   rotation?: number;
   constructor(options: IGraph) {
     this.id = genId();
+    this.objectName = 'Graph ' + this.id;
     this.x = options.x;
     this.y = options.y;
     this.width = options.width;

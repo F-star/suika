@@ -8,7 +8,7 @@ export const noop = () => {
 export const genId = (() => {
   let id = 0;
   return () => {
-    return id++;
+    return String(id++);
   };
 })();
 

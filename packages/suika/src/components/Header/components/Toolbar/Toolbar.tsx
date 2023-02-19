@@ -1,12 +1,11 @@
 import classNames from 'classnames';
 import { useEffect, useContext, useState } from 'react';
 import { EditorContext } from '../../../../context';
-import ToolBtn from './components/ToolBtn';
+import { ToolBtn } from './components/ToolBtn/ToolBtn';
+import './Toolbar.scss';
 
-import './style.scss';
 
-
-const ToolBar = () => {
+export const ToolBar = () => {
   const editor = useContext(EditorContext);
   const [tool, setTool] = useState('');
 
@@ -100,5 +99,3 @@ const ToolBar = () => {
     </div>
   );
 };
-
-export default ToolBar;

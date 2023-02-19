@@ -1,4 +1,3 @@
-
 export interface IRect {
   x: number;
   y: number;
@@ -22,4 +21,9 @@ export type INoEmptyArray<T> = [T, ...T[]];
 export interface IPoint {
   x: number;
   y: number;
+}
+
+export interface IObject {
+  id: string;
+  name: string;
 }

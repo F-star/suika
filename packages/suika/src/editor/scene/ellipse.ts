@@ -6,5 +6,6 @@ export interface IEllipseGraph extends IGraph, IBox {}
 export class Ellipse extends Graph {
   constructor(options: IEllipseGraph) {
     super(options);
+    this.objectName = 'Ellipse ' + this.id;
   }
 }
