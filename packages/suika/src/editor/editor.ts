@@ -41,10 +41,10 @@ export class Editor {
 
     this.setting = new Setting();
     if (options.offsetX) {
-      this.setting.offsetX = options.offsetX;
+      this.setting.set('offsetX', options.offsetX);
     }
     if (options.offsetY) {
-      this.setting.offsetY = options.offsetY;
+      this.setting.set('offsetY', options.offsetY);
     }
 
     this.sceneGraph = new SceneGraph(this);
@@ -94,7 +94,7 @@ export class Editor {
   viewportCoordsToScene(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, this.setting.snapToPixelGrid);
+    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, this.setting.get('snapToPixelGrid'));
   }
   sceneCoordsToViewport(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();
@@ -103,8 +103,8 @@ export class Editor {
   }
   getPointerXY(event: PointerEvent | WheelEvent) {
     return {
-      x: event.clientX - this.setting.offsetX,
-      y: event.clientY - this.setting.offsetY,
+      x: event.clientX - this.setting.get('offsetX'),
+      y: event.clientY - this.setting.get('offsetY'),
     };
   }
 }

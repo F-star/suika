@@ -52,7 +52,7 @@ export class ToolManager {
       if (isPressing) {
         const dx = e.clientX - startPos[0];
         const dy = e.clientY - startPos[1];
-        const dragBlockStep = this.editor.setting.dragBlockStep;
+        const dragBlockStep = this.editor.setting.get('dragBlockStep');
         if (
           !isEnableDrag &&
           (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep)

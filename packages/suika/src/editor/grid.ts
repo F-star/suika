@@ -20,7 +20,7 @@ class Grid {
     const endXInScene = getClosestVal(offsetX + width / zoom, step);
 
     while (startXInScene <= endXInScene) {
-      ctx.strokeStyle = setting.pixelGridLineColor;
+      ctx.strokeStyle = setting.get('pixelGridLineColor');
       const x = nearestPixelVal((startXInScene - offsetX) * zoom);
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -35,7 +35,7 @@ class Grid {
     const endYInScene = getClosestVal(offsetY + height / zoom, step);
 
     while (startYInScene <= endYInScene) {
-      ctx.strokeStyle = setting.pixelGridLineColor;
+      ctx.strokeStyle = setting.get('pixelGridLineColor');
       const y = nearestPixelVal((startYInScene - offsetY) * zoom);
       ctx.beginPath();
       ctx.moveTo(0, y);

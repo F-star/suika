@@ -83,7 +83,7 @@ export class SelectRotationTool implements IBaseTool {
       // https://blog.fstars.wang/posts/calc-vector-angle/
       let dRotation = calcVectorRadian(cx, cy, lastPointer.x, lastPointer.y);
       if (this.editor.hostEventManager.isShiftPressing) {
-        const lockRotation = this.editor.setting.lockRotation;
+        const lockRotation = this.editor.setting.get('lockRotation');
         dRotation = getClosestVal(dRotation, lockRotation);
       }
       this.dRotation = dRotation;
@@ -104,7 +104,7 @@ export class SelectRotationTool implements IBaseTool {
           lastPointer.y
         );
         if (this.editor.hostEventManager.isShiftPressing) {
-          const lockRotation = this.editor.setting.lockRotation;
+          const lockRotation = this.editor.setting.get('lockRotation');
           dRotation = getClosestVal(dRotation, lockRotation);
         }
         this.dRotation = dRotation;
