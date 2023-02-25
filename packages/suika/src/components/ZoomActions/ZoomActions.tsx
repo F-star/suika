@@ -1,28 +1,42 @@
+import { useClickAway } from 'ahooks';
 import classNames from 'classnames';
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../context';
+import { SettingValue } from '../../editor/setting';
+import { ActionItem } from './components/ActionItem/ActionItem';
 import './ZoomActions.scss';
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);
   const [zoom, setZoom] = useState(1);
+  const [setting, setSetting] = useState<SettingValue>({} as SettingValue);
+  const [popoverVisible, setPopoverVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useClickAway(() => {
+    setPopoverVisible(false);
+  }, containerRef);
+
   useEffect(() => {
     if (editor) {
       setZoom(editor.zoomManager.getZoom());
+      setSetting(editor.setting.getAttrs());
+
       const handler = (zoom: number) => {
         setZoom(zoom);
       };
       editor.zoomManager.on('zoomChange', handler);
+      editor.setting.on('update', (setting => {
+        setSetting(setting);
+      }));
       return () => {
         editor.zoomManager.off('zoomChange', handler);
       };
     }
   }, [editor]);
 
-  const [popoverVisible, setPopoverVisible] = useState(false);
-
   return (
-    <div className="zoom-actions">
+    <div ref={containerRef} className="zoom-actions">
       <div
         className={classNames(['value', { active: popoverVisible }])}
         onClick={() => {
@@ -42,8 +56,7 @@ export const ZoomActions: FC = () => {
       </div>
       {popoverVisible && (
         <div className="popover">
-          <div
-            className="item"
+          <ActionItem
             onClick={() => {
               editor?.zoomManager.zoomOut();
               editor?.sceneGraph.render();
@@ -51,9 +64,8 @@ export const ZoomActions: FC = () => {
             }}
           >
             Zoom in
-          </div>
-          <div
-            className="item"
+          </ActionItem>
+          <ActionItem
             onClick={() => {
               editor?.zoomManager.zoomIn();
               editor?.sceneGraph.render();
@@ -61,17 +73,23 @@ export const ZoomActions: FC = () => {
             }}
           >
             Zoom out
-          </div>
+          </ActionItem>
+          <div className='separator' />
+          <ActionItem
+            check={setting.enablePixelGrid}
+            onClick={() => {
+              if (editor) {
+                const enablePixelGrid = editor.setting.get('enablePixelGrid');
+                editor.setting.set('enablePixelGrid', !enablePixelGrid);
+                editor.sceneGraph.render();
+                setPopoverVisible(false);
+              }
+            }}
+          >
+            Pixel grid
+          </ActionItem>
         </div>
       )}
-      {/* <button
-        onClick={() => {
-          editor?.zoomManager.zoomIn();
-          editor?.sceneGraph.render();
-        }}
-      >
-        +
-      </button> */}
     </div>
   );
 };

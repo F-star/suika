@@ -1,0 +1,24 @@
+.suika {
+  .action-item {
+    display: flex;
+    align-items: center;
+
+    padding: 0 8px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 14px;
+
+    .icon-box {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      color: #fff;
+      .icon-box svg path {
+        stroke: #fff !important;
+      }
+      background-color: #0f8fff;
+    }
+  }
+}
