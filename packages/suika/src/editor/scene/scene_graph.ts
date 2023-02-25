@@ -93,7 +93,7 @@ export class SceneGraph {
 
     // 绘制背景色
     ctx.save();
-    ctx.fillStyle = setting.canvasBgColor;
+    ctx.fillStyle = setting.get('canvasBgColor');
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
 
@@ -154,7 +154,7 @@ export class SceneGraph {
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
 
     // draw pixel grid
-    if (zoom >= this.editor.setting.minPixelGridZoom) {
+    if (setting.get('enablePixelGrid') && zoom >= this.editor.setting.get('minPixelGridZoom')) {
       this.grid.draw();
     }
 
@@ -164,8 +164,8 @@ export class SceneGraph {
     // 绘制选区（使用选区工具时用到）
     if (this.selection) {
       ctx.save();
-      ctx.strokeStyle = setting.selectionStroke;
-      ctx.fillStyle = setting.selectionFill;
+      ctx.strokeStyle = setting.get('selectionStroke');
+      ctx.fillStyle = setting.get('selectionFill');
       const { x, y, width, height } = this.selection;
 
       const { x: xInViewport, y: yInViewport } =
@@ -219,7 +219,7 @@ export class SceneGraph {
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
       const bBox = bBoxes[i];
-      ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+      ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
 
       const currElement = selectedElements[i];
       if (currElement.rotation) {
@@ -244,7 +244,7 @@ export class SceneGraph {
 
     // 多个选中元素时，才绘制选中盒
     if (selectedElements.length > 1) {
-      ctx.strokeStyle = this.editor.setting.guideBBoxStroke;
+      ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
       const { x: xInViewport, y: yInViewport } =
         this.editor.sceneCoordsToViewport(
           selectedElementsBBox.x,

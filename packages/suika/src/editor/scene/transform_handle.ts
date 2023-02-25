@@ -31,9 +31,9 @@ export class TransformHandle {
         selectedElements.length === 1 ? selectedElements[0].rotation || 0 : 0;
 
       ctx.save();
-      ctx.strokeStyle = setting.handleRotationStroke;
-      ctx.fillStyle = setting.handleRotationFill;
-      ctx.lineWidth = setting.handleStrokeWidth;
+      ctx.strokeStyle = setting.get('handleRotationStroke');
+      ctx.fillStyle = setting.get('handleRotationFill');
+      ctx.lineWidth = setting.get('handleStrokeWidth');
 
       // 绘制旋转控制点
       const rotationPos = this.editor.sceneCoordsToViewport(
@@ -41,7 +41,7 @@ export class TransformHandle {
         handle.rotation.y
       );
 
-      const size = setting.handleSize;
+      const size = setting.get('handleSize');
       drawCircle(ctx, rotationPos.x, rotationPos.y, size / 2);
       // nw（左上）
       const nwPos = this.editor.sceneCoordsToViewport(handle.nw.x, handle.nw.y);
@@ -97,7 +97,7 @@ export class TransformHandle {
       // 旋转控制点
       let rotation = {
         x: x + width / 2,
-        y: y - setting.handleRotationLineLength / zoom,
+        y: y - setting.get('handleRotationLineLength') / zoom,
       };
       // 左上
       let nw = { x, y };
@@ -144,7 +144,7 @@ export class TransformHandle {
       const { x, y, width, height } = selectedElementsBBox;
       const rotation = {
         x: x + width / 2,
-        y: y - setting.handleRotationLineLength / zoom,
+        y: y - setting.get('handleRotationLineLength') / zoom,
       };
       const nw = { x, y };
       const ne = { x: x + width, y };
@@ -172,7 +172,7 @@ export class TransformHandle {
     // 选中图形的旋转角度。。
     const elRotation = this.editor.selectedElements.getRotation();
     const setting = this.editor.setting;
-    const size = setting.handleSize + setting.handleStrokeWidth;
+    const size = setting.get('handleSize') + setting.get('handleStrokeWidth');
 
     // 是否在缩放控制点上
     let key: keyof typeof handle;
@@ -218,7 +218,7 @@ export class TransformHandle {
     const rotationPoint = transformHandle.rotation;
     const zoom = this.editor.zoomManager.getZoom();
 
-    const size = this.editor.setting.handleSize;
+    const size = this.editor.setting.get('handleSize');
     const padding = 4;
     return isPointInCircle(point, {
       x: rotationPoint.x,

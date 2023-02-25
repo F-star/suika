@@ -118,7 +118,7 @@ export abstract class DrawShapeTool implements ITool {
     } else {
       const element = new this.ShapeCtor({
         ...rect,
-        fill: this.editor.setting.fill,
+        fill: this.editor.setting.get('fill'),
       });
       sceneGraph.appendChild(element);
 
@@ -136,15 +136,15 @@ export abstract class DrawShapeTool implements ITool {
     const endPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
     if (this.drawingShape === null) {
       const { x: cx, y: cy } = endPointer;
-      const width = this.editor.setting.drawRectDefaultWidth;
-      const height = this.editor.setting.drawRectDefaultHeight;
+      const width = this.editor.setting.get('drawRectDefaultWidth');
+      const height = this.editor.setting.get('drawRectDefaultHeight');
 
       this.drawingShape = new this.ShapeCtor({
         x: cx - width / 2,
         y: cy - height / 2,
         width,
         height,
-        fill: this.editor.setting.fill,
+        fill: this.editor.setting.get('fill'),
       });
       this.editor.sceneGraph.appendChild(this.drawingShape);
 

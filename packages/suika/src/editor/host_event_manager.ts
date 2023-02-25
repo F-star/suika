@@ -165,7 +165,7 @@ class HostEventManager {
         const viewportPos = this.editor.getPointerXY(event);
         const dx = viewportPos.x - startPointer.x;
         const dy = viewportPos.y - startPointer.y;
-        const dragBlockStep = this.editor.setting.dragBlockStep;
+        const dragBlockStep = this.editor.setting.get('dragBlockStep');
         if (!isEnableDrag && Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep) {
           isEnableDrag = true;
         }

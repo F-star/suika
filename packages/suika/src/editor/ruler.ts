@@ -46,29 +46,29 @@ class Ruler {
     const { width: viewportWidth, height: viewportHeight } = viewport;
     ctx.save();
     // 绘制背景
-    ctx.fillStyle = setting.rulerBgColor;
-    ctx.fillRect(0, 0, viewportWidth, setting.rulerWidth);
-    ctx.fillRect(0, 0, setting.rulerWidth, viewportHeight);
+    ctx.fillStyle = setting.get('rulerBgColor');
+    ctx.fillRect(0, 0, viewportWidth, setting.get('rulerWidth'));
+    ctx.fillRect(0, 0, setting.get('rulerWidth'), viewportHeight);
 
     this.drawXRuler();
     this.drawYRuler();
 
     // 把左上角的小矩形上的刻度盖掉
-    ctx.fillStyle = setting.rulerBgColor;
-    ctx.fillRect(0, 0, setting.rulerWidth, setting.rulerWidth);
+    ctx.fillStyle = setting.get('rulerBgColor');
+    ctx.fillRect(0, 0, setting.get('rulerWidth'), setting.get('rulerWidth'));
 
     // 绘制 border
-    ctx.strokeStyle = setting.rulerStroke;
+    ctx.strokeStyle = setting.get('rulerStroke');
     ctx.beginPath();
     // 水平 border
-    ctx.moveTo(0, setting.rulerWidth + 0.5);
-    ctx.lineTo(viewportWidth, setting.rulerWidth + 0.5);
+    ctx.moveTo(0, setting.get('rulerWidth') + 0.5);
+    ctx.lineTo(viewportWidth, setting.get('rulerWidth') + 0.5);
     ctx.stroke();
     ctx.closePath();
     // 垂直 border
     ctx.beginPath();
-    ctx.moveTo(setting.rulerWidth + 0.5, 0);
-    ctx.lineTo(setting.rulerWidth + 0.5, viewportHeight);
+    ctx.moveTo(setting.get('rulerWidth') + 0.5, 0);
+    ctx.lineTo(setting.get('rulerWidth') + 0.5, viewportHeight);
     ctx.stroke();
     ctx.closePath();
 
@@ -83,7 +83,7 @@ class Ruler {
     const viewport = this.editor.viewportManager.getViewport();
     const stepInScene = getStepByZoom(zoom);
 
-    const startX = setting.rulerWidth;
+    const startX = setting.get('rulerWidth');
     let startXInScene = viewport.x + startX / zoom;
     startXInScene = getClosestVal(startXInScene, stepInScene);
 
@@ -92,14 +92,14 @@ class Ruler {
     endXInScene = getClosestVal(endXInScene, stepInScene);
 
     ctx.textAlign = 'center';
-    const y = setting.rulerWidth - setting.rulerMarkSize;
+    const y = setting.get('rulerWidth') - setting.get('rulerMarkSize');
     while (startXInScene <= endXInScene) {
-      ctx.strokeStyle = setting.rulerMarkStroke;
-      ctx.fillStyle = setting.rulerMarkStroke;
+      ctx.strokeStyle = setting.get('rulerMarkStroke');
+      ctx.fillStyle = setting.get('rulerMarkStroke');
       const x = nearestPixelVal((startXInScene - viewport.x) * zoom);
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x, y + setting.rulerMarkSize);
+      ctx.lineTo(x, y + setting.get('rulerMarkSize'));
       ctx.stroke();
       ctx.closePath();
       ctx.fillText(String(startXInScene), x, y - 4);
@@ -114,7 +114,7 @@ class Ruler {
     const viewport = this.editor.viewportManager.getViewport();
     const stepInScene = getStepByZoom(zoom);
 
-    const startY = setting.rulerWidth;
+    const startY = setting.get('rulerWidth');
     let startYInScene = viewport.y + startY / zoom;
     startYInScene = getClosestVal(startYInScene, stepInScene);
 
@@ -122,14 +122,14 @@ class Ruler {
     let endYInScene = viewport.y + endY / zoom;
     endYInScene = getClosestVal(endYInScene, stepInScene);
 
-    const x = setting.rulerWidth - setting.rulerMarkSize;
+    const x = setting.get('rulerWidth') - setting.get('rulerMarkSize');
     ctx.textAlign = 'center';
     while (startYInScene <= endYInScene) {
-      ctx.fillStyle = setting.rulerMarkStroke;
+      ctx.fillStyle = setting.get('rulerMarkStroke');
       const y = nearestPixelVal((startYInScene - viewport.y) * zoom);
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x + setting.rulerMarkSize, y);
+      ctx.lineTo(x + setting.get('rulerMarkSize'), y);
       ctx.stroke();
       ctx.closePath();
       rotateInCanvas(ctx, -HALF_PI, x, y);
