@@ -88,6 +88,19 @@ export const ZoomActions: FC = () => {
           >
             Pixel grid
           </ActionItem>
+          <ActionItem
+            check={setting.snapToPixelGrid}
+            onClick={() => {
+              if (editor) {
+                const snapToPixelGrid = editor.setting.get('snapToPixelGrid');
+                editor.setting.set('snapToPixelGrid', !snapToPixelGrid);
+                editor.sceneGraph.render();
+                setPopoverVisible(false);
+              }
+            }}
+          >
+            Snap to pixel grid
+          </ActionItem>
         </div>
       )}
     </div>
