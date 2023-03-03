@@ -1,3 +1,5 @@
+import { IPoint } from '../type.interface';
+
 export const noop = () => {
   // do nothing
 };

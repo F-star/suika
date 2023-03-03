@@ -91,10 +91,10 @@ export class Editor {
   /**
    * 视口坐标 转 场景坐标
    */
-  viewportCoordsToScene(x: number, y: number) {
+  viewportCoordsToScene(x: number, y: number, round = false) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, this.setting.get('snapToPixelGrid'));
+    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, round);
   }
   sceneCoordsToViewport(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();

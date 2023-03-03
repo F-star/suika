@@ -41,7 +41,8 @@ export abstract class DrawShapeTool implements ITool {
       if (this.isDragging) {
         this.lastDragPointer = editor.viewportCoordsToScene(
           this.lastDragPointerInViewport.x,
-          this.lastDragPointerInViewport.y
+          this.lastDragPointerInViewport.y,
+          this.editor.setting.get('snapToPixelGrid')
         );
         this.updateRect();
       }
@@ -66,7 +67,7 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
     const pos = this.editor.getPointerXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
+    this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y, this.editor.setting.get('snapToPixelGrid'));
     this.drawingShape = null;
     this.isDragging = false;
   }
@@ -81,6 +82,7 @@ export abstract class DrawShapeTool implements ITool {
     this.lastDragPointer = this.editor.viewportCoordsToScene(
       pos.x,
       pos.y,
+      this.editor.setting.get('snapToPixelGrid')
     );
     this.updateRect();
   }
@@ -133,7 +135,7 @@ export abstract class DrawShapeTool implements ITool {
     }
 
     const pos = this.editor.getPointerXY(e);
-    const endPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
+    const endPointer = this.editor.viewportCoordsToScene(pos.x, pos.y, this.editor.setting.get('snapToPixelGrid'));
     if (this.drawingShape === null) {
       const { x: cx, y: cy } = endPointer;
       const width = this.editor.setting.get('drawRectDefaultWidth');

@@ -1,4 +1,4 @@
-import { IPoint } from '../../../type.interface';
+import { IBox, IPoint } from '../../../type.interface';
 import { noop } from '../../../utils/common';
 import { MoveElementsCommand } from '../../commands/move_elements';
 import { Editor } from '../../editor';
@@ -10,11 +10,12 @@ import { IBaseTool } from '../type';
  * 移动元素
  */
 export class SelectMoveTool implements IBaseTool {
-  startPointer: IPoint = { x: -1, y: -1 };
-  startPoints: IPoint[] = [];
-  dragPointer!: IPoint;
-  dx = 0;
-  dy = 0;
+  private startPointer: IPoint = { x: -1, y: -1 };
+  private startPoints: IPoint[] = [];
+  private dragPointer!: IPoint;
+  private dx = 0;
+  private dy = 0;
+  private prevBBoxPos: IPoint = { x: -1, y: -1 };
 
   unbindEvents = noop;
 
@@ -42,6 +43,12 @@ export class SelectMoveTool implements IBaseTool {
       x: element.x,
       y: element.y,
     }));
+    const bBox = this.editor.selectedElements.getBBox();
+    if (!bBox) {
+      console.error('selected elements should\'t be empty when moving, please report us issue');
+    } else {
+      this.prevBBoxPos = { x: bBox.x, y: bBox.y };
+    }
   }
   drag(e: PointerEvent) {
     this.dragPointer = this.editor.getPointerXY(e);
@@ -62,6 +69,14 @@ export class SelectMoveTool implements IBaseTool {
       } else {
         dx = 0;
       }
+    }
+
+    // in the moving phase, AABBox's x and y should round to be integer (snap to pixel grid)
+    if (this.editor.setting.get('snapToPixelGrid')) {
+      // if dx == 0, we thing it is in vertical moving.
+      if (dx !== 0) dx = Math.round(this.prevBBoxPos.x + dx) - this.prevBBoxPos.x;
+      // similarly dy
+      if (dy !== 0) dy = Math.round(this.prevBBoxPos.y + dy) - this.prevBBoxPos.y;
     }
 
     const selectedElements = this.editor.selectedElements.getItems();
