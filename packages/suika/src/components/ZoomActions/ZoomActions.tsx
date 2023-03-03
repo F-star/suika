@@ -101,6 +101,19 @@ export const ZoomActions: FC = () => {
           >
             Snap to pixel grid
           </ActionItem>
+          <ActionItem
+            check={setting.enableRuler}
+            onClick={() => {
+              if (editor) {
+                const enableRuler = editor.setting.get('enableRuler');
+                editor.setting.set('enableRuler', !enableRuler);
+                editor.sceneGraph.render();
+                setPopoverVisible(false);
+              }
+            }}
+          >
+            Rulers
+          </ActionItem>
         </div>
       )}
     </div>

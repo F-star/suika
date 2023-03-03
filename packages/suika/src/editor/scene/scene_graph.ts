@@ -186,8 +186,10 @@ export class SceneGraph {
 
     this.transformHandle.draw(selectedElementsBBox);
 
-    // 绘制标尺
-    this.editor.ruler.draw();
+    // drawing rulers
+    if (setting.get('enableRuler')) {
+      this.editor.ruler.draw();
+    }
 
     ctx.restore();
 

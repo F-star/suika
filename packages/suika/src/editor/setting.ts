@@ -27,6 +27,7 @@ export class Setting {
     drawRectDefaultHeight: 100, // 高度，同上
 
     /**** 标尺相关 ****/
+    enableRuler: true,
     minStepInViewport: 50, // 视口区域下的最小步长
     rulerBgColor: '#fff',
     rulerStroke: '#e6e6e6',
