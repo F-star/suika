@@ -1,4 +1,4 @@
-import { IBox, IPoint } from '../../../type.interface';
+import { IPoint } from '../../../type.interface';
 import { noop } from '../../../utils/common';
 import { MoveElementsCommand } from '../../commands/move_elements';
 import { Editor } from '../../editor';
