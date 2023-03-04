@@ -1,7 +1,11 @@
 import EventEmitter from '../utils/event_emitter';
 
+interface Events {
+  update(attrs: SettingValue): void
+}
+
 export class Setting {
-  private eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter<Events>();
   private value = {
     canvasBgColor: '#f4f4f4',
     stroke: '',

@@ -6,9 +6,13 @@ import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
 
+interface Events {
+  itemsChange(items: Graph[]): void
+}
+
 class SelectedElements {
   private items: Graph[] = [];
-  private eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
   setItems(items: Graph[]) {

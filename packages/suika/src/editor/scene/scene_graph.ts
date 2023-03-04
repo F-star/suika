@@ -23,6 +23,10 @@ import { getDevicePixelRatio } from '../../utils/common';
 
 const DOUBLE_PI = Math.PI * 2;
 
+interface Events {
+  render(): void
+}
+
 /**
  * 图形树
  */
@@ -35,7 +39,7 @@ export class SceneGraph {
     height: number;
   } | null = null;
   // private handle: { rotation: IPoint } | null = null;
-  private eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter<Events>();
   transformHandle: TransformHandle;
   grid: Grid;
 

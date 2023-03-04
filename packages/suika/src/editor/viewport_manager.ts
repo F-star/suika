@@ -3,10 +3,15 @@ import { getDevicePixelRatio } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
+interface Events {
+  xOrYChange(x: number | undefined, y: number): void
+}
+
+
 export class ViewportManager {
   private scrollX = 0;
   private scrollY = 0;
-  private eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
   getViewport(): IBox {
@@ -37,7 +42,7 @@ export class ViewportManager {
     }
 
     if (prevX !== x || prevY !== y) {
-      this.eventEmitter.emit('xOrYChange', x, y);
+      this.eventEmitter.emit('xOrYChange', x as number, y as number);
     }
   }
   translate(dx: number, dy: number) {

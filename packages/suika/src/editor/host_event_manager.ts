@@ -8,6 +8,10 @@ import { noop } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
+interface Events {
+  shiftToggle(): void;
+}
+
 class HostEventManager {
   isShiftPressing = false;
   isCtrlPressing = false;
@@ -23,7 +27,7 @@ class HostEventManager {
   private unbindScrollEventToZoom: () => void = noop;
   private unbindDragCanvasEvent: () => void = noop;
 
-  private eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
   bindHotkeys() {

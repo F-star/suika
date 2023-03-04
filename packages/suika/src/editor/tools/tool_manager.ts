@@ -7,13 +7,16 @@ import { DrawRectTool } from './tool_draw_rect';
 import { SelectTool } from './tool_select';
 import { ITool } from './type';
 
+interface Events {
+  change(type: string): void;
+}
+
 export class ToolManager {
   toolMap = new Map<string, ITool>();
   currentTool: ITool | null = null;
-  eventEmitter: EventEmitter;
+  eventEmitter = new EventEmitter<Events>();
   _unbindEvent: () => void;
   constructor(private editor: Editor) {
-    this.eventEmitter = new EventEmitter();
     // 绑定 tool
     this.toolMap.set(DrawRectTool.type, new DrawRectTool(editor));
     this.toolMap.set(DrawEllipseTool.type, new DrawEllipseTool(editor));
@@ -107,10 +110,10 @@ export class ToolManager {
     currentTool.active();
     this.eventEmitter.emit('change', currentTool.type);
   }
-  on(eventName: 'change', handler: (toolName: string) => void) {
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'change', handler: (toolName: string) => void) {
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
   destroy() {

@@ -3,9 +3,13 @@ import { ceil, viewportCoordsToSceneUtil } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
+interface Events {
+  zoomChange(zoom: number, prevZoom: number): void
+}
+
 export class ZoomManager {
   private zoom = 1;
-  private eventEmitter = new EventEmitter();
+  private eventEmitter = new EventEmitter<Events>();
   constructor(private editor: Editor) {}
   getZoom() {
     return this.zoom;

@@ -1,34 +1,34 @@
-
 /**
- * EventEmiter
+ * EventEmitter
  *
  * Publish-Subscribe Design Pattern
  */
 
-type EventName = string | symbol
-type Listener = (...args: any[]) => void
+class EventEmitter<
+  T extends Record<string | symbol, any>
+> {
+  private eventMap: Record<keyof T, Array<(...args: any[]) => void>> =
+    {} as any;
 
-class EventEmitter {
-  private hashMap: { [eventName: string]: Array<Listener> } = {};
-
-  on(eventName: EventName, listener: Listener): this {
-    const name = eventName as string;
-    if (!this.hashMap[name]) {
-      this.hashMap[name] = [];
+  on<K extends keyof T>(eventName: K, listener: T[K]) {
+    if (!this.eventMap[eventName]) {
+      this.eventMap[eventName] = [];
     }
-    this.hashMap[name].push(listener);
+    this.eventMap[eventName].push(listener);
     return this;
   }
-  emit(eventName: EventName, ...args: any): boolean {
-    const listeners = this.hashMap[eventName as string];
+
+  emit<K extends keyof T>(eventName: K, ...args: Parameters<T[K]>) {
+    const listeners = this.eventMap[eventName];
     if (!listeners || listeners.length === 0) return false;
-    listeners.forEach(listener => {
+    listeners.forEach((listener) => {
       listener(...args);
     });
     return true;
   }
-  off(eventName: EventName, listener: Listener): this {
-    const listeners = this.hashMap[eventName as string];
+
+  off<K extends keyof T>(eventName: K, listener: T[K]) {
+    const listeners = this.eventMap[eventName];
     if (listeners && listeners.length > 0) {
       const index = listeners.indexOf(listener);
       if (index > -1) {
