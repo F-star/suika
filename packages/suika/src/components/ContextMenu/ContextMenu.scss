@@ -1,0 +1,22 @@
+.suika {
+  .suika-context-menu-mask {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 20;
+  }
+
+  .suika-context-menu {
+    position: fixed;
+    border: 1px solid #999;
+    border-radius: 4px;
+    padding: 8px 0;
+    width: 200px;
+    z-index: 25;
+
+    background-color: #eee;
+
+  }
+}

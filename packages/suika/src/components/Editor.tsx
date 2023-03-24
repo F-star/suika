@@ -6,6 +6,7 @@ import Header from './Header';
 import InfoPanel from './InfoPanel';
 import { LayerPanel } from './LayerPanel';
 import './Editor.scss';
+import { ContextMenu } from './ContextMenu';
 
 const rightPadding = 241;
 
@@ -59,6 +60,7 @@ const Editor: FC = () => {
             ref={canvasRef}
           />
           <InfoPanel />
+          <ContextMenu />
         </div>
       </EditorContext.Provider>
     </div>

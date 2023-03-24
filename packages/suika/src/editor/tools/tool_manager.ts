@@ -34,14 +34,17 @@ export class ToolManager {
     let isPressing = false;
     let startPos: [x: number, y: number] = [0, 0];
     let isEnableDrag = false;
+    let startWithLeftMouse = false;
 
     const handleDown = (e: PointerEvent) => {
       isPressing = true;
       isEnableDrag = false;
+      startWithLeftMouse = false;
       if (e.button !== 0) {
         // must to be left mouse button
         return;
       }
+      startWithLeftMouse = true;
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
@@ -53,6 +56,9 @@ export class ToolManager {
         throw new Error('未设置当前使用工具');
       }
       if (isPressing) {
+        if (!startWithLeftMouse) {
+          return;
+        }
         const dx = e.clientX - startPos[0];
         const dy = e.clientY - startPos[1];
         const dragBlockStep = this.editor.setting.get('dragBlockStep');
@@ -71,18 +77,21 @@ export class ToolManager {
       }
     };
     const handleUp = (e: PointerEvent) => {
+      if (!startWithLeftMouse) {
+        return;
+      }
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-      if (e.button === 0) {
-        // 必须是鼠标左键
-        if (isPressing) {
-          this.editor.hostEventManager.enableDragBySpace();
-          isPressing = false;
-          this.currentTool.end(e, isEnableDrag);
-          this.currentTool.afterEnd();
-        }
+
+
+      if (isPressing) {
+        this.editor.hostEventManager.enableDragBySpace();
+        isPressing = false;
+        this.currentTool.end(e, isEnableDrag);
+        this.currentTool.afterEnd();
       }
+
       isEnableDrag = false;
     };
     const canvas = this.editor.canvasElement;
