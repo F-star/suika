@@ -97,10 +97,8 @@ export const ContextMenu: FC = () => {
           top: pos.y + OFFSET_Y,
         }}
       >
-        {editor?.selectedElements.isEmpty()
-          ? renderNoSelectContextMenu()
-          : renderSelectContextMenu()
-        }
+        {renderNoSelectContextMenu()}
+        {editor && !editor.selectedElements.isEmpty() && renderSelectContextMenu()}
       </div>
     </div>
   );
