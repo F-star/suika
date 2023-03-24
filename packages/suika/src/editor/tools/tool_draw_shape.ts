@@ -73,6 +73,7 @@ export abstract class DrawShapeTool implements ITool {
   }
   drag(e: PointerEvent) {
     this.editor.hostEventManager.disableDelete();
+    this.editor.hostEventManager.disableContextmenu();
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
@@ -166,6 +167,7 @@ export abstract class DrawShapeTool implements ITool {
   afterEnd() {
     this.isDragging = false;
     this.editor.hostEventManager.enableDelete();
+    this.editor.hostEventManager.enableContextmenu();
     this.editor.toolManager.setTool('select');
   }
 }

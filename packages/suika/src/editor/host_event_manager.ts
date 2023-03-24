@@ -4,12 +4,12 @@
 
 import hotkeys from 'hotkeys-js';
 import { IBox, IPoint } from '../type.interface';
-import { noop } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
 interface Events {
   shiftToggle(): void;
+  contextmenu(point: IPoint): void;
 }
 
 class HostEventManager {
@@ -21,13 +21,11 @@ class HostEventManager {
   isDraggingCanvasBySpace = false;
   isEnableDragCanvasBySpace = true;
   isEnableDelete = true;
+  isEnableContextMenu = true;
 
   private prevCursor = '';
-
-  private unbindScrollEventToZoom: () => void = noop;
-  private unbindDragCanvasEvent: () => void = noop;
-
   private eventEmitter = new EventEmitter<Events>();
+  private unbindHandlers: Array<() => void> = [];
 
   constructor(private editor: Editor) {}
   bindHotkeys() {
@@ -35,8 +33,10 @@ class HostEventManager {
     this.bindActionHotkeys(); // 操作快捷键，比如 ctrl+z 撤销
     this.bindWheelEventToZoom(); // 滚轮移动画布
     this.bindDragCanvasEvent(); // 空格和拖拽移动画布
+    this.bindContextMenu();
   }
   private bindModifiersRecordEvent() {
+    // record if shift, ctrl, command is pressed
     hotkeys('*', { keydown: true, keyup: true }, (event) => {
       if (hotkeys.shift) {
         const prev = this.isShiftPressing;
@@ -90,10 +90,10 @@ class HostEventManager {
   /**
    * shiftToggle 会在切换时触发。按住 shift 不放，只会触发一次
    */
-  on(eventName: 'shiftToggle', handler: () => void) {
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'shiftToggle', handler: () => void) {
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
   private bindActionHotkeys() {
@@ -104,7 +104,7 @@ class HostEventManager {
       this.editor.commandManager.redo();
     });
     hotkeys('backspace, delete', { keydown: true }, () => {
-      // TODO: 一些情况下是不能删除的
+      // TODO: 一些情况下是不能进行删除操作的
       // 1. 绘制图形过程中
       //
       // 可以删除但要特殊处理的情况
@@ -138,9 +138,9 @@ class HostEventManager {
     };
     editor.canvasElement.addEventListener('wheel', handler);
 
-    this.unbindScrollEventToZoom = () => {
+    this.unbindHandlers.push(() => {
       editor.canvasElement.removeEventListener('wheel', handler);
-    };
+    });
   }
 
   private bindDragCanvasEvent() {
@@ -199,12 +199,26 @@ class HostEventManager {
     };
     window.addEventListener('pointerup', pointerupHandler);
 
-    this.unbindDragCanvasEvent = () => {
+    this.unbindHandlers.push(() => {
       this.editor.canvasElement.removeEventListener('pointerdown', pointerdownHandler);
       window.removeEventListener('pointermove', pointermoveHandler);
       window.removeEventListener('pointerup', pointerupHandler);
-    };
+    });
   }
+
+  private bindContextMenu() {
+    const handler = (e: MouseEvent) => {
+      e.preventDefault();
+      if (this.isEnableContextMenu) {
+        this.eventEmitter.emit('contextmenu', { x: e.clientX, y: e.clientY });
+      }
+    };
+    this.editor.canvasElement.addEventListener('contextmenu', handler);
+    this.unbindHandlers.push(() => {
+      this.editor.canvasElement.removeEventListener('contextmenu', handler);
+    });
+  }
+
   enableDragBySpace() {
     this.isEnableDragCanvasBySpace = true;
   }
@@ -217,10 +231,16 @@ class HostEventManager {
   disableDelete() {
     this.isEnableDelete = false;
   }
+  enableContextmenu() {
+    this.isEnableContextMenu = true;
+  }
+  disableContextmenu() {
+    this.isEnableContextMenu = false;
+  }
   destroy() {
     hotkeys.unbind();
-    this.unbindScrollEventToZoom();
-    this.unbindDragCanvasEvent();
+    this.unbindHandlers.forEach(fn => fn());
+    this.unbindHandlers = [];
   }
 }
 
