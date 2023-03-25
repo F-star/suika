@@ -14,7 +14,7 @@
 			"",
 			"interface IProps {}",
 			"",
-			"const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}: FC<IProps> = (props) => {",
+			"export const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}: FC<IProps> = (props) => {",
 			"\treturn (",
 			"\t\t<div>",
 			"\t\t\t$0",
@@ -22,7 +22,6 @@
 			"\t);",
 			"};",
 			"",
-			"export default ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/};"
 		],
 		"description": "React Functional Component"
 	}
