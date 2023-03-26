@@ -5,6 +5,7 @@ import EventEmitter from '../utils/event_emitter';
 import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
+import { AlignCmd, AlignType } from './commands/align';
 
 interface Events {
   itemsChange(items: Graph[]): void
@@ -62,6 +63,9 @@ class SelectedElements {
       throw new Error('还没实现，敬请期待');
     }
   }
+  size() {
+    return this.items.length;
+  }
   isEmpty() {
     return this.items.length === 0;
   }
@@ -99,6 +103,17 @@ class SelectedElements {
       const element = items[i];
       element.setRotateXY(rotatedX, rotatedY);
     }
+  }
+  align(type: AlignType) {
+    if (this.size() < 2) {
+      console.warn('can align zero or two elements, fail silently');
+      return;
+    }
+    this.editor.commandManager.pushCommand(
+      new AlignCmd('Align ' + type, this.editor, this.items, type)
+    );
+
+    this.editor.sceneGraph.render();
   }
 }
 

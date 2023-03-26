@@ -1,6 +1,6 @@
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { IBox } from '../../type.interface';
+import { IBox, IBox2 } from '../../type.interface';
 import { genId } from '../../utils/common';
 import {
   getAbsoluteCoords,
@@ -100,6 +100,36 @@ export class Graph {
       height: maxY - minY,
     };
   }
+  getBBox2(): IBox2 {
+    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
+    const rotation = this.rotation;
+    if (!rotation) {
+      const box = this.getBBoxWithoutRotation();
+      return {
+        minX: box.x,
+        minY: box.y,
+        maxX: box.x + box.width,
+        maxY: box.y + box.height,
+      };
+    }
+
+    const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
+    const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const [brX, brY] = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const [blX, blY] = transformRotate(x, y2, rotation, cx, cy); // 右下
+
+    const minX = Math.min(tlX, trX, brX, blX);
+    const minY = Math.min(tlY, trY, brY, blY);
+    const maxX = Math.max(tlX, trX, brX, blX);
+    const maxY = Math.max(tlY, trY, brY, blY);
+    return {
+      minX,
+      minY,
+      maxX,
+      maxY,
+    };
+  }
+
   getBBoxWithoutRotation() {
     return {
       x: this.x,

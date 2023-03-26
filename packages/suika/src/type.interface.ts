@@ -7,6 +7,13 @@ export interface IRect {
 
 export type IBox = IRect;
 
+export interface IBox2 {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
 export interface ICircle {
   x: number;
   y: number;
