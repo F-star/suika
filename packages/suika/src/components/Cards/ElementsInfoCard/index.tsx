@@ -17,7 +17,6 @@ const MIXED = 'Mixed';
 /**
  * 因为运算中会丢失精度
  * 如果两个数距离非常非常小，我们认为它相等
- *
  */
 const isEqual = (a: number | string, b: number) => {
   if (typeof a === 'string') return false;
