@@ -1,0 +1,24 @@
+.suika {
+  .align-list {
+    display: flex;
+    padding: 0 8px;
+    .align-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      margin: 0 1px;
+      border-radius: 3px;
+      width: 32px;
+      height: 32px;
+      &:hover {
+        background-color: #f2f2f2;
+      }
+    }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.3;
+    }
+  }
+}

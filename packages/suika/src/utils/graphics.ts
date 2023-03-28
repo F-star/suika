@@ -51,7 +51,7 @@ export const normalizeAngle = (angle: number): number => {
  */
 export function getRectsBBox(...rects: IRect[]): IBox {
   if (rects.length === 0) {
-    throw new Error('矩形数量不能为 0');
+    throw new Error('the count of rect can not be 0');
   }
   const first = rects[0];
   let x = first.x;
