@@ -2,6 +2,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
 import { IPoint } from '../../type.interface';
 import ContextMenuItem from './components/ContextMenuItem';
+import ContextMenuSep from './components/ContextMenuSep';
 import './ContextMenu.scss';
 
 const OFFSET_X = 2;
@@ -65,6 +66,7 @@ export const ContextMenu: FC = () => {
   const renderSelectContextMenu = () => {
     return (
       <>
+        <ContextMenuSep />
         <ContextMenuItem
           onClick={() => {
             setVisible(false);
