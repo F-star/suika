@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
+import { AlignType } from '../../../editor/commands/align';
 import { Graph } from '../../../editor/scene/graph';
 import { BaseCard } from '../BaseCard';
 import './AlignCard.scss';
@@ -33,26 +34,52 @@ export const AlignCard: FC = () => {
     }
   }, [editor]);
 
-
   return (
     <BaseCard>
       <div className={classNames('align-list', { disabled })}>
-        <div className="align-item">
+        <div
+          className="align-item"
+          onClick={() => {
+            editor?.selectedElements.align(AlignType.Left);
+          }}
+        >
           <IconAlignLeft />
         </div>
-        <div className="align-item">
+        <div
+          className="align-item"
+          onClick={() => {
+            editor?.selectedElements.align(AlignType.HCenter);
+          }}
+        >
           <IconAlignHCenter />
         </div>
-        <div className="align-item">
+        <div
+          className="align-item"
+          onClick={() => {
+            editor?.selectedElements.align(AlignType.Right);
+          }}
+        >
           <IconAlignRight />
         </div>
-        <div className="align-item">
+        <div className="align-item"
+          onClick={() => {
+            editor?.selectedElements.align(AlignType.Top);
+          }}
+        >
           <IconAlignTop />
         </div>
-        <div className="align-item">
+        <div className="align-item"
+          onClick={() => {
+            editor?.selectedElements.align(AlignType.VCenter);
+          }}
+        >
           <IconAlignVCenter />
         </div>
-        <div className="align-item">
+        <div className="align-item"
+          onClick={() => {
+            editor?.selectedElements.align(AlignType.Bottom);
+          }}
+        >
           <IconAlignBottom />
         </div>
       </div>
