@@ -1,5 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
+import { ArrangeType } from '../../editor/commands/arrange';
 import { IPoint } from '../../type.interface';
 import ContextMenuItem from './components/ContextMenuItem';
 import ContextMenuSep from './components/ContextMenuSep';
@@ -66,6 +67,48 @@ export const ContextMenu: FC = () => {
   const renderSelectContextMenu = () => {
     return (
       <>
+        <ContextMenuSep />
+        <ContextMenuItem
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              editor.selectedElements.arrange(ArrangeType.Forward);
+            }
+          }}
+        >
+          Forward
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              editor.selectedElements.arrange(ArrangeType.Backward);
+            }
+          }}
+        >
+          Backward
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              editor.selectedElements.arrange(ArrangeType.Front);
+            }
+          }}
+        >
+          Bring to front
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              editor.selectedElements.arrange(ArrangeType.Back);
+            }
+          }}
+        >
+          Send to Back
+        </ContextMenuItem>
+
         <ContextMenuSep />
         <ContextMenuItem
           onClick={() => {

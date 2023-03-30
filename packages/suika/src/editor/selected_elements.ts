@@ -6,6 +6,7 @@ import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
 import { AlignCmd, AlignType } from './commands/align';
+import { ArrangeCmd, ArrangeType } from './commands/arrange';
 
 interface Events {
   itemsChange(items: Graph[]): void
@@ -112,7 +113,22 @@ class SelectedElements {
     this.editor.commandManager.pushCommand(
       new AlignCmd('Align ' + type, this.editor, this.items, type)
     );
+    this.editor.sceneGraph.render();
+  }
 
+  arrange(type: ArrangeType) {
+    if (this.size() === 0) {
+      console.warn('can\'t arrange, no element');
+    }
+
+    /**
+     * TODO:
+     * if the selected graphs had already in the top, stop exec front command
+     * also other arrange type
+     */
+    this.editor.commandManager.pushCommand(
+      new ArrangeCmd('Arrange ' + type, this.editor, this.items, type)
+    );
     this.editor.sceneGraph.render();
   }
 }
