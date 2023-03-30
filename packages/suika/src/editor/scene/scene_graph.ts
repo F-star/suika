@@ -353,6 +353,17 @@ export class SceneGraph {
     return objects;
   }
 
+  // TODO: update tree by patch obj and id
+  updateElements() {
+    /**
+     * {
+     *   update: { id: '123', attrs: { width: 1 }  }
+     *   removed: new Set(['8', '9'])
+     *   create: { type: rect, }
+     * }
+     */
+  }
+
   on(eventName: 'render', handler: () => void) {
     this.eventEmitter.on(eventName, handler);
   }
