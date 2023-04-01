@@ -6,7 +6,7 @@ export enum ArrangeType {
   Front = 'Front',
   Back = 'Back',
   Forward = 'Forward',
-  Backward = 'Backward'
+  Backward = 'Backward',
 }
 
 export class ArrangeCmd implements ICommand {
@@ -22,12 +22,14 @@ export class ArrangeCmd implements ICommand {
     public type: ArrangeType
   ) {
     if (movedGraphs.length === 0) {
-      throw new Error('can\'t arrange, no element');
+      throw new Error("can't arrange, no element");
     }
 
-    const movedGraphSet = this.movedGraphSet = new Set(movedGraphs);
+    const movedGraphSet = (this.movedGraphSet = new Set(movedGraphs));
     if (movedGraphSet.size !== movedGraphs.length) {
-      console.warn('the arg "movedGraphs" in ArrangeCmd constructor has duplicate values');
+      console.warn(
+        'the arg "movedGraphs" in ArrangeCmd constructor has duplicate values'
+      );
     }
 
     this.do();
@@ -35,64 +37,59 @@ export class ArrangeCmd implements ICommand {
   do() {
     const graphs = this.editor.sceneGraph.children;
     switch (this.type) {
-    case ArrangeType.Front: {
-      this.prevGraphs = graphs;
+      case ArrangeType.Front: {
+        this.prevGraphs = graphs;
 
-      const newSceneGraphs: Graph[] = [];
-      const tailGraphs: Graph[] = [];
-      const prevIndexes: number[] = [];
+        const newSceneGraphs: Graph[] = [];
+        const tailGraphs: Graph[] = [];
 
-      /**
+        /**
          * move to tail
          */
-      for (let i = 0; i < graphs.length; i++) {
-        const graph = graphs[i];
-        if (this.movedGraphSet.has(graph)) {
-          tailGraphs.push(graph);
-          prevIndexes.push(i);
-        } else {
-          newSceneGraphs.push(graph);
+        for (let i = 0; i < graphs.length; i++) {
+          const graph = graphs[i];
+          if (this.movedGraphSet.has(graph)) {
+            tailGraphs.push(graph);
+          } else {
+            newSceneGraphs.push(graph);
+          }
         }
+        newSceneGraphs.push(...tailGraphs);
+        this.editor.sceneGraph.children = newSceneGraphs;
+
+        break;
       }
-      newSceneGraphs.push(...tailGraphs);
-      this.editor.sceneGraph.children = newSceneGraphs;
+      case ArrangeType.Forward: {
+        forward(graphs, this.movedGraphSet);
+        break;
+      }
+      case ArrangeType.Backward: {
+        backward(graphs, this.movedGraphSet);
+        break;
+      }
+      case ArrangeType.Back: {
+        this.prevGraphs = graphs;
 
-      break;
-    }
-    case ArrangeType.Forward: {
-      forward(graphs, this.movedGraphSet);
-      break;
-    }
-    case ArrangeType.Backward: {
-      backward(graphs, this.movedGraphSet);
-      break;
-    }
-    case ArrangeType.Back: {
-      this.prevGraphs = graphs;
+        const newSceneGraphs: Graph[] = [];
+        const tailGraphs: Graph[] = [];
 
-      const newSceneGraphs: Graph[] = [];
-      const tailGraphs: Graph[] = [];
-      const prevIndexes: number[] = [];
-
-      /**
+        /**
          * move to tail
          */
-      for (let i = graphs.length - 1; i >= 0; i--) {
-        const graph = graphs[i];
-        if (this.movedGraphSet.has(graph)) {
-          tailGraphs.push(graph);
-          prevIndexes.push(i);
-        } else {
-          newSceneGraphs.push(graph);
+        for (let i = graphs.length - 1; i >= 0; i--) {
+          const graph = graphs[i];
+          if (this.movedGraphSet.has(graph)) {
+            tailGraphs.push(graph);
+          } else {
+            newSceneGraphs.push(graph);
+          }
         }
+        newSceneGraphs.push(...tailGraphs);
+        this.editor.sceneGraph.children = newSceneGraphs.reverse(); // reverse
+
+        break;
       }
-      newSceneGraphs.push(...tailGraphs);
-      this.editor.sceneGraph.children = newSceneGraphs.reverse(); // reverse
-
-      break;
     }
-    }
-
   }
   redo() {
     this.do();
@@ -100,34 +97,48 @@ export class ArrangeCmd implements ICommand {
   undo() {
     const graphs = this.editor.sceneGraph.children;
     switch (this.type) {
-    case ArrangeType.Forward:
-      backward(graphs, this.movedGraphSet);
-      break;
-    case ArrangeType.Backward:
-      forward(graphs, this.movedGraphSet);
-      break;
-    case ArrangeType.Front:
-      this.editor.sceneGraph.children = this.prevGraphs;
-      break;
-    case ArrangeType.Back:
-      this.editor.sceneGraph.children = this.prevGraphs;
-      break;
-    default:
-      console.warn('invalid arrange type:', this.type);
-      break;
+      case ArrangeType.Forward:
+        backward(graphs, this.movedGraphSet);
+        break;
+      case ArrangeType.Backward:
+        forward(graphs, this.movedGraphSet);
+        break;
+      case ArrangeType.Front:
+        this.editor.sceneGraph.children = this.prevGraphs;
+        break;
+      case ArrangeType.Back:
+        this.editor.sceneGraph.children = this.prevGraphs;
+        break;
+      default:
+        console.warn('invalid arrange type:', this.type);
+        break;
     }
   }
 }
 
+function front(graphs: Graph[], movedGraphSet: Set<Graph>) {
+  const newSceneGraphs: Graph[] = [];
+  const tailGraphs: Graph[] = [];
+
+  for (let i = 0; i < graphs.length; i++) {
+    const graph = graphs[i];
+    if (movedGraphSet.has(graph)) {
+      tailGraphs.push(graph);
+    } else {
+      newSceneGraphs.push(graph);
+    }
+  }
+  newSceneGraphs.push(...tailGraphs);
+  return newSceneGraphs;
+}
 
 function forward(graphs: Graph[], movedGraphs: Set<Graph>) {
   for (let i = graphs.length - 2; i >= 0; i--) {
     if (movedGraphs.has(graphs[i])) {
-      [graphs[i], graphs[i+1]] = [graphs[i + 1], graphs[i]];
+      [graphs[i], graphs[i + 1]] = [graphs[i + 1], graphs[i]];
     }
   }
 }
-
 
 function backward(graphs: Graph[], movedGraphs: Set<Graph>) {
   for (let i = 1; i < graphs.length; i++) {
