@@ -13,8 +13,6 @@ import NumberInput from '../../input/NumberInput';
 import './style.scss';
 import { useIntl } from 'react-intl';
 
-// const MIXED = 'Mixed';
-
 /**
  * 因为运算中会丢失精度
  * 如果两个数距离非常非常小，我们认为它相等
@@ -90,7 +88,7 @@ const ElementsInfoCards: FC = () => {
         editor.sceneGraph.off('render', handler);
       };
     }
-  }, [editor]);
+  }, [editor, MIXED]);
 
   return (
     <BaseCard>
