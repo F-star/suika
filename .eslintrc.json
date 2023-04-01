@@ -13,7 +13,7 @@
   "parser": "@typescript-eslint/parser",
   "rules": {
     // 缩进
-    "indent": ["error", 2],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     // 必须使用分号
     "semi": "error",
     // 使用单引号
