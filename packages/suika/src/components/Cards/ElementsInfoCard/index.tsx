@@ -11,8 +11,9 @@ import {
 import { BaseCard } from '../BaseCard';
 import NumberInput from '../../input/NumberInput';
 import './style.scss';
+import { useIntl } from 'react-intl';
 
-const MIXED = 'Mixed';
+// const MIXED = 'Mixed';
 
 /**
  * 因为运算中会丢失精度
@@ -25,6 +26,9 @@ const isEqual = (a: number | string, b: number) => {
 
 const ElementsInfoCards: FC = () => {
   const editor = useContext(EditorContext);
+  const intl = useIntl();
+  const MIXED = intl.formatMessage({ id: 'mixed' });
+
   const [rotatedX, setRotatedX] = useState<number | typeof MIXED>(MIXED);
   const [rotatedY, setRotatedY] = useState<number | typeof MIXED>(MIXED);
   const [width, setWidth] = useState<number | typeof MIXED>(MIXED);
@@ -66,17 +70,17 @@ const ElementsInfoCards: FC = () => {
           }
 
           setRotatedX(
-            newRotatedX === MIXED ? newRotatedX : remainTwoDecimal(newRotatedX)
+            newRotatedX === MIXED ? newRotatedX : remainTwoDecimal(newRotatedX as number)
           );
           setRotatedY(
-            newRotatedY === MIXED ? newRotatedY : remainTwoDecimal(newRotatedY)
+            newRotatedY === MIXED ? newRotatedY : remainTwoDecimal(newRotatedY as number)
           );
           setWidth(newWidth);
           setHeight(newHeight);
           setRotation(
             newRotation === MIXED
               ? newRotation
-              : remainTwoDecimal(radian2Degree(newRotation))
+              : remainTwoDecimal(radian2Degree(newRotation as number))
           );
         }
       };

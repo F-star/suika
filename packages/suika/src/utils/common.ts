@@ -120,6 +120,7 @@ export const remainTwoDecimal = (n: number) => {
  * 字符串转换为数字，并保留两位小数
  */
 export const parseToNumber = (str: string) => {
+  if (!str) return NaN;
   const num = Number(str);
   if (Number.isNaN(num)) {
     return NaN;
