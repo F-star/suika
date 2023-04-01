@@ -9,6 +9,7 @@ interface ICustomRuleInputProps {
 
 const CustomRuleInput: FC<ICustomRuleInputProps> = ({ value, onBlur, parser }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const isActive = useRef(false);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -23,7 +24,10 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = ({ value, onBlur, parser }) =
       defaultValue={value}
       onMouseUp={(e) => {
         const el = e.currentTarget;
-        el.setSelectionRange(0, el.value.length);
+        if (!isActive.current) {
+          el.select();
+        }
+        isActive.current = true;
       }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
@@ -31,6 +35,9 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = ({ value, onBlur, parser }) =
         }
       }}
       onBlur={(e) => {
+        isActive.current = false;
+        const selection = window.getSelection();
+        selection && selection.removeAllRanges();
         if (inputRef.current) {
           const str = inputRef.current.value.trim();
           const newValue = parser(str);
