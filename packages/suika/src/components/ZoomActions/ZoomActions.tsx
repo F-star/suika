@@ -5,6 +5,8 @@ import { EditorContext } from '../../context';
 import { SettingValue } from '../../editor/setting';
 import { ActionItem } from './components/ActionItem/ActionItem';
 import './ZoomActions.scss';
+import { IconDownOutlined } from './icons';
+import { FormattedMessage } from 'react-intl';
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);
@@ -44,27 +46,10 @@ export const ZoomActions: FC = () => {
         }}
       >
         {Math.floor(zoom * 100)}%
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M7 10L12 15L17 10" stroke="#333333" />
-        </svg>
+        <IconDownOutlined />
       </div>
       {popoverVisible && (
         <div className="popover">
-          <ActionItem
-            onClick={() => {
-              editor?.zoomManager.zoomOut();
-              editor?.sceneGraph.render();
-              setPopoverVisible(false);
-            }}
-          >
-            Zoom in
-          </ActionItem>
           <ActionItem
             onClick={() => {
               editor?.zoomManager.zoomIn();
@@ -72,7 +57,16 @@ export const ZoomActions: FC = () => {
               setPopoverVisible(false);
             }}
           >
-            Zoom out
+            <FormattedMessage id='zoom.zoomIn' />
+          </ActionItem>
+          <ActionItem
+            onClick={() => {
+              editor?.zoomManager.zoomOut();
+              editor?.sceneGraph.render();
+              setPopoverVisible(false);
+            }}
+          >
+            <FormattedMessage id='zoom.zoomOut' />
           </ActionItem>
           <div className='separator' />
           <ActionItem
@@ -86,7 +80,7 @@ export const ZoomActions: FC = () => {
               }
             }}
           >
-            Pixel grid
+            <FormattedMessage id='setting.grid.pixelGrid' />
           </ActionItem>
           <ActionItem
             check={setting.snapToPixelGrid}
@@ -99,7 +93,7 @@ export const ZoomActions: FC = () => {
               }
             }}
           >
-            Snap to pixel grid
+            <FormattedMessage id='setting.grid.snapToPixelGrid' />
           </ActionItem>
           <ActionItem
             check={setting.enableRuler}
@@ -112,7 +106,7 @@ export const ZoomActions: FC = () => {
               }
             }}
           >
-            Rulers
+            <FormattedMessage id='setting.rulers' />
           </ActionItem>
         </div>
       )}

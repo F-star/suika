@@ -10,13 +10,13 @@
 
   .suika-context-menu {
     position: fixed;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 8px 0;
     width: 200px;
     z-index: 25;
 
-    box-shadow: 0px 5px 7px rgba(0,0,0,0.15);
-    background-color: #eee;
+    box-shadow: 0px 5px 10px rgba(0,0,0,0.15);
+
+    background-color: #fff;
   }
 }

@@ -14,14 +14,15 @@
     .tooltip {
       display: none;
       position: absolute;
-      bottom: -40px;
+      bottom: -30px;
 
       border-radius: 4px;
-      padding: 8px 12px;
+      padding: 4px 8px;
 
       color: #fff;
       font-size: 12px;
       background-color: #333333ee;
+      white-space: nowrap;
       z-index: 2;
     }
 

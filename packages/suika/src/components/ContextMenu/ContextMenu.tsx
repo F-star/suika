@@ -5,6 +5,7 @@ import { IPoint } from '../../type.interface';
 import ContextMenuItem from './components/ContextMenuItem';
 import ContextMenuSep from './components/ContextMenuSep';
 import './ContextMenu.scss';
+import { FormattedMessage } from 'react-intl';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;
@@ -45,7 +46,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Undo
+          <FormattedMessage id="command.undo" />
         </ContextMenuItem>
         <ContextMenuItem
           onClick={() => {
@@ -55,7 +56,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Redo
+          <FormattedMessage id="command.redo" />
         </ContextMenuItem>
       </>
     );
@@ -76,7 +77,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Forward
+          <FormattedMessage id="arrange.forward" />
         </ContextMenuItem>
         <ContextMenuItem
           onClick={() => {
@@ -86,7 +87,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Backward
+          <FormattedMessage id="arrange.backward" />
         </ContextMenuItem>
         <ContextMenuItem
           onClick={() => {
@@ -96,7 +97,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Bring to front
+          <FormattedMessage id="arrange.front" />
         </ContextMenuItem>
         <ContextMenuItem
           onClick={() => {
@@ -106,7 +107,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Send to Back
+          <FormattedMessage id="arrange.back" />
         </ContextMenuItem>
 
         <ContextMenuSep />
@@ -118,7 +119,7 @@ export const ContextMenu: FC = () => {
             }
           }}
         >
-          Delete
+          <FormattedMessage id="delete" />
         </ContextMenuItem>
       </>
     );

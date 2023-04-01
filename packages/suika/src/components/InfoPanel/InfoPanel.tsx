@@ -3,7 +3,7 @@ import { EditorContext } from '../../context';
 import { IGraph } from '../../editor/scene/graph';
 import { AlignCard } from '../Cards/AlignCard';
 import ElementsInfoCards from '../Cards/ElementsInfoCard';
-import FillCard from '../Cards/FillCard';
+import { FillCard } from '../Cards/FillCard';
 import './style.scss';
 
 enum PanelType {
