@@ -3,6 +3,7 @@
     "source.fixAll.eslint": true
   },
   "cSpell.words": [
+    "Formatjs",
     "IRGBA",
     "isequal",
     "suika"
