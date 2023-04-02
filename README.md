@@ -14,3 +14,7 @@ https://blog.fstars.wang/app/suika/
 另外可以关注我的公众号，持续更新图形编辑器相关文章。
 
 ![image](https://user-images.githubusercontent.com/18698939/219853531-e39e1537-99e6-40bf-a56f-81330fca3180.png)
+
+## 物料
+
+icons：https://www.figma.com/community/file/1224385128783567603/suika-icons
