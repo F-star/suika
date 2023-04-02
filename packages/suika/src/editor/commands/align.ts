@@ -42,59 +42,59 @@ export class AlignCmd implements ICommand {
     );
 
     switch (type) {
-    case AlignType.Left: {
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        this.dx[i] = mixedBBox.minX - bBoxes[i].minX;
-        el.x += this.dx[i];
+      case AlignType.Left: {
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          this.dx[i] = mixedBBox.minX - bBoxes[i].minX;
+          el.x += this.dx[i];
+        }
+        break;
       }
-      break;
-    }
-    case AlignType.HCenter: {
-      const centerX = mixedBBox.minX / 2 + mixedBBox.maxX / 2;
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        this.dx[i] = centerX - (bBoxes[i].minX / 2 + bBoxes[i].maxX / 2);
-        el.x += this.dx[i];
+      case AlignType.HCenter: {
+        const centerX = mixedBBox.minX / 2 + mixedBBox.maxX / 2;
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          this.dx[i] = centerX - (bBoxes[i].minX / 2 + bBoxes[i].maxX / 2);
+          el.x += this.dx[i];
+        }
+        break;
       }
-      break;
-    }
-    case AlignType.Right: {
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        this.dx[i] = mixedBBox.maxX - bBoxes[i].maxX;
-        el.x += this.dx[i];
+      case AlignType.Right: {
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          this.dx[i] = mixedBBox.maxX - bBoxes[i].maxX;
+          el.x += this.dx[i];
+        }
+        break;
       }
-      break;
-    }
-    case AlignType.Top: {
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        this.dy[i] = mixedBBox.minY - bBoxes[i].minY;
-        el.y += this.dy[i];
+      case AlignType.Top: {
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          this.dy[i] = mixedBBox.minY - bBoxes[i].minY;
+          el.y += this.dy[i];
+        }
+        break;
       }
-      break;
-    }
-    case AlignType.VCenter: {
-      const centerY = mixedBBox.minY / 2 + mixedBBox.maxY / 2;
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        this.dy[i] = centerY - (bBoxes[i].minY / 2 + bBoxes[i].maxY / 2);
-        el.y += this.dy[i];
+      case AlignType.VCenter: {
+        const centerY = mixedBBox.minY / 2 + mixedBBox.maxY / 2;
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          this.dy[i] = centerY - (bBoxes[i].minY / 2 + bBoxes[i].maxY / 2);
+          el.y += this.dy[i];
+        }
+        break;
       }
-      break;
-    }
-    case AlignType.Bottom: {
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        this.dy[i] = mixedBBox.maxY - bBoxes[i].maxY;
-        el.y += this.dy[i];
+      case AlignType.Bottom: {
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          this.dy[i] = mixedBBox.maxY - bBoxes[i].maxY;
+          el.y += this.dy[i];
+        }
+        break;
       }
-      break;
-    }
-    default:
-      console.warn('invalid type:', type);
-      break;
+      default:
+        console.warn('invalid type:', type);
+        break;
     }
   }
   redo() {
