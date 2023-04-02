@@ -2,7 +2,7 @@ import throttle from 'lodash.throttle';
 import { FC, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../context';
 import { Editor as GraphEditor } from '../editor/editor';
-import Header from './Header';
+import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
 import { LayerPanel } from './LayerPanel';
 import './Editor.scss';

@@ -2,16 +2,18 @@ import { FC } from 'react';
 import { ZoomActions } from '../ZoomActions';
 import Title from './components/Title';
 import { ToolBar } from './components/Toolbar';
-import './style.scss';
+import './Header.scss';
+import { LocaleSelector } from '../LocaleSelector';
 
-const Header: FC = () => {
+export const Header: FC = () => {
   return (
     <div className='header'>
       <ToolBar />
       <Title />
-      <ZoomActions />
+      <div className='right-area'>
+        <LocaleSelector />
+        <ZoomActions />
+      </div>
     </div>
   );
 };
-
-export default Header;

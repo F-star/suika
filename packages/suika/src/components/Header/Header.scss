@@ -6,5 +6,11 @@
     border-bottom: 1px solid #e6e6e6;
     height: 48px;
     background-color: #fff;
+
+    .right-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }
