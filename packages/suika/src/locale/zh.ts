@@ -4,6 +4,7 @@ export const zh: (typeof en) = {
   'delete': '删除',
   'fill': '填充',
   'mixed': '混合',
+  'noSelectedShapes': '没有选中的图形',
   'tool.select': '选择',
   'tool.rectangle': '矩形',
   'tool.ellipse': '圆',

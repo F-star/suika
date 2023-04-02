@@ -4,6 +4,7 @@ export const en = {
   'delete': 'Delete',
   'fill': 'Fill',
   'mixed': 'Mixed',
+  'noSelectedShapes': 'No Selected Shapes',
   'tool.select': 'Select',
   'tool.rectangle': 'Rectangle',
   'tool.ellipse': 'Ellipse',

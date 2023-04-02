@@ -5,6 +5,7 @@ import { AlignCard } from '../Cards/AlignCard';
 import ElementsInfoCards from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
 import './style.scss';
+import { FormattedMessage } from 'react-intl';
 
 enum PanelType {
   Global = 'Global',
@@ -39,7 +40,9 @@ export const InfoPanel: FC = () => {
         </>
       )}
       {type === PanelType.Global && (
-        <div className="empty-text">No Selected Shapes</div>
+        <div className="empty-text">
+          <FormattedMessage id="noSelectedShapes" />
+        </div>
       )}
     </div>
   );
