@@ -1,5 +1,9 @@
-import { IRGBA } from '../editor/scene/graph';
-
+interface IRGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
 export function parseRGBAStr({ r, g, b, a }: IRGBA) {
   return `rgba(${r},${g},${b},${a})`;
 }
@@ -25,11 +29,9 @@ export const normalizeHex = (hex: string) => {
   }
 };
 
-export const parseHexToRGBA = (hex: string) => {
-  //
-  hex;
-};
 
-export const parseHexToRGBAAndOpacity = () => {
-  //
+export const parseRGBToHex = (rgb: {r: number, g: number, b: number}) => {
+  const { r, g, b } = rgb;
+  const hex = (r << 16) | (g << 8) | b;
+  return '#' + hex.toString(16).toUpperCase().padStart(6, '0');
 };

@@ -20,6 +20,7 @@ import { forEach } from '../../utils/array_util';
 import { parseRGBAStr } from '../../utils/color';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
+import { TextureType } from '../texture';
 
 const DOUBLE_PI = Math.PI * 2;
 
@@ -119,9 +120,11 @@ export class SceneGraph {
         }
         ctx.beginPath();
         ctx.rect(element.x, element.y, element.width, element.height);
-        forEach(element.fill, (val) => {
-          ctx.fillStyle = parseRGBAStr(val);
-          ctx.fill();
+        forEach(element.fill, (texture) => {
+          if (texture.type === TextureType.Solid) {
+            ctx.fillStyle = parseRGBAStr(texture.attrs);
+            ctx.fill();
+          }
         });
         ctx.closePath();
         if (element.rotation) {
@@ -141,9 +144,11 @@ export class SceneGraph {
           0,
           DOUBLE_PI
         );
-        forEach(element.fill, (val) => {
-          ctx.fillStyle = parseRGBAStr(val);
-          ctx.fill();
+        forEach(element.fill, (texture) => {
+          if (texture.type === TextureType.Solid) {
+            ctx.fillStyle = parseRGBAStr(texture.attrs);
+            ctx.fill();
+          }
         });
         ctx.closePath();
       }

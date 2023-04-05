@@ -20,4 +20,7 @@ export const en = {
   'setting.grid.pixelGrid': 'Pixel grid',
   'setting.grid.snapToPixelGrid': 'Snap to pixel grid',
   'setting.rulers': 'rulers',
+
+  'textureType.solid': 'Solid',
+  'textureType.image': 'Image',
 };

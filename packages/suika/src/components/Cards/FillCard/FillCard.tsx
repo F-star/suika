@@ -1,32 +1,48 @@
 import isEqual from 'lodash.isequal';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../../context';
-import { IRGBA } from '../../../editor/scene/graph';
-import { parseRGBAStr } from '../../../utils/color';
+import { parseRGBAStr, parseRGBToHex } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
-import { SketchPicker } from 'react-color';
-import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
-import { forEach } from '../../../utils/array_util';
 import { useClickAway } from 'ahooks';
-import './style.scss';
+import './FillCard.scss';
 import { useIntl } from 'react-intl';
+import { ITexture, TextureType } from '../../../editor/texture';
+import { TexturePicker } from '../../ColorPicker/TexturePicker';
+import cloneDeep from 'lodash.clonedeep';
+import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
-  const [fill, setFill] = useState<IRGBA[]>([]);
-  const prevFills = useRef<IRGBA[][]>([]);
+
+  const [fill, setFill] = useState<ITexture[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const prevFills = useRef<ITexture[][]>([]);
   const colorPickerPopoverRef = useRef<HTMLDivElement>(null);
-  const [colorPickIdx, setColorPickIdx] = useState(-1);
+
+  /**
+   * update fill and return a new fill
+   */
+  const updateSelectedFills = (newTexture: ITexture, index: number) => {
+    if (!editor) return;
+    const newFill = [...fill];
+    newFill[index] = newTexture;
+    setFill(newFill);
+
+    const selectItems = editor.selectedElements.getItems();
+
+    selectItems.forEach((item) => {
+      item.fill = cloneDeep(newFill);
+    });
+    return newFill;
+  };
 
   useClickAway(
     () => {
-      setColorPickIdx(-1);
+      setActiveIndex(-1);
     },
     [
-      () => {
-        return document.querySelector('.color-picker-popover');
-      },
+      colorPickerPopoverRef,
       () => {
         return document.querySelector('.color-block');
       },
@@ -36,6 +52,8 @@ export const FillCard: FC = () => {
 
   useEffect(() => {
     if (editor) {
+      prevFills.current = editor.selectedElements.getItems().map((el) => cloneDeep(el.fill));
+
       const handler = () => {
         const selectedElements = editor.selectedElements.getItems();
         if (selectedElements.length > 0) {
@@ -44,12 +62,11 @@ export const FillCard: FC = () => {
            * 显示 fill 值时，如果有的图形没有 fill，将其排除。
            * 添加颜色时，如果有的图形不存在 fill，赋值给它。
            */
-
           let newFill = selectedElements[0].fill;
           for (let i = 1, len = selectedElements.length; i < len; i++) {
             const currentFill = selectedElements[i].fill;
             if (!isEqual(newFill, currentFill)) {
-              // TODO: 标记为不相同
+              // TODO: 标记为不相同，作为文案提示
               newFill = [];
               break;
             }
@@ -65,71 +82,71 @@ export const FillCard: FC = () => {
   }, [editor]);
 
   return (
-    <BaseCard title={intl.formatMessage({ id: 'fill' })}>
-      {fill.length > 0 ? (
-        fill.map((rgba, index) => {
-          const rgbaStr = parseRGBAStr(rgba);
-          return (
-            <div key={index} className="fill-item">
-              {index === colorPickIdx && (
-                <div
-                  ref={colorPickerPopoverRef}
-                  className="color-picker-popover"
-                >
-                  <SketchPicker
-                    color={rgba}
-                    onChange={(color, event) => {
-                      if (!editor) {
-                        return;
-                      }
-
-                      const elements = editor.selectedElements.getItems();
-                      if (editor && event.type !== 'mousemove') {
-                        // 记录颜色变化前的颜色
-                        prevFills.current = elements.map((el) => el.fill);
-                      }
-                      forEach(elements, (el) => {
-                        el.fill = [{ ...color.rgb, a: color.rgb.a || 1 }];
-                      });
-                      editor.sceneGraph.render();
-                    }}
-                    onChangeComplete={(color) => {
-                      if (!editor) {
-                        return;
-                      }
-
-                      const elements = editor.selectedElements.getItems();
-                      const newFill = [{ ...color.rgb, a: color.rgb.a || 1 }];
-                      editor.commandManager.pushCommand(
-                        new SetElementsAttrs(
-                          'Update Fill',
-                          elements,
-                          { fill: newFill },
-                          elements.map((item, index) => ({
-                            fill: prevFills.current[index],
-                          }))
-                        )
-                      );
-
-                      editor.sceneGraph.render();
+    <>
+      <BaseCard title={intl.formatMessage({ id: 'fill' })}>
+        {fill.length > 0 ? (
+          fill.map((texture, index) => {
+            /** SOLID **/
+            if (texture.type === TextureType.Solid) {
+              return (
+                <div className="fill-item" key={index}>
+                  <div
+                    className="color-block"
+                    style={{ backgroundColor: parseRGBAStr(texture.attrs) }}
+                    onClick={() => {
+                      setActiveIndex(index);
                     }}
                   />
+                  { parseRGBToHex(texture.attrs) }
                 </div>
-              )}
+              );
+            }
+          })
+        ) : (
+          <div style={{ marginLeft: 16 }}>Mixed</div>
+        )}
+      </BaseCard>
 
-              <div
-                className="color-block"
-                style={{ backgroundColor: rgbaStr }}
-                onClick={() => {
-                  setColorPickIdx(index);
-                }}
-              />
-            </div>
-          );
-        })
-      ) : (
-        <div style={{ marginLeft: 16 }}>Mixed</div>
+      {activeIndex >= 0 && (
+        <div ref={colorPickerPopoverRef} className="fill-card-color-picker-popover">
+          <TexturePicker
+            texture={fill[activeIndex]}
+            onClose={() => {
+              setActiveIndex(-1);
+            }}
+            onChange={(newTexture) => {
+              if (!editor) return;
+
+              updateSelectedFills(newTexture, activeIndex);
+              editor.sceneGraph.render();
+            }}
+            onChangeComplete={(newTexture) => {
+              if (!editor) return;
+
+              const newFill = updateSelectedFills(newTexture, activeIndex);
+              const selectedElements = editor.selectedElements.getItems();
+
+              editor.commandManager.pushCommand(
+                new SetElementsAttrs(
+                  'Update Fill',
+                  selectedElements,
+                  { fill: newFill },
+                  // prev value
+                  selectedElements.map((item, index) => ({
+                    fill: cloneDeep(prevFills.current[index]),
+                  }))
+                )
+              );
+
+              prevFills.current = selectedElements.map((el) =>
+                cloneDeep(el.fill)
+              );
+
+              editor.sceneGraph.render();
+            }}
+          />
+        </div>
       )}
-    </BaseCard>
+    </>
   );
 };
