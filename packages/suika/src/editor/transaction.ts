@@ -13,8 +13,8 @@ export class Transaction {
   destroyItems() {
     //
   }
-  commit(msg: string) {
-    // 更新 Graph 树
-    //
-  }
+  // commit(msg: string) {
+  //   // 更新 Graph 树
+  //   //
+  // }
 }
