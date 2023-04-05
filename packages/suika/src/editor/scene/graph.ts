@@ -8,6 +8,7 @@ import {
   getRectCenterPoint,
 } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
+import { ITexture } from '../texture';
 
 export interface IGraph {
   x: number;
@@ -15,18 +16,11 @@ export interface IGraph {
   width: number;
   height: number;
   // 颜色
-  fill?: IRGBA[];
+  fill?: ITexture[];
   stroke?: string;
   strokeWidth?: number;
   // transform 相关
   rotation?: number;
-}
-
-export interface IRGBA {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
 }
 
 export class Graph {
@@ -37,7 +31,7 @@ export class Graph {
   width: number;
   height: number;
   // color
-  fill: IRGBA[] = [];
+  fill: ITexture[] = [];
   stroke?: string;
   strokeWidth?: number;
   // transform

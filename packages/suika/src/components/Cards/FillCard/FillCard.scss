@@ -3,14 +3,15 @@
     position: relative;
     display: flex;
     margin-left: 16px;
-    .color-picker-popover {
-      position: absolute;
-      left: -238px;
-      top: -30px;
-    }
     .color-block {
+      margin-right: 8px;
       width: 16px;
       height: 16px;
     }
+  }
+  .fill-card-color-picker-popover {
+    position: fixed;
+    right: 240px;
+    top: 230px;
   }
 }

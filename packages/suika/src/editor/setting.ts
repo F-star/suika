@@ -1,7 +1,8 @@
 import EventEmitter from '../utils/event_emitter';
+import { ITexture, TextureType } from './texture';
 
 interface Events {
-  update(attrs: SettingValue): void
+  update(attrs: SettingValue): void;
 }
 
 export class Setting {
@@ -9,7 +10,12 @@ export class Setting {
   private value = {
     canvasBgColor: '#f4f4f4',
     stroke: '',
-    fill: [{ r: 217, g: 217, b: 217, a: 1 }], // '#D9D9D9',
+    fill: [
+      {
+        type: TextureType.Solid,
+        attrs: { r: 217, g: 217, b: 217, a: 1 },
+      },
+    ] as ITexture[],
     guideBBoxStroke: '#1592fe',
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
@@ -51,8 +57,7 @@ export class Setting {
     offsetY: 0,
   };
 
-
-  set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K] ) {
+  set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {
     this.value[key] = value;
     this.eventEmitter.emit('update', this.getAttrs());
   }
@@ -71,4 +76,4 @@ export class Setting {
   }
 }
 
-export type SettingValue = Setting['value']
+export type SettingValue = Setting['value'];

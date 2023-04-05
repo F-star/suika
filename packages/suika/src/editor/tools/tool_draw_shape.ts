@@ -5,6 +5,7 @@ import { normalizeRect } from '../../utils/graphics';
 import { AddShapeCommand } from '../commands/add_shape';
 import { Editor } from '../editor';
 import { ITool } from './type';
+import cloneDeep from 'lodash.clonedeep';
 
 export abstract class DrawShapeTool implements ITool {
   static type = 'drawShape';
@@ -67,7 +68,11 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
     const pos = this.editor.getPointerXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y, this.editor.setting.get('snapToPixelGrid'));
+    this.startPointer = this.editor.viewportCoordsToScene(
+      pos.x,
+      pos.y,
+      this.editor.setting.get('snapToPixelGrid')
+    );
     this.drawingShape = null;
     this.isDragging = false;
   }
@@ -121,7 +126,7 @@ export abstract class DrawShapeTool implements ITool {
     } else {
       const element = new this.ShapeCtor({
         ...rect,
-        fill: this.editor.setting.get('fill'),
+        fill: cloneDeep(this.editor.setting.get('fill')),
       });
       sceneGraph.appendChild(element);
 
@@ -136,7 +141,11 @@ export abstract class DrawShapeTool implements ITool {
     }
 
     const pos = this.editor.getPointerXY(e);
-    const endPointer = this.editor.viewportCoordsToScene(pos.x, pos.y, this.editor.setting.get('snapToPixelGrid'));
+    const endPointer = this.editor.viewportCoordsToScene(
+      pos.x,
+      pos.y,
+      this.editor.setting.get('snapToPixelGrid')
+    );
     if (this.drawingShape === null) {
       const { x: cx, y: cy } = endPointer;
       const width = this.editor.setting.get('drawRectDefaultWidth');
@@ -147,7 +156,7 @@ export abstract class DrawShapeTool implements ITool {
         y: cy - height / 2,
         width,
         height,
-        fill: this.editor.setting.get('fill'),
+        fill: cloneDeep(this.editor.setting.get('fill')),
       });
       this.editor.sceneGraph.appendChild(this.drawingShape);
 
@@ -156,11 +165,7 @@ export abstract class DrawShapeTool implements ITool {
     }
 
     this.editor.commandManager.pushCommand(
-      new AddShapeCommand(
-        this.commandDesc,
-        this.editor,
-        this.drawingShape
-      )
+      new AddShapeCommand(this.commandDesc, this.editor, this.drawingShape)
     );
   }
 

@@ -20,4 +20,7 @@ export const zh: (typeof en) = {
   'setting.grid.pixelGrid': '显示像素网格',
   'setting.grid.snapToPixelGrid': '对齐像素网格',
   'setting.rulers': '显示标尺',
+
+  'textureType.solid': '纯色',
+  'textureType.image': '图片',
 };

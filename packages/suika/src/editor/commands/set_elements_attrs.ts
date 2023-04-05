@@ -1,5 +1,5 @@
-import { IRGBA } from '../scene/graph';
 import { Rect } from '../scene/rect';
+import { ITexture } from '../texture';
 import { ICommand } from './type';
 
 type IAttrs = Partial<{
@@ -8,7 +8,7 @@ type IAttrs = Partial<{
   width: number;
   height: number;
   rotation: number;
-  fill: IRGBA[];
+  fill: ITexture[];
 }>;
 
 /**
