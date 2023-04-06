@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "yarn workspace @suika/suika start",
+    "start": "pnpm --filter @suika/suika start",
     "build": "yarn workspace @suika/suika build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -25,5 +25,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }
