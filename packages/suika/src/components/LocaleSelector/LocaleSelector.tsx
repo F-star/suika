@@ -1,5 +1,4 @@
 import { FC, useState } from 'react';
-import { IconI18n } from './icons';
 import './LocaleSelector.scss';
 import {
   autoUpdate,
@@ -12,6 +11,7 @@ import classNames from 'classnames';
 import { useClickAway } from 'ahooks';
 import store from 'store2';
 import { appEventEmitter } from '../../events';
+import { I18n } from '@suika/icons';
 
 export const LocaleSelector: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +40,7 @@ export const LocaleSelector: FC = () => {
         {...getReferenceProps()}
         className={classNames('locale-selector', { active: isOpen })}
       >
-        <IconI18n />
+        <I18n />
       </div>
       {isOpen && (
         <div

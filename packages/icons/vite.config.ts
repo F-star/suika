@@ -26,8 +26,8 @@ export default defineConfig({
       },
       plugins: [
         typescript({
-          target: 'es2015', // 这里指定编译到的版本，
-          rootDir: resolvePath('packages/'),
+          target: 'esnext',
+          rootDir: resolvePath('src'),
           declaration: true,
           declarationDir: resolvePath('dist'),
           exclude: resolvePath('node_modules/**'),

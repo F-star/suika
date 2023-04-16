@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const IconDownOutlined = React.memo(() => {
+export const Close = React.memo(() => {
   return (
     <svg
       width="24"
@@ -9,7 +9,7 @@ export const IconDownOutlined = React.memo(() => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d="M7 10L12 15L17 10" stroke="#333333" />
+      <path d="M7 7L17 17M7 17L17 7" stroke="#333333" />
     </svg>
   );
 });

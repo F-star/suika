@@ -1,2 +1,2 @@
 
-export * from './icons/ArrowDownOutline';
+export * from './icons';
