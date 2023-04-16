@@ -3,7 +3,7 @@ import { SolidPicker } from '../SolidPicker';
 import { ITexture, TextureType } from '../../../editor/texture';
 import './TexturePicker.scss';
 import { FormattedMessage } from 'react-intl';
-import { IconCloseOutlined } from './icons';
+import { Close } from '@suika/icons';
 
 interface IProps {
   texture: ITexture;
@@ -33,7 +33,7 @@ export const TexturePicker: FC<IProps> = ({
             onClose && onClose();
           }}
         >
-          <IconCloseOutlined />
+          <Close />
         </div>
       </div>
 

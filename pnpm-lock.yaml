@@ -48,6 +48,7 @@ importers:
   packages/suika:
     specifiers:
       '@floating-ui/react': ^0.22.3
+      '@suika/icons': workspace:^0.0.1
       '@testing-library/jest-dom': ^5.14.1
       '@testing-library/react': ^13.0.0
       '@testing-library/user-event': ^13.2.1
@@ -78,6 +79,7 @@ importers:
       web-vitals: ^2.1.0
     dependencies:
       '@floating-ui/react': 0.22.3_biqbaboplfbrettd7655fr4n2y
+      '@suika/icons': link:../icons
       '@testing-library/jest-dom': 5.16.5
       '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
       '@testing-library/user-event': 13.5.0
@@ -4601,8 +4603,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
-      is-text-path: 1.0.1
       JSONStream: 1.3.5
+      is-text-path: 1.0.1
       lodash: 4.17.21
       meow: 8.1.2
       split2: 3.2.2
@@ -9437,6 +9439,12 @@ packages:
   /react-dev-utils/12.0.1_ejmzrgarqxnh7hvgzebfqcrvju:
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}
     engines: {node: '>=14'}
+    peerDependencies:
+      typescript: '>=2.7'
+      webpack: '>=4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     dependencies:
       '@babel/code-frame': 7.21.4
       address: 1.2.2
@@ -9467,9 +9475,7 @@ packages:
     transitivePeerDependencies:
       - eslint
       - supports-color
-      - typescript
       - vue-template-compiler
-      - webpack
     dev: false
 
   /react-dom/18.2.0_react@18.2.0:

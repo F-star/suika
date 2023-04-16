@@ -9,8 +9,10 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "pnpm --filter @suika/suika start",
-    "build": "yarn workspace @suika/suika build",
+    "app:dev": "pnpm --filter @suika/suika dev",
+    "app:build": "pnpm --filter @suika/suika build",
+    "icons:dev": "pnpm --filter @suika/icons dev",
+    "all:build": "pnpm -r exec pnpm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install",

@@ -5,14 +5,7 @@ import { AlignType } from '../../../editor/commands/align';
 import { Graph } from '../../../editor/scene/graph';
 import { BaseCard } from '../BaseCard';
 import './AlignCard.scss';
-import {
-  IconAlignBottom,
-  IconAlignHCenter,
-  IconAlignLeft,
-  IconAlignRight,
-  IconAlignTop,
-  IconAlignVCenter,
-} from './icons';
+import { AlignHCenter, AlignLeft, AlignRight, AlignTop, AlignVCenter, IconAlignBottom } from '@suika/icons';
 
 export const AlignCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -43,7 +36,7 @@ export const AlignCard: FC = () => {
             editor?.selectedElements.align(AlignType.Left);
           }}
         >
-          <IconAlignLeft />
+          <AlignLeft />
         </div>
         <div
           className="align-item"
@@ -51,7 +44,7 @@ export const AlignCard: FC = () => {
             editor?.selectedElements.align(AlignType.HCenter);
           }}
         >
-          <IconAlignHCenter />
+          <AlignHCenter />
         </div>
         <div
           className="align-item"
@@ -59,21 +52,21 @@ export const AlignCard: FC = () => {
             editor?.selectedElements.align(AlignType.Right);
           }}
         >
-          <IconAlignRight />
+          <AlignRight />
         </div>
         <div className="align-item"
           onClick={() => {
             editor?.selectedElements.align(AlignType.Top);
           }}
         >
-          <IconAlignTop />
+          <AlignTop />
         </div>
         <div className="align-item"
           onClick={() => {
             editor?.selectedElements.align(AlignType.VCenter);
           }}
         >
-          <IconAlignVCenter />
+          <AlignVCenter />
         </div>
         <div className="align-item"
           onClick={() => {

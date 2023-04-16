@@ -5,8 +5,9 @@ import { EditorContext } from '../../context';
 import { SettingValue } from '../../editor/setting';
 import { ActionItem } from './components/ActionItem/ActionItem';
 import './ZoomActions.scss';
-import { IconDownOutlined } from './icons';
 import { FormattedMessage } from 'react-intl';
+import { ArrowDownOutlined } from '@suika/icons';
+
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);
@@ -46,7 +47,7 @@ export const ZoomActions: FC = () => {
         }}
       >
         {Math.floor(zoom * 100)}%
-        <IconDownOutlined />
+        <ArrowDownOutlined />
       </div>
       {popoverVisible && (
         <div className="popover">
