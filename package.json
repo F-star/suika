@@ -23,13 +23,23 @@
     "@commitlint/config-conventional": "^17.3.0",
     "@typescript-eslint/parser": "^5.47.0",
     "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.2",
-    "lint-staged": "^13.1.0"
+    "lint-staged": "^13.1.0",
+    "prettier": "2.8.7"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 80,
+    "tabWidth": 2,
+    "semi": true,
+    "bracketSpacing": true
   }
 }

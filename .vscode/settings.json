@@ -2,11 +2,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "cSpell.words": [
-    "Formatjs",
-    "IRGBA",
-    "isequal",
-    "suika",
-    "xigua"
-  ]
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "cSpell.words": ["Formatjs", "IRGBA", "isequal", "suika", "xigua"]
 }
