@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ main ]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,9 +27,9 @@ jobs:
       - name: Install Dep
         run: |
           sudo apt-get install snapd
-          sudo snap install node --classic --channel=16
-          npm i -g yarn
-          yarn
+          sudo snap install node --classic --channel=18
+          npm i -g pnpm
+          pnpm
 
       # 构建 html
       - name: build static files
