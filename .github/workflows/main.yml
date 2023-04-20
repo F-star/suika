@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo apt-get install snapd
           sudo snap install node --classic --channel=18
-          npm i -g pnpm
+          npm i -g pnpm@7
           pnpm
 
       # 构建 html
