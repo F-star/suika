@@ -1,6 +1,7 @@
 {
   "name": "@suika/suika",
   "version": "0.0.1",
+  "description": "a graph editor.",
   "private": true,
   "scripts": {
     "dev": "react-scripts start",

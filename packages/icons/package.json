@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "main": "./dist/icons.es.js",
-  "module": "./dist/icons.es.js",
+  "main": "./dist/icons.esm.js",
+  "module": "./dist/icons.esm.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/icons.es.js",
+      "import": "./dist/icons.esm.js",
       "require": "./dist/icons.cjs.js"
     }
   },

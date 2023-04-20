@@ -9,6 +9,8 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "run-p \"watch icons\" app:dev",
+    "watch": "node scripts/dev.js",
     "app:dev": "pnpm --filter @suika/suika dev",
     "app:build": "pnpm --filter @suika/suika build",
     "icons:dev": "pnpm --filter @suika/icons dev",
@@ -22,12 +24,14 @@
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
     "@typescript-eslint/parser": "^5.47.0",
+    "esbuild": "^0.17.17",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
+    "minimist": "^1.2.8",
     "prettier": "2.8.7"
   },
   "dependencies": {
