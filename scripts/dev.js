@@ -51,11 +51,7 @@ const setup = async () => {
     ],
   });
 
-  await ctx.rebuild();
-
-  await ctx.watch(() => {
-    console.log('watch build succeeded:', relativeOutputFile);
-  });
+  await ctx.watch();
 };
 
 setup();
