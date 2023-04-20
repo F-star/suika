@@ -16,7 +16,7 @@ const setup = async () => {
 
   const outfile = path.resolve(
     __dirname,
-    `../packages/${target}/dist/${target}.esm.js`,
+    `../packages/${target}/dist/${target}.es.js`,
   );
   const relativeOutputFile = path.relative(process.cwd(), outfile);
 
