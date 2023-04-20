@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
-    "@suika/icons": "workspace:^0.0.1",
+    "@suika/components": "workspace:^",
+    "@suika/icons": "workspace:^",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
