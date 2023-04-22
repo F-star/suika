@@ -13,7 +13,7 @@
     "watch": "node scripts/dev.js",
     "app:dev": "pnpm --filter @suika/suika dev",
     "app:build": "pnpm --filter @suika/suika build",
-    "components:dev": "pnpm --filter @suika/components dev",
+    "storybook": "pnpm --filter @suika/components storybook",
     "components:build": "pnpm --filter @suika/components build",
     "icons:dev": "pnpm --filter @suika/icons dev",
     "all:build": "pnpm -r exec pnpm run build",

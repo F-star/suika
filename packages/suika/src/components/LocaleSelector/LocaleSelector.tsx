@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import { useClickAway } from 'ahooks';
 import store from 'store2';
 import { appEventEmitter } from '../../events';
-import { I18n } from '@suika/icons';
+import { I18nOutlined } from '@suika/icons';
 
 export const LocaleSelector: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,7 @@ export const LocaleSelector: FC = () => {
       setIsOpen(false);
     },
     [refs.domReference, refs.floating],
-    'mousedown'
+    'mousedown',
   );
 
   return (
@@ -40,7 +40,7 @@ export const LocaleSelector: FC = () => {
         {...getReferenceProps()}
         className={classNames('locale-selector', { active: isOpen })}
       >
-        <I18n />
+        <I18nOutlined />
       </div>
       {isOpen && (
         <div

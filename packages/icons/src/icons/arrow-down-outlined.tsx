@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Ellipse = React.memo(() => {
+export const ArrowDownOutlined = React.memo(() => {
   return (
     <svg
       width="24"
@@ -9,7 +9,7 @@ export const Ellipse = React.memo(() => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="12" cy="12" r="7.5" stroke="#333" />
+      <path d="M7 10L12 15L17 10" stroke="#333333" />
     </svg>
   );
 });
