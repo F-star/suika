@@ -1,6 +1,7 @@
-const { build, context } = require('esbuild');
+const { context } = require('esbuild');
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
+const { sassPlugin } = require('esbuild-sass-plugin');
 
 const setup = async () => {
   const target = args._[0];
@@ -36,6 +37,9 @@ const setup = async () => {
     format: 'esm',
     platform: 'browser',
     plugins: [
+      sassPlugin({
+        type: 'style',
+      }),
       {
         name: 'watch-build',
         setup(build) {
