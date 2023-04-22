@@ -8,7 +8,7 @@ import {
 import React, { FC, useState } from 'react';
 import './select.scss';
 import classNames from 'classnames';
-import { ArrowDownOutlined } from '@suika/icons';
+import { ArrowDownOutlined, CheckOutlined } from '@suika/icons';
 
 type ValueType = string;
 
@@ -98,6 +98,10 @@ export const Select: FC<SelectProps> = ({
                 key={option.label}
                 onClick={() => handleChange(option.value)}
               >
+                <span className="sk-select-popover-item-icon">
+                  {option.value === value && <CheckOutlined />}
+                </span>
+
                 {option.label}
               </div>
             ))}
