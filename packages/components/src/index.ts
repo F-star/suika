@@ -1,1 +1,1 @@
-export * from './components/dropdown';
+export * from './components/select';
