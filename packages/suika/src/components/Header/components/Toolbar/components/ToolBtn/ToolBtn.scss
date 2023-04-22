@@ -9,6 +9,8 @@
     border-radius: 4px;
     width: 36px;
     height: 32px;
+    color: #333;
+
     cursor: pointer;
 
     .tooltip {
@@ -34,9 +36,7 @@
     }
     &.active {
       background-color: #0f8fff;
-      svg * {
-        stroke: #fff;
-      }
+      color: #fff;
     }
   }
 }

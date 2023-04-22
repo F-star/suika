@@ -3,7 +3,7 @@ import { SolidPicker } from '../SolidPicker';
 import { ITexture, TextureType } from '../../../editor/texture';
 import './TexturePicker.scss';
 import { FormattedMessage } from 'react-intl';
-import { Close } from '@suika/icons';
+import { CloseOutlined } from '@suika/icons';
 
 interface IProps {
   texture: ITexture;
@@ -33,7 +33,7 @@ export const TexturePicker: FC<IProps> = ({
             onClose && onClose();
           }}
         >
-          <Close />
+          <CloseOutlined />
         </div>
       </div>
 
@@ -45,9 +45,7 @@ export const TexturePicker: FC<IProps> = ({
             onChange({ type: TextureType.Solid, attrs: newColor });
           }}
           onChangeComplete={(color) => {
-            onChangeComplete(
-              { type: TextureType.Solid, attrs: color }
-            );
+            onChangeComplete({ type: TextureType.Solid, attrs: color });
           }}
         />
       )}

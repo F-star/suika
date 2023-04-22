@@ -4,8 +4,12 @@ import { EditorContext } from '../../../../context';
 import { ToolBtn } from './components/ToolBtn/ToolBtn';
 import './Toolbar.scss';
 import { useIntl } from 'react-intl';
-import { Ellipse, Hand, Rect, Select } from '@suika/icons';
-
+import {
+  EllipseOutlined,
+  HandOutlined,
+  RectOutlined,
+  SelectOutlined,
+} from '@suika/icons';
 
 export const ToolBar = () => {
   const editor = useContext(EditorContext);
@@ -30,7 +34,7 @@ export const ToolBar = () => {
           editor?.toolManager.setTool('select');
         }}
       >
-        <Select />
+        <SelectOutlined />
       </ToolBtn>
       <ToolBtn
         className={classNames({ active: tool === 'drawRect' })}
@@ -39,7 +43,7 @@ export const ToolBar = () => {
           editor?.toolManager.setTool('drawRect');
         }}
       >
-        <Rect />
+        <RectOutlined />
       </ToolBtn>
       <ToolBtn
         className={classNames({ active: tool === 'drawEllipse' })}
@@ -48,7 +52,7 @@ export const ToolBar = () => {
           editor?.toolManager.setTool('drawEllipse');
         }}
       >
-        <Ellipse />
+        <EllipseOutlined />
       </ToolBtn>
       <ToolBtn
         className={classNames({ active: tool === 'dragCanvas' })}
@@ -57,7 +61,7 @@ export const ToolBar = () => {
           editor?.toolManager.setTool('dragCanvas');
         }}
       >
-        <Hand />
+        <HandOutlined />
       </ToolBtn>
     </div>
   );
