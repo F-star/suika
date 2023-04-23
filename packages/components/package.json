@@ -24,7 +24,9 @@
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
     "@suika/icons": "workspace:^",
-    "classnames": "^2.3.2",
+    "classnames": "^2.3.2"
+  },
+  "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

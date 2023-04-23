@@ -1,9 +1,10 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { SolidPicker } from '../SolidPicker';
 import { ITexture, TextureType } from '../../../editor/texture';
 import './TexturePicker.scss';
-import { FormattedMessage } from 'react-intl';
 import { CloseOutlined } from '@suika/icons';
+import { Select } from '@suika/components';
+import { useIntl } from 'react-intl';
 
 interface IProps {
   texture: ITexture;
@@ -23,10 +24,29 @@ export const TexturePicker: FC<IProps> = ({
   onChangeComplete,
   onClose,
 }) => {
+  const intl = useIntl();
+
+  const [value, setValue] = useState(texture.type); // TODO: just test, replace it plz
+
+  const options = [
+    {
+      value: TextureType.Solid,
+      label: intl.formatMessage({ id: intlIdMap[TextureType.Solid] }),
+    },
+    {
+      value: TextureType.Image,
+      label: intl.formatMessage({ id: intlIdMap[TextureType.Image] }),
+    },
+  ];
+
   return (
-    <div className="texture-picker">
+    <div className="suika-texture-picker">
       <div className="texture-picker-header">
-        <FormattedMessage id={intlIdMap[texture.type]} />
+        <Select
+          value={value}
+          options={options}
+          onSelect={(val) => setValue(val as TextureType)}
+        />
         <div
           className="suika-close-btn"
           onClick={() => {

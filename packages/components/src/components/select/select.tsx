@@ -32,7 +32,7 @@ interface SelectProps {
    * width of dropdown
    */
   dropdownWidth?: number;
-  onSelect: (value: ValueType) => void;
+  onSelect?: (value: ValueType) => void;
 }
 
 export const Select: FC<SelectProps> = ({
