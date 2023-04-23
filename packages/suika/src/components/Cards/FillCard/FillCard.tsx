@@ -3,13 +3,13 @@ import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../../context';
 import { parseRGBAStr, parseRGBToHex } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
-import { useClickAway } from 'ahooks';
 import './FillCard.scss';
 import { useIntl } from 'react-intl';
 import { ITexture, TextureType } from '../../../editor/texture';
 import { TexturePicker } from '../../ColorPicker/TexturePicker';
 import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
+import { Popover } from '@suika/components';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -18,7 +18,6 @@ export const FillCard: FC = () => {
   const [fill, setFill] = useState<ITexture[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const prevFills = useRef<ITexture[][]>([]);
-  const colorPickerPopoverRef = useRef<HTMLDivElement>(null);
 
   /**
    * update fill and return a new fill
@@ -37,22 +36,11 @@ export const FillCard: FC = () => {
     return newFill;
   };
 
-  useClickAway(
-    () => {
-      setActiveIndex(-1);
-    },
-    [
-      colorPickerPopoverRef,
-      () => {
-        return document.querySelector('.color-block');
-      },
-    ],
-    'mousedown'
-  );
-
   useEffect(() => {
     if (editor) {
-      prevFills.current = editor.selectedElements.getItems().map((el) => cloneDeep(el.fill));
+      prevFills.current = editor.selectedElements
+        .getItems()
+        .map((el) => cloneDeep(el.fill));
 
       const handler = () => {
         const selectedElements = editor.selectedElements.getItems();
@@ -81,72 +69,68 @@ export const FillCard: FC = () => {
     }
   }, [editor]);
 
+  const pickerPopover = (
+    <TexturePicker
+      texture={fill[activeIndex]}
+      onClose={() => {
+        setActiveIndex(-1);
+      }}
+      onChange={(newTexture) => {
+        if (!editor) return;
+
+        updateSelectedFills(newTexture, activeIndex);
+        editor.sceneGraph.render();
+      }}
+      onChangeComplete={(newTexture) => {
+        if (!editor) return;
+
+        const newFill = updateSelectedFills(newTexture, activeIndex);
+        const selectedElements = editor.selectedElements.getItems();
+
+        editor.commandManager.pushCommand(
+          new SetElementsAttrs(
+            'Update Fill',
+            selectedElements,
+            { fill: newFill },
+            // prev value
+            selectedElements.map((item, index) => ({
+              fill: cloneDeep(prevFills.current[index]),
+            })),
+          ),
+        );
+
+        prevFills.current = selectedElements.map((el) => cloneDeep(el.fill));
+
+        editor.sceneGraph.render();
+      }}
+    />
+  );
+
+  if (fill.length == 0) {
+    return <div style={{ marginLeft: 16 }}>Mixed</div>;
+  }
+
   return (
-    <>
+    <Popover content={activeIndex >= 0 && pickerPopover}>
       <BaseCard title={intl.formatMessage({ id: 'fill' })}>
-        {fill.length > 0 ? (
-          fill.map((texture, index) => {
-            /** SOLID **/
-            if (texture.type === TextureType.Solid) {
-              return (
-                <div className="fill-item" key={index}>
-                  <div
-                    className="color-block"
-                    style={{ backgroundColor: parseRGBAStr(texture.attrs) }}
-                    onClick={() => {
-                      setActiveIndex(index);
-                    }}
-                  />
-                  { parseRGBToHex(texture.attrs) }
-                </div>
-              );
-            }
-          })
-        ) : (
-          <div style={{ marginLeft: 16 }}>Mixed</div>
-        )}
+        {fill.map((texture, index) => {
+          /** SOLID **/
+          if (texture.type === TextureType.Solid) {
+            return (
+              <div className="fill-item" key={index}>
+                <div
+                  className="color-block"
+                  style={{ backgroundColor: parseRGBAStr(texture.attrs) }}
+                  onClick={() => {
+                    setActiveIndex(index);
+                  }}
+                />
+                {parseRGBToHex(texture.attrs)}
+              </div>
+            );
+          }
+        })}
       </BaseCard>
-
-      {activeIndex >= 0 && (
-        <div ref={colorPickerPopoverRef} className="fill-card-color-picker-popover">
-          <TexturePicker
-            texture={fill[activeIndex]}
-            onClose={() => {
-              setActiveIndex(-1);
-            }}
-            onChange={(newTexture) => {
-              if (!editor) return;
-
-              updateSelectedFills(newTexture, activeIndex);
-              editor.sceneGraph.render();
-            }}
-            onChangeComplete={(newTexture) => {
-              if (!editor) return;
-
-              const newFill = updateSelectedFills(newTexture, activeIndex);
-              const selectedElements = editor.selectedElements.getItems();
-
-              editor.commandManager.pushCommand(
-                new SetElementsAttrs(
-                  'Update Fill',
-                  selectedElements,
-                  { fill: newFill },
-                  // prev value
-                  selectedElements.map((item, index) => ({
-                    fill: cloneDeep(prevFills.current[index]),
-                  }))
-                )
-              );
-
-              prevFills.current = selectedElements.map((el) =>
-                cloneDeep(el.fill)
-              );
-
-              editor.sceneGraph.render();
-            }}
-          />
-        </div>
-      )}
-    </>
+    </Popover>
   );
 };
