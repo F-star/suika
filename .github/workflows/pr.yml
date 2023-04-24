@@ -13,6 +13,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '18'
-      - run: npm i -g pnpm
+      - run: npm i -g pnpm@7
       - run: pnpm install
       - run: pnpm run eslint:check
