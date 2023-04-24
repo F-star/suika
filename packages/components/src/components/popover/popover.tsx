@@ -1,22 +1,26 @@
-import React, { FC, PropsWithChildren, ReactElement, useState } from 'react';
+import React, { FC, useState } from 'react';
 import './popover.scss';
 
 import {
   FloatingPortal,
   Placement,
   autoUpdate,
+  flip,
+  offset,
+  useClick,
   useDismiss,
   useFloating,
   useInteractions,
 } from '@floating-ui/react';
 
-interface PopoverProps extends PropsWithChildren {
+interface PopoverProps {
   placement?: Placement;
   content: React.ReactNode;
+  children: React.ReactElement;
 }
 
 export const Popover: FC<PopoverProps> = ({
-  placement = 'left-start',
+  placement = 'bottom',
   content,
   children,
 }) => {
@@ -27,18 +31,27 @@ export const Popover: FC<PopoverProps> = ({
     open: isOpen,
     onOpenChange: setIsOpen,
     whileElementsMounted: autoUpdate,
+    middleware: [
+      flip({
+        fallbackAxisSideDirection: 'end',
+      }),
+      offset(5),
+    ],
   });
 
+  const click = useClick(context);
   const dismiss = useDismiss(context);
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    click,
+    dismiss,
+  ]);
 
   return (
     <>
-      {React.cloneElement(children as ReactElement, {
+      {React.cloneElement(children, {
         ref: refs.setReference,
         ...getReferenceProps(),
-        onClick: () => setIsOpen(!isOpen),
       })}
       <FloatingPortal>
         {isOpen && (
