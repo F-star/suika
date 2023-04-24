@@ -14,7 +14,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     content: <div style={{ padding: 8 }}>This is content</div>,
-    children: <span>Click me.</span>,
-    placement: 'bottom',
+    children: <span style={{ marginLeft: 100 }}>Click me.</span>,
   },
 };
