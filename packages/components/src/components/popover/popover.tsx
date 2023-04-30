@@ -17,19 +17,27 @@ interface PopoverProps {
   placement?: Placement;
   content: React.ReactNode;
   children: React.ReactElement;
+
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const Popover: FC<PopoverProps> = ({
   placement = 'bottom',
   content,
   children,
+  open,
+  onOpenChange,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(open ?? false);
 
   const { x, y, strategy, refs, context } = useFloating({
     placement: placement,
     open: isOpen,
-    onOpenChange: setIsOpen,
+    onOpenChange: (open) => {
+      setIsOpen(open);
+      onOpenChange?.(open);
+    },
     whileElementsMounted: autoUpdate,
     middleware: [
       flip({
@@ -47,14 +55,20 @@ export const Popover: FC<PopoverProps> = ({
     dismiss,
   ]);
 
+  const showPopover = () => {
+    if (open === undefined) {
+      return isOpen;
+    }
+    return open;
+  };
+
   return (
     <>
-      {React.cloneElement(children, {
-        ref: refs.setReference,
-        ...getReferenceProps(),
-      })}
+      <span ref={refs.setReference} {...getReferenceProps()}>
+        {children}
+      </span>
       <FloatingPortal>
-        {isOpen && (
+        {showPopover() && (
           <div
             ref={refs.setFloating}
             className="sk-popover-content"
