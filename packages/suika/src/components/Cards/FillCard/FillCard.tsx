@@ -111,7 +111,11 @@ export const FillCard: FC = () => {
   }
 
   return (
-    <Popover content={activeIndex >= 0 && pickerPopover}>
+    <Popover
+      open={activeIndex >= 0}
+      content={activeIndex >= 0 && pickerPopover}
+      placement="left-start"
+    >
       <BaseCard title={intl.formatMessage({ id: 'fill' })}>
         {fill.map((texture, index) => {
           /** SOLID **/
