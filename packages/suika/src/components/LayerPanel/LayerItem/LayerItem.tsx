@@ -4,10 +4,18 @@ import './LayerItem.scss';
 
 interface IProps extends PropsWithChildren {
   active?: boolean;
+  layerId: string;
 }
 
-const LayerItem: FC<IProps> = ({ children, active = false }) => {
-  return <div className={classNames('layer-item', { active })}>{children}</div>;
+const LayerItem: FC<IProps> = ({ children, active = false, layerId }) => {
+  return (
+    <div
+      className={classNames('layer-item', { active })}
+      data-layer-id={layerId}
+    >
+      {children}
+    </div>
+  );
 };
 
 export default LayerItem;

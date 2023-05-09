@@ -9,7 +9,7 @@ import { AlignCmd, AlignType } from './commands/align';
 import { ArrangeCmd, ArrangeType } from './commands/arrange';
 
 interface Events {
-  itemsChange(items: Graph[]): void
+  itemsChange(items: Graph[]): void;
 }
 
 class SelectedElements {
@@ -28,8 +28,22 @@ class SelectedElements {
     return [...this.items];
   }
   getIdSet() {
-    return new Set(this.items.map(item => item.id));
+    return new Set(this.items.map((item) => item.id));
   }
+  setItemsById(ids: Set<string>) {
+    const items: Graph[] = [];
+    this.editor.sceneGraph.children.forEach((item) => {
+      if (ids.has(item.id)) {
+        items.push(item);
+      }
+    });
+    if (items.length === 0) {
+      console.warn('can not find element by id');
+    } else {
+      this.setItems(items);
+    }
+  }
+
   clear() {
     this.items = [];
     this.eventEmitter.emit('itemsChange', this.items);
@@ -94,7 +108,7 @@ class SelectedElements {
       return;
     }
     this.editor.commandManager.pushCommand(
-      new RemoveElement('Remove Elements', this.editor, this.items)
+      new RemoveElement('Remove Elements', this.editor, this.items),
     );
     this.editor.sceneGraph.render();
   }
@@ -111,14 +125,14 @@ class SelectedElements {
       return;
     }
     this.editor.commandManager.pushCommand(
-      new AlignCmd('Align ' + type, this.editor, this.items, type)
+      new AlignCmd('Align ' + type, this.editor, this.items, type),
     );
     this.editor.sceneGraph.render();
   }
 
   arrange(type: ArrangeType) {
     if (this.size() === 0) {
-      console.warn('can\'t arrange, no element');
+      console.warn("can't arrange, no element");
     }
 
     /**
@@ -127,7 +141,7 @@ class SelectedElements {
      * also other arrange type
      */
     this.editor.commandManager.pushCommand(
-      new ArrangeCmd('Arrange ' + type, this.editor, this.items, type)
+      new ArrangeCmd('Arrange ' + type, this.editor, this.items, type),
     );
     this.editor.sceneGraph.render();
   }
