@@ -32,6 +32,6 @@ Some Chinese language articles on how to develop a graphic editor.
   src="https://user-images.githubusercontent.com/18698939/219853531-e39e1537-99e6-40bf-a56f-81330fca3180.png" 
 />
 
-## material
+## Material
 
-- [icons]https://www.figma.com/community/file/1224385128783567603/suika-icons
+- [icons](https://www.figma.com/community/file/1224385128783567603/suika-icons)
