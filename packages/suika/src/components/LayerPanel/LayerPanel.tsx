@@ -20,11 +20,29 @@ export const LayerPanel: FC = () => {
     }
   }, [editor]);
 
+  const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!editor) return;
+    const target = event.target;
+
+    if (target instanceof HTMLElement && target.hasAttribute('data-layer-id')) {
+      const objId = target.getAttribute('data-layer-id');
+      if (objId) {
+        editor.selectedElements.setItemsById(new Set([objId]));
+        editor.sceneGraph.render();
+      }
+    }
+  };
+
   return (
-    <div className="layer-panel">
+    <div className="layer-panel" onClick={(e) => handleClick(e)}>
       {objects
         .map((item) => (
-          <LayerItem active={selectedIds.has(item.id)} key={item.id}>
+          <LayerItem
+            active={selectedIds.has(item.id)}
+            key={item.id}
+            layerId={item.id}
+          >
+            {' '}
             {item.name}
           </LayerItem>
         ))
