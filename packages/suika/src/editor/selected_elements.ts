@@ -32,11 +32,20 @@ class SelectedElements {
   }
   setItemsById(ids: Set<string>) {
     const items: Graph[] = [];
-    this.editor.sceneGraph.children.forEach((item) => {
+    let count = ids.size;
+
+    const allGraphs = this.editor.sceneGraph.children;
+    for (let i = 0; i < allGraphs.length; i++) {
+      const item = allGraphs[i];
       if (ids.has(item.id)) {
         items.push(item);
+        count--;
+        if (count === 0) {
+          break;
+        }
       }
-    });
+    }
+
     if (items.length === 0) {
       console.warn('can not find element by id');
     } else {
