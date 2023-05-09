@@ -25,7 +25,7 @@ import { TextureType } from '../texture';
 const DOUBLE_PI = Math.PI * 2;
 
 interface Events {
-  render(): void
+  render(): void;
 }
 
 /**
@@ -54,6 +54,9 @@ export class SceneGraph {
     } else {
       this.children.splice(idx, 0, element);
     }
+  }
+  getElementById(id: string) {
+    return this.children.find((item) => item.id === id);
   }
   removeChild(element: Graph) {
     const idx = this.children.indexOf(element);
@@ -142,7 +145,7 @@ export class SceneGraph {
           element.height / 2,
           element.rotation || 0,
           0,
-          DOUBLE_PI
+          DOUBLE_PI,
         );
         forEach(element.fill, (texture) => {
           if (texture.type === TextureType.Solid) {
@@ -163,7 +166,10 @@ export class SceneGraph {
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
 
     // draw pixel grid
-    if (setting.get('enablePixelGrid') && zoom >= this.editor.setting.get('minPixelGridZoom')) {
+    if (
+      setting.get('enablePixelGrid') &&
+      zoom >= this.editor.setting.get('minPixelGridZoom')
+    ) {
       this.grid.draw();
     }
 
@@ -188,7 +194,7 @@ export class SceneGraph {
         xInViewport,
         yInViewport,
         widthInViewport,
-        heightInViewport
+        heightInViewport,
       );
       ctx.restore();
     }
@@ -219,7 +225,7 @@ export class SceneGraph {
     const selectedElements = this.editor.selectedElements.getItems();
 
     const bBoxes = selectedElements.map((element) =>
-      element.getBBoxWithoutRotation()
+      element.getBBoxWithoutRotation(),
     );
 
     const zoom = this.editor.zoomManager.getZoom();
@@ -245,7 +251,7 @@ export class SceneGraph {
         xInViewport,
         yInViewport,
         bBox.width * zoom,
-        bBox.height * zoom
+        bBox.height * zoom,
       );
       ctx.restore();
     }
@@ -259,13 +265,13 @@ export class SceneGraph {
       const { x: xInViewport, y: yInViewport } =
         this.editor.sceneCoordsToViewport(
           selectedElementsBBox.x,
-          selectedElementsBBox.y
+          selectedElementsBBox.y,
         );
       ctx.strokeRect(
         xInViewport,
         yInViewport,
         selectedElementsBBox.width * zoom,
-        selectedElementsBBox.height * zoom
+        selectedElementsBBox.height * zoom,
       );
     }
     ctx.restore();
@@ -283,14 +289,14 @@ export class SceneGraph {
     // 【单个元素被选中】求不考虑旋转的 bBox，将其和旋转后的角度比较
     if (selectedElements.length === 1) {
       bBoxes = selectedElements.map((element) =>
-        element.getBBoxWithoutRotation()
+        element.getBBoxWithoutRotation(),
       );
       // 单个元素，要考虑旋转
       const element = selectedElements[0];
       const [cx, cy] = getRectCenterPoint(element);
       if (element.rotation) {
         point = arr2point(
-          transformRotate(point.x, point.y, -element.rotation, cx, cy)
+          transformRotate(point.x, point.y, -element.rotation, cx, cy),
         );
       }
     }
@@ -310,14 +316,14 @@ export class SceneGraph {
       const [cx, cy] = getRectCenterPoint(bBox);
       const rotatedHitPointer = element.rotation
         ? arr2point(
-          transformRotate(
-            hitPointer.x,
-            hitPointer.y,
-            -element.rotation,
-            cx,
-            cy
+            transformRotate(
+              hitPointer.x,
+              hitPointer.y,
+              -element.rotation,
+              cx,
+              cy,
+            ),
           )
-        )
         : hitPointer;
 
       if (isPointInRect(rotatedHitPointer, bBox)) {
@@ -352,7 +358,7 @@ export class SceneGraph {
   getObjects() {
     const children = this.children;
     const objects: IObject[] = [];
-    forEach(children, item => {
+    forEach(children, (item) => {
       objects.push({ id: item.id, name: item.objectName });
     });
     return objects;

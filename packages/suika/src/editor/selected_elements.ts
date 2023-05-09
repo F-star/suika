@@ -52,7 +52,6 @@ class SelectedElements {
       this.setItems(items);
     }
   }
-
   clear() {
     this.items = [];
     this.eventEmitter.emit('itemsChange', this.items);
@@ -61,23 +60,31 @@ class SelectedElements {
    * “追加” 多个元素
    * 如果已选中元素中存在追加元素，将其从已选中元素中取出，否则添加进去
    */
-  toggleElement(addedElements: Graph[]) {
+  toggleItems(toggledElements: Graph[]) {
     const prevItems = this.items;
     const retItems: Graph[] = [];
     for (let i = 0, len = prevItems.length; i < len; i++) {
       const item = prevItems[i];
-      const idx = addedElements.indexOf(item);
+      const idx = toggledElements.indexOf(item);
       if (idx === -1) {
         retItems.push(item);
       } else {
-        addedElements.splice(idx, 1);
+        toggledElements.splice(idx, 1);
       }
     }
-    retItems.push(...addedElements);
+    retItems.push(...toggledElements);
     this.items = retItems;
 
     if (!isSameArray(prevItems, retItems)) {
       this.eventEmitter.emit('itemsChange', this.items);
+    }
+  }
+  toggleItemById(id: string) {
+    const toggledElement = this.editor.sceneGraph.getElementById(id);
+    if (toggledElement) {
+      this.toggleItems([toggledElement]);
+    } else {
+      console.warn('can not find element by id');
     }
   }
   getCenterPoint() {

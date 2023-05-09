@@ -27,7 +27,11 @@ export const LayerPanel: FC = () => {
     if (target instanceof HTMLElement && target.hasAttribute('data-layer-id')) {
       const objId = target.getAttribute('data-layer-id');
       if (objId) {
-        editor.selectedElements.setItemsById(new Set([objId]));
+        if (event.ctrlKey || event.metaKey) {
+          editor.selectedElements.toggleItemById(objId);
+        } else {
+          editor.selectedElements.setItemsById(new Set([objId]));
+        }
         editor.sceneGraph.render();
       }
     }

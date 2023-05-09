@@ -46,7 +46,7 @@ export class DrawSelectionBox implements IBaseTool {
     const elements = this.editor.sceneGraph.getElementsInSelection();
 
     if (this.isShiftPressingWhenStart) {
-      this.editor.selectedElements.toggleElement(elements);
+      this.editor.selectedElements.toggleItems(elements);
     } else {
       this.editor.selectedElements.setItems(elements);
     }

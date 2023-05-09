@@ -74,7 +74,11 @@ export class SelectTool implements ITool {
     this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     // 0. 点中 handle（旋转点）
-    if (sceneGraph.transformHandle.getTransformHandleByPoint(this.startPointer) === 'rotation') {
+    if (
+      sceneGraph.transformHandle.getTransformHandleByPoint(
+        this.startPointer,
+      ) === 'rotation'
+    ) {
       this.currStrategy = this.strategySelectRotation;
     }
 
@@ -94,7 +98,7 @@ export class SelectTool implements ITool {
           if (selectedElements.getItems().includes(topHitElement)) {
             this.topHitElementWhenStart = topHitElement;
           } else {
-            selectedElements.toggleElement([topHitElement]);
+            selectedElements.toggleItems([topHitElement]);
           }
         } else {
           selectedElements.setItems([topHitElement]);
@@ -136,7 +140,7 @@ export class SelectTool implements ITool {
     }
 
     if (this.topHitElementWhenStart && !this.isDragHappened) {
-      this.editor.selectedElements.toggleElement([this.topHitElementWhenStart]);
+      this.editor.selectedElements.toggleItems([this.topHitElementWhenStart]);
       this.editor.sceneGraph.render();
     }
 
