@@ -14,55 +14,50 @@ import {
 export const ToolBar = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
-  const [tool, setTool] = useState('');
+  const [currTool, setCurrTool] = useState('');
 
   useEffect(() => {
     if (editor) {
-      setTool(editor.toolManager.getToolName() || '');
+      setCurrTool(editor.toolManager.getToolName() || '');
       editor.toolManager.on('change', (toolName: string) => {
-        setTool(toolName);
+        setCurrTool(toolName);
       });
     }
   }, [editor]);
 
   return (
     <div className="suika-tool-bar">
-      <ToolBtn
-        className={classNames({ active: tool === 'select' })}
-        tooltipContent={intl.formatMessage({ id: 'tool.select' })}
-        onClick={() => {
-          editor?.toolManager.setTool('select');
-        }}
-      >
-        <SelectOutlined />
-      </ToolBtn>
-      <ToolBtn
-        className={classNames({ active: tool === 'drawRect' })}
-        tooltipContent={intl.formatMessage({ id: 'tool.rectangle' })}
-        onClick={() => {
-          editor?.toolManager.setTool('drawRect');
-        }}
-      >
-        <RectOutlined />
-      </ToolBtn>
-      <ToolBtn
-        className={classNames({ active: tool === 'drawEllipse' })}
-        tooltipContent={intl.formatMessage({ id: 'tool.ellipse' })}
-        onClick={() => {
-          editor?.toolManager.setTool('drawEllipse');
-        }}
-      >
-        <EllipseOutlined />
-      </ToolBtn>
-      <ToolBtn
-        className={classNames({ active: tool === 'dragCanvas' })}
-        tooltipContent={intl.formatMessage({ id: 'tool.hand' })}
-        onClick={() => {
-          editor?.toolManager.setTool('dragCanvas');
-        }}
-      >
-        <HandOutlined />
-      </ToolBtn>
+      {(
+        [
+          { name: 'select', intlId: 'tool.select', icon: <SelectOutlined /> },
+          {
+            name: 'drawRect',
+            intlId: 'tool.rectangle',
+            icon: <RectOutlined />,
+          },
+          {
+            name: 'drawEllipse',
+            intlId: 'tool.ellipse',
+            icon: <EllipseOutlined />,
+          },
+          {
+            name: 'dragCanvas',
+            intlId: 'tool.hand',
+            icon: <HandOutlined />,
+          },
+        ] as const
+      ).map((tool) => (
+        <ToolBtn
+          key={tool.name}
+          className={classNames({ active: currTool === tool.name })}
+          tooltipContent={intl.formatMessage({ id: tool.intlId })}
+          onClick={() => {
+            editor?.toolManager.setTool(tool.name);
+          }}
+        >
+          {tool.icon}
+        </ToolBtn>
+      ))}
     </div>
   );
 };
