@@ -1,14 +1,18 @@
 import { FC, PropsWithChildren } from 'react';
 import './ContextMenuItem.scss';
+import classNames from 'classnames';
 
 interface IProps extends PropsWithChildren {
+  disabled?: boolean;
   onClick(): void;
 }
 
-const ContextMenuItem: FC<IProps> = ({ children, onClick }) => {
+const ContextMenuItem: FC<IProps> = ({ children, disabled, onClick }) => {
   return (
     <div
-      className="suika-context-menu-item"
+      className={classNames('suika-context-menu-item', {
+        'suika-is-disable': disabled,
+      })}
       onClick={onClick}
     >
       {children}

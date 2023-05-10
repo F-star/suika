@@ -6,6 +6,7 @@ import ContextMenuItem from './components/ContextMenuItem';
 import ContextMenuSep from './components/ContextMenuSep';
 import './ContextMenu.scss';
 import { FormattedMessage } from 'react-intl';
+import { IHistoryStatus } from '../../editor/commands/command_manager';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;
@@ -14,19 +15,28 @@ export const ContextMenu: FC = () => {
   const editor = useContext(EditorContext);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [canRedo, setCanRedo] = useState(false);
+  const [canUndo, setCanUdo] = useState(false);
 
   useEffect(() => {
     if (editor) {
       // 监听 editor 的 contextmenu 事件
-      const handler = (pos: IPoint) => {
+      const handleContextmenu = (pos: IPoint) => {
         if (!visible) {
           setVisible(true);
           setPos(pos);
         }
       };
-      editor.hostEventManager.on('contextmenu', handler);
+      editor.hostEventManager.on('contextmenu', handleContextmenu);
+
+      const handleCommandChange = (status: IHistoryStatus) => {
+        setCanRedo(status.canRedo);
+        setCanUdo(status.canUndo);
+      };
+      editor.commandManager.on('change', handleCommandChange);
       return () => {
-        editor.hostEventManager.off('contextmenu', handler);
+        editor.hostEventManager.off('contextmenu', handleContextmenu);
+        editor.commandManager.off('change', handleCommandChange);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,6 +49,7 @@ export const ContextMenu: FC = () => {
     return (
       <>
         <ContextMenuItem
+          disabled={!canUndo}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -49,6 +60,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="command.undo" />
         </ContextMenuItem>
         <ContextMenuItem
+          disabled={!canRedo}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -144,7 +156,9 @@ export const ContextMenu: FC = () => {
         }}
       >
         {renderNoSelectContextMenu()}
-        {editor && !editor.selectedElements.isEmpty() && renderSelectContextMenu()}
+        {editor &&
+          !editor.selectedElements.isEmpty() &&
+          renderSelectContextMenu()}
       </div>
     </div>
   );
