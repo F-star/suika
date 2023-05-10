@@ -8,5 +8,13 @@
       color: #fff;
       background-color: #0f8fff;
     }
+    &.suika-is-disable {
+      color: #ccc;
+      pointer-events: none;
+      &:hover {
+        color: #ccc;
+        background-color: transparent;
+      }
+    }
   }
 }
