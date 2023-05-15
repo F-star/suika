@@ -8,7 +8,8 @@ import { LayerPanel } from './LayerPanel';
 import './Editor.scss';
 import { ContextMenu } from './ContextMenu';
 
-const rightPadding = 241;
+const topMargin = 48;
+const leftRightMargin = 240 * 2;
 
 const Editor: FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,8 +20,8 @@ const Editor: FC = () => {
     if (canvasRef.current) {
       const editor = new GraphEditor({
         canvasElement: canvasRef.current,
-        width: document.body.clientWidth - rightPadding,
-        height: document.body.clientHeight,
+        width: document.body.clientWidth - leftRightMargin,
+        height: document.body.clientHeight - topMargin,
         offsetY: 48,
         offsetX: 240,
       });
@@ -29,13 +30,13 @@ const Editor: FC = () => {
       const changeViewport = throttle(
         () => {
           editor.viewportManager.setViewport({
-            width: document.body.clientWidth - rightPadding,
-            height: document.body.clientHeight,
+            width: document.body.clientWidth - leftRightMargin,
+            height: document.body.clientHeight - topMargin,
           });
           editor.sceneGraph.render();
         },
         150,
-        { leading: false }
+        { leading: false },
       );
       window.addEventListener('resize', changeViewport);
       setEditor(editor);
