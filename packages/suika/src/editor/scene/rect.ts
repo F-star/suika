@@ -1,4 +1,4 @@
-import { IBox, IRect } from '../../type.interface';
+import { IBox, IRect, GraphType } from '../../type.interface';
 import { getAbsoluteCoords } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { Graph, IGraph } from './graph';
@@ -6,9 +6,12 @@ import { Graph, IGraph } from './graph';
 export interface RectGraph extends IGraph, IRect {}
 
 export class Rect extends Graph {
+  type = GraphType.Rect;
   constructor(options: RectGraph) {
     super(options);
-    this.objectName = 'Rectangle ' + this.id;
+    if (!options.objectName) {
+      this.objectName = 'Rectangle ' + this.id;
+    }
   }
   /**
    * 计算包围盒（不考虑 strokeWidth）

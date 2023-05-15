@@ -1,5 +1,8 @@
 import { SceneGraph } from './scene/scene_graph';
-import { sceneCoordsToViewportUtil, viewportCoordsToSceneUtil } from '../utils/common';
+import {
+  sceneCoordsToViewportUtil,
+  viewportCoordsToSceneUtil,
+} from '../utils/common';
 import { CommandManager } from './commands/command_manager';
 import HostEventManager from './host_event_manager';
 import Ruler from './ruler';
@@ -8,6 +11,7 @@ import { Setting } from './setting';
 import { ToolManager } from './tools/tool_manager';
 import { ViewportManager } from './viewport_manager';
 import { ZoomManager } from './zoom_manager';
+import { AutoSaveGraphs } from './store/auto-save-graphs';
 
 interface IEditorOptions {
   canvasElement: HTMLCanvasElement;
@@ -35,6 +39,8 @@ export class Editor {
   selectedElements: SelectedElements;
   ruler: Ruler;
 
+  autoSaveGraphs: AutoSaveGraphs;
+
   constructor(options: IEditorOptions) {
     this.canvasElement = options.canvasElement;
     this.ctx = this.canvasElement.getContext('2d')!;
@@ -52,7 +58,6 @@ export class Editor {
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
 
-
     this.viewportManager = new ViewportManager(this);
 
     this.toolManager = new ToolManager(this);
@@ -62,6 +67,10 @@ export class Editor {
     this.selectedElements = new SelectedElements(this);
     this.ruler = new Ruler(this);
 
+    this.autoSaveGraphs = new AutoSaveGraphs(this);
+    this.autoSaveGraphs.load();
+    this.autoSaveGraphs.autoSave();
+
     // 设置初始视口
     this.viewportManager.setViewport({
       x: -options.width / 2,
@@ -69,6 +78,7 @@ export class Editor {
       width: options.width,
       height: options.height,
     });
+
     /**
      * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
      * 所以下面的 render 要异步执行

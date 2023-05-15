@@ -6,7 +6,6 @@ import { en } from './locale/en';
 import { useEffect, useState } from 'react';
 import { appEventEmitter } from './events';
 import { SupportedLocale } from './locale/types';
-import store from 'store2';
 
 const messageMap = {
   zh,
@@ -14,7 +13,7 @@ const messageMap = {
 };
 
 const getLocale = (): SupportedLocale => {
-  const locale = store.get('suika-locale') || navigator.language;
+  const locale = localStorage.getItem('suika-locale') || navigator.language;
   return locale.startsWith('zh') ? 'zh' : 'en';
 };
 
