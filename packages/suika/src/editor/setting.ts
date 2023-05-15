@@ -55,6 +55,8 @@ export class Setting {
 
     offsetX: 0, // 鼠标坐标位置的修正值
     offsetY: 0,
+
+    zoomToFixPadding: 100, // base viewport coord
   };
 
   set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {

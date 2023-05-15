@@ -1,10 +1,9 @@
-
-/* eslint quote-props: ["error", "always"] */
 export const en = {
-  'delete': 'Delete',
-  'fill': 'Fill',
-  'mixed': 'Mixed',
-  'noSelectedShapes': 'No Selected Shapes',
+  delete: 'Delete',
+  fill: 'Fill',
+  mixed: 'Mixed',
+  noSelectedShapes: 'No Selected Shapes',
+
   'tool.select': 'Select',
   'tool.rectangle': 'Rectangle',
   'tool.ellipse': 'Ellipse',
@@ -15,8 +14,11 @@ export const en = {
   'arrange.backward': 'Backward',
   'arrange.front': 'Bring to Front',
   'arrange.back': 'Send to Back',
-  'zoom.zoomIn': 'Zoom In',
-  'zoom.zoomOut': 'zoom Out',
+
+  'zoom.zoomIn': 'Zoom in',
+  'zoom.zoomOut': 'zoom out',
+  'zoom.zoomToFit': 'Zoom to fix',
+
   'setting.grid.pixelGrid': 'Pixel grid',
   'setting.grid.snapToPixelGrid': 'Snap to pixel grid',
   'setting.rulers': 'rulers',

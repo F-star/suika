@@ -18,7 +18,6 @@ export class AutoSaveGraphs {
     this.editor.commandManager.off('change', this.listener);
   }
   save() {
-    console.log('save!!');
     localStorage.setItem(STORE_KEY, this.editor.sceneGraph.toJSON());
   }
   load() {

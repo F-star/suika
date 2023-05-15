@@ -79,6 +79,8 @@ export class Editor {
       height: options.height,
     });
 
+    this.zoomManager.zoomToFit();
+
     /**
      * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
      * 所以下面的 render 要异步执行

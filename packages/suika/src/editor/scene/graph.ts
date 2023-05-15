@@ -75,6 +75,9 @@ export class Graph {
     }
     return attrs;
   }
+  /**
+   * AABB (axis-aligned bounding box)
+   */
   getBBox(): IBox {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
     const rotation = this.rotation;
@@ -98,6 +101,9 @@ export class Graph {
       height: maxY - minY,
     };
   }
+  /**
+   * AABB (axis-aligned bounding box)
+   */
   getBBox2(): IBox2 {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
     const rotation = this.rotation;

@@ -1,10 +1,10 @@
-
 import { ceil, viewportCoordsToSceneUtil } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
+import { getRectsBBox } from '../utils/graphics';
 import { Editor } from './editor';
 
 interface Events {
-  zoomChange(zoom: number, prevZoom: number): void
+  zoomChange(zoom: number, prevZoom: number): void;
 }
 
 export class ZoomManager {
@@ -17,7 +17,8 @@ export class ZoomManager {
   setZoom(zoom: number) {
     const prevZoom = this.zoom;
     this.zoom = zoom;
-    Promise.resolve().then(() => { // 异步通知
+    Promise.resolve().then(() => {
+      // 异步通知
       this.eventEmitter.emit('zoomChange', zoom, prevZoom);
     });
   }
@@ -26,25 +27,83 @@ export class ZoomManager {
     this.setZoom(zoom);
     this.adjustScroll(undefined, undefined, prevZoom);
   }
-  zoomIn(): void
-  zoomIn(cx: number, cy: number): void
+  zoomIn(): void;
+  zoomIn(cx: number, cy: number): void;
   zoomIn(cx?: number, cy?: number) {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
-    const zoom = Math.min(ceil(prevZoom * (1 + zoomStep)), this.editor.setting.get('zoomMax'));
+    const zoom = Math.min(
+      ceil(prevZoom * (1 + zoomStep)),
+      this.editor.setting.get('zoomMax'),
+    );
 
     this.setZoom(zoom);
     this.adjustScroll(cx, cy, prevZoom);
   }
-  zoomOut(): void
-  zoomOut(cx: number, cy: number): void
+  zoomOut(): void;
+  zoomOut(cx: number, cy: number): void;
   zoomOut(cx?: number, cy?: number) {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
-    const zoom = Math.max(ceil(prevZoom * (1 - zoomStep)), this.editor.setting.get('zoomMin'));
+    const zoom = Math.max(
+      ceil(prevZoom * (1 - zoomStep)),
+      this.editor.setting.get('zoomMin'),
+    );
 
     this.setZoom(zoom);
     this.adjustScroll(cx, cy, prevZoom);
+  }
+  reset() {
+    this.setZoom(1);
+    const viewportManager = this.editor.viewportManager;
+    const viewport = viewportManager.getViewport();
+    viewportManager.setViewport({
+      x: -viewport.width / 2,
+      y: -viewport.height / 2,
+    });
+  }
+  zoomToFit() {
+    const padding = this.editor.setting.get('zoomToFixPadding');
+    const viewport = this.editor.viewportManager.getViewport();
+    const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
+
+    if (bboxs.length === 0) {
+      this.reset();
+      return;
+    }
+
+    const composedBBox = getRectsBBox(...bboxs);
+
+    // TODO: FIXME:
+    // consider "rulerWidth" and
+    // "zoomToFixPadding" need to base viewport
+    composedBBox.x -= padding;
+    composedBBox.y -= padding;
+    composedBBox.width += padding * 2;
+    composedBBox.height += padding * 2;
+
+    viewport;
+
+    const viewportRatio = viewport.width / viewport.height;
+    const bboxRatio = composedBBox.width / composedBBox.height;
+    let newZoom: number;
+    let dx = 0;
+    let dy = 0;
+    if (viewportRatio > bboxRatio) {
+      // The aspect ratio of the viewport is greater than the aspect ratio of the bbox,
+      // which means that the height of the bbox is the limiting factor
+      newZoom = viewport.height / composedBBox.height;
+      dx = (viewport.width / newZoom - composedBBox.width) / 2;
+    } else {
+      newZoom = viewport.width / composedBBox.width;
+      dy = (viewport.height / newZoom - composedBBox.height) / 2;
+    }
+
+    this.setZoom(newZoom);
+    this.editor.viewportManager.setViewport({
+      x: composedBBox.x - dx,
+      y: composedBBox.y - dy,
+    });
   }
   getCanvasCenter() {
     const width = this.editor.canvasElement.width;
@@ -58,7 +117,11 @@ export class ZoomManager {
    * 调整 scroll 值
    * 滚轮缩放时，选中点作为缩放中心进行缩放
    */
-  adjustScroll(cx: number | undefined, cy: number | undefined, prevZoom: number) {
+  adjustScroll(
+    cx: number | undefined,
+    cy: number | undefined,
+    prevZoom: number,
+  ) {
     const viewportManager = this.editor.viewportManager;
     const zoom = this.editor.zoomManager.getZoom();
 
@@ -76,7 +139,13 @@ export class ZoomManager {
       _cy = cy;
     }
 
-    const { x: sceneX, y: sceneY } = viewportCoordsToSceneUtil(_cx, _cy, prevZoom, scrollX, scrollY);
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneUtil(
+      _cx,
+      _cy,
+      prevZoom,
+      scrollX,
+      scrollY,
+    );
     const newScrollX = sceneX - _cx / zoom;
     const newScrollY = sceneY - _cy / zoom;
 
@@ -85,10 +154,16 @@ export class ZoomManager {
       y: newScrollY,
     });
   }
-  on(eventName:'zoomChange', handler: (zoom: number, prevZoom: number) => void) {
+  on(
+    eventName: 'zoomChange',
+    handler: (zoom: number, prevZoom: number) => void,
+  ) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName:'zoomChange', handler: (zoom: number, prevZoom: number) => void) {
+  off(
+    eventName: 'zoomChange',
+    handler: (zoom: number, prevZoom: number) => void,
+  ) {
     this.eventEmitter.off(eventName, handler);
   }
 }

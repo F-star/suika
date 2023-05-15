@@ -4,5 +4,13 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "cSpell.words": ["Formatjs", "IRGBA", "isequal", "outfile", "suika", "xigua"]
+  "cSpell.words": [
+    "bbox",
+    "Formatjs",
+    "IRGBA",
+    "isequal",
+    "outfile",
+    "suika",
+    "xigua"
+  ]
 }

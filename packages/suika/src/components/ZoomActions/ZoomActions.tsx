@@ -8,7 +8,6 @@ import './ZoomActions.scss';
 import { FormattedMessage } from 'react-intl';
 import { ArrowDownOutlined } from '@suika/icons';
 
-
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);
   const [zoom, setZoom] = useState(1);
@@ -29,9 +28,9 @@ export const ZoomActions: FC = () => {
         setZoom(zoom);
       };
       editor.zoomManager.on('zoomChange', handler);
-      editor.setting.on('update', (setting => {
+      editor.setting.on('update', (setting) => {
         setSetting(setting);
-      }));
+      });
       return () => {
         editor.zoomManager.off('zoomChange', handler);
       };
@@ -58,7 +57,7 @@ export const ZoomActions: FC = () => {
               setPopoverVisible(false);
             }}
           >
-            <FormattedMessage id='zoom.zoomIn' />
+            <FormattedMessage id="zoom.zoomIn" />
           </ActionItem>
           <ActionItem
             onClick={() => {
@@ -67,9 +66,18 @@ export const ZoomActions: FC = () => {
               setPopoverVisible(false);
             }}
           >
-            <FormattedMessage id='zoom.zoomOut' />
+            <FormattedMessage id="zoom.zoomOut" />
           </ActionItem>
-          <div className='separator' />
+          <ActionItem
+            onClick={() => {
+              editor?.zoomManager.zoomToFit();
+              editor?.sceneGraph.render();
+              setPopoverVisible(false);
+            }}
+          >
+            <FormattedMessage id="zoom.zoomToFit" />
+          </ActionItem>
+          <div className="separator" />
           <ActionItem
             check={setting.enablePixelGrid}
             onClick={() => {
@@ -81,7 +89,7 @@ export const ZoomActions: FC = () => {
               }
             }}
           >
-            <FormattedMessage id='setting.grid.pixelGrid' />
+            <FormattedMessage id="setting.grid.pixelGrid" />
           </ActionItem>
           <ActionItem
             check={setting.snapToPixelGrid}
@@ -94,7 +102,7 @@ export const ZoomActions: FC = () => {
               }
             }}
           >
-            <FormattedMessage id='setting.grid.snapToPixelGrid' />
+            <FormattedMessage id="setting.grid.snapToPixelGrid" />
           </ActionItem>
           <ActionItem
             check={setting.enableRuler}
@@ -107,7 +115,7 @@ export const ZoomActions: FC = () => {
               }
             }}
           >
-            <FormattedMessage id='setting.rulers' />
+            <FormattedMessage id="setting.rulers" />
           </ActionItem>
         </div>
       )}
