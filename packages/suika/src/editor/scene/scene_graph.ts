@@ -1,5 +1,5 @@
 import { Editor } from '../editor';
-import { IBox, IObject, IPoint, IRect } from '../../type.interface';
+import { GraphType, IBox, IObject, IPoint, IRect } from '../../type.interface';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
 import {
@@ -13,7 +13,7 @@ import {
 import rafThrottle from '../../utils/raf_throttle';
 import { transformRotate } from '../../utils/transform';
 import { Ellipse } from './ellipse';
-import { Graph } from './graph';
+import { Graph, IGraph } from './graph';
 import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
 import { forEach } from '../../utils/array_util';
@@ -362,6 +362,31 @@ export class SceneGraph {
       objects.push({ id: item.id, name: item.objectName });
     });
     return objects;
+  }
+
+  toJSON() {
+    return JSON.stringify(this.children);
+  }
+
+  load(str: string) {
+    const ctorMap = {
+      [GraphType.Graph]: Graph,
+      [GraphType.Rect]: Rect,
+      [GraphType.Ellipse]: Ellipse,
+    };
+
+    const data: IGraph[] = JSON.parse(str);
+    // TODO: check valid
+    this.children = data.map((attrs) => {
+      const type = attrs.type;
+      const Ctor = ctorMap[type!];
+
+      if (!Ctor) {
+        throw new Error('found wrong type of graph');
+      }
+
+      return new Ctor(attrs);
+    });
   }
 
   // TODO: update tree by patch obj and id

@@ -24,6 +24,7 @@
     "classnames": "^2.3.2",
     "hotkeys-js": "^3.10.1",
     "lodash.clonedeep": "^4.5.0",
+    "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
     "lodash.throttle": "^4.1.1",
     "rbush": "^3.0.1",
@@ -33,7 +34,6 @@
     "react-intl": "^6.3.2",
     "react-scripts": "5.0.1",
     "sass": "^1.57.1",
-    "store2": "^2.14.2",
     "web-vitals": "^2.1.0"
   },
   "browserslist": {
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@types/lodash.clonedeep": "^4.5.7",
+    "@types/lodash.debounce": "^4.0.7",
     "@types/lodash.isequal": "^4.5.6",
     "@types/lodash.throttle": "^4.1.7",
     "@types/rbush": "^3.0.0",

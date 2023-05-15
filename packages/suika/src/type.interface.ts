@@ -34,3 +34,9 @@ export interface IObject {
   id: string;
   name: string;
 }
+
+export enum GraphType {
+  Graph = 0,
+  Rect = 1,
+  Ellipse = 2,
+}

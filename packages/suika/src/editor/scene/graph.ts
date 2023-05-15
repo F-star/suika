@@ -1,6 +1,6 @@
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { IBox, IBox2 } from '../../type.interface';
+import { IBox, IBox2, GraphType } from '../../type.interface';
 import { genId } from '../../utils/common';
 import {
   getAbsoluteCoords,
@@ -11,6 +11,9 @@ import { transformRotate } from '../../utils/transform';
 import { ITexture } from '../texture';
 
 export interface IGraph {
+  type?: GraphType;
+  id?: string;
+  objectName?: string;
   x: number;
   y: number;
   width: number;
@@ -24,6 +27,7 @@ export interface IGraph {
 }
 
 export class Graph {
+  type = GraphType.Graph;
   id: string;
   objectName: string;
   x: number;
@@ -139,7 +143,7 @@ export class Graph {
       rotatedY,
       -(this.rotation || 0),
       cx,
-      cy
+      cy,
     );
     this.x = x;
     this.y = y;
@@ -176,8 +180,8 @@ export const MutateElementsAndRecord = {
         'Update X of Elements',
         elements,
         elements.map((el) => ({ x: el.x })),
-        prevXs
-      )
+        prevXs,
+      ),
     );
   },
   setRotateY(editor: Editor, elements: Graph[], rotatedY: number) {
@@ -197,8 +201,8 @@ export const MutateElementsAndRecord = {
         'Update Y of Elements',
         elements,
         elements.map((el) => ({ y: el.y })),
-        prevXs
-      )
+        prevXs,
+      ),
     );
   },
   setWidth(editor: Editor, elements: Graph[], width: number) {
@@ -225,8 +229,8 @@ export const MutateElementsAndRecord = {
         'Update Width of Elements',
         elements,
         elements.map((el) => ({ width: el.width, x: el.x, y: el.y })),
-        prevAttrs
-      )
+        prevAttrs,
+      ),
     );
   },
   setHeight(editor: Editor, elements: Graph[], height: number) {
@@ -253,8 +257,8 @@ export const MutateElementsAndRecord = {
         'update Height of Elements',
         elements,
         elements.map((el) => ({ height: el.height, x: el.x, y: el.y })),
-        prevAttrs
-      )
+        prevAttrs,
+      ),
     );
   },
   setRotation(editor: Editor, elements: Graph[], rotation: number) {
@@ -267,7 +271,12 @@ export const MutateElementsAndRecord = {
       el.rotation = rotation;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs('update Rotation', elements, { rotation }, prevAttrs)
+      new SetElementsAttrs(
+        'update Rotation',
+        elements,
+        { rotation },
+        prevAttrs,
+      ),
     );
   },
 };

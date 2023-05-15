@@ -9,7 +9,6 @@ import {
 } from '@floating-ui/react';
 import classNames from 'classnames';
 import { useClickAway } from 'ahooks';
-import store from 'store2';
 import { appEventEmitter } from '../../events';
 import { I18nOutlined } from '@suika/icons';
 
@@ -58,7 +57,7 @@ export const LocaleSelector: FC = () => {
             className="locale-selector-popover-item"
             onClick={() => {
               const en = 'en';
-              store.set('suika-locale', en);
+              localStorage.setItem('suika-locale', en);
               appEventEmitter.emit('localeChange', en);
               setIsOpen(false);
             }}
@@ -69,7 +68,7 @@ export const LocaleSelector: FC = () => {
             className="locale-selector-popover-item"
             onClick={() => {
               const zh = 'zh';
-              store.set('suika-locale', zh);
+              localStorage.setItem('suika-locale', zh);
               appEventEmitter.emit('localeChange', zh);
               setIsOpen(false);
             }}

@@ -127,6 +127,7 @@ importers:
       '@testing-library/user-event': ^13.2.1
       '@types/jest': ^27.0.1
       '@types/lodash.clonedeep': ^4.5.7
+      '@types/lodash.debounce': ^4.0.7
       '@types/lodash.isequal': ^4.5.6
       '@types/lodash.throttle': ^4.1.7
       '@types/node': ^18.0.0
@@ -138,6 +139,7 @@ importers:
       classnames: ^2.3.2
       hotkeys-js: ^3.10.1
       lodash.clonedeep: ^4.5.0
+      lodash.debounce: ^4.0.8
       lodash.isequal: ^4.5.0
       lodash.throttle: ^4.1.1
       rbush: ^3.0.1
@@ -147,7 +149,6 @@ importers:
       react-intl: ^6.3.2
       react-scripts: 5.0.1
       sass: ^1.57.1
-      store2: ^2.14.2
       web-vitals: ^2.1.0
     dependencies:
       '@floating-ui/react': 0.22.3_biqbaboplfbrettd7655fr4n2y
@@ -157,6 +158,7 @@ importers:
       '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
       '@testing-library/user-event': 13.5.0_yxlyej73nftwmh2fiao7paxmlm
       '@types/jest': 27.5.2
+      '@types/lodash.debounce': 4.0.7
       '@types/node': 18.15.13
       '@types/react': 18.0.38
       '@types/react-dom': 18.0.11
@@ -164,6 +166,7 @@ importers:
       classnames: 2.3.2
       hotkeys-js: 3.10.2
       lodash.clonedeep: 4.5.0
+      lodash.debounce: 4.0.8
       lodash.isequal: 4.5.0
       lodash.throttle: 4.1.1
       rbush: 3.0.1
@@ -173,7 +176,6 @@ importers:
       react-intl: 6.4.1_oxnxxw5cisuxfd3tsgnto6yp4e
       react-scripts: 5.0.1_2kejuiv6me2f54prfqzhstm5cu
       sass: 1.62.0
-      store2: 2.14.2
       web-vitals: 2.1.4
     devDependencies:
       '@types/lodash.clonedeep': 4.5.7
@@ -4181,6 +4183,12 @@ packages:
       '@types/lodash': 4.14.194
     dev: true
 
+  /@types/lodash.debounce/4.0.7:
+    resolution: {integrity: sha512-X1T4wMZ+gT000M2/91SYj0d/7JfeNZ9PeeOldSNoE/lunLeQXKvkmIumI29IaKMotU/ln/McOIvgzZcQ/3TrSA==}
+    dependencies:
+      '@types/lodash': 4.14.194
+    dev: false
+
   /@types/lodash.isequal/4.5.6:
     resolution: {integrity: sha512-Ww4UGSe3DmtvLLJm2F16hDwEQSv7U0Rr8SujLUA2wHI2D2dm8kPu6Et+/y303LfjTIwSBKXB/YTUcAKpem/XEg==}
     dependencies:
@@ -4195,7 +4203,6 @@ packages:
 
   /@types/lodash/4.14.194:
     resolution: {integrity: sha512-r22s9tAS7imvBt2lyHC9B8AGwWnXaYb1tY09oyLkXDs4vArpYJzw09nj8MLx5VfciBPGIb+ZwG0ssYnEPJxn/g==}
-    dev: true
 
   /@types/mdx/2.0.4:
     resolution: {integrity: sha512-qCYrNdpKwN6YO6FVnx+ulfqifKlE3lQGsNhvDaW9Oxzyob/cRLBJWow8GHBBD4NxQ7BVvtsATgLsX0vZAWmtrg==}
@@ -12560,6 +12567,7 @@ packages:
 
   /store2/2.14.2:
     resolution: {integrity: sha512-siT1RiqlfQnGqgT/YzXVUNsom9S0H1OX+dpdGN1xkyYATo4I6sep5NmsRD/40s3IIOvlCq6akxkqG82urIZW1w==}
+    dev: true
 
   /storybook/7.0.6:
     resolution: {integrity: sha512-dhl+5jbPf6sT/cQxePxXM4T6AGJ0EtdSUTZmdOA7LA6P5C55Wc+GqPdIAh7RqZoMJdNNhXBeHHtCoYZev7uPxw==}
