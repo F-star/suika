@@ -156,9 +156,17 @@ class SelectedElements {
      * if the selected graphs had already in the top, stop exec front command
      * also other arrange type
      */
-    this.editor.commandManager.pushCommand(
-      new ArrangeCmd('Arrange ' + type, this.editor, this.items, type),
-    );
+    if (
+      ArrangeCmd.shouldExecCmd(
+        type,
+        this.editor.sceneGraph.children,
+        new Set(this.items),
+      )
+    ) {
+      this.editor.commandManager.pushCommand(
+        new ArrangeCmd('Arrange ' + type, this.editor, this.items, type),
+      );
+    }
     this.editor.sceneGraph.render();
   }
 }
