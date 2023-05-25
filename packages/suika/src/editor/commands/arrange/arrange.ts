@@ -1,6 +1,7 @@
-import { Graph } from '../scene/graph';
-import { Editor } from '../editor';
-import { ICommand } from './type';
+import { Editor } from '../../editor';
+import { Graph } from '../../scene/graph';
+import { ICommand } from '../type';
+import { firstInfoOfUnmovedGraphs, lastInfoOfUnmovedGraphs } from './util';
 
 export enum ArrangeType {
   Front = 'Front',
@@ -19,7 +20,7 @@ export class ArrangeCmd implements ICommand {
      * it's no need to keep right relative order
      */
     movedGraphs: Graph[],
-    public type: ArrangeType
+    public type: ArrangeType,
   ) {
     if (movedGraphs.length === 0) {
       throw new Error("can't arrange, no element");
@@ -28,7 +29,7 @@ export class ArrangeCmd implements ICommand {
     const movedGraphSet = (this.movedGraphSet = new Set(movedGraphs));
     if (movedGraphSet.size !== movedGraphs.length) {
       console.warn(
-        'the arg "movedGraphs" in ArrangeCmd constructor has duplicate values'
+        'the arg "movedGraphs" in ArrangeCmd constructor has duplicate values',
       );
     }
 
@@ -61,6 +62,37 @@ export class ArrangeCmd implements ICommand {
   }
   undo() {
     this.editor.sceneGraph.children = this.prevGraphs;
+  }
+  static shouldExecCmd(
+    type: ArrangeType,
+    graphs: Graph[],
+    movedGraphSet: Set<Graph>,
+  ): boolean {
+    if (
+      graphs.length === 0 ||
+      movedGraphSet.size === 0 ||
+      movedGraphSet.size === graphs.length
+    ) {
+      return false;
+    }
+
+    switch (type) {
+      case ArrangeType.Front:
+      case ArrangeType.Forward: {
+        // ps: the last element in the array is the top element in the canvas
+        const { count } = lastInfoOfUnmovedGraphs(graphs, movedGraphSet);
+        if (count === movedGraphSet.size) return false;
+        break;
+      }
+      case ArrangeType.Back:
+      case ArrangeType.Backward: {
+        const { count } = firstInfoOfUnmovedGraphs(graphs, movedGraphSet);
+        if (count === movedGraphSet.size) return false;
+        break;
+      }
+    }
+
+    return true;
   }
 }
 
@@ -96,7 +128,10 @@ const back = (graphs: Graph[], movedGraphSet: Set<Graph>) => {
 
 const forward = (graphs: Graph[], movedGraphs: Set<Graph>) => {
   const newGraphs = [...graphs];
-  for (let i = newGraphs.length - 2; i >= 0; i--) {
+
+  let i = lastInfoOfUnmovedGraphs(newGraphs, movedGraphs).index;
+
+  for (; i >= 0; i--) {
     if (movedGraphs.has(newGraphs[i])) {
       [newGraphs[i], newGraphs[i + 1]] = [newGraphs[i + 1], newGraphs[i]];
     }
@@ -106,7 +141,10 @@ const forward = (graphs: Graph[], movedGraphs: Set<Graph>) => {
 
 const backward = (graphs: Graph[], movedGraphs: Set<Graph>) => {
   const newGraphs = [...graphs];
-  for (let i = 1; i < newGraphs.length; i++) {
+
+  let i = firstInfoOfUnmovedGraphs(newGraphs, movedGraphs).index;
+
+  for (; i < newGraphs.length; i++) {
     if (movedGraphs.has(newGraphs[i])) {
       [newGraphs[i], newGraphs[i - 1]] = [newGraphs[i - 1], newGraphs[i]];
     }
