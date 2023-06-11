@@ -43,6 +43,7 @@ export class SceneGraph {
   private eventEmitter = new EventEmitter<Events>();
   transformHandle: TransformHandle;
   grid: Grid;
+  showOutline = true;
 
   constructor(private editor: Editor) {
     this.transformHandle = new TransformHandle(editor);
@@ -165,7 +166,7 @@ export class SceneGraph {
 
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
 
-    // draw pixel grid
+    // 1. draw pixel grid
     if (
       setting.get('enablePixelGrid') &&
       zoom >= this.editor.setting.get('minPixelGridZoom')
@@ -173,10 +174,12 @@ export class SceneGraph {
       this.grid.draw();
     }
 
-    // 3. 绘制 选中框
-    this.highLightSelectedBox(selectedElementsBBox);
+    // 2. draw selected elements bbox
+    if (this.showOutline) {
+      this.highLightSelectedBox(selectedElementsBBox);
+    }
 
-    // 绘制选区（使用选区工具时用到）
+    // 3. draw selectionBox
     if (this.selection) {
       ctx.save();
       ctx.strokeStyle = setting.get('selectionStroke');
@@ -199,9 +202,12 @@ export class SceneGraph {
       ctx.restore();
     }
 
-    this.transformHandle.draw(selectedElementsBBox);
+    // 4. draw transform handle
+    if (this.showOutline) {
+      this.transformHandle.draw(selectedElementsBBox);
+    }
 
-    // drawing rulers
+    // 5. drawing rulers
     if (setting.get('enableRuler')) {
       this.editor.ruler.draw();
     }
