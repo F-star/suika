@@ -37,7 +37,10 @@ export class SelectMoveTool implements IBaseTool {
   }
   start(e: PointerEvent) {
     const viewportPos = this.editor.getPointerXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(viewportPos.x, viewportPos.y);
+    this.startPointer = this.editor.viewportCoordsToScene(
+      viewportPos.x,
+      viewportPos.y,
+    );
     const selectedElements = this.editor.selectedElements.getItems();
     this.startPoints = selectedElements.map((element) => ({
       x: element.x,
@@ -45,7 +48,9 @@ export class SelectMoveTool implements IBaseTool {
     }));
     const bBox = this.editor.selectedElements.getBBox();
     if (!bBox) {
-      console.error('selected elements should\'t be empty when moving, please report us issue');
+      console.error(
+        "selected elements should't be empty when moving, please report us issue",
+      );
     } else {
       this.prevBBoxPos = { x: bBox.x, y: bBox.y };
     }
@@ -55,9 +60,10 @@ export class SelectMoveTool implements IBaseTool {
     this.move();
   }
   private move() {
+    this.editor.sceneGraph.showOutline = false;
     const { x, y } = this.editor.viewportCoordsToScene(
       this.dragPointer.x,
-      this.dragPointer.y
+      this.dragPointer.y,
     );
 
     let dx = (this.dx = x - this.startPointer.x);
@@ -74,9 +80,11 @@ export class SelectMoveTool implements IBaseTool {
     // in the moving phase, AABBox's x and y should round to be integer (snap to pixel grid)
     if (this.editor.setting.get('snapToPixelGrid')) {
       // if dx == 0, we thing it is in vertical moving.
-      if (dx !== 0) dx = Math.round(this.prevBBoxPos.x + dx) - this.prevBBoxPos.x;
+      if (dx !== 0)
+        dx = Math.round(this.prevBBoxPos.x + dx) - this.prevBBoxPos.x;
       // similarly dy
-      if (dy !== 0) dy = Math.round(this.prevBBoxPos.y + dy) - this.prevBBoxPos.y;
+      if (dy !== 0)
+        dy = Math.round(this.prevBBoxPos.y + dy) - this.prevBBoxPos.y;
     }
 
     const selectedElements = this.editor.selectedElements.getItems();
@@ -89,7 +97,8 @@ export class SelectMoveTool implements IBaseTool {
   }
   end(e: PointerEvent, isEnableDrag: boolean) {
     const selectedElements = this.editor.selectedElements.getItems();
-    if (selectedElements.length === 0) { // 移动的时候元素被删除了，或者撤销导致为空
+    if (selectedElements.length === 0) {
+      // 移动的时候元素被删除了，或者撤销导致为空
       // TODO: 属性复原
       return;
     }
@@ -100,12 +109,13 @@ export class SelectMoveTool implements IBaseTool {
           'Move Elements',
           selectedElements,
           this.dx,
-          this.dy
-        )
+          this.dy,
+        ),
       );
     }
   }
   afterEnd() {
-    // do nothing
+    this.editor.sceneGraph.showOutline = true;
+    this.editor.sceneGraph.render();
   }
 }
