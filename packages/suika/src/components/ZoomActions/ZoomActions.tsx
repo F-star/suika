@@ -50,33 +50,59 @@ export const ZoomActions: FC = () => {
       </div>
       {popoverVisible && (
         <div className="popover">
-          <ActionItem
-            onClick={() => {
-              editor?.zoomManager.zoomIn();
-              editor?.sceneGraph.render();
-              setPopoverVisible(false);
-            }}
-          >
-            <FormattedMessage id="zoom.zoomIn" />
-          </ActionItem>
-          <ActionItem
-            onClick={() => {
-              editor?.zoomManager.zoomOut();
-              editor?.sceneGraph.render();
-              setPopoverVisible(false);
-            }}
-          >
-            <FormattedMessage id="zoom.zoomOut" />
-          </ActionItem>
-          <ActionItem
-            onClick={() => {
-              editor?.zoomManager.zoomToFit();
-              editor?.sceneGraph.render();
-              setPopoverVisible(false);
-            }}
-          >
-            <FormattedMessage id="zoom.zoomToFit" />
-          </ActionItem>
+          {(
+            [
+              {
+                id: 'zoom.zoomIn',
+                action: () => {
+                  editor?.zoomManager.zoomIn();
+                },
+              },
+              {
+                id: 'zoom.zoomOut',
+                action: () => {
+                  editor?.zoomManager.zoomOut();
+                },
+              },
+              {
+                id: 'zoom.zoomToFit',
+                action: () => {
+                  editor?.zoomManager.zoomToFit();
+                },
+              },
+              {
+                id: 'zoom.zoomTo50',
+                action: () => {
+                  editor?.zoomManager.setZoomAndUpdateViewport(0.5);
+                },
+              },
+              {
+                id: 'zoom.zoomTo100',
+                action: () => {
+                  editor?.zoomManager.setZoomAndUpdateViewport(1);
+                },
+              },
+              {
+                id: 'zoom.zoomTo200',
+                action: () => {
+                  editor?.zoomManager.setZoomAndUpdateViewport(2);
+                },
+              },
+            ] as const
+          ).map((item) => {
+            return (
+              <ActionItem
+                key={item.id}
+                onClick={() => {
+                  item.action();
+                  editor?.sceneGraph.render();
+                  setPopoverVisible(false);
+                }}
+              >
+                <FormattedMessage id={item.id} />
+              </ActionItem>
+            );
+          })}
           <div className="separator" />
           <ActionItem
             check={setting.enablePixelGrid}

@@ -19,6 +19,9 @@ export const zh: typeof en = {
   'zoom.zoomIn': '放大',
   'zoom.zoomOut': '缩小',
   'zoom.zoomToFit': '适应画布',
+  'zoom.zoomTo50': '50%',
+  'zoom.zoomTo100': '100%',
+  'zoom.zoomTo200': '200%',
 
   'setting.grid.pixelGrid': '显示像素网格',
   'setting.grid.snapToPixelGrid': '对齐像素网格',
