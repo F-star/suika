@@ -17,7 +17,7 @@ export const en = {
 
   'zoom.zoomIn': 'Zoom in',
   'zoom.zoomOut': 'zoom out',
-  'zoom.zoomToFit': 'Zoom to fix',
+  'zoom.zoomToFit': 'Zoom to fit',
 
   'setting.grid.pixelGrid': 'Pixel grid',
   'setting.grid.snapToPixelGrid': 'Snap to pixel grid',
