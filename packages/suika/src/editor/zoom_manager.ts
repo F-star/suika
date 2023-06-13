@@ -106,16 +106,15 @@ export class ZoomManager {
     });
   }
   getCanvasCenter() {
-    const width = this.editor.canvasElement.width;
-    const height = this.editor.canvasElement.height;
+    const { width, height } = this.editor.viewportManager.getViewport();
     return {
       x: width / 2,
       y: height / 2,
     };
   }
   /**
-   * 调整 scroll 值
-   * 滚轮缩放时，选中点作为缩放中心进行缩放
+   * adjust scroll value
+   * if no set (cx, cy), scale by canvas center
    */
   adjustScroll(
     cx: number | undefined,
