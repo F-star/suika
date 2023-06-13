@@ -3,10 +3,11 @@ import classNames from 'classnames';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../context';
 import { SettingValue } from '../../editor/setting';
-import { ActionItem } from './components/ActionItem/ActionItem';
-import './ZoomActions.scss';
+import { ActionItem } from './components/ActionItem';
 import { FormattedMessage } from 'react-intl';
 import { ArrowDownOutlined } from '@suika/icons';
+import './ZoomActions.scss';
+import { ZoomInput } from './components/ZoomInput';
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);
@@ -50,6 +51,16 @@ export const ZoomActions: FC = () => {
       </div>
       {popoverVisible && (
         <div className="popover">
+          <div className="zoom-input-box">
+            <ZoomInput
+              defaultValue={zoom}
+              onChange={(newZoom) => {
+                editor?.zoomManager.setZoomAndUpdateViewport(newZoom);
+                editor?.sceneGraph.render();
+              }}
+            />
+          </div>
+          <div className="separator" />
           {(
             [
               {
