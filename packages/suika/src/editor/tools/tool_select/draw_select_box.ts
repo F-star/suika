@@ -26,7 +26,7 @@ export class DrawSelectionBox implements IBaseTool {
       this.editor.selectedElements.clear();
     }
 
-    const pos = this.editor.getPointerXY(e);
+    const pos = this.editor.getCursorXY(e);
     this.lastPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     this.editor.sceneGraph.render();
@@ -34,7 +34,7 @@ export class DrawSelectionBox implements IBaseTool {
     this.editor.sceneGraph.setSelection(this.lastPointer);
   }
   drag(e: PointerEvent) {
-    const pos = this.editor.getPointerXY(e);
+    const pos = this.editor.getCursorXY(e);
     const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     const box = getRectByTwoCoord(this.lastPointer, pointer);

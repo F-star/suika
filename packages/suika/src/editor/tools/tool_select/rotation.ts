@@ -1,7 +1,11 @@
 import hotkeys from 'hotkeys-js';
 import { IPoint } from '../../../type.interface';
 import { getClosestVal } from '../../../utils/common';
-import { calcVectorRadian, getRectCenterPoint, normalizeAngle } from '../../../utils/graphics';
+import {
+  calcVectorRadian,
+  getRectCenterPoint,
+  normalizeAngle,
+} from '../../../utils/graphics';
 import { transformRotate } from '../../../utils/transform';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
@@ -37,8 +41,11 @@ export class SelectRotationTool implements IBaseTool {
     hotkeys.unbind('*', this.shiftPressHandler);
   }
   start(e: PointerEvent) {
-    const viewportPos = this.editor.getPointerXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(viewportPos.x, viewportPos.y);
+    const viewportPos = this.editor.getCursorXY(e);
+    this.startPointer = this.editor.viewportCoordsToScene(
+      viewportPos.x,
+      viewportPos.y,
+    );
     this.lastPointer = null;
     this.dRotation = 0;
 
@@ -59,11 +66,16 @@ export class SelectRotationTool implements IBaseTool {
 
     // 记录组合包围盒的中心点
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
-    this.selectedElementsBBoxCenter = selectedElementsBBox ? getRectCenterPoint(selectedElementsBBox) : null;
+    this.selectedElementsBBoxCenter = selectedElementsBBox
+      ? getRectCenterPoint(selectedElementsBBox)
+      : null;
   }
   drag(e: PointerEvent) {
-    const viewportPos = this.editor.getPointerXY(e);
-    this.lastPointer = this.editor.viewportCoordsToScene(viewportPos.x, viewportPos.y);
+    const viewportPos = this.editor.getCursorXY(e);
+    this.lastPointer = this.editor.viewportCoordsToScene(
+      viewportPos.x,
+      viewportPos.y,
+    );
 
     this.rotateSelectedElements();
   }
@@ -89,19 +101,18 @@ export class SelectRotationTool implements IBaseTool {
       this.dRotation = dRotation;
 
       element.rotation = dRotation;
-    }
-    /**** 旋转多个元素 ****/
-    else if (selectedElements.length > 1) {
+    } else if (selectedElements.length > 1) {
+      /**** 旋转多个元素 ****/
       const selectedElementsBBox = this.editor.selectedElements.getBBox();
       if (selectedElementsBBox) {
-        const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] =
-          this.selectedElementsBBoxCenter as [number, number];
+        const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] = this
+          .selectedElementsBBoxCenter as [number, number];
 
         let dRotation = calcVectorRadian(
           cxInSelectedElementsBBox,
           cyInSelectedElementsBBox,
           lastPointer.x,
-          lastPointer.y
+          lastPointer.y,
         );
         if (this.editor.hostEventManager.isShiftPressing) {
           const lockRotation = this.editor.setting.get('lockRotation');
@@ -122,7 +133,7 @@ export class SelectRotationTool implements IBaseTool {
             cy,
             dRotation,
             cxInSelectedElementsBBox,
-            cyInSelectedElementsBBox
+            cyInSelectedElementsBBox,
           );
 
           const x = newCx - prevElementHalfSizes[i][0];
@@ -149,8 +160,8 @@ export class SelectRotationTool implements IBaseTool {
             {
               rotation: this.dRotation,
             },
-            this.prevRotations.map((rotation) => ({ rotation }))
-          )
+            this.prevRotations.map((rotation) => ({ rotation })),
+          ),
         );
       } else {
         this.editor.commandManager.pushCommand(
@@ -166,8 +177,8 @@ export class SelectRotationTool implements IBaseTool {
               rotation,
               x: this.prevElementXYs[index][0],
               y: this.prevElementXYs[index][1],
-            }))
-          )
+            })),
+          ),
         );
       }
       // TODO: 多选的历史记录实现

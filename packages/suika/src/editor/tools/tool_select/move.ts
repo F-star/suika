@@ -36,7 +36,7 @@ export class SelectMoveTool implements IBaseTool {
     this.unbindEvents();
   }
   start(e: PointerEvent) {
-    const viewportPos = this.editor.getPointerXY(e);
+    const viewportPos = this.editor.getCursorXY(e);
     this.startPointer = this.editor.viewportCoordsToScene(
       viewportPos.x,
       viewportPos.y,
@@ -56,7 +56,7 @@ export class SelectMoveTool implements IBaseTool {
     }
   }
   drag(e: PointerEvent) {
-    this.dragPointer = this.editor.getPointerXY(e);
+    this.dragPointer = this.editor.getCursorXY(e);
     this.move();
   }
   private move() {
