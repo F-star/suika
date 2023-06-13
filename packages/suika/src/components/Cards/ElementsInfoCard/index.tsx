@@ -40,7 +40,7 @@ const ElementsInfoCards: FC = () => {
         if (items.length > 0) {
           let [newRotatedX, newRotatedY]: [
             number | typeof MIXED,
-            number | typeof MIXED
+            number | typeof MIXED,
           ] = getElementRotatedXY(items[0]);
           let newWidth: number | typeof MIXED = items[0].width;
           let newHeight: number | typeof MIXED = items[0].height;
@@ -68,17 +68,21 @@ const ElementsInfoCards: FC = () => {
           }
 
           setRotatedX(
-            newRotatedX === MIXED ? newRotatedX : remainTwoDecimal(newRotatedX as number)
+            newRotatedX === MIXED
+              ? newRotatedX
+              : remainTwoDecimal(newRotatedX as number),
           );
           setRotatedY(
-            newRotatedY === MIXED ? newRotatedY : remainTwoDecimal(newRotatedY as number)
+            newRotatedY === MIXED
+              ? newRotatedY
+              : remainTwoDecimal(newRotatedY as number),
           );
           setWidth(newWidth);
           setHeight(newHeight);
           setRotation(
             newRotation === MIXED
               ? newRotation
-              : remainTwoDecimal(radian2Degree(newRotation as number))
+              : remainTwoDecimal(radian2Degree(newRotation as number)),
           );
         }
       };
@@ -103,7 +107,7 @@ const ElementsInfoCards: FC = () => {
                 MutateElementsAndRecord.setRotateX(
                   editor,
                   elements,
-                  newRotatedX
+                  newRotatedX,
                 );
                 editor.sceneGraph.render();
               }
@@ -120,7 +124,7 @@ const ElementsInfoCards: FC = () => {
                 MutateElementsAndRecord.setRotateY(
                   editor,
                   elements,
-                  newRotatedY
+                  newRotatedY,
                 );
                 editor.sceneGraph.render();
               }
@@ -175,7 +179,7 @@ const ElementsInfoCards: FC = () => {
                 MutateElementsAndRecord.setRotation(
                   editor,
                   elements,
-                  newRotation
+                  newRotation,
                 );
                 editor.sceneGraph.render();
               }
