@@ -119,7 +119,7 @@ class HostEventManager {
     const handler = (event: WheelEvent) => {
       if (this.isCtrlPressing || this.isCommandPressing) {
         event.preventDefault();
-        const { x: cx, y: cy } = this.editor.getPointerXY(event);
+        const { x: cx, y: cy } = this.editor.getCursorXY(event);
         if (event.deltaY > 0) {
           editor.zoomManager.zoomOut(cx, cy);
           editor.sceneGraph.render();
@@ -131,7 +131,7 @@ class HostEventManager {
         const zoom = editor.zoomManager.getZoom();
         editor.viewportManager.translate(
           event.deltaX / zoom,
-          event.deltaY / zoom
+          event.deltaY / zoom,
         );
         editor.sceneGraph.render();
       }
@@ -157,20 +157,26 @@ class HostEventManager {
       if (this.isEnableDragCanvasBySpace && this.isSpacePressing) {
         this.editor.setCursor('grabbing');
         this.isDraggingCanvasBySpace = true;
-        startPointer = this.editor.getPointerXY(event);
+        startPointer = this.editor.getCursorXY(event);
         prevViewport = this.editor.viewportManager.getViewport();
       }
     };
-    this.editor.canvasElement.addEventListener('pointerdown', pointerdownHandler);
+    this.editor.canvasElement.addEventListener(
+      'pointerdown',
+      pointerdownHandler,
+    );
 
     // drag canvas when mouse move
     const pointermoveHandler = (event: PointerEvent) => {
       if (startPointer) {
-        const viewportPos = this.editor.getPointerXY(event);
+        const viewportPos = this.editor.getCursorXY(event);
         const dx = viewportPos.x - startPointer.x;
         const dy = viewportPos.y - startPointer.y;
         const dragBlockStep = this.editor.setting.get('dragBlockStep');
-        if (!isEnableDrag && Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep) {
+        if (
+          (!isEnableDrag && Math.abs(dx) > dragBlockStep) ||
+          Math.abs(dy) > dragBlockStep
+        ) {
           isEnableDrag = true;
         }
         if (isEnableDrag) {
@@ -178,7 +184,10 @@ class HostEventManager {
           const viewportX = prevViewport.x - dx / zoom;
           const viewportY = prevViewport.y - dy / zoom;
 
-          this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
+          this.editor.viewportManager.setViewport({
+            x: viewportX,
+            y: viewportY,
+          });
           this.editor.sceneGraph.render();
         }
       }
@@ -200,7 +209,10 @@ class HostEventManager {
     window.addEventListener('pointerup', pointerupHandler);
 
     this.unbindHandlers.push(() => {
-      this.editor.canvasElement.removeEventListener('pointerdown', pointerdownHandler);
+      this.editor.canvasElement.removeEventListener(
+        'pointerdown',
+        pointerdownHandler,
+      );
       window.removeEventListener('pointermove', pointermoveHandler);
       window.removeEventListener('pointerup', pointerupHandler);
     });
@@ -239,7 +251,7 @@ class HostEventManager {
   }
   destroy() {
     hotkeys.unbind();
-    this.unbindHandlers.forEach(fn => fn());
+    this.unbindHandlers.forEach((fn) => fn());
     this.unbindHandlers = [];
   }
 }

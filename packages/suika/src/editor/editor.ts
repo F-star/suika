@@ -113,7 +113,7 @@ export class Editor {
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
     return sceneCoordsToViewportUtil(x, y, zoom, scrollX, scrollY);
   }
-  getPointerXY(event: PointerEvent | WheelEvent) {
+  getCursorXY(event: PointerEvent | WheelEvent) {
     return {
       x: event.clientX - this.setting.get('offsetX'),
       y: event.clientY - this.setting.get('offsetY'),

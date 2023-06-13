@@ -41,7 +41,7 @@ export class SelectTool implements ITool {
     if (this.editor.hostEventManager.isSpacePressing) {
       return;
     }
-    const pos = this.editor.getPointerXY(e);
+    const pos = this.editor.getCursorXY(e);
     const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     const transformHandle = this.editor.sceneGraph.transformHandle;
@@ -70,7 +70,7 @@ export class SelectTool implements ITool {
     const selectedElements = this.editor.selectedElements;
     const isShiftPressing = this.editor.hostEventManager.isShiftPressing;
 
-    const pos = this.editor.getPointerXY(e);
+    const pos = this.editor.getCursorXY(e);
     this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     // 0. 点中 handle（旋转点）

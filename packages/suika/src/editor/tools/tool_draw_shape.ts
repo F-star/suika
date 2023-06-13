@@ -43,7 +43,7 @@ export abstract class DrawShapeTool implements ITool {
         this.lastDragPointer = editor.viewportCoordsToScene(
           this.lastDragPointerInViewport.x,
           this.lastDragPointerInViewport.y,
-          this.editor.setting.get('snapToPixelGrid')
+          this.editor.setting.get('snapToPixelGrid'),
         );
         this.updateRect();
       }
@@ -67,11 +67,11 @@ export abstract class DrawShapeTool implements ITool {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
-    const pos = this.editor.getPointerXY(e);
+    const pos = this.editor.getCursorXY(e);
     this.startPointer = this.editor.viewportCoordsToScene(
       pos.x,
       pos.y,
-      this.editor.setting.get('snapToPixelGrid')
+      this.editor.setting.get('snapToPixelGrid'),
     );
     this.drawingShape = null;
     this.isDragging = false;
@@ -83,12 +83,12 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
     this.isDragging = true;
-    this.lastDragPointerInViewport = this.editor.getPointerXY(e);
-    const pos = this.editor.getPointerXY(e);
+    this.lastDragPointerInViewport = this.editor.getCursorXY(e);
+    const pos = this.editor.getCursorXY(e);
     this.lastDragPointer = this.editor.viewportCoordsToScene(
       pos.x,
       pos.y,
-      this.editor.setting.get('snapToPixelGrid')
+      this.editor.setting.get('snapToPixelGrid'),
     );
     this.updateRect();
   }
@@ -140,11 +140,11 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
 
-    const pos = this.editor.getPointerXY(e);
+    const pos = this.editor.getCursorXY(e);
     const endPointer = this.editor.viewportCoordsToScene(
       pos.x,
       pos.y,
-      this.editor.setting.get('snapToPixelGrid')
+      this.editor.setting.get('snapToPixelGrid'),
     );
     if (this.drawingShape === null) {
       const { x: cx, y: cy } = endPointer;
@@ -165,7 +165,7 @@ export abstract class DrawShapeTool implements ITool {
     }
 
     this.editor.commandManager.pushCommand(
-      new AddShapeCommand(this.commandDesc, this.editor, this.drawingShape)
+      new AddShapeCommand(this.commandDesc, this.editor, this.drawingShape),
     );
   }
 
