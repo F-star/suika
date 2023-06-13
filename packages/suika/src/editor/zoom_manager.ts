@@ -16,6 +16,18 @@ export class ZoomManager {
   }
   setZoom(zoom: number) {
     const prevZoom = this.zoom;
+
+    // limit zoom range
+    const zoomMax = this.editor.setting.get('zoomMax');
+    if (zoom > zoomMax) {
+      zoom = zoomMax;
+    }
+
+    const zoomMin = this.editor.setting.get('zoomMin');
+    if (zoom < zoomMin) {
+      zoom = zoomMin;
+    }
+
     this.zoom = zoom;
     Promise.resolve().then(() => {
       // 异步通知
