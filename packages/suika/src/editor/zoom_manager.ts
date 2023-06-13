@@ -22,7 +22,7 @@ export class ZoomManager {
       this.eventEmitter.emit('zoomChange', zoom, prevZoom);
     });
   }
-  setZoomAndAdjustScroll(zoom: number) {
+  setZoomAndUpdateViewport(zoom: number) {
     const prevZoom = this.zoom;
     this.setZoom(zoom);
     this.adjustScroll(undefined, undefined, prevZoom);
