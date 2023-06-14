@@ -11,6 +11,8 @@ import { SelectRotationTool } from './rotation';
 export class SelectTool implements ITool {
   static type = 'select';
   type = 'select';
+  hotkey = 'v';
+
   startPointer: IPoint = { x: -1, y: -1 };
   drawingRect: Rect | null = null;
   currStrategy: IBaseTool | null = null;

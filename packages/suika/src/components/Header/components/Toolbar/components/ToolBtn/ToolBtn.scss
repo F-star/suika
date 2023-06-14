@@ -26,6 +26,11 @@
       background-color: #333333ee;
       white-space: nowrap;
       z-index: 2;
+
+      .tool-hotkey {
+        margin-left: 8px;
+        color: #ccc;
+      }
     }
 
     &:hover {

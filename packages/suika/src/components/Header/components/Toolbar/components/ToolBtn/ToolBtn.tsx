@@ -6,6 +6,7 @@ interface IToolBtn {
   className?: string;
   children?: React.ReactNode;
   tooltipContent: string;
+  hotkey: string;
   onClick: () => void;
 }
 
@@ -14,6 +15,7 @@ export const ToolBtn: FC<IToolBtn> = ({
   onClick,
   className,
   tooltipContent,
+  hotkey,
 }) => {
   return (
     <div
@@ -23,7 +25,9 @@ export const ToolBtn: FC<IToolBtn> = ({
       }}
     >
       {children}
-      <div className="tooltip">{tooltipContent}</div>
+      <div className="tooltip">
+        {tooltipContent} <span className="tool-hotkey">{hotkey}</span>
+      </div>
     </div>
   );
 };

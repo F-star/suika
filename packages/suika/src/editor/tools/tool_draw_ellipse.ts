@@ -6,6 +6,7 @@ import { ITool } from './type';
 export class DrawEllipseTool extends DrawShapeTool implements ITool {
   static type = 'drawEllipse';
   type = 'drawEllipse';
+  hotkey = 'o';
 
   constructor(editor: Editor) {
     super(editor);

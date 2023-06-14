@@ -6,6 +6,7 @@ import { ITool } from './type';
 export class DrawRectTool extends DrawShapeTool implements ITool {
   static type = 'drawRect';
   type = 'drawRect';
+  hotkey = 'r';
 
   constructor(editor: Editor) {
     super(editor);

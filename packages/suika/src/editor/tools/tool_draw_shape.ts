@@ -11,6 +11,7 @@ export abstract class DrawShapeTool implements ITool {
   static type = 'drawShape';
   type = 'drawShape';
   commandDesc = 'Add Shape';
+  hotkey = '';
 
   ShapeCtor: typeof Graph = Graph;
 
@@ -173,6 +174,6 @@ export abstract class DrawShapeTool implements ITool {
     this.isDragging = false;
     this.editor.hostEventManager.enableDelete();
     this.editor.hostEventManager.enableContextmenu();
-    this.editor.toolManager.setTool('select');
+    this.editor.toolManager.setActiveTool('select');
   }
 }
