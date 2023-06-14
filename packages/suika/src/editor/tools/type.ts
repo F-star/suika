@@ -1,4 +1,5 @@
 export interface ITool extends IBaseTool {
+  hotkey: string;
   type: string;
   moveExcludeDrag: (event: PointerEvent) => void;
 }

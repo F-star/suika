@@ -8,6 +8,7 @@ import { ITool } from './type';
 export class DragCanvasTool implements ITool {
   static type = 'dragCanvas';
   type = 'dragCanvas';
+  hotkey = 'h';
   startPointer: IPoint = { x: -1, y: -1 };
   prevViewport!: IBox;
 

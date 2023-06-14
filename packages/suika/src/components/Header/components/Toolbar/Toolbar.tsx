@@ -18,7 +18,7 @@ export const ToolBar = () => {
 
   useEffect(() => {
     if (editor) {
-      setCurrTool(editor.toolManager.getToolName() || '');
+      setCurrTool(editor.toolManager.getActiveToolName() || '');
       editor.toolManager.on('change', (toolName: string) => {
         setCurrTool(toolName);
       });
@@ -29,19 +29,27 @@ export const ToolBar = () => {
     <div className="suika-tool-bar">
       {(
         [
-          { name: 'select', intlId: 'tool.select', icon: <SelectOutlined /> },
+          {
+            name: 'select',
+            hotkey: 'V',
+            intlId: 'tool.select',
+            icon: <SelectOutlined />,
+          },
           {
             name: 'drawRect',
+            hotkey: 'R',
             intlId: 'tool.rectangle',
             icon: <RectOutlined />,
           },
           {
             name: 'drawEllipse',
+            hotkey: 'O',
             intlId: 'tool.ellipse',
             icon: <EllipseOutlined />,
           },
           {
             name: 'dragCanvas',
+            hotkey: 'H',
             intlId: 'tool.hand',
             icon: <HandOutlined />,
           },
@@ -51,8 +59,9 @@ export const ToolBar = () => {
           key={tool.name}
           className={classNames({ active: currTool === tool.name })}
           tooltipContent={intl.formatMessage({ id: tool.intlId })}
+          hotkey={tool.hotkey}
           onClick={() => {
-            editor?.toolManager.setTool(tool.name);
+            editor?.toolManager.setActiveTool(tool.name);
           }}
         >
           {tool.icon}

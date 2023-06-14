@@ -1,3 +1,4 @@
+import hotkeys from 'hotkeys-js';
 import { noop } from '../../utils/common';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
@@ -13,24 +14,40 @@ interface Events {
 
 export class ToolManager {
   toolMap = new Map<string, ITool>();
+  hotkeyMap = new Map<string, string>();
+
   currentTool: ITool | null = null;
   eventEmitter = new EventEmitter<Events>();
+
+  enableSwitchTool = true;
+
   _unbindEvent: () => void;
   constructor(private editor: Editor) {
-    // 绑定 tool
-    this.toolMap.set(DrawRectTool.type, new DrawRectTool(editor));
-    this.toolMap.set(DrawEllipseTool.type, new DrawEllipseTool(editor));
-    this.toolMap.set(SelectTool.type, new SelectTool(editor));
-    this.toolMap.set(DragCanvasTool.type, new DragCanvasTool(editor));
+    this.registerToolAndHotKey(new SelectTool(editor));
+    this.registerToolAndHotKey(new DrawRectTool(editor));
+    this.registerToolAndHotKey(new DrawEllipseTool(editor));
+    this.registerToolAndHotKey(new DragCanvasTool(editor));
 
-    this.setTool(DrawRectTool.type);
+    this.setActiveTool(SelectTool.type);
 
     this._unbindEvent = this.bindEvent();
   }
-  getToolName() {
+  registerToolAndHotKey(tool: ITool) {
+    if (this.toolMap.has(tool.type)) {
+      console.warn(`tool "${tool.type}" had exit, replace it!`);
+    }
+    this.toolMap.set(tool.type, tool);
+
+    if (this.hotkeyMap.has(tool.hotkey)) {
+      console.warn(`hotkey "${tool.type}" had exit, replace it!`);
+    }
+    this.hotkeyMap.set(tool.hotkey, tool.type);
+  }
+  getActiveToolName() {
     return this.currentTool?.type;
   }
-  bindEvent() {
+  private bindEvent() {
+    // (1) drag block strategy
     let isPressing = false;
     let startPos: [x: number, y: number] = [0, 0];
     let isEnableDrag = false;
@@ -69,6 +86,7 @@ export class ToolManager {
           isEnableDrag = true;
         }
         if (isEnableDrag) {
+          this.enableSwitchTool = false;
           this.editor.hostEventManager.disableDragBySpace();
           this.currentTool.drag(e);
         }
@@ -77,13 +95,14 @@ export class ToolManager {
       }
     };
     const handleUp = (e: PointerEvent) => {
+      this.enableSwitchTool = true;
+
       if (!startWithLeftMouse) {
         return;
       }
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
-
 
       if (isPressing) {
         this.editor.hostEventManager.enableDragBySpace();
@@ -99,17 +118,38 @@ export class ToolManager {
     window.addEventListener('pointermove', handleMove);
     window.addEventListener('pointerup', handleUp);
 
+    // (2) tool hotkey
+    const handler = (e: KeyboardEvent) => {
+      const key = e.key;
+      if (
+        !e.shiftKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        !e.metaKey &&
+        this.hotkeyMap.has(key)
+      ) {
+        const type = this.hotkeyMap.get(key)!;
+        this.setActiveTool(type);
+      }
+    };
+    hotkeys('*', { keydown: true }, handler);
+
     return function unbindEvent() {
       canvas.removeEventListener('pointerdown', handleDown);
       window.removeEventListener('pointermove', handleMove);
       window.removeEventListener('pointerup', handleUp);
+      hotkeys.unbind('*', handler);
     };
   }
   unbindEvent() {
     this._unbindEvent();
     this._unbindEvent = noop;
   }
-  setTool(toolName: string) {
+  setActiveTool(toolName: string) {
+    if (!this.enableSwitchTool) {
+      return;
+    }
+
     const prevTool = this.currentTool;
     const currentTool = (this.currentTool = this.toolMap.get(toolName) || null);
     if (!currentTool) {
