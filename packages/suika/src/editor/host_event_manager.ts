@@ -6,6 +6,10 @@ import hotkeys from 'hotkeys-js';
 import { IBox, IPoint } from '../type.interface';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
+import { ArrMap } from '../utils/array_util';
+import { SetElementsAttrs } from './commands/set_elements_attrs';
+import { Graph } from './scene/graph';
+import debounce from 'lodash.debounce';
 
 interface Events {
   shiftToggle(): void;
@@ -22,6 +26,7 @@ class HostEventManager {
   isEnableDragCanvasBySpace = true;
   isEnableDelete = true;
   isEnableContextMenu = true;
+  isEnableMoveSelectedElementByKey = true;
 
   private prevCursor = '';
   private eventEmitter = new EventEmitter<Events>();
@@ -34,6 +39,7 @@ class HostEventManager {
     this.bindWheelEventToZoom(); // 滚轮移动画布
     this.bindDragCanvasEvent(); // 空格和拖拽移动画布
     this.bindContextMenu();
+    this.bindMoveSelectedElementByKeyEvent();
   }
   private bindModifiersRecordEvent() {
     // record if shift, ctrl, command is pressed
@@ -228,6 +234,73 @@ class HostEventManager {
     this.editor.canvasElement.addEventListener('contextmenu', handler);
     this.unbindHandlers.push(() => {
       this.editor.canvasElement.removeEventListener('contextmenu', handler);
+    });
+  }
+
+  private bindMoveSelectedElementByKeyEvent() {
+    const editor = this.editor;
+    let startPoints: IPoint[] = [];
+
+    const recordDebounce = debounce((moveEls: Graph[]) => {
+      editor.commandManager.pushCommand(
+        new SetElementsAttrs(
+          'move elements',
+          moveEls,
+          ArrMap(moveEls, ({ x, y }) => ({ x, y })),
+          startPoints,
+        ),
+      );
+    }, editor.setting.get('moveElementsDelay'));
+
+    const pressed = {
+      ArrowLeft: false,
+      ArrowRight: false,
+      ArrowUp: false,
+      ArrowDown: false,
+    };
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      const movedEls = editor.selectedElements.getItems();
+      if (movedEls.length === 0) return;
+
+      if (this.isEnableMoveSelectedElementByKey) {
+        if (event.key in pressed) {
+          pressed[event.key as keyof typeof pressed] = true;
+        }
+        startPoints = ArrMap(movedEls, (el) => ({ x: el.x, y: el.y }));
+        let step = editor.setting.get('moveElementsStep');
+        if (event.shiftKey) step = editor.setting.get('moveElementsStepFast');
+
+        if (pressed.ArrowLeft) {
+          editor.moveElements(movedEls, -step, 0);
+        }
+        if (pressed.ArrowRight) {
+          editor.moveElements(movedEls, step, 0);
+        }
+        if (pressed.ArrowUp) {
+          editor.moveElements(movedEls, 0, -step);
+        }
+        if (pressed.ArrowDown) {
+          editor.moveElements(movedEls, 0, step);
+        }
+      }
+      recordDebounce(movedEls);
+      editor.sceneGraph.render();
+    };
+
+    const handleKeyup = (e: KeyboardEvent) => {
+      const key = e.key;
+      if (key in pressed) {
+        pressed[key as keyof typeof pressed] = false;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    window.addEventListener('keyup', handleKeyup);
+
+    this.unbindHandlers.push(() => {
+      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('keyup', handleKeyup);
     });
   }
 

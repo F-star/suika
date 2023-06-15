@@ -1,4 +1,4 @@
-import { Rect } from '../scene/rect';
+import { Graph } from '../scene/graph';
 import { ITexture } from '../texture';
 import { ICommand } from './type';
 
@@ -18,9 +18,9 @@ export class SetElementsAttrs implements ICommand {
   static readonly type = 'SetElementsAttrs';
   constructor(
     public desc: string,
-    private elements: Rect[],
+    private elements: Graph[],
     private attrs: IAttrs | IAttrs[],
-    private prevAttrs: IAttrs[]
+    private prevAttrs: IAttrs[],
   ) {
     if (elements.length !== prevAttrs.length) {
       throw new Error('elements 和 preAttrs 数量不匹配');

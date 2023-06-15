@@ -57,6 +57,10 @@ export class Setting {
     offsetY: 0,
 
     zoomToFixPadding: 100, // base viewport coord
+
+    moveElementsStep: 1,
+    moveElementsStepFast: 10,
+    moveElementsDelay: 500,
   };
 
   set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {

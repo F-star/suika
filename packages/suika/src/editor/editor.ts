@@ -12,6 +12,7 @@ import { ToolManager } from './tools/tool_manager';
 import { ViewportManager } from './viewport_manager';
 import { ZoomManager } from './zoom_manager';
 import { AutoSaveGraphs } from './store/auto-save-graphs';
+import { IGraph } from './scene/graph';
 
 interface IEditorOptions {
   canvasElement: HTMLCanvasElement;
@@ -118,5 +119,11 @@ export class Editor {
       x: event.clientX - this.setting.get('offsetX'),
       y: event.clientY - this.setting.get('offsetY'),
     };
+  }
+  moveElements(elements: IGraph[], dx: number, dy: number) {
+    for (const element of elements) {
+      element.x += dx;
+      element.y += dy;
+    }
   }
 }
