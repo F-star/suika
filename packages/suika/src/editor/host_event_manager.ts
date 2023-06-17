@@ -26,7 +26,7 @@ class HostEventManager {
   isEnableDragCanvasBySpace = true;
   isEnableDelete = true;
   isEnableContextMenu = true;
-  isEnableMoveSelectedElementByKey = true;
+  // isEnableMoveSelectedElementByKey = true; // TODO: no use now
 
   private prevCursor = '';
   private eventEmitter = new EventEmitter<Events>();
@@ -240,17 +240,24 @@ class HostEventManager {
   private bindMoveSelectedElementByKeyEvent() {
     const editor = this.editor;
     let startPoints: IPoint[] = [];
+    let isEnableUpdateStartPoints = true;
 
     const recordDebounce = debounce((moveEls: Graph[]) => {
+      isEnableUpdateStartPoints = true;
+      this.editor.commandManager.enableRedoUndo();
       editor.commandManager.pushCommand(
         new SetElementsAttrs(
-          'move elements',
+          'Move elements',
           moveEls,
           ArrMap(moveEls, ({ x, y }) => ({ x, y })),
           startPoints,
         ),
       );
     }, editor.setting.get('moveElementsDelay'));
+
+    const flushRecordDebounce = () => {
+      recordDebounce.flush();
+    };
 
     const pressed = {
       ArrowLeft: false,
@@ -259,31 +266,43 @@ class HostEventManager {
       ArrowDown: false,
     };
 
+    const checkPressed = () =>
+      pressed.ArrowLeft ||
+      pressed.ArrowRight ||
+      pressed.ArrowUp ||
+      pressed.ArrowDown;
+
     const handleKeydown = (event: KeyboardEvent) => {
       const movedEls = editor.selectedElements.getItems();
       if (movedEls.length === 0) return;
 
-      if (this.isEnableMoveSelectedElementByKey) {
-        if (event.key in pressed) {
-          pressed[event.key as keyof typeof pressed] = true;
-        }
-        startPoints = ArrMap(movedEls, (el) => ({ x: el.x, y: el.y }));
-        let step = editor.setting.get('moveElementsStep');
-        if (event.shiftKey) step = editor.setting.get('moveElementsStepFast');
-
-        if (pressed.ArrowLeft) {
-          editor.moveElements(movedEls, -step, 0);
-        }
-        if (pressed.ArrowRight) {
-          editor.moveElements(movedEls, step, 0);
-        }
-        if (pressed.ArrowUp) {
-          editor.moveElements(movedEls, 0, -step);
-        }
-        if (pressed.ArrowDown) {
-          editor.moveElements(movedEls, 0, step);
-        }
+      if (event.key in pressed) {
+        pressed[event.key as keyof typeof pressed] = true;
       }
+      if (!checkPressed()) return;
+
+      if (isEnableUpdateStartPoints) {
+        startPoints = ArrMap(movedEls, (el) => ({ x: el.x, y: el.y }));
+        isEnableUpdateStartPoints = false;
+      }
+
+      let step = editor.setting.get('moveElementsStep');
+      if (event.shiftKey) step = editor.setting.get('moveElementsStepFast');
+
+      if (pressed.ArrowLeft) {
+        editor.moveElements(movedEls, -step, 0);
+      }
+      if (pressed.ArrowRight) {
+        editor.moveElements(movedEls, step, 0);
+      }
+      if (pressed.ArrowUp) {
+        editor.moveElements(movedEls, 0, -step);
+      }
+      if (pressed.ArrowDown) {
+        editor.moveElements(movedEls, 0, step);
+      }
+
+      this.editor.commandManager.disableRedoUndo();
       recordDebounce(movedEls);
       editor.sceneGraph.render();
     };
@@ -297,10 +316,12 @@ class HostEventManager {
 
     window.addEventListener('keydown', handleKeydown);
     window.addEventListener('keyup', handleKeyup);
+    editor.commandManager.on('beforeExecCmd', flushRecordDebounce);
 
     this.unbindHandlers.push(() => {
       window.removeEventListener('keydown', handleKeydown);
       window.removeEventListener('keyup', handleKeyup);
+      editor.commandManager.off('beforeExecCmd', flushRecordDebounce);
     });
   }
 

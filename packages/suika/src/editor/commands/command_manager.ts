@@ -7,13 +7,16 @@ export interface IHistoryStatus {
   canUndo: boolean;
 }
 
+interface Events {
+  change(status: IHistoryStatus): void;
+  beforeExecCmd(): void;
+}
+
 export class CommandManager {
   redoStack: ICommand[] = [];
   undoStack: ICommand[] = [];
   private isEnableRedoUndo = true;
-  private emitter = new EventEmitter<{
-    change(status: IHistoryStatus): void;
-  }>();
+  private emitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
 
@@ -60,6 +63,7 @@ export class CommandManager {
     this.isEnableRedoUndo = false;
   }
   pushCommand(command: ICommand) {
+    this.emitter.emit('beforeExecCmd');
     console.log(
       `%c Exec %c ${command.desc}`,
       'background: #222; color: #bada55',
@@ -75,10 +79,10 @@ export class CommandManager {
       canUndo: this.undoStack.length > 0,
     });
   }
-  on(eventName: 'change', listener: (status: IHistoryStatus) => void) {
+  on<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.on(eventName, listener);
   }
-  off(eventName: 'change', listener: (status: IHistoryStatus) => void) {
+  off<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.off(eventName, listener);
   }
 }
