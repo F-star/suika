@@ -56,9 +56,6 @@ export class Editor {
 
     this.sceneGraph = new SceneGraph(this);
 
-    this.hostEventManager = new HostEventManager(this);
-    this.hostEventManager.bindHotkeys();
-
     this.viewportManager = new ViewportManager(this);
 
     this.toolManager = new ToolManager(this);
@@ -67,6 +64,9 @@ export class Editor {
 
     this.selectedElements = new SelectedElements(this);
     this.ruler = new Ruler(this);
+
+    this.hostEventManager = new HostEventManager(this);
+    this.hostEventManager.bindHotkeys();
 
     this.autoSaveGraphs = new AutoSaveGraphs(this);
     this.autoSaveGraphs.load();
