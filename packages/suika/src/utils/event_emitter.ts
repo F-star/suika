@@ -4,9 +4,7 @@
  * Publish-Subscribe Design Pattern
  */
 
-class EventEmitter<
-  T extends Record<string | symbol, any>
-> {
+class EventEmitter<T extends Record<string | symbol, any>> {
   private eventMap: Record<keyof T, Array<(...args: any[]) => void>> =
     {} as any;
 
@@ -28,12 +26,10 @@ class EventEmitter<
   }
 
   off<K extends keyof T>(eventName: K, listener: T[K]) {
-    const listeners = this.eventMap[eventName];
-    if (listeners && listeners.length > 0) {
-      const index = listeners.indexOf(listener);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
+    if (this.eventMap[eventName]) {
+      this.eventMap[eventName] = this.eventMap[eventName].filter(
+        (item) => item !== listener,
+      );
     }
     return this;
   }
