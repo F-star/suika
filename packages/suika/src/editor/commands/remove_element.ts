@@ -8,11 +8,12 @@ export class RemoveElement implements ICommand {
   constructor(
     public desc: string,
     private editor: Editor,
-    private removedElements: Graph[]
+    private removedElements: Graph[],
   ) {
     this.do();
   }
   private do() {
+    this.removedIndexes = [];
     const set = new Set(this.removedElements);
     if (set.size !== this.removedElements.length) {
       throw new Error('removedElements 不能有重复元素');
@@ -42,7 +43,7 @@ export class RemoveElement implements ICommand {
     const elements = sceneGraph.children;
     const removedIndexes = this.removedIndexes;
     const nextElements: Graph[] = new Array(
-      elements.length + removedIndexes.length
+      elements.length + removedIndexes.length,
     );
 
     let i = 0; // nextElements 的指针
