@@ -146,7 +146,7 @@ export class ToolManager {
     this._unbindEvent = noop;
   }
   setActiveTool(toolName: string) {
-    if (!this.enableSwitchTool) {
+    if (!this.enableSwitchTool || this.getActiveToolName() === toolName) {
       return;
     }
 
