@@ -1,14 +1,14 @@
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
 import { IBox, IBox2, GraphType } from '../../type.interface';
-import { genId } from '../../utils/common';
+import { calcCoverScale, genId } from '../../utils/common';
 import {
   getAbsoluteCoords,
   getElementRotatedXY,
   getRectCenterPoint,
 } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
-import { ITexture } from '../texture';
+import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 
 export interface IGraph {
   type?: GraphType;
@@ -166,6 +166,39 @@ export class Graph {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fillTexture(ctx: CanvasRenderingContext2D) {
     throw new Error('Method not implemented.');
+  }
+
+  fillImage(ctx: CanvasRenderingContext2D, texture: TextureImage) {
+    const src = texture.attrs.src;
+    const width = this.width;
+    const height = this.height;
+    let img: CanvasImageSource;
+    if (src) {
+      img = new Image();
+      img.src = src;
+      // TODO: rerender when image loaded, but notice endless loop
+    } else {
+      img = DEFAULT_IMAGE;
+      ctx.imageSmoothingEnabled = false;
+    }
+
+    // reference: https://mp.weixin.qq.com/s/TSpZv_0VJtxPTCCzEqDl8Q
+    const scale = calcCoverScale(img.width, img.height, width, height);
+
+    const sx = img.width / 2 - width / scale / 2;
+    const sy = img.height / 2 - height / scale / 2;
+
+    ctx.drawImage(
+      img,
+      sx,
+      sy,
+      width / scale,
+      height / scale,
+      this.x,
+      this.y,
+      width,
+      height,
+    );
   }
 }
 

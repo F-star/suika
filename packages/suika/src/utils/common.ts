@@ -1,4 +1,3 @@
-
 export const noop = () => {
   // do nothing
 };
@@ -69,7 +68,7 @@ export const sceneCoordsToViewportUtil = (
   y: number,
   zoom: number,
   scrollX: number,
-  scrollY: number
+  scrollY: number,
 ) => {
   return {
     x: (x - scrollX) * zoom,
@@ -143,4 +142,17 @@ export const shallowCompareArrays = (a1: unknown[], a2: unknown[]) => {
 
 export const getDevicePixelRatio = () => {
   return window.devicePixelRatio || 1;
+};
+
+export const calcCoverScale = (
+  w: number,
+  h: number,
+  cw: number,
+  ch: number,
+): number => {
+  if (w === 0 || h === 0) return 1;
+  const scaleW = cw / w;
+  const scaleH = ch / h;
+  const scale = Math.max(scaleW, scaleH);
+  return scale;
 };
