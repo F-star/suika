@@ -4,6 +4,8 @@ export const en = {
   mixed: 'Mixed',
   noSelectedShapes: 'No Selected Shapes',
 
+  uploadFile: 'Upload File',
+
   'tool.select': 'Select',
   'tool.rectangle': 'Rectangle',
   'tool.ellipse': 'Ellipse',

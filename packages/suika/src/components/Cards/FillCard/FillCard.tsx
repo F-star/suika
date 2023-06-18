@@ -5,11 +5,16 @@ import { parseRGBAStr, parseRGBToHex } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
 import './FillCard.scss';
 import { useIntl } from 'react-intl';
-import { ITexture, TextureType } from '../../../editor/texture';
+import {
+  DEFAULT_IMAGE_SRC,
+  ITexture,
+  TextureType,
+} from '../../../editor/texture';
 import { TexturePicker } from '../../ColorPicker/TexturePicker';
 import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { Popover } from '@suika/components';
+import { ArrMap } from '../../../utils/array_util';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -25,14 +30,26 @@ export const FillCard: FC = () => {
   const updateSelectedFills = (newTexture: ITexture, index: number) => {
     if (!editor) return;
     const newFill = [...fill];
+
     newFill[index] = newTexture;
     setFill(newFill);
 
     const selectItems = editor.selectedElements.getItems();
 
+    const prevFillAttrs: { fill: ITexture[] }[] = [];
     selectItems.forEach((item) => {
+      prevFillAttrs.push({ fill: item.fill });
       item.fill = cloneDeep(newFill);
     });
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        'Change fill',
+        selectItems,
+        ArrMap(selectItems, (item) => ({ fill: item.fill })),
+        prevFillAttrs,
+      ),
+    );
+
     return newFill;
   };
 
@@ -130,6 +147,29 @@ export const FillCard: FC = () => {
                   }}
                 />
                 {parseRGBToHex(texture.attrs)}
+              </div>
+            );
+          }
+          /** IMAGE */
+          if (texture.type === TextureType.Image) {
+            return (
+              <div className="fill-item" key={index}>
+                <div
+                  className="color-block"
+                  onClick={() => {
+                    setActiveIndex(index);
+                  }}
+                >
+                  <img
+                    style={{
+                      backgroundImage: `url(${texture.attrs.src})`,
+                      objectFit: 'contain',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                    src={texture.attrs.src || DEFAULT_IMAGE_SRC}
+                  />
+                </div>
               </div>
             );
           }
