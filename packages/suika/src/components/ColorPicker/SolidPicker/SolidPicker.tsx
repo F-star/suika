@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { SketchPicker } from 'react-color';
-import { IRGBA } from '../../editor/texture';
+import { IRGBA } from '../../../editor/texture';
 
 interface IProps {
   color: IRGBA;
@@ -8,7 +8,11 @@ interface IProps {
   onChangeComplete: (color: IRGBA) => void;
 }
 
-export const SolidPicker: FC<IProps> = ({ color, onChange, onChangeComplete }) => {
+export const SolidPicker: FC<IProps> = ({
+  color,
+  onChange,
+  onChangeComplete,
+}) => {
   const handleColor = (newColor: IRGBA) => {
     onChange(newColor);
   };

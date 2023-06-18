@@ -17,12 +17,8 @@ import { Graph, IGraph } from './graph';
 import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
 import { forEach } from '../../utils/array_util';
-import { parseRGBAStr } from '../../utils/color';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
-import { TextureType } from '../texture';
-
-const DOUBLE_PI = Math.PI * 2;
 
 interface Events {
   render(): void;
@@ -112,52 +108,12 @@ export class SceneGraph {
     ctx.scale(dpr * zoom, dpr * zoom);
     ctx.translate(-viewport.x, -viewport.y);
 
-    ctx.save();
     for (let i = 0, len = visibleElements.length; i < len; i++) {
+      ctx.save();
       const element = visibleElements[i];
-      if (element instanceof Rect) {
-        if (element.rotation) {
-          const cx = element.x + element.width / 2;
-          const cy = element.y + element.height / 2;
-          ctx.save();
-          rotateInCanvas(ctx, element.rotation, cx, cy);
-        }
-        ctx.beginPath();
-        ctx.rect(element.x, element.y, element.width, element.height);
-        forEach(element.fill, (texture) => {
-          if (texture.type === TextureType.Solid) {
-            ctx.fillStyle = parseRGBAStr(texture.attrs);
-            ctx.fill();
-          }
-        });
-        ctx.closePath();
-        if (element.rotation) {
-          ctx.restore();
-        }
-      } else if (element instanceof Ellipse) {
-        const cx = element.x + element.width / 2;
-        const cy = element.y + element.height / 2;
-
-        ctx.beginPath();
-        ctx.ellipse(
-          cx,
-          cy,
-          element.width / 2,
-          element.height / 2,
-          element.rotation || 0,
-          0,
-          DOUBLE_PI,
-        );
-        forEach(element.fill, (texture) => {
-          if (texture.type === TextureType.Solid) {
-            ctx.fillStyle = parseRGBAStr(texture.attrs);
-            ctx.fill();
-          }
-        });
-        ctx.closePath();
-      }
+      element.fillTexture(ctx);
+      ctx.restore();
     }
-    ctx.restore();
 
     /******************* 绘制辅助线层 ********************/
     ctx.save();

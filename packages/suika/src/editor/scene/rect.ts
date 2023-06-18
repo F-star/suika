@@ -1,6 +1,9 @@
 import { IBox, IRect, GraphType } from '../../type.interface';
+import { rotateInCanvas } from '../../utils/canvas';
+import { parseRGBAStr } from '../../utils/color';
 import { getAbsoluteCoords } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
+import { DEFAULT_IMAGE, TextureType } from '../texture';
 import { Graph, IGraph } from './graph';
 
 export interface RectGraph extends IGraph, IRect {}
@@ -48,4 +51,70 @@ export class Rect extends Graph {
       height: this.height,
     };
   }
+
+  fillTexture(ctx: CanvasRenderingContext2D) {
+    if (this.rotation) {
+      const cx = this.x + this.width / 2;
+      const cy = this.y + this.height / 2;
+
+      rotateInCanvas(ctx, this.rotation, cx, cy);
+    }
+    ctx.beginPath();
+    ctx.rect(this.x, this.y, this.width, this.height);
+    for (const texture of this.fill) {
+      switch (texture.type) {
+        case TextureType.Solid: {
+          ctx.fillStyle = parseRGBAStr(texture.attrs);
+          ctx.fill();
+          break;
+        }
+        case TextureType.Image: {
+          const src = texture.attrs.src;
+          const width = this.width;
+          const height = this.height;
+          let img: CanvasImageSource;
+          if (src) {
+            img = new Image();
+            img.src = src;
+            // TODO: rerender when image loaded, but notice endless loop
+          } else {
+            img = DEFAULT_IMAGE;
+            ctx.imageSmoothingEnabled = false;
+          }
+
+          // reference: https://mp.weixin.qq.com/s/TSpZv_0VJtxPTCCzEqDl8Q
+          const scale = calcCoverScale(img.width, img.height, width, height);
+
+          const sx = img.width / 2 - width / scale / 2;
+          const sy = img.height / 2 - height / scale / 2;
+
+          ctx.drawImage(
+            img,
+            sx,
+            sy,
+            width / scale,
+            height / scale,
+            this.x,
+            this.y,
+            width,
+            height,
+          );
+        }
+      }
+    }
+    ctx.closePath();
+  }
 }
+
+const calcCoverScale = (
+  w: number,
+  h: number,
+  cw: number,
+  ch: number,
+): number => {
+  if (w === 0 || h === 0) return 1;
+  const scaleW = cw / w;
+  const scaleH = ch / h;
+  const scale = Math.max(scaleW, scaleH);
+  return scale;
+};

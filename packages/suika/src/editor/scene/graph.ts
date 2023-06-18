@@ -162,6 +162,11 @@ export class Graph {
     const [, prevRotatedY] = getElementRotatedXY(this);
     this.y = this.y + rotatedY - prevRotatedY;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  fillTexture(ctx: CanvasRenderingContext2D) {
+    throw new Error('Method not implemented.');
+  }
 }
 
 /**
