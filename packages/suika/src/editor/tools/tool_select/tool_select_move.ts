@@ -5,9 +5,9 @@ import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 
 /**
- * 选中工具的一个分支
+ * select tool
  *
- * 移动元素
+ * move selected elements
  */
 export class SelectMoveTool implements IBaseTool {
   private startPointer: IPoint = { x: -1, y: -1 };
@@ -97,13 +97,13 @@ export class SelectMoveTool implements IBaseTool {
   }
   end(e: PointerEvent, isEnableDrag: boolean) {
     const selectedElements = this.editor.selectedElements.getItems();
-    if (selectedElements.length === 0) {
+    if (selectedElements.length === 0 || !isEnableDrag) {
       // 移动的时候元素被删除了，或者撤销导致为空
       // TODO: 属性复原
       return;
     }
 
-    if (isEnableDrag && (this.dx !== 0 || this.dy !== 0)) {
+    if (this.dx !== 0 || this.dy !== 0) {
       this.editor.commandManager.pushCommand(
         new MoveElementsCommand(
           'Move Elements',

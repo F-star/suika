@@ -27,10 +27,10 @@ export class Rect extends Graph {
       return this.getBBoxWithoutRotation();
     }
 
-    const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
-    const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const [brX, brY] = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const [blX, blY] = transformRotate(x, y2, rotation, cx, cy); // 右下
+    const { x: tlX, y: tlY } = transformRotate(x, y, rotation, cx, cy); // 左上
+    const { x: trX, y: trY } = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const { x: brX, y: brY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const { x: blX, y: blY } = transformRotate(x, y2, rotation, cx, cy); // 右下
 
     const minX = Math.min(tlX, trX, brX, blX);
     const minY = Math.min(tlY, trY, brY, blY);

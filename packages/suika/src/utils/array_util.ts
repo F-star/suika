@@ -12,7 +12,7 @@ export const forEach = <T>(
   }
 };
 
-export const ArrMap = <T, U>(
+export const arrMap = <T, U>(
   array: T[],
   cb: (item: T, index?: number) => U,
 ): U[] => {

@@ -10,6 +10,12 @@ export interface IBaseTool {
   // moveExcludeDrag: (event: PointerEvent) => void;
   start: (event: PointerEvent) => void;
   drag: (event: PointerEvent) => void;
+  /**
+   *
+   * @param event
+   * @param isEnableDrag is drag happened
+   * @returns
+   */
   end: (event: PointerEvent, isEnableDrag: boolean) => void;
   /**
    * init state when finish a drag loop

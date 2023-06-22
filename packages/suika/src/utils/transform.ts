@@ -14,12 +14,12 @@ type IMatrix = [
   c: number,
   d: number,
   e: number,
-  f: number
+  f: number,
 ];
 
 export function transform(
   { x, y }: IVector,
-  [a, b, c, d, e, f]: IMatrix
+  [a, b, c, d, e, f]: IMatrix,
 ): IVector {
   return {
     x: x * a + y * c + e,
@@ -35,17 +35,17 @@ export function transformRotate(
   y: number,
   radian: number,
   cx: number,
-  cy: number
-): [rotatedX: number, rotatedY: number] {
+  cy: number,
+): { x: number; y: number } {
   if (!radian) {
-    return [x, y];
+    return { x, y };
   }
   const cos = Math.cos(radian);
   const sin = Math.sin(radian);
-  return [
-    (x - cx) * cos - (y - cy) * sin + cx,
-    (x - cx) * sin + (y - cy) * cos + cy,
-  ];
+  return {
+    x: (x - cx) * cos - (y - cy) * sin + cx,
+    y: (x - cx) * sin + (y - cy) * cos + cy,
+  };
 }
 
 /**
@@ -58,7 +58,7 @@ export function getOriginXY(
   rotatedY: number,
   radian: number,
   width: number,
-  height: number
+  height: number,
 ): [rotatedX: number, rotatedY: number] {
   if (!radian) {
     return [rotatedX, rotatedY];

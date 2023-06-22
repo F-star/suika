@@ -6,7 +6,7 @@ import hotkeys from 'hotkeys-js';
 import { IBox, IPoint } from '../type.interface';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
-import { ArrMap } from '../utils/array_util';
+import { arrMap } from '../utils/array_util';
 import { SetElementsAttrs } from './commands/set_elements_attrs';
 import { Graph } from './scene/graph';
 import debounce from 'lodash.debounce';
@@ -249,7 +249,7 @@ class HostEventManager {
         new SetElementsAttrs(
           'Move elements',
           moveEls,
-          ArrMap(moveEls, ({ x, y }) => ({ x, y })),
+          arrMap(moveEls, ({ x, y }) => ({ x, y })),
           startPoints,
         ),
       );
@@ -282,7 +282,7 @@ class HostEventManager {
       if (!checkPressed()) return;
 
       if (isEnableUpdateStartPoints) {
-        startPoints = ArrMap(movedEls, (el) => ({ x: el.x, y: el.y }));
+        startPoints = arrMap(movedEls, (el) => ({ x: el.x, y: el.y }));
         isEnableUpdateStartPoints = false;
       }
 

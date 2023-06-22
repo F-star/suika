@@ -128,7 +128,7 @@ export class SelectRotationTool implements IBaseTool {
           el.rotation = normalizeAngle(this.prevRotations[i] + dRotation);
 
           const [cx, cy] = prevElementCenters[i];
-          const [newCx, newCy] = transformRotate(
+          const { x: newCx, y: newCy } = transformRotate(
             cx,
             cy,
             dRotation,

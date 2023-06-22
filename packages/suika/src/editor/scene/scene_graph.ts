@@ -3,7 +3,6 @@ import { GraphType, IBox, IObject, IPoint, IRect } from '../../type.interface';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
 import {
-  arr2point,
   getRectCenterPoint,
   getRectsBBox,
   isPointInRect,
@@ -257,9 +256,7 @@ export class SceneGraph {
       const element = selectedElements[0];
       const [cx, cy] = getRectCenterPoint(element);
       if (element.rotation) {
-        point = arr2point(
-          transformRotate(point.x, point.y, -element.rotation, cx, cy),
-        );
+        point = transformRotate(point.x, point.y, -element.rotation, cx, cy);
       }
     }
     // 【多个元素被选中】
@@ -277,15 +274,7 @@ export class SceneGraph {
       // "点击点" 根据图形进行 反旋转旋转
       const [cx, cy] = getRectCenterPoint(bBox);
       const rotatedHitPointer = element.rotation
-        ? arr2point(
-            transformRotate(
-              hitPointer.x,
-              hitPointer.y,
-              -element.rotation,
-              cx,
-              cy,
-            ),
-          )
+        ? transformRotate(hitPointer.x, hitPointer.y, -element.rotation, cx, cy)
         : hitPointer;
 
       if (isPointInRect(rotatedHitPointer, bBox)) {

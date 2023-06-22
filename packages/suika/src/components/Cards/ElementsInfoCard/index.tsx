@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
 import { MutateElementsAndRecord } from '../../../editor/scene/graph';
-import { remainTwoDecimal } from '../../../utils/common';
+import { remainDecimal } from '../../../utils/common';
 import {
   degree2Radian,
   getElementRotatedXY,
@@ -38,17 +38,20 @@ const ElementsInfoCards: FC = () => {
       const handler = () => {
         const items = editor.selectedElements.getItems();
         if (items.length > 0) {
-          let [newRotatedX, newRotatedY]: [
-            number | typeof MIXED,
-            number | typeof MIXED,
-          ] = getElementRotatedXY(items[0]);
+          let {
+            x: newRotatedX,
+            y: newRotatedY,
+          }: {
+            x: number | typeof MIXED;
+            y: number | typeof MIXED;
+          } = getElementRotatedXY(items[0]);
           let newWidth: number | typeof MIXED = items[0].width;
           let newHeight: number | typeof MIXED = items[0].height;
           let newRotation: number | typeof MIXED = items[0].rotation || 0;
 
           for (let i = 0, len = items.length; i < len; i++) {
             const element = items[i];
-            const [currentRotatedX, currentRotatedY] =
+            const { x: currentRotatedX, y: currentRotatedY } =
               getElementRotatedXY(element);
             if (!isEqual(newRotatedX, currentRotatedX)) {
               newRotatedX = MIXED;
@@ -70,19 +73,19 @@ const ElementsInfoCards: FC = () => {
           setRotatedX(
             newRotatedX === MIXED
               ? newRotatedX
-              : remainTwoDecimal(newRotatedX as number),
+              : remainDecimal(newRotatedX as number),
           );
           setRotatedY(
             newRotatedY === MIXED
               ? newRotatedY
-              : remainTwoDecimal(newRotatedY as number),
+              : remainDecimal(newRotatedY as number),
           );
           setWidth(newWidth);
           setHeight(newHeight);
           setRotation(
             newRotation === MIXED
               ? newRotation
-              : remainTwoDecimal(radian2Degree(newRotation as number)),
+              : remainDecimal(radian2Degree(newRotation as number)),
           );
         }
       };

@@ -120,6 +120,10 @@ export class Editor {
       y: event.clientY - this.setting.get('offsetY'),
     };
   }
+  getSceneCursorXY(event: PointerEvent | WheelEvent, round = false) {
+    const { x, y } = this.getCursorXY(event);
+    return this.viewportCoordsToScene(x, y, round);
+  }
   moveElements(elements: IGraph[], dx: number, dy: number) {
     for (const element of elements) {
       element.x += dx;

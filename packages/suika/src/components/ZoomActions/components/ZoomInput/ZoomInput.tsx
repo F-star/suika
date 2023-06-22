@@ -1,5 +1,5 @@
 import { FC, useRef, useState } from 'react';
-import { remainTwoDecimal } from '../../../../utils/common';
+import { remainDecimal } from '../../../../utils/common';
 import { useMount } from 'ahooks';
 import './style.scss';
 
@@ -23,7 +23,7 @@ export const ZoomInput: FC<IProps> = ({ defaultValue, onChange }) => {
   const emitChange = () => {
     const newZoom = parseInt(value);
     if (!Number.isNaN(newZoom)) {
-      onChange && onChange(remainTwoDecimal(newZoom / 100));
+      onChange && onChange(remainDecimal(newZoom / 100));
     }
   };
 
