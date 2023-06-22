@@ -75,7 +75,6 @@ export class ZoomManager {
     });
   }
   zoomToFit() {
-    const padding = this.editor.setting.get('zoomToFixPadding');
     const viewport = this.editor.viewportManager.getViewport();
     const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
 
@@ -86,35 +85,42 @@ export class ZoomManager {
 
     const composedBBox = getRectsBBox(...bboxs);
 
-    // TODO: FIXME:
-    // consider "rulerWidth" and
-    // "zoomToFixPadding" need to base viewport
-    composedBBox.x -= padding;
-    composedBBox.y -= padding;
-    composedBBox.width += padding * 2;
-    composedBBox.height += padding * 2;
+    const padding = this.editor.setting.get('zoomToFixPadding');
+    // TODO:
+    // const rulerWidth = this.editor.setting.get('enableRuler')
+    //   ? this.editor.setting.get('rulerWidth')
+    //   : 0;
+    // const leftPadding = rulerWidth + padding;
+    // const topPadding = rulerWidth + padding;
 
-    viewport;
-
-    const viewportRatio = viewport.width / viewport.height;
-    const bboxRatio = composedBBox.width / composedBBox.height;
-    let newZoom: number;
-    let dx = 0;
-    let dy = 0;
-    if (viewportRatio > bboxRatio) {
-      // The aspect ratio of the viewport is greater than the aspect ratio of the bbox,
-      // which means that the height of the bbox is the limiting factor
-      newZoom = viewport.height / composedBBox.height;
-      dx = (viewport.width / newZoom - composedBBox.width) / 2;
-    } else {
-      newZoom = viewport.width / composedBBox.width;
-      dy = (viewport.height / newZoom - composedBBox.height) / 2;
+    let vh = viewport.height - padding * 2;
+    if (vh <= 0) {
+      vh = viewport.height;
     }
+    let vw = viewport.width - padding * 2;
+    if (vw <= 0) {
+      vw = viewport.width;
+    }
+
+    let newZoom: number;
+    const viewportRatio = vw / vh;
+    const bboxRatio = composedBBox.width / composedBBox.height;
+    if (viewportRatio > bboxRatio) {
+      // basic height
+      newZoom = vh / composedBBox.height;
+    } else {
+      newZoom = vw / composedBBox.width;
+    }
+
+    const newViewportX =
+      composedBBox.x - (viewport.width / newZoom - composedBBox.width) / 2;
+    const newViewportY =
+      composedBBox.y - (viewport.height / newZoom - composedBBox.height) / 2;
 
     this.setZoom(newZoom);
     this.editor.viewportManager.setViewport({
-      x: composedBBox.x - dx,
-      y: composedBBox.y - dy,
+      x: newViewportX,
+      y: newViewportY,
     });
   }
   getCanvasCenter() {

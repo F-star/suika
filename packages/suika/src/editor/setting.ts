@@ -56,7 +56,7 @@ export class Setting {
     offsetX: 0, // 鼠标坐标位置的修正值
     offsetY: 0,
 
-    zoomToFixPadding: 100, // base viewport coord
+    zoomToFixPadding: 32, // base viewport coord
 
     moveElementsStep: 1,
     moveElementsStepFast: 10,
