@@ -3,7 +3,7 @@ import { Editor } from '../editor';
 import { ITool } from './type';
 
 /**
- * 拖拽画布
+ * drag canvas
  */
 export class DragCanvasTool implements ITool {
   static type = 'dragCanvas';

@@ -2,12 +2,19 @@ import { Editor } from '../editor';
 import { IBox, IPoint, IRect } from '../../type.interface';
 import {
   drawCircle,
-  // drawSquareWithCenter,
+  drawSquareWithCenter,
   rotateInCanvas,
 } from '../../utils/canvas';
-import { arr2point, isPointInCircle, isPointInRect } from '../../utils/graphics';
+import { isPointInCircle, isPointInRect } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 
+export type HandleName = 'rotation' | 'nw' | 'ne' | 'se' | 'sw';
+
+/**
+ * draw transform handle
+ *
+ * rotation and scale
+ */
 export class TransformHandle {
   handle: {
     rotation: IPoint;
@@ -35,34 +42,36 @@ export class TransformHandle {
       ctx.fillStyle = setting.get('handleRotationFill');
       ctx.lineWidth = setting.get('handleStrokeWidth');
 
-      // 绘制旋转控制点
+      // (1) draw rotation handle
       const rotationPos = this.editor.sceneCoordsToViewport(
         handle.rotation.x,
-        handle.rotation.y
+        handle.rotation.y,
       );
 
+      // (2) draw scale handle
       const size = setting.get('handleSize');
       drawCircle(ctx, rotationPos.x, rotationPos.y, size / 2);
       // nw（左上）
+      const startTf = ctx.getTransform();
       const nwPos = this.editor.sceneCoordsToViewport(handle.nw.x, handle.nw.y);
       rotateInCanvas(ctx, elementsRotation, nwPos.x, nwPos.y);
-      // drawSquareWithCenter(ctx, nwPos.x, nwPos.y, size);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      drawSquareWithCenter(ctx, nwPos.x, nwPos.y, size);
+      ctx.setTransform(startTf);
       // ne（右上）
       const nePos = this.editor.sceneCoordsToViewport(handle.ne.x, handle.ne.y);
       rotateInCanvas(ctx, elementsRotation, nePos.x, nePos.y);
-      // drawSquareWithCenter(ctx, nePos.x, nePos.y, size);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      drawSquareWithCenter(ctx, nePos.x, nePos.y, size);
+      ctx.setTransform(startTf);
       // se（右下）
       const sePos = this.editor.sceneCoordsToViewport(handle.se.x, handle.se.y);
       rotateInCanvas(ctx, elementsRotation, sePos.x, sePos.y);
-      // drawSquareWithCenter(ctx, sePos.x, sePos.y, size);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      drawSquareWithCenter(ctx, sePos.x, sePos.y, size);
+      ctx.setTransform(startTf);
       // sw（左下）
       const swPos = this.editor.sceneCoordsToViewport(handle.sw.x, handle.sw.y);
       rotateInCanvas(ctx, elementsRotation, swPos.x, swPos.y);
-      // drawSquareWithCenter(ctx, swPos.x, swPos.y, size);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      drawSquareWithCenter(ctx, swPos.x, swPos.y, size);
+      ctx.setTransform(startTf);
 
       ctx.restore();
     }
@@ -85,7 +94,7 @@ export class TransformHandle {
 
     if (selectedElements.length === 0) {
       console.error(
-        '根据逻辑分支，代码走到这里 selectedElements.length 不可能为 0，请给我提 issue'
+        '根据逻辑分支，代码走到这里 selectedElements.length 不可能为 0，请给我提 issue',
       );
       return null;
     }
@@ -108,26 +117,43 @@ export class TransformHandle {
       let sw = { x, y: y + height };
       const [cx, cy] = this.editor.selectedElements.getCenterPoint();
       if (singleSelectedElement.rotation) {
-        rotation = arr2point(
-          transformRotate(
-            rotation.x,
-            rotation.y,
-            singleSelectedElement.rotation,
-            cx,
-            cy
-          )
+        rotation = transformRotate(
+          rotation.x,
+          rotation.y,
+          singleSelectedElement.rotation,
+          cx,
+          cy,
         );
-        nw = arr2point(
-          transformRotate(nw.x, nw.y, singleSelectedElement.rotation, cx, cy)
+
+        nw = transformRotate(
+          nw.x,
+          nw.y,
+          singleSelectedElement.rotation,
+          cx,
+          cy,
         );
-        ne = arr2point(
-          transformRotate(ne.x, ne.y, singleSelectedElement.rotation, cx, cy)
+
+        ne = transformRotate(
+          ne.x,
+          ne.y,
+          singleSelectedElement.rotation,
+          cx,
+          cy,
         );
-        se = arr2point(
-          transformRotate(se.x, se.y, singleSelectedElement.rotation, cx, cy)
+        se = transformRotate(
+          se.x,
+          se.y,
+          singleSelectedElement.rotation,
+          cx,
+          cy,
         );
-        sw = arr2point(
-          transformRotate(sw.x, sw.y, singleSelectedElement.rotation, cx, cy)
+
+        sw = transformRotate(
+          sw.x,
+          sw.y,
+          singleSelectedElement.rotation,
+          cx,
+          cy,
         );
       }
 
@@ -160,7 +186,7 @@ export class TransformHandle {
       };
     }
   }
-  getTransformHandleByPoint(point: IPoint) {
+  getNameByPoint(point: IPoint) {
     const handle = this.handle;
     if (!handle) {
       return undefined;
@@ -186,13 +212,15 @@ export class TransformHandle {
       let rotatedX = point.x;
       let rotatedY = point.y;
       if (elRotation) {
-        [rotatedX, rotatedY] = transformRotate(
+        const rotatedPoint = transformRotate(
           point.x,
           point.y,
           elRotation,
           scalePoint.x,
-          scalePoint.y
+          scalePoint.y,
         );
+        rotatedX = rotatedPoint.x;
+        rotatedY = rotatedPoint.y;
       }
       if (
         isPointInRect(
@@ -202,7 +230,7 @@ export class TransformHandle {
             y: scalePoint.y - size / 2,
             width: size,
             height: size,
-          }
+          },
         )
       ) {
         return key;

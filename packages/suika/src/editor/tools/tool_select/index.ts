@@ -4,9 +4,10 @@ import { Rect } from '../../scene/rect';
 import { IPoint } from '../../../type.interface';
 import { Editor } from '../../editor';
 import { IBaseTool, ITool } from '../type';
-import { DrawSelectionBox } from './draw_select_box';
-import { SelectMoveTool } from './move';
-import { SelectRotationTool } from './rotation';
+import { DrawSelectionBox } from './tool_select_selection';
+import { SelectMoveTool } from './tool_select_move';
+import { SelectRotationTool } from './tool_select_rotation';
+import { SelectScaleTool } from './tool_select_scale';
 
 export class SelectTool implements ITool {
   static type = 'select';
@@ -20,6 +21,7 @@ export class SelectTool implements ITool {
   strategyMove: SelectMoveTool;
   strategyDrawSelectionBox: DrawSelectionBox;
   strategySelectRotation: SelectRotationTool;
+  strategySelectScale: SelectScaleTool;
 
   // 鼠标按下时选中的元素，在鼠标释放时可能会用到。shift 取消一个元素时需要使用
   topHitElementWhenStart: Graph | null = null;
@@ -29,6 +31,7 @@ export class SelectTool implements ITool {
     this.strategyMove = new SelectMoveTool(editor);
     this.strategyDrawSelectionBox = new DrawSelectionBox(editor);
     this.strategySelectRotation = new SelectRotationTool(editor);
+    this.strategySelectScale = new SelectScaleTool(editor);
   }
   active() {
     this.editor.setCursor('');
@@ -47,7 +50,7 @@ export class SelectTool implements ITool {
     const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     const transformHandle = this.editor.sceneGraph.transformHandle;
-    if (transformHandle.getTransformHandleByPoint(pointer) === 'rotation') {
+    if (['rotation', 'se'].includes(transformHandle.getNameByPoint(pointer)!)) {
       this.editor.setCursor('grab');
     } else {
       this.editor.setCursor('');
@@ -76,13 +79,18 @@ export class SelectTool implements ITool {
     this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     // 0. 点中 handle（旋转点）
-    if (
-      sceneGraph.transformHandle.getTransformHandleByPoint(
-        this.startPointer,
-      ) === 'rotation'
-    ) {
+    const handleName = sceneGraph.transformHandle.getNameByPoint(
+      this.startPointer,
+    );
+    // if (handleName) {
+    if (handleName === 'rotation') {
       this.currStrategy = this.strategySelectRotation;
     }
+    // TODO: now only support se scale handle
+    else if (handleName === 'se') {
+      this.currStrategy = this.strategySelectScale;
+    }
+    // }
 
     // 1. 点击落在选中盒中
     else if (

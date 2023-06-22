@@ -111,20 +111,20 @@ export const isSameArray = (a1: unknown[], a2: unknown[]) => {
  * 保留两位小数
  * 如果是 0，丢弃 0
  */
-export const remainTwoDecimal = (n: number) => {
-  return Number(n.toFixed(2));
+export const remainDecimal = (num: number, precision = 2) => {
+  return Number(num.toFixed(precision));
 };
 
 /**
  * 字符串转换为数字，并保留两位小数
  */
-export const parseToNumber = (str: string) => {
+export const parseToNumber = (str: string, precision = 2) => {
   if (!str) return NaN;
   const num = Number(str);
   if (Number.isNaN(num)) {
     return NaN;
   }
-  return remainTwoDecimal(num);
+  return remainDecimal(num, precision);
 };
 
 /**

@@ -85,10 +85,10 @@ export class Graph {
       return this.getBBoxWithoutRotation();
     }
 
-    const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
-    const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const [brX, brY] = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const [blX, blY] = transformRotate(x, y2, rotation, cx, cy); // 右下
+    const { x: tlX, y: tlY } = transformRotate(x, y, rotation, cx, cy); // 左上
+    const { x: trX, y: trY } = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const { x: brX, y: brY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const { x: blX, y: blY } = transformRotate(x, y2, rotation, cx, cy); // 右下
 
     const minX = Math.min(tlX, trX, brX, blX);
     const minY = Math.min(tlY, trY, brY, blY);
@@ -117,10 +117,10 @@ export class Graph {
       };
     }
 
-    const [tlX, tlY] = transformRotate(x, y, rotation, cx, cy); // 左上
-    const [trX, trY] = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const [brX, brY] = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const [blX, blY] = transformRotate(x, y2, rotation, cx, cy); // 右下
+    const { x: tlX, y: tlY } = transformRotate(x, y, rotation, cx, cy); // 左上
+    const { x: trX, y: trY } = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const { x: brX, y: brY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const { x: blX, y: blY } = transformRotate(x, y2, rotation, cx, cy); // 右下
 
     const minX = Math.min(tlX, trX, brX, blX);
     const minY = Math.min(tlY, trY, brY, blY);
@@ -144,7 +144,7 @@ export class Graph {
   }
   setRotateXY(rotatedX: number, rotatedY: number) {
     const [cx, cy] = getRectCenterPoint(this);
-    const [x, y] = transformRotate(
+    const { x, y } = transformRotate(
       rotatedX,
       rotatedY,
       -(this.rotation || 0),
@@ -155,14 +155,33 @@ export class Graph {
     this.y = y;
   }
   setRotatedX(rotatedX: number) {
-    const [prevRotatedX] = getElementRotatedXY(this);
+    const { x: prevRotatedX } = getElementRotatedXY(this);
     this.x = this.x + rotatedX - prevRotatedX;
   }
   setRotatedY(rotatedY: number) {
-    const [, prevRotatedY] = getElementRotatedXY(this);
+    const { y: prevRotatedY } = getElementRotatedXY(this);
     this.y = this.y + rotatedY - prevRotatedY;
   }
-
+  resizeAndKeepRotatedXY({
+    width,
+    height,
+  }: {
+    width?: number;
+    height?: number;
+  }) {
+    const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(this);
+    if (width) {
+      this.width = width;
+    }
+    if (height) {
+      this.height = height;
+    }
+    const { x: rotatedX, y: rotatedY } = getElementRotatedXY(this);
+    const dx = rotatedX - preRotatedX;
+    const dy = rotatedY - preRotatedY;
+    this.x -= dx;
+    this.y -= dy;
+  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fillTexture(ctx: CanvasRenderingContext2D) {
     throw new Error('Method not implemented.');
@@ -260,9 +279,9 @@ export const MutateElementsAndRecord = {
       width: el.width,
     }));
     elements.forEach((el) => {
-      const [preRotatedX, preRotatedY] = getElementRotatedXY(el);
+      const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(el);
       el.width = width;
-      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      const { x: rotatedX, y: rotatedY } = getElementRotatedXY(el);
       const dx = rotatedX - preRotatedX;
       const dy = rotatedY - preRotatedY;
       el.x -= dx;
@@ -288,9 +307,9 @@ export const MutateElementsAndRecord = {
       height: el.height,
     }));
     elements.forEach((el) => {
-      const [preRotatedX, preRotatedY] = getElementRotatedXY(el);
+      const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(el);
       el.height = height;
-      const [rotatedX, rotatedY] = getElementRotatedXY(el);
+      const { x: rotatedX, y: rotatedY } = getElementRotatedXY(el);
       const dx = rotatedX - preRotatedX;
       const dy = rotatedY - preRotatedY;
       el.x -= dx;

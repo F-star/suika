@@ -2,7 +2,7 @@ import hotkeys from 'hotkeys-js';
 import { noop } from '../../utils/common';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
-import { DragCanvasTool } from './drag_canvas';
+import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawRectTool } from './tool_draw_rect';
 import { SelectTool } from './tool_select';

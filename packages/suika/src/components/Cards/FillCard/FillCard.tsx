@@ -14,7 +14,7 @@ import { TexturePicker } from '../../ColorPicker/TexturePicker';
 import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { Popover } from '@suika/components';
-import { ArrMap } from '../../../utils/array_util';
+import { arrMap } from '../../../utils/array_util';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -45,7 +45,7 @@ export const FillCard: FC = () => {
       new SetElementsAttrs(
         'Change fill',
         selectItems,
-        ArrMap(selectItems, (item) => ({ fill: item.fill })),
+        arrMap(selectItems, (item) => ({ fill: item.fill })),
         prevFillAttrs,
       ),
     );
