@@ -1,4 +1,4 @@
-import { ceil, viewportCoordsToSceneUtil } from '../utils/common';
+import { remainDecimal, viewportCoordsToSceneUtil } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { getRectsBBox } from '../utils/graphics';
 import { Editor } from './editor';
@@ -45,7 +45,7 @@ export class ZoomManager {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
     const zoom = Math.min(
-      ceil(prevZoom * (1 + zoomStep)),
+      remainDecimal(prevZoom * (1 + zoomStep)),
       this.editor.setting.get('zoomMax'),
     );
 
@@ -58,7 +58,7 @@ export class ZoomManager {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
     const zoom = Math.max(
-      ceil(prevZoom * (1 - zoomStep)),
+      remainDecimal(prevZoom * (1 - zoomStep)),
       this.editor.setting.get('zoomMin'),
     );
 

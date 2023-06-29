@@ -33,13 +33,6 @@ export const getClosestVal = (value: number, segment: number) => {
   return value - left <= right - value ? left : right;
 };
 
-/**
- * 保留小数
- */
-export const ceil = (n: number, digit = 2) => {
-  return Number(n.toFixed(digit));
-};
-
 export const viewportCoordsToSceneUtil = (
   x: number,
   y: number,
