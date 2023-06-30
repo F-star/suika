@@ -12,14 +12,14 @@ const topMargin = 48;
 const leftRightMargin = 240 * 2;
 
 const Editor: FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [editor, setEditor] = useState<GraphEditor | null>(null);
 
   useEffect(() => {
-    if (canvasRef.current) {
+    if (containerRef.current) {
       const editor = new GraphEditor({
-        canvasElement: canvasRef.current,
+        containerElement: containerRef.current,
         width: document.body.clientWidth - leftRightMargin,
         height: document.body.clientHeight - topMargin,
         offsetY: 48,
@@ -47,7 +47,7 @@ const Editor: FC = () => {
         changeViewport.cancel();
       };
     }
-  }, [canvasRef]);
+  }, [containerRef]);
 
   return (
     <div>
@@ -56,9 +56,9 @@ const Editor: FC = () => {
         {/* body */}
         <div className="body">
           <LayerPanel />
-          <canvas
+          <div
+            ref={containerRef}
             style={{ position: 'absolute', left: 240, top: 0 }}
-            ref={canvasRef}
           />
           <InfoPanel />
           <ContextMenu />

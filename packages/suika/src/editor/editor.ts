@@ -15,7 +15,7 @@ import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { IGraph } from './scene/graph';
 
 interface IEditorOptions {
-  canvasElement: HTMLCanvasElement;
+  containerElement: HTMLDivElement;
   width: number;
   height: number;
   offsetX?: number;
@@ -23,6 +23,7 @@ interface IEditorOptions {
 }
 
 export class Editor {
+  containerElement: HTMLDivElement;
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   sceneGraph: SceneGraph;
@@ -43,7 +44,9 @@ export class Editor {
   autoSaveGraphs: AutoSaveGraphs;
 
   constructor(options: IEditorOptions) {
-    this.canvasElement = options.canvasElement;
+    this.containerElement = options.containerElement;
+    this.canvasElement = document.createElement('canvas');
+    this.containerElement.appendChild(this.canvasElement);
     this.ctx = this.canvasElement.getContext('2d')!;
 
     this.setting = new Setting();
@@ -91,6 +94,7 @@ export class Editor {
     });
   }
   destroy() {
+    this.containerElement.removeChild(this.canvasElement);
     this.hostEventManager.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
