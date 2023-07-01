@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
-import { IGraph } from '../../editor/scene/graph';
+import { GraphAttrs } from '../../editor/scene/graph';
 import { AlignCard } from '../Cards/AlignCard';
 import ElementsInfoCards from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
@@ -19,7 +19,7 @@ export const InfoPanel: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      const handler = (items: IGraph[]) => {
+      const handler = (items: GraphAttrs[]) => {
         setType(items.length ? PanelType.SelectedElements : PanelType.Global);
       };
       editor.selectedElements.on('itemsChange', handler);
@@ -34,7 +34,7 @@ export const InfoPanel: FC = () => {
     <div className="info-panel" onKeyDown={(e) => e.stopPropagation()}>
       {type === PanelType.SelectedElements && (
         <>
-          <AlignCard/>
+          <AlignCard />
           <ElementsInfoCards />
           <FillCard />
         </>

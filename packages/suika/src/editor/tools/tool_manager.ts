@@ -7,6 +7,7 @@ import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawRectTool } from './tool_draw_rect';
 import { SelectTool } from './tool_select';
 import { ITool } from './type';
+import { DrawTextTool } from './tool_text';
 
 interface Events {
   change(type: string): void;
@@ -27,6 +28,7 @@ export class ToolManager {
     this.registerToolAndHotKey(new DrawRectTool(editor));
     this.registerToolAndHotKey(new DrawEllipseTool(editor));
     this.registerToolAndHotKey(new DragCanvasTool(editor));
+    this.registerToolAndHotKey(new DrawTextTool(editor));
 
     this.setActiveTool(SelectTool.type);
 
@@ -58,12 +60,16 @@ export class ToolManager {
       isEnableDrag = false;
       startWithLeftMouse = false;
       if (e.button !== 0) {
-        // must to be left mouse button
+        // must be left mouse button
         return;
       }
+      if (this.editor.textEditor.isEditing()) {
+        return;
+      }
+
       startWithLeftMouse = true;
       if (!this.currentTool) {
-        throw new Error('未设置当前使用工具');
+        throw new Error('there is no active tool');
       }
       startPos = [e.clientX, e.clientY];
       this.currentTool.start(e);

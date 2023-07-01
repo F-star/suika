@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { useEffect, useContext, useState } from 'react';
 import { EditorContext } from '../../../../context';
-import { ToolBtn } from './components/ToolBtn/ToolBtn';
+import { ToolBtn } from './components/ToolBtn';
 import './Toolbar.scss';
 import { useIntl } from 'react-intl';
 import {
@@ -9,6 +9,7 @@ import {
   HandOutlined,
   RectOutlined,
   SelectOutlined,
+  TextFilled,
 } from '@suika/icons';
 
 export const ToolBar = () => {
@@ -46,6 +47,12 @@ export const ToolBar = () => {
             hotkey: 'O',
             intlId: 'tool.ellipse',
             icon: <EllipseOutlined />,
+          },
+          {
+            name: 'drawText',
+            hotkey: 'T',
+            intlId: 'tool.text',
+            icon: <TextFilled />,
           },
           {
             name: 'dragCanvas',

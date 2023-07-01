@@ -9,6 +9,7 @@ export const en = {
   'tool.select': 'Select',
   'tool.rectangle': 'Rectangle',
   'tool.ellipse': 'Ellipse',
+  'tool.text': 'Text',
   'tool.hand': 'Hand',
   'command.undo': 'Undo',
   'command.redo': 'Redo',

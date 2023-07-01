@@ -10,7 +10,7 @@ import {
 import { transformRotate } from '../../utils/transform';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 
-export interface IGraph {
+export interface GraphAttrs {
   type?: GraphType;
   id?: string;
   objectName?: string;
@@ -40,7 +40,7 @@ export class Graph {
   strokeWidth?: number;
   // transform
   rotation?: number;
-  constructor(options: IGraph) {
+  constructor(options: GraphAttrs) {
     this.id = genId();
     this.objectName = 'Graph ' + this.id;
     this.x = options.x;
@@ -58,16 +58,16 @@ export class Graph {
       this.rotation = options.rotation;
     }
   }
-  setAttrs(attrs: Partial<IGraph>) {
-    let key: keyof Partial<IGraph>;
+  setAttrs(attrs: Partial<GraphAttrs>) {
+    let key: keyof Partial<GraphAttrs>;
     for (key in attrs) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       const self: any = this;
       self[key] = attrs[key];
     }
   }
-  getAttrs(attrKeys: Array<keyof IGraph>) {
-    const attrs: Partial<IGraph> = {};
+  getAttrs(attrKeys: Array<keyof GraphAttrs>) {
+    const attrs: Partial<GraphAttrs> = {};
     for (let i = 0, len = attrKeys.length; i < len; i++) {
       const key = attrKeys[i];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
