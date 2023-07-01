@@ -11,6 +11,7 @@ export const zh: typeof en = {
   'tool.select': '选择',
   'tool.rectangle': '矩形',
   'tool.ellipse': '圆',
+  'tool.text': '文字',
   'tool.hand': '拖拽画布',
   'command.undo': '撤销',
   'command.redo': '重做',

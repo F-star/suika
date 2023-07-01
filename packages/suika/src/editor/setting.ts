@@ -16,6 +16,7 @@ export class Setting {
         attrs: { r: 217, g: 217, b: 217, a: 1 },
       },
     ] as ITexture[],
+
     guideBBoxStroke: '#1592fe',
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
@@ -26,6 +27,15 @@ export class Setting {
     handleStrokeWidth: 2,
     handleSize: 6,
     handleRotationLineLength: 15,
+
+    /** default font **/
+    defaultFontSize: 12,
+    textFill: [
+      {
+        type: TextureType.Solid,
+        attrs: { r: 0, g: 0, b: 0, a: 1 },
+      },
+    ] as ITexture[],
 
     lockRotation: Math.PI / 12, // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
 

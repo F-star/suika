@@ -12,12 +12,13 @@ import {
 import rafThrottle from '../../utils/raf_throttle';
 import { transformRotate } from '../../utils/transform';
 import { Ellipse } from './ellipse';
-import { Graph, IGraph } from './graph';
+import { Graph, GraphAttrs } from './graph';
 import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
 import { forEach } from '../../utils/array_util';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
+import { TextGraph } from './text';
 
 interface Events {
   render(): void;
@@ -324,10 +325,10 @@ export class SceneGraph {
       [GraphType.Graph]: Graph,
       [GraphType.Rect]: Rect,
       [GraphType.Ellipse]: Ellipse,
+      [GraphType.Text]: TextGraph,
     };
 
-    const data: IGraph[] = JSON.parse(str);
-    // TODO: check valid
+    const data: GraphAttrs[] = JSON.parse(str);
     this.children = data.map((attrs) => {
       const type = attrs.type;
       const Ctor = ctorMap[type!];
@@ -336,7 +337,7 @@ export class SceneGraph {
         throw new Error('found wrong type of graph');
       }
 
-      return new Ctor(attrs);
+      return new Ctor(attrs as any);
     });
   }
 

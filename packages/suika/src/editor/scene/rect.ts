@@ -4,13 +4,13 @@ import { parseRGBAStr } from '../../utils/color';
 import { getAbsoluteCoords } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { TextureType } from '../texture';
-import { Graph, IGraph } from './graph';
+import { Graph, GraphAttrs } from './graph';
 
-export interface RectGraph extends IGraph, IRect {}
+export interface RectAttrs extends GraphAttrs, IRect {}
 
 export class Rect extends Graph {
   type = GraphType.Rect;
-  constructor(options: RectGraph) {
+  constructor(options: RectAttrs) {
     super(options);
     if (!options.objectName) {
       this.objectName = 'Rectangle ' + this.id;

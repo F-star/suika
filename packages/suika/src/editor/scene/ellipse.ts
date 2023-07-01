@@ -3,13 +3,13 @@ import { IBox, GraphType } from '../../type.interface';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
 import { TextureType } from '../texture';
-import { Graph, IGraph } from './graph';
+import { Graph, GraphAttrs } from './graph';
 
-export interface IEllipseGraph extends IGraph, IBox {}
+export interface EllipseAttrs extends GraphAttrs, IBox {}
 
 export class Ellipse extends Graph {
   type = GraphType.Ellipse;
-  constructor(options: IEllipseGraph) {
+  constructor(options: EllipseAttrs) {
     super(options);
     if (!options.objectName) {
       this.objectName = 'Ellipse ' + this.id;
