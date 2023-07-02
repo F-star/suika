@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
 import { ArrangeType } from '../../editor/commands/arrange';
-import { IPoint } from '../../type.interface';
+import { IPoint } from '../../type';
 import ContextMenuItem from './components/ContextMenuItem';
 import ContextMenuSep from './components/ContextMenuSep';
 import './ContextMenu.scss';

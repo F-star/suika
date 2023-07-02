@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
-import { IObject } from '../../type.interface';
+import { IObject } from '../../type';
 import LayerItem from './LayerItem/LayerItem';
 import './LayerPanel.scss';
 

@@ -1,7 +1,7 @@
 import { Graph, GraphAttrs } from './graph';
 import { Optional } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
-import { GraphType } from '../../type.interface';
+import { GraphType } from '../../type';
 import { TextureType } from '../texture';
 import { parseRGBAStr } from '../../utils/color';
 
@@ -17,13 +17,13 @@ const DEFAULT_TEXT_WEIGHT = 30;
 const tmpCtx = document.createElement('canvas').getContext('2d')!;
 
 export class TextGraph extends Graph {
-  type = GraphType.Text;
   content: string;
   fontSize: number;
   autoFit?: boolean;
   constructor(options: Optional<TextAttrs, 'width' | 'height'>) {
     super({
       ...options,
+      type: GraphType.Text,
       width: options.width ?? DEFAULT_TEXT_WIDTH,
       height: options.height ?? DEFAULT_TEXT_WEIGHT,
     });
@@ -38,10 +38,6 @@ export class TextGraph extends Graph {
     this.autoFit = options.autoFit;
     this.content = options.content;
     this.fontSize = options.fontSize;
-
-    if (!options.objectName) {
-      this.objectName = 'Text ' + this.id;
-    }
   }
   fillTexture(ctx: CanvasRenderingContext2D) {
     if (this.rotation) {

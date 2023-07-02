@@ -1,12 +1,11 @@
-import { IBox } from '../type.interface';
+import { IBox } from '../type';
 import { getDevicePixelRatio } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 
 interface Events {
-  xOrYChange(x: number | undefined, y: number): void
+  xOrYChange(x: number | undefined, y: number): void;
 }
-
 
 export class ViewportManager {
   private scrollX = 0;

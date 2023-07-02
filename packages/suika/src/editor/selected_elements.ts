@@ -1,5 +1,5 @@
 import { Graph } from './scene/graph';
-import { IBox } from '../type.interface';
+import { IBox } from '../type';
 import { isSameArray } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';

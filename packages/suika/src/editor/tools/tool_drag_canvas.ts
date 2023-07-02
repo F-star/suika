@@ -1,4 +1,4 @@
-import { IBox, IPoint } from '../../type.interface';
+import { IBox, IPoint } from '../../type';
 import { Editor } from '../editor';
 import { ITool } from './type';
 

@@ -1,4 +1,4 @@
-import { IBox, ICircle, IPoint, IRect } from '../type.interface';
+import { IBox, ICircle, IPoint, IRect } from '../type';
 import { transformRotate } from './transform';
 
 /**
@@ -166,7 +166,7 @@ export function degree2Radian(degree: number) {
  * 计算绝对坐标
  */
 export function getAbsoluteCoords(
-  rect: IRect
+  rect: IRect,
 ): [x: number, y: number, x2: number, y2: number, cx: number, cy: number] {
   return [
     rect.x,

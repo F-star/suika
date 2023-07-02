@@ -3,7 +3,7 @@
  */
 
 import hotkeys from 'hotkeys-js';
-import { IBox, IPoint } from '../type.interface';
+import { IBox, IPoint } from '../type';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
 import { arrMap } from '../utils/array_util';

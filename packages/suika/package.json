@@ -34,6 +34,7 @@
     "react-intl": "^6.3.2",
     "react-scripts": "5.0.1",
     "sass": "^1.57.1",
+    "uuid": "^9.0.0",
     "web-vitals": "^2.1.0"
   },
   "browserslist": {
@@ -54,6 +55,7 @@
     "@types/lodash.isequal": "^4.5.6",
     "@types/lodash.throttle": "^4.1.7",
     "@types/rbush": "^3.0.0",
-    "@types/react-color": "^3.0.6"
+    "@types/react-color": "^3.0.6",
+    "@types/uuid": "^9.0.2"
   }
 }

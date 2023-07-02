@@ -1,7 +1,7 @@
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { IBox, IBox2, GraphType } from '../../type.interface';
-import { calcCoverScale, genId } from '../../utils/common';
+import { IBox, IBox2, GraphType } from '../../type';
+import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
 import {
   getAbsoluteCoords,
   getElementRotatedXY,
@@ -41,8 +41,16 @@ export class Graph {
   // transform
   rotation?: number;
   constructor(options: GraphAttrs) {
-    this.id = genId();
-    this.objectName = 'Graph ' + this.id;
+    this.type = options.type ?? this.type;
+    this.id = options.id ?? genId();
+
+    if (options.objectName) {
+      this.objectName = options.objectName;
+      objectNameGenerator.setMaxIdx(options.objectName);
+    } else {
+      this.objectName = objectNameGenerator.gen(options.type ?? this.type);
+    }
+
     this.x = options.x;
     this.y = options.y;
     this.width = options.width;

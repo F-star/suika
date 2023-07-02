@@ -1,4 +1,4 @@
-import { IPoint } from '../../../type.interface';
+import { IPoint } from '../../../type';
 import { arrMap } from '../../../utils/array_util';
 import { remainDecimal } from '../../../utils/common';
 import { transformRotate } from '../../../utils/transform';

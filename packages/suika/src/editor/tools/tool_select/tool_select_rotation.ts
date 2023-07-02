@@ -1,5 +1,5 @@
 import hotkeys from 'hotkeys-js';
-import { IPoint } from '../../../type.interface';
+import { IPoint } from '../../../type';
 import { getClosestVal } from '../../../utils/common';
 import {
   calcVectorRadian,

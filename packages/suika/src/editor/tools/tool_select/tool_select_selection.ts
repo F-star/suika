@@ -1,4 +1,4 @@
-import { IPoint } from '../../../type.interface';
+import { IPoint } from '../../../type';
 import { getRectByTwoCoord } from '../../../utils/graphics';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';

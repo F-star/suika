@@ -1,7 +1,7 @@
 import throttle from 'lodash.throttle';
 import { Graph } from '../../scene/graph';
 import { Rect } from '../../scene/rect';
-import { IPoint } from '../../../type.interface';
+import { IPoint } from '../../../type';
 import { Editor } from '../../editor';
 import { IBaseTool, ITool } from '../type';
 import { DrawSelectionBox } from './tool_select_selection';

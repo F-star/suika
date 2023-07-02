@@ -1,5 +1,5 @@
 import { DOUBLE_PI } from '../../constant';
-import { IBox, GraphType } from '../../type.interface';
+import { IBox, GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
 import { TextureType } from '../texture';
@@ -8,12 +8,8 @@ import { Graph, GraphAttrs } from './graph';
 export interface EllipseAttrs extends GraphAttrs, IBox {}
 
 export class Ellipse extends Graph {
-  type = GraphType.Ellipse;
   constructor(options: EllipseAttrs) {
-    super(options);
-    if (!options.objectName) {
-      this.objectName = 'Ellipse ' + this.id;
-    }
+    super({ ...options, type: GraphType.Ellipse });
   }
   fillTexture(ctx: CanvasRenderingContext2D): void {
     const cx = this.x + this.width / 2;

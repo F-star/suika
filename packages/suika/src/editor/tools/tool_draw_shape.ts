@@ -1,5 +1,5 @@
 import { Graph } from '../scene/graph';
-import { IPoint } from '../../type.interface';
+import { IPoint } from '../../type';
 import { noop } from '../../utils/common';
 import { normalizeRect } from '../../utils/graphics';
 import { AddShapeCommand } from '../commands/add_shape';

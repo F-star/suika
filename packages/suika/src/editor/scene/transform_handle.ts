@@ -1,5 +1,5 @@
 import { Editor } from '../editor';
-import { IBox, IPoint, IRect } from '../../type.interface';
+import { IBox, IPoint, IRect } from '../../type';
 import {
   drawCircle,
   drawSquareWithCenter,

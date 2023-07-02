@@ -1,5 +1,5 @@
 import { Editor } from '../editor';
-import { GraphType, IBox, IObject, IPoint, IRect } from '../../type.interface';
+import { GraphType, IBox, IObject, IPoint, IRect } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
 import {
