@@ -15,7 +15,6 @@ import { TexturePicker } from '../../ColorPicker/TexturePicker';
 import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { Popover } from '@suika/components';
-import { arrMap } from '../../../utils/array_util';
 
 const isNearWhite = (rgba: IRGBA, threshold = 85) => {
   const { r, g, b } = rgba;
@@ -46,19 +45,9 @@ export const FillCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
 
-    const prevFillAttrs: { fill: ITexture[] }[] = [];
     selectItems.forEach((item) => {
-      prevFillAttrs.push({ fill: item.fill });
       item.fill = cloneDeep(newFill);
     });
-    editor.commandManager.pushCommand(
-      new SetElementsAttrs(
-        'Change fill',
-        selectItems,
-        arrMap(selectItems, (item) => ({ fill: item.fill })),
-        prevFillAttrs,
-      ),
-    );
 
     return newFill;
   };
