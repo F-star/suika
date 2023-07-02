@@ -7,6 +7,7 @@ import './FillCard.scss';
 import { useIntl } from 'react-intl';
 import {
   DEFAULT_IMAGE_SRC,
+  IRGBA,
   ITexture,
   TextureType,
 } from '../../../editor/texture';
@@ -15,6 +16,15 @@ import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { Popover } from '@suika/components';
 import { arrMap } from '../../../utils/array_util';
+
+const isNearWhite = (rgba: IRGBA, threshold = 85) => {
+  const { r, g, b } = rgba;
+
+  const dist = Math.sqrt(
+    Math.pow(r - 255, 2) + Math.pow(g - 255, 2) + Math.pow(b - 255, 2),
+  );
+  return dist < threshold;
+};
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -141,7 +151,12 @@ export const FillCard: FC = () => {
               <div className="fill-item" key={index}>
                 <div
                   className="color-block"
-                  style={{ backgroundColor: parseRGBAStr(texture.attrs) }}
+                  style={{
+                    backgroundColor: parseRGBAStr(texture.attrs),
+                    boxShadow: isNearWhite(texture.attrs)
+                      ? '0 0 0 1px rgba(0,0,0,0.1) inset'
+                      : undefined,
+                  }}
                   onClick={() => {
                     setActiveIndex(index);
                   }}
@@ -167,6 +182,7 @@ export const FillCard: FC = () => {
                       width: '100%',
                       height: '100%',
                     }}
+                    alt="img"
                     src={texture.attrs.src || DEFAULT_IMAGE_SRC}
                   />
                 </div>
