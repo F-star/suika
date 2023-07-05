@@ -1,6 +1,6 @@
 import hotkeys from 'hotkeys-js';
 import { IPoint } from '../../../type';
-import { getClosestVal } from '../../../utils/common';
+import { getClosestTimesVal } from '../../../utils/common';
 import {
   calcVectorRadian,
   getRectCenterPoint,
@@ -96,7 +96,7 @@ export class SelectRotationTool implements IBaseTool {
       let dRotation = calcVectorRadian(cx, cy, lastPointer.x, lastPointer.y);
       if (this.editor.hostEventManager.isShiftPressing) {
         const lockRotation = this.editor.setting.get('lockRotation');
-        dRotation = getClosestVal(dRotation, lockRotation);
+        dRotation = getClosestTimesVal(dRotation, lockRotation);
       }
       this.dRotation = dRotation;
 
@@ -116,7 +116,7 @@ export class SelectRotationTool implements IBaseTool {
         );
         if (this.editor.hostEventManager.isShiftPressing) {
           const lockRotation = this.editor.setting.get('lockRotation');
-          dRotation = getClosestVal(dRotation, lockRotation);
+          dRotation = getClosestTimesVal(dRotation, lockRotation);
         }
         this.dRotation = dRotation;
 

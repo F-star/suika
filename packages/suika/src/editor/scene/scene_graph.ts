@@ -73,13 +73,7 @@ export class SceneGraph {
     } = this.editor;
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
-    const viewportBoxInScene = {
-      // TODO: 考虑外扩一个 padding
-      x: viewport.x,
-      y: viewport.y,
-      width: viewport.width / zoom,
-      height: viewport.height / zoom,
-    };
+    const viewportBoxInScene = this.editor.viewportManager.getBbox();
 
     const visibleElements: Graph[] = [];
     // 1. 找出视口下所有元素
@@ -162,6 +156,8 @@ export class SceneGraph {
     if (this.showOutline) {
       this.transformHandle.draw(selectedElementsBBox);
     }
+
+    this.editor.refLine.drawRefLine(ctx);
 
     // 5. drawing rulers
     if (setting.get('enableRuler')) {

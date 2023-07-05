@@ -1,5 +1,6 @@
 import { IPoint } from '../../../type';
 import { noop } from '../../../utils/common';
+import { bboxToBbox2 } from '../../../utils/graphics';
 import { MoveElementsCommand } from '../../commands/move_elements';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
@@ -54,6 +55,8 @@ export class SelectMoveTool implements IBaseTool {
     } else {
       this.prevBBoxPos = { x: bBox.x, y: bBox.y };
     }
+
+    this.editor.refLine.cacheXYToBbox();
   }
   drag(e: PointerEvent) {
     this.dragPointer = this.editor.getCursorXY(e);
@@ -93,6 +96,17 @@ export class SelectMoveTool implements IBaseTool {
       selectedElements[i].x = startPoints[i].x + dx;
       selectedElements[i].y = startPoints[i].y + dy;
     }
+
+    // 参照线处理（目前不处理 “吸附到像素网格的情况” 的特殊情况）
+    const { offsetX, offsetY } = this.editor.refLine.updateRefLine(
+      bboxToBbox2(this.editor.selectedElements.getBBox()!),
+    );
+
+    for (let i = 0, len = selectedElements.length; i < len; i++) {
+      selectedElements[i].x = startPoints[i].x + dx + offsetX;
+      selectedElements[i].y = startPoints[i].y + dy + offsetY;
+    }
+
     this.editor.sceneGraph.render();
   }
   end(e: PointerEvent, isEnableDrag: boolean) {
@@ -116,6 +130,7 @@ export class SelectMoveTool implements IBaseTool {
   }
   afterEnd() {
     this.editor.sceneGraph.showOutline = true;
+    this.editor.refLine.clear();
     this.editor.sceneGraph.render();
   }
 }

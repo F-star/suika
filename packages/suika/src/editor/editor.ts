@@ -14,6 +14,7 @@ import { ZoomManager } from './zoom_manager';
 import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { GraphAttrs } from './scene/graph';
 import { TextEditor } from './text/text_editor';
+import { RefLine } from './ref-line';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -41,6 +42,7 @@ export class Editor {
 
   selectedElements: SelectedElements;
   ruler: Ruler;
+  refLine: RefLine;
   textEditor: TextEditor;
 
   autoSaveGraphs: AutoSaveGraphs;
@@ -69,6 +71,7 @@ export class Editor {
 
     this.selectedElements = new SelectedElements(this);
     this.ruler = new Ruler(this);
+    this.refLine = new RefLine(this);
     this.textEditor = new TextEditor(this);
 
     this.hostEventManager = new HostEventManager(this);

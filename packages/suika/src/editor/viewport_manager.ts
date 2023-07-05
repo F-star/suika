@@ -1,4 +1,4 @@
-import { IBox } from '../type';
+import { IBox, IBox2 } from '../type';
 import { getDevicePixelRatio } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { Editor } from './editor';
@@ -48,6 +48,26 @@ export class ViewportManager {
     this.scrollX += dx;
     this.scrollY += dy;
     this.eventEmitter.emit('xOrYChange', this.scrollX, this.scrollY);
+  }
+  getBbox(): IBox {
+    const { x, y, width, height } = this.getViewport();
+    const zoom = this.editor.zoomManager.getZoom();
+    return {
+      x: x,
+      y: y,
+      width: width / zoom,
+      height: height / zoom,
+    };
+  }
+  getBbox2(): IBox2 {
+    const { x, y, width, height } = this.getViewport();
+    const zoom = this.editor.zoomManager.getZoom();
+    return {
+      minX: x,
+      minY: y,
+      maxX: x + width / zoom,
+      maxY: y + height / zoom,
+    };
   }
   on(eventName: 'xOrYChange', handler: (x: number, y: number) => void) {
     this.eventEmitter.on(eventName, handler);

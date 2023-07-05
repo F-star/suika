@@ -1,4 +1,4 @@
-import { IBox, ICircle, IPoint, IRect } from '../type';
+import { IBox, IBox2, IBoxWithMid, ICircle, IPoint, IRect } from '../type';
 import { transformRotate } from './transform';
 
 /**
@@ -10,6 +10,15 @@ export function isRectIntersect(rect1: IRect, rect2: IRect) {
     rect1.x + rect1.width >= rect2.x &&
     rect1.y <= rect2.y + rect2.height &&
     rect1.y + rect1.height >= rect2.y
+  );
+}
+
+export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
+  return (
+    rect1.minX <= rect2.maxX &&
+    rect1.maxX >= rect2.minX &&
+    rect1.minY <= rect2.maxY &&
+    rect1.maxY >= rect2.minY
   );
 }
 
@@ -117,6 +126,15 @@ export function isRectContain(rect1: IRect, rect2: IRect) {
   );
 }
 
+export function isRectContain2(rect1: IBox2, rect2: IBox2) {
+  return (
+    rect1.minX <= rect2.minX &&
+    rect1.minY <= rect2.minY &&
+    rect1.maxX >= rect2.maxX &&
+    rect1.maxY >= rect2.maxY
+  );
+}
+
 /**
  * rect 中心点
  */
@@ -195,3 +213,20 @@ export function getElementRotatedXY(element: {
   const [cx, cy] = getRectCenterPoint(element);
   return transformRotate(element.x, element.y, element.rotation || 0, cx, cy);
 }
+
+export const bboxToBbox2 = (bbox: IBox): IBox2 => {
+  return {
+    minX: bbox.x,
+    minY: bbox.y,
+    maxX: bbox.x + bbox.width,
+    maxY: bbox.y + bbox.height,
+  };
+};
+
+export const bboxToBboxWithMid = (box: IBox2): IBoxWithMid => {
+  return {
+    ...box,
+    midX: box.minX / 2 + box.maxX / 2,
+    midY: box.minY / 2 + box.maxY / 2,
+  };
+};

@@ -1,5 +1,5 @@
 import { rotateInCanvas } from '../utils/canvas';
-import { getClosestVal, nearestPixelVal } from '../utils/common';
+import { getClosestTimesVal, nearestPixelVal } from '../utils/common';
 import { Editor } from './editor';
 
 const HALF_PI = Math.PI / 2;
@@ -85,11 +85,11 @@ class Ruler {
 
     const startX = setting.get('rulerWidth');
     let startXInScene = viewport.x + startX / zoom;
-    startXInScene = getClosestVal(startXInScene, stepInScene);
+    startXInScene = getClosestTimesVal(startXInScene, stepInScene);
 
     const endX = viewport.width;
     let { x: endXInScene } = this.editor.viewportCoordsToScene(endX, 0);
-    endXInScene = getClosestVal(endXInScene, stepInScene);
+    endXInScene = getClosestTimesVal(endXInScene, stepInScene);
 
     ctx.textAlign = 'center';
     const y = setting.get('rulerWidth') - setting.get('rulerMarkSize');
@@ -116,11 +116,11 @@ class Ruler {
 
     const startY = setting.get('rulerWidth');
     let startYInScene = viewport.y + startY / zoom;
-    startYInScene = getClosestVal(startYInScene, stepInScene);
+    startYInScene = getClosestTimesVal(startYInScene, stepInScene);
 
     const endY = viewport.height;
     let endYInScene = viewport.y + endY / zoom;
-    endYInScene = getClosestVal(endYInScene, stepInScene);
+    endYInScene = getClosestTimesVal(endYInScene, stepInScene);
 
     const x = setting.get('rulerWidth') - setting.get('rulerMarkSize');
     ctx.textAlign = 'center';
