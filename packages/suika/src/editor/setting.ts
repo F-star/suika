@@ -71,6 +71,12 @@ export class Setting {
     moveElementsStep: 1,
     moveElementsStepFast: 10,
     moveElementsDelay: 500,
+
+    // reference line
+    refLineTolerance: 4,
+    refLineStroke: '#f14f30ee',
+    refLineStrokeWidth: 1,
+    refLinePointSize: 5,
   };
 
   set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {

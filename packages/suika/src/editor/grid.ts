@@ -1,4 +1,4 @@
-import { getClosestVal, nearestPixelVal } from '../utils/common';
+import { getClosestTimesVal, nearestPixelVal } from '../utils/common';
 import { Editor } from './editor';
 
 /**
@@ -10,14 +10,19 @@ class Grid {
   draw() {
     const ctx = this.editor.ctx;
 
-    const { x: offsetX, y: offsetY, width, height } = this.editor.viewportManager.getViewport();
+    const {
+      x: offsetX,
+      y: offsetY,
+      width,
+      height,
+    } = this.editor.viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
     const setting = this.editor.setting;
     const step = this.step;
 
     /*** draw vertical lines ***/
-    let startXInScene = getClosestVal(offsetX, step);
-    const endXInScene = getClosestVal(offsetX + width / zoom, step);
+    let startXInScene = getClosestTimesVal(offsetX, step);
+    const endXInScene = getClosestTimesVal(offsetX + width / zoom, step);
 
     while (startXInScene <= endXInScene) {
       ctx.strokeStyle = setting.get('pixelGridLineColor');
@@ -31,8 +36,8 @@ class Grid {
     }
 
     /*** draw horizontal lines ***/
-    let startYInScene = getClosestVal(offsetY, step);
-    const endYInScene = getClosestVal(offsetY + height / zoom, step);
+    let startYInScene = getClosestTimesVal(offsetY, step);
+    const endYInScene = getClosestTimesVal(offsetY + height / zoom, step);
 
     while (startYInScene <= endYInScene) {
       ctx.strokeStyle = setting.get('pixelGridLineColor');

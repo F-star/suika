@@ -14,6 +14,11 @@ export interface IBox2 {
   maxY: number;
 }
 
+export interface IBoxWithMid extends IBox2 {
+  midX: number;
+  midY: number;
+}
+
 export interface ICircle {
   x: number;
   y: number;
