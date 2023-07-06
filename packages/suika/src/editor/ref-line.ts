@@ -90,17 +90,18 @@ export class RefLine {
     this.toDrawHLines = [];
     const targetBbox = bboxToBboxWithMid(_targetBbox);
 
-    let offsetX: number | undefined = undefined;
-    let offsetY: number | undefined = undefined;
-    const xMap = this.hLineMap;
-    const yMap = this.vLineMap;
+    const hLineMap = this.hLineMap;
+    const vLineMap = this.vLineMap;
     const sortedXs = this.sortedXs;
     const sortedYs = this.sortedYs;
 
     // there are no reference graphs
-    if (sortedXs.length === 0) {
+    if (sortedXs.length === 0 && sortedYs.length === 0) {
       return { offsetX: 0, offsetY: 0 };
     }
+
+    let offsetX: number | undefined = undefined;
+    let offsetY: number | undefined = undefined;
 
     // closest x
     const closestMinX = getClosestValInSortedArr(sortedXs, targetBbox.minX);
@@ -181,7 +182,7 @@ export class RefLine {
 
         vLine.ys.push(correctedTargetBbox.minY);
         vLine.ys.push(correctedTargetBbox.maxY);
-        vLine.ys.push(...xMap.get(closestMinX)!);
+        vLine.ys.push(...hLineMap.get(closestMinX)!);
 
         this.toDrawVLines.push(vLine);
       }
@@ -197,7 +198,7 @@ export class RefLine {
         };
 
         vLine.ys.push(correctedTargetBbox.midY);
-        vLine.ys.push(...xMap.get(closestMidX)!);
+        vLine.ys.push(...hLineMap.get(closestMidX)!);
 
         this.toDrawVLines.push(vLine);
       }
@@ -214,7 +215,7 @@ export class RefLine {
 
         vLine.ys.push(correctedTargetBbox.minY);
         vLine.ys.push(correctedTargetBbox.maxY);
-        vLine.ys.push(...xMap.get(closestMaxX)!);
+        vLine.ys.push(...hLineMap.get(closestMaxX)!);
 
         this.toDrawVLines.push(vLine);
       }
@@ -233,7 +234,7 @@ export class RefLine {
 
         hLine.xs.push(correctedTargetBbox.minX);
         hLine.xs.push(correctedTargetBbox.maxX);
-        hLine.xs.push(...yMap.get(closestMinY)!);
+        hLine.xs.push(...vLineMap.get(closestMinY)!);
 
         this.toDrawHLines.push(hLine);
       }
@@ -248,7 +249,7 @@ export class RefLine {
         };
 
         hLine.xs.push(correctedTargetBbox.midX);
-        hLine.xs.push(...yMap.get(closestMidY)!);
+        hLine.xs.push(...vLineMap.get(closestMidY)!);
 
         this.toDrawHLines.push(hLine);
       }
@@ -264,7 +265,7 @@ export class RefLine {
 
         hLine.xs.push(correctedTargetBbox.minX);
         hLine.xs.push(correctedTargetBbox.maxX);
-        hLine.xs.push(...yMap.get(closestMaxY)!);
+        hLine.xs.push(...vLineMap.get(closestMaxY)!);
 
         this.toDrawHLines.push(hLine);
       }
