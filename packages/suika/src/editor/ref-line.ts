@@ -1,37 +1,39 @@
 import { Editor } from './editor';
-import { IBox2, IBoxWithMid, IPoint } from '../type';
+import { IBox2 } from '../type';
 import { bboxToBboxWithMid, isRectIntersect2 } from '../utils/graphics';
 import { getClosestValInSortedArr } from '../utils/common';
 import { drawLine, drawXShape } from '../utils/canvas';
+
+interface IVerticalLine {
+  x: number;
+  ys: number[];
+}
+
+interface IHorizontalLine {
+  y: number;
+  xs: number[];
+}
 
 /**
  * reference line
  */
 export class RefLine {
-  private xMap = new Map<number, IBoxWithMid[]>();
-  private yMap = new Map<number, IBoxWithMid[]>();
-  private sortedXs: number[] = [];
-  private sortedYs: number[] = [];
+  private hLineMap = new Map<number, number[]>(); // 参考图形产生的垂直参照线，y 相同（作为 key），x 值不同（作为 value）
+  private vLineMap = new Map<number, number[]>(); // 参考图形产生的水平照线，x 相同（作为 key），y 值不同（作为 value）
 
-  /**
-   * some vertical lines with points. e.g:
-   * [
-   *  [0, 0], [9, 0], [2, 0],
-   *  [9, 5], [10, 5]
-   * ]
-   */
-  refVLines: IPoint[][] = [];
-  refHLines: IPoint[][] = [];
+  private sortedXs: number[] = []; // 对 hLineMap 的 key 排序
+  private sortedYs: number[] = []; // 对 vLineMap 的 key 排序
+
+  private toDrawVLines: IVerticalLine[] = []; // 等待绘制的垂直参照线
+  private toDrawHLines: IHorizontalLine[] = []; // 等待绘制的水平参照线
 
   constructor(private editor: Editor) {}
 
-  // 计算图形的 bbox 缓存为两个 map，一个 map 的 key 是 x，value 为 bbox
-  // 另一个 map 的 key 为 y 值
   cacheXYToBbox() {
     this.clear();
 
-    const xMap = this.xMap;
-    const yMap = this.yMap;
+    const hLineMap = this.hLineMap;
+    const vLineMap = this.vLineMap;
 
     const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox2();
@@ -45,36 +47,36 @@ export class RefLine {
         continue;
       }
 
-      this.addBboxToMap(xMap, bbox.minX, bbox);
-      this.addBboxToMap(xMap, bbox.midX, bbox);
-      this.addBboxToMap(xMap, bbox.maxX, bbox);
+      this.addBboxToMap(hLineMap, bbox.minX, [bbox.minY, bbox.maxY]);
+      this.addBboxToMap(hLineMap, bbox.midX, [bbox.minY, bbox.maxY]);
+      this.addBboxToMap(hLineMap, bbox.maxX, [bbox.minY, bbox.maxY]);
 
-      this.addBboxToMap(yMap, bbox.minY, bbox);
-      this.addBboxToMap(yMap, bbox.midY, bbox);
-      this.addBboxToMap(yMap, bbox.maxY, bbox);
+      this.addBboxToMap(vLineMap, bbox.minY, [bbox.minX, bbox.maxX]);
+      this.addBboxToMap(vLineMap, bbox.midY, [bbox.minX, bbox.maxX]);
+      this.addBboxToMap(vLineMap, bbox.maxY, [bbox.minX, bbox.maxX]);
     }
 
-    this.sortedXs = Array.from(xMap.keys()).sort((a, b) => a - b);
-    this.sortedYs = Array.from(yMap.keys()).sort((a, b) => a - b);
+    this.sortedXs = Array.from(hLineMap.keys()).sort((a, b) => a - b);
+    this.sortedYs = Array.from(vLineMap.keys()).sort((a, b) => a - b);
   }
   clear() {
-    this.xMap.clear();
-    this.yMap.clear();
+    this.hLineMap.clear();
+    this.vLineMap.clear();
     this.sortedXs = [];
     this.sortedYs = [];
-    this.refVLines = [];
-    this.refHLines = [];
+    this.toDrawVLines = [];
+    this.toDrawHLines = [];
   }
   private addBboxToMap(
-    m: Map<number, IBoxWithMid[]>,
-    num: number,
-    bbox: IBoxWithMid,
+    m: Map<number, number[]>,
+    xOrY: number,
+    xsOrYs: number[],
   ) {
-    const bboxes = m.get(num);
-    if (bboxes) {
-      bboxes.push(bbox);
+    const line = m.get(xOrY);
+    if (line) {
+      line.push(...xsOrYs);
     } else {
-      m.set(num, [bbox]);
+      m.set(xOrY, [...xsOrYs]);
     }
   }
 
@@ -84,14 +86,14 @@ export class RefLine {
     offsetX: number;
     offsetY: number;
   } {
-    this.refVLines = [];
-    this.refHLines = [];
+    this.toDrawVLines = [];
+    this.toDrawHLines = [];
     const targetBbox = bboxToBboxWithMid(_targetBbox);
 
     let offsetX: number | undefined = undefined;
     let offsetY: number | undefined = undefined;
-    const xMap = this.xMap;
-    const yMap = this.yMap;
+    const xMap = this.hLineMap;
+    const yMap = this.vLineMap;
     const sortedXs = this.sortedXs;
     const sortedYs = this.sortedYs;
 
@@ -172,16 +174,16 @@ export class RefLine {
         isEqualNum(closestXDist, distMinX) &&
         isEqualNum(offsetX, closestMinX - targetBbox.minX)
       ) {
-        const points: IPoint[] = [];
-        // points of targetBbox
-        points.push({ x: closestMinX, y: correctedTargetBbox.minY });
-        points.push({ x: closestMinX, y: correctedTargetBbox.maxY });
-        // points of reference graphs
-        for (const b of xMap.get(closestMinX)!) {
-          points.push({ x: closestMinX, y: b.minY });
-          points.push({ x: closestMinX, y: b.maxY });
-        }
-        this.refVLines.push(points);
+        const vLine: IVerticalLine = {
+          x: closestMinX,
+          ys: [],
+        };
+
+        vLine.ys.push(correctedTargetBbox.minY);
+        vLine.ys.push(correctedTargetBbox.maxY);
+        vLine.ys.push(...xMap.get(closestMinX)!);
+
+        this.toDrawVLines.push(vLine);
       }
 
       /*************** 中间垂直的参考线 ************/
@@ -189,16 +191,15 @@ export class RefLine {
         isEqualNum(closestXDist, distMidX) &&
         isEqualNum(offsetX, closestMidX - targetBbox.midX)
       ) {
-        const points: IPoint[] = [];
-        points.push({
+        const vLine: IVerticalLine = {
           x: closestMidX,
-          y: correctedTargetBbox.midY,
-        });
-        for (const b of xMap.get(closestMidX)!) {
-          points.push({ x: closestMidX, y: b.minY });
-          points.push({ x: closestMidX, y: b.maxY });
-        }
-        this.refVLines.push(points);
+          ys: [],
+        };
+
+        vLine.ys.push(correctedTargetBbox.midY);
+        vLine.ys.push(...xMap.get(closestMidX)!);
+
+        this.toDrawVLines.push(vLine);
       }
 
       /*************** 右垂直的参考线 ************/
@@ -206,63 +207,66 @@ export class RefLine {
         isEqualNum(closestXDist, distMaxX) &&
         isEqualNum(offsetX, closestMaxX - targetBbox.maxX)
       ) {
-        const points: IPoint[] = [];
-        points.push({ x: closestMaxX, y: correctedTargetBbox.minY });
-        points.push({ x: closestMaxX, y: correctedTargetBbox.maxY });
-        for (const b of xMap.get(closestMaxX)!) {
-          points.push({ x: closestMaxX, y: b.minY });
-          points.push({ x: closestMaxX, y: b.maxY });
-        }
-        this.refVLines.push(points);
+        const vLine: IVerticalLine = {
+          x: closestMaxX,
+          ys: [],
+        };
+
+        vLine.ys.push(correctedTargetBbox.minY);
+        vLine.ys.push(correctedTargetBbox.maxY);
+        vLine.ys.push(...xMap.get(closestMaxX)!);
+
+        this.toDrawVLines.push(vLine);
       }
     }
 
     if (offsetY !== undefined) {
+      /*************** 上水平的参考线 ************/
       if (
         isEqualNum(closestYDist, distMinY) &&
         isEqualNum(offsetY, closestMinY - targetBbox.minY)
       ) {
-        offsetY = closestMinY - targetBbox.minY;
-        /*************** 上水平的参考线 ************/
-        const points: IPoint[] = [];
-        // 自己的点也放进去
-        points.push({ x: correctedTargetBbox.minX, y: closestMinY });
-        points.push({ x: correctedTargetBbox.maxX, y: closestMinY });
-        for (const b of yMap.get(closestMinY)!) {
-          points.push({ x: b.minX, y: closestMinY });
-          points.push({ x: b.maxX, y: closestMinY });
-        }
-        this.refHLines.push(points);
+        const hLine: IHorizontalLine = {
+          y: closestMinY,
+          xs: [],
+        };
+
+        hLine.xs.push(correctedTargetBbox.minX);
+        hLine.xs.push(correctedTargetBbox.maxX);
+        hLine.xs.push(...yMap.get(closestMinY)!);
+
+        this.toDrawHLines.push(hLine);
       }
       /*************** 中间水平的参考线 ************/
       if (
         isEqualNum(closestYDist, distMidY) &&
         isEqualNum(offsetY, closestMidY - targetBbox.midY)
       ) {
-        const points: IPoint[] = [];
-        points.push({
-          x: correctedTargetBbox.midX,
+        const hLine: IHorizontalLine = {
           y: closestMidY,
-        });
-        for (const b of yMap.get(closestMidY)!) {
-          points.push({ x: b.minX, y: closestMidY });
-          points.push({ x: b.maxX, y: closestMidY });
-        }
-        this.refHLines.push(points);
+          xs: [],
+        };
+
+        hLine.xs.push(correctedTargetBbox.midX);
+        hLine.xs.push(...yMap.get(closestMidY)!);
+
+        this.toDrawHLines.push(hLine);
       }
       /*************** 下水平的参考线 ************/
       if (
         isEqualNum(closestYDist, distMaxY) &&
         isEqualNum(offsetY, closestMaxY - targetBbox.maxY)
       ) {
-        const points: IPoint[] = [];
-        points.push({ x: correctedTargetBbox.minX, y: closestMaxY });
-        points.push({ x: correctedTargetBbox.maxX, y: closestMaxY });
-        for (const b of yMap.get(closestMaxY)!) {
-          points.push({ x: b.minX, y: closestMaxY });
-          points.push({ x: b.maxX, y: closestMaxY });
-        }
-        this.refHLines.push(points);
+        const hLine: IHorizontalLine = {
+          y: closestMaxY,
+          xs: [],
+        };
+
+        hLine.xs.push(correctedTargetBbox.minX);
+        hLine.xs.push(correctedTargetBbox.maxX);
+        hLine.xs.push(...yMap.get(closestMaxY)!);
+
+        this.toDrawHLines.push(hLine);
       }
     }
 
@@ -291,13 +295,16 @@ export class RefLine {
     pointSize: number,
     pointsSet: Set<string>,
   ) {
-    for (const pts of this.refVLines) {
-      let min = Infinity;
-      let max = -Infinity;
-      for (const p of pts) {
-        const { x, y } = this.editor.sceneCoordsToViewport(p.x, p.y);
-        min = Math.min(min, y);
-        max = Math.max(max, y);
+    for (const vLine of this.toDrawVLines) {
+      let minY = Infinity;
+      let maxY = -Infinity;
+
+      const { x } = this.editor.sceneCoordsToViewport(vLine.x, 0);
+      for (const y_ of vLine.ys) {
+        // TODO: optimize
+        const { y } = this.editor.sceneCoordsToViewport(0, y_);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
 
         // prevent draw same points again
         const key = `${x},${y}`;
@@ -309,8 +316,7 @@ export class RefLine {
         drawXShape(ctx, x, y, pointSize);
       }
 
-      const { x: p0x } = this.editor.sceneCoordsToViewport(pts[0].x, 0);
-      drawLine(ctx, p0x, min, p0x, max);
+      drawLine(ctx, x, minY, x, maxY);
     }
   }
 
@@ -319,13 +325,16 @@ export class RefLine {
     pointSize: number,
     pointsSet: Set<string>,
   ) {
-    for (const pts of this.refHLines) {
-      let min = Infinity;
-      let max = -Infinity;
-      for (const p of pts) {
-        const { x, y } = this.editor.sceneCoordsToViewport(p.x, p.y);
-        min = Math.min(min, x);
-        max = Math.max(max, x);
+    for (const hLine of this.toDrawHLines) {
+      let minX = Infinity;
+      let maxX = -Infinity;
+
+      const { y } = this.editor.sceneCoordsToViewport(0, hLine.y);
+
+      for (const x_ of hLine.xs) {
+        const { x } = this.editor.sceneCoordsToViewport(x_, 0);
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
 
         // prevent draw same points again
         const key = `${x},${y}`;
@@ -337,8 +346,7 @@ export class RefLine {
         drawXShape(ctx, x, y, pointSize);
       }
 
-      const { y: p0y } = this.editor.sceneCoordsToViewport(0, pts[0].y);
-      drawLine(ctx, min, p0y, max, p0y);
+      drawLine(ctx, minX, y, maxX, y);
     }
   }
 }
