@@ -28,7 +28,7 @@ Some Chinese language articles on how to develop a graphic editor.
 另外可以关注我的公众号，持续更新图形编辑器相关文章。
 
 <img 
-  style="max-width: 400px;"
+  width="500px"
   src="https://user-images.githubusercontent.com/18698939/219853531-e39e1537-99e6-40bf-a56f-81330fca3180.png" 
 />
 
