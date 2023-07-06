@@ -140,7 +140,7 @@ export class RefLine {
       } else if (isEqualNum(closestXDist, distMaxX)) {
         offsetX = closestMaxX - targetBbox.maxX;
       } else {
-        throw new Error('it should reach here, please put a issue to us');
+        throw new Error('it should not reach here, please put a issue to us');
       }
     }
 
@@ -153,7 +153,7 @@ export class RefLine {
       } else if (isEqualNum(closestYDist, distMaxY)) {
         offsetY = closestMaxY - targetBbox.maxY;
       } else {
-        throw new Error('it should reach here, please put a issue to us');
+        throw new Error('it should not reach here, please put a issue to us');
       }
     }
 
@@ -171,10 +171,7 @@ export class RefLine {
 
     if (offsetX !== undefined) {
       /*************** 左垂直的参考线 ************/
-      if (
-        isEqualNum(closestXDist, distMinX) &&
-        isEqualNum(offsetX, closestMinX - targetBbox.minX)
-      ) {
+      if (isEqualNum(offsetX, closestMinX - targetBbox.minX)) {
         const vLine: IVerticalLine = {
           x: closestMinX,
           ys: [],
@@ -188,10 +185,7 @@ export class RefLine {
       }
 
       /*************** 中间垂直的参考线 ************/
-      if (
-        isEqualNum(closestXDist, distMidX) &&
-        isEqualNum(offsetX, closestMidX - targetBbox.midX)
-      ) {
+      if (isEqualNum(offsetX, closestMidX - targetBbox.midX)) {
         const vLine: IVerticalLine = {
           x: closestMidX,
           ys: [],
@@ -204,10 +198,7 @@ export class RefLine {
       }
 
       /*************** 右垂直的参考线 ************/
-      if (
-        isEqualNum(closestXDist, distMaxX) &&
-        isEqualNum(offsetX, closestMaxX - targetBbox.maxX)
-      ) {
+      if (isEqualNum(offsetX, closestMaxX - targetBbox.maxX)) {
         const vLine: IVerticalLine = {
           x: closestMaxX,
           ys: [],
@@ -223,10 +214,7 @@ export class RefLine {
 
     if (offsetY !== undefined) {
       /*************** 上水平的参考线 ************/
-      if (
-        isEqualNum(closestYDist, distMinY) &&
-        isEqualNum(offsetY, closestMinY - targetBbox.minY)
-      ) {
+      if (isEqualNum(offsetY, closestMinY - targetBbox.minY)) {
         const hLine: IHorizontalLine = {
           y: closestMinY,
           xs: [],
@@ -239,10 +227,7 @@ export class RefLine {
         this.toDrawHLines.push(hLine);
       }
       /*************** 中间水平的参考线 ************/
-      if (
-        isEqualNum(closestYDist, distMidY) &&
-        isEqualNum(offsetY, closestMidY - targetBbox.midY)
-      ) {
+      if (isEqualNum(offsetY, closestMidY - targetBbox.midY)) {
         const hLine: IHorizontalLine = {
           y: closestMidY,
           xs: [],
@@ -254,10 +239,7 @@ export class RefLine {
         this.toDrawHLines.push(hLine);
       }
       /*************** 下水平的参考线 ************/
-      if (
-        isEqualNum(closestYDist, distMaxY) &&
-        isEqualNum(offsetY, closestMaxY - targetBbox.maxY)
-      ) {
+      if (isEqualNum(offsetY, closestMaxY - targetBbox.maxY)) {
         const hLine: IHorizontalLine = {
           y: closestMaxY,
           xs: [],
