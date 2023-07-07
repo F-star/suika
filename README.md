@@ -4,6 +4,9 @@ An open-source vector graphics editor based on Canvas, similar to Figma.
 
 [Suika Editor](https://blog.fstars.wang/app/suika/)
 
+![image](https://github.com/F-star/suika/assets/18698939/46ec7396-ecab-4caa-a0da-f77cf9ba773e)
+
+
 ## Feature
 
 - Graphics editing
