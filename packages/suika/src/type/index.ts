@@ -56,3 +56,9 @@ export enum GraphType {
  * // { a: string; b?: number; c: boolean }
  */
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+export interface IEditorPaperData {
+  appVersion: string;
+  paperId: string;
+  data: string;
+}

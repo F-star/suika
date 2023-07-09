@@ -1,7 +1,8 @@
 import debounce from 'lodash.debounce';
 import { Editor } from '../editor';
+import { IEditorPaperData } from '../../type';
 
-const STORE_KEY = 'suika-scene-graphs';
+const STORE_KEY = 'suika-paper';
 
 export class AutoSaveGraphs {
   listener: () => void;
@@ -21,7 +22,9 @@ export class AutoSaveGraphs {
     localStorage.setItem(STORE_KEY, this.editor.sceneGraph.toJSON());
   }
   load() {
-    const data = localStorage.getItem(STORE_KEY);
-    data && this.editor.sceneGraph.load(data);
+    const dataStr = localStorage.getItem(STORE_KEY);
+    if (!dataStr) return null;
+    const data = JSON.parse(dataStr) as IEditorPaperData;
+    return data;
   }
 }

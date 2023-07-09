@@ -4,7 +4,7 @@ import { GithubOutlined } from '@suika/icons';
 
 const Title: FC = () => {
   return (
-    <div className="title">
+    <div className="suika-header-title">
       <GithubOutlined />
       <a href="https://github.com/F-star/suika" target="_blank">
         suika

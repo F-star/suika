@@ -1,5 +1,6 @@
 import { SceneGraph } from './scene/scene_graph';
 import {
+  genId,
   sceneCoordsToViewportUtil,
   viewportCoordsToSceneUtil,
 } from '../utils/common';
@@ -15,6 +16,7 @@ import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { GraphAttrs } from './scene/graph';
 import { TextEditor } from './text/text_editor';
 import { RefLine } from './ref-line';
+import { ClipboardManager } from './clipboard';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -28,6 +30,10 @@ export class Editor {
   containerElement: HTMLDivElement;
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+
+  appVersion = 'suika-editor_0.0.1';
+  paperId: string;
+
   sceneGraph: SceneGraph;
 
   setting: Setting;
@@ -39,6 +45,7 @@ export class Editor {
   zoomManager: ZoomManager;
 
   hostEventManager: HostEventManager;
+  clipboard: ClipboardManager;
 
   selectedElements: SelectedElements;
   ruler: Ruler;
@@ -77,8 +84,16 @@ export class Editor {
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
 
+    this.clipboard = new ClipboardManager(this);
+    this.clipboard.bindEvents();
+
     this.autoSaveGraphs = new AutoSaveGraphs(this);
-    this.autoSaveGraphs.load();
+    const data = this.autoSaveGraphs.load();
+    if (data) {
+      this.sceneGraph.load(data.data);
+      this.paperId = data.paperId;
+    }
+    this.paperId ??= genId();
     this.autoSaveGraphs.autoSave();
 
     // 设置初始视口
@@ -103,6 +118,7 @@ export class Editor {
     this.containerElement.removeChild(this.canvasElement);
     this.textEditor.destroy();
     this.hostEventManager.destroy();
+    this.clipboard.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
   }

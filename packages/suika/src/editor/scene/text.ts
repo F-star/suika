@@ -39,6 +39,15 @@ export class TextGraph extends Graph {
     this.content = options.content;
     this.fontSize = options.fontSize;
   }
+  getAttrs() {
+    return {
+      ...super.getAttrs(),
+      content: this.content,
+      fontSize: this.fontSize,
+      autoFit: this.autoFit,
+    };
+  }
+
   fillTexture(ctx: CanvasRenderingContext2D) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;

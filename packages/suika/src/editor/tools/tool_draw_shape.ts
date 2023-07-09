@@ -129,7 +129,7 @@ export abstract class DrawShapeTool implements ITool {
         ...rect,
         fill: cloneDeep(this.editor.setting.get('fill')),
       });
-      sceneGraph.appendChild(element);
+      sceneGraph.addItems([element]);
 
       this.drawingShape = element;
     }
@@ -159,14 +159,14 @@ export abstract class DrawShapeTool implements ITool {
         height,
         fill: cloneDeep(this.editor.setting.get('fill')),
       });
-      this.editor.sceneGraph.appendChild(this.drawingShape);
+      this.editor.sceneGraph.addItems([this.drawingShape]);
 
       this.editor.selectedElements.setItems([this.drawingShape]);
       this.editor.sceneGraph.render();
     }
 
     this.editor.commandManager.pushCommand(
-      new AddShapeCommand(this.commandDesc, this.editor, this.drawingShape),
+      new AddShapeCommand(this.commandDesc, this.editor, [this.drawingShape]),
     );
   }
 

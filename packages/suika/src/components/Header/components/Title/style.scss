@@ -1,11 +1,11 @@
 .suika {
-  .title {
+  .suika-header-title {
     flex: 1;
-
     display: flex;
     justify-content: center;
     align-items: center;
     color: #0f8fff;
+    user-select: none;
     a {
       margin-left: 4px;
       text-decoration: none;
