@@ -6,7 +6,6 @@ An open-source vector graphics editor based on Canvas, similar to Figma.
 
 ![image](https://github.com/F-star/suika/assets/18698939/46ec7396-ecab-4caa-a0da-f77cf9ba773e)
 
-
 ## Feature
 
 - Graphics editing
@@ -31,7 +30,7 @@ Some Chinese language articles on how to develop a graphic editor.
 另外可以关注我的公众号，持续更新图形编辑器相关文章。
 
 <img 
-  width="500px"
+  width="550px"
   src="https://user-images.githubusercontent.com/18698939/219853531-e39e1537-99e6-40bf-a56f-81330fca3180.png" 
 />
 
