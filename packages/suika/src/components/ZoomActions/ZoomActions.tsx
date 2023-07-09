@@ -82,6 +82,12 @@ export const ZoomActions: FC = () => {
                 },
               },
               {
+                id: 'zoom.zoomToSelection',
+                action: () => {
+                  editor?.zoomManager.zoomToSelection();
+                },
+              },
+              {
                 id: 'zoom.zoomTo50',
                 action: () => {
                   editor?.zoomManager.setZoomAndUpdateViewport(0.5);

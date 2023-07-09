@@ -66,6 +66,21 @@ export class Graph {
       this.rotation = options.rotation;
     }
   }
+  getAttrs(): GraphAttrs {
+    return {
+      type: this.type,
+      id: this.id,
+      objectName: this.objectName,
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      fill: this.fill,
+      stroke: this.stroke,
+      strokeWidth: this.strokeWidth,
+      rotation: this.rotation,
+    };
+  }
   setAttrs(attrs: Partial<GraphAttrs>) {
     let key: keyof Partial<GraphAttrs>;
     for (key in attrs) {
@@ -74,15 +89,7 @@ export class Graph {
       self[key] = attrs[key];
     }
   }
-  getAttrs(attrKeys: Array<keyof GraphAttrs>) {
-    const attrs: Partial<GraphAttrs> = {};
-    for (let i = 0, len = attrKeys.length; i < len; i++) {
-      const key = attrKeys[i];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (attrs as any)[key] = this[key];
-    }
-    return attrs;
-  }
+
   /**
    * AABB (axis-aligned bounding box)
    */
@@ -226,6 +233,13 @@ export class Graph {
       width,
       height,
     );
+  }
+
+  static dMove(graphs: Graph[], dx: number, dy: number) {
+    for (const graph of graphs) {
+      graph.x += dx;
+      graph.y += dy;
+    }
   }
 }
 

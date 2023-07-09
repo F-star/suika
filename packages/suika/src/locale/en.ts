@@ -21,6 +21,7 @@ export const en = {
   'zoom.zoomIn': 'Zoom in',
   'zoom.zoomOut': 'zoom out',
   'zoom.zoomToFit': 'Zoom to fit',
+  'zoom.zoomToSelection': 'Zoom to selection',
   'zoom.zoomTo50': 'Zoom to 50%',
   'zoom.zoomTo100': 'Zoom to 100%',
   'zoom.zoomTo200': 'Zoom to 200%',

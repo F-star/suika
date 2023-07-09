@@ -3,22 +3,20 @@ import { Editor } from '../editor';
 import { ICommand } from './type';
 
 /**
- * 创建矩形
+ * add elements
  */
 export class AddShapeCommand implements ICommand {
-  idx = -1;
-
   constructor(
     public desc: string,
     private editor: Editor,
-    private element: Graph
+    private elements: Graph[],
   ) {}
   redo() {
-    this.editor.sceneGraph.appendChild(this.element, this.idx);
-    this.editor.selectedElements.setItems([this.element]);
+    this.editor.sceneGraph.addItems(this.elements);
+    this.editor.selectedElements.setItems(this.elements);
   }
   undo() {
-    this.idx = this.editor.sceneGraph.removeChild(this.element);
+    this.editor.sceneGraph.removeItems(this.elements);
     this.editor.selectedElements.clear();
   }
 }

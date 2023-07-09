@@ -1,5 +1,12 @@
 import { Editor } from '../editor';
-import { GraphType, IBox, IObject, IPoint, IRect } from '../../type';
+import {
+  GraphType,
+  IBox,
+  IEditorPaperData,
+  IObject,
+  IPoint,
+  IRect,
+} from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
 import {
@@ -45,22 +52,28 @@ export class SceneGraph {
     this.transformHandle = new TransformHandle(editor);
     this.grid = new Grid(editor);
   }
-  appendChild(element: Graph, idx?: number) {
+  addItems(element: Graph[], idx?: number) {
     if (idx === undefined) {
-      this.children.push(element);
+      this.children.push(...element);
     } else {
-      this.children.splice(idx, 0, element);
+      this.children.splice(idx, 0, ...element);
     }
   }
   getElementById(id: string) {
     return this.children.find((item) => item.id === id);
   }
-  removeChild(element: Graph) {
-    const idx = this.children.indexOf(element);
-    if (idx !== -1) {
-      this.children.splice(idx, 1);
+  removeItems(elements: Graph[]) {
+    if (elements.length > 1) {
+      forEach(elements, (element) => {
+        this.removeItems([element]);
+      });
+    } else {
+      const element = elements[0];
+      const idx = this.children.indexOf(element);
+      if (idx !== -1) {
+        this.children.splice(idx, 1);
+      }
     }
-    return idx;
   }
   // 全局重渲染
   render = rafThrottle(() => {
@@ -313,10 +326,15 @@ export class SceneGraph {
   }
 
   toJSON() {
-    return JSON.stringify(this.children);
+    const paperData: IEditorPaperData = {
+      appVersion: 'suika-editor_0.0.1',
+      paperId: this.editor.paperId,
+      data: JSON.stringify(this.children),
+    };
+    return JSON.stringify(paperData);
   }
 
-  load(str: string) {
+  addGraphsByStr(str: string) {
     const ctorMap = {
       [GraphType.Graph]: Graph,
       [GraphType.Rect]: Rect,
@@ -325,7 +343,7 @@ export class SceneGraph {
     };
 
     const data: GraphAttrs[] = JSON.parse(str);
-    this.children = data.map((attrs) => {
+    const newChildren = data.map((attrs) => {
       const type = attrs.type;
       const Ctor = ctorMap[type!];
 
@@ -335,6 +353,14 @@ export class SceneGraph {
 
       return new Ctor(attrs as any);
     });
+
+    this.children.push(...newChildren);
+    return newChildren;
+  }
+
+  load(str: string) {
+    this.children = [];
+    this.addGraphsByStr(str);
   }
 
   // TODO: update tree by patch obj and id

@@ -2,14 +2,14 @@ import { ICommand } from './type';
 import { Graph } from '../scene/graph';
 
 /**
- * 创建矩形
+ * move elements
  */
 export class MoveElementsCommand implements ICommand {
   constructor(
     public desc: string,
     private elements: Graph[],
     private dx: number,
-    private dy: number
+    private dy: number,
   ) {}
   redo() {
     const { dx, dy } = this;

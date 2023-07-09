@@ -1,3 +1,4 @@
+import { IBox } from '../type';
 import { remainDecimal, viewportCoordsToSceneUtil } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
 import { getRectsBBox } from '../utils/graphics';
@@ -65,6 +66,10 @@ export class ZoomManager {
     this.setZoom(zoom);
     this.adjustScroll(cx, cy, prevZoom);
   }
+  /**
+   * make origin in viewport center
+   * and set zoom 100%
+   */
   reset() {
     this.setZoom(1);
     const viewportManager = this.editor.viewportManager;
@@ -74,19 +79,11 @@ export class ZoomManager {
       y: -viewport.height / 2,
     });
   }
-  zoomToFit() {
-    const viewport = this.editor.viewportManager.getViewport();
-    const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
-
-    if (bboxs.length === 0) {
-      this.reset();
-      return;
-    }
-
-    const composedBBox = getRectsBBox(...bboxs);
-
+  private zoomBoxToFit(composedBBox: IBox) {
     const padding = this.editor.setting.get('zoomToFixPadding');
-    // TODO:
+    const viewport = this.editor.viewportManager.getViewport();
+
+    // TODO: consider padding from ruler
     // const rulerWidth = this.editor.setting.get('enableRuler')
     //   ? this.editor.setting.get('rulerWidth')
     //   : 0;
@@ -122,6 +119,22 @@ export class ZoomManager {
       x: newViewportX,
       y: newViewportY,
     });
+  }
+  zoomToSelection() {
+    const selectionBox = this.editor.selectedElements.getBBox();
+    if (!selectionBox) {
+      this.zoomToFit();
+    } else {
+      this.zoomBoxToFit(selectionBox);
+    }
+  }
+  zoomToFit() {
+    if (this.editor.sceneGraph.children.length === 0) {
+      this.reset();
+      return;
+    }
+    const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
+    this.zoomBoxToFit(getRectsBBox(...bboxs));
   }
   getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();
