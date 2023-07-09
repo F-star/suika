@@ -4,7 +4,7 @@ import { EditorContext } from '../../../context';
 import { parseRGBAStr, parseRGBToHex } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
 import './FillCard.scss';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   DEFAULT_IMAGE_SRC,
   IRGBA,
@@ -123,7 +123,13 @@ export const FillCard: FC = () => {
   );
 
   if (fill.length == 0) {
-    return <div style={{ marginLeft: 16 }}>Mixed</div>;
+    return (
+      <BaseCard title={intl.formatMessage({ id: 'fill' })}>
+        <div style={{ marginLeft: 16 }}>
+          <FormattedMessage id="mixed" />
+        </div>
+      </BaseCard>
+    );
   }
 
   return (
