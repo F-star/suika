@@ -112,8 +112,10 @@ export class SceneGraph {
     // 场景坐标转换为视口坐标
     const dpr = getDevicePixelRatio();
 
+    const dx = -viewport.x;
+    const dy = -viewport.y;
     ctx.scale(dpr * zoom, dpr * zoom);
-    ctx.translate(-viewport.x, -viewport.y);
+    ctx.translate(dx, dy);
 
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       ctx.save();
