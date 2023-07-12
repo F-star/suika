@@ -2,27 +2,6 @@ import { IBox, IBox2, IBoxWithMid, ICircle, IPoint, IRect } from '../type';
 import { transformRotate } from './transform';
 
 /**
- * 矩形是否相交
- */
-export function isRectIntersect(rect1: IRect, rect2: IRect) {
-  return (
-    rect1.x <= rect2.x + rect2.width &&
-    rect1.x + rect1.width >= rect2.x &&
-    rect1.y <= rect2.y + rect2.height &&
-    rect1.y + rect1.height >= rect2.y
-  );
-}
-
-export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
-  return (
-    rect1.minX <= rect2.maxX &&
-    rect1.maxX >= rect2.minX &&
-    rect1.minY <= rect2.maxY &&
-    rect1.maxY >= rect2.minY
-  );
-}
-
-/**
  * 根据两个坐标点确定一个矩形
  */
 export function getRectByTwoCoord(point1: IPoint, point2: IPoint): IRect {
@@ -96,6 +75,27 @@ export function isPointInCircle(point: IPoint, circle: ICircle) {
   const dy = point.y - circle.y;
   const dSquare = dx * dx + dy * dy;
   return dSquare <= circle.radius * circle.radius;
+}
+
+/**
+ * 矩形是否相交
+ */
+export function isRectIntersect(rect1: IRect, rect2: IRect) {
+  return (
+    rect1.x <= rect2.x + rect2.width &&
+    rect1.x + rect1.width >= rect2.x &&
+    rect1.y <= rect2.y + rect2.height &&
+    rect1.y + rect1.height >= rect2.y
+  );
+}
+
+export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
+  return (
+    rect1.minX <= rect2.maxX &&
+    rect1.maxX >= rect2.minX &&
+    rect1.minY <= rect2.maxY &&
+    rect1.maxY >= rect2.minY
+  );
 }
 
 /**
@@ -213,4 +213,28 @@ export const bboxToBboxWithMid = (box: IBox2): IBoxWithMid => {
     midX: box.minX / 2 + box.maxX / 2,
     midY: box.minY / 2 + box.maxY / 2,
   };
+};
+
+export const pointsToVLines = (points: IPoint[]): Map<number, number[]> => {
+  const map = new Map<number, number[]>();
+  for (const point of points) {
+    const { x, y } = point;
+    if (!map.has(x)) {
+      map.set(x, []);
+    }
+    map.get(x)!.push(y);
+  }
+  return map;
+};
+
+export const pointsToHLines = (points: IPoint[]): Map<number, number[]> => {
+  const map = new Map<number, number[]>();
+  for (const point of points) {
+    const { x, y } = point;
+    if (!map.has(y)) {
+      map.set(y, []);
+    }
+    map.get(y)!.push(x);
+  }
+  return map;
 };

@@ -62,3 +62,13 @@ export interface IEditorPaperData {
   paperId: string;
   data: string;
 }
+
+export interface IVerticalLine {
+  x: number;
+  ys: number[];
+}
+
+export interface IHorizontalLine {
+  y: number;
+  xs: number[];
+}

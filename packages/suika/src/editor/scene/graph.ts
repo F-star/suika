@@ -1,6 +1,6 @@
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { IBox, IBox2, GraphType } from '../../type';
+import { IBox, IBox2, GraphType, IPoint } from '../../type';
 import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
 import {
   getAbsoluteCoords,
@@ -94,7 +94,8 @@ export class Graph {
   }
 
   /**
-   * AABB (axis-aligned bounding box)
+   * 计算包围盒（不考虑 strokeWidth）
+   * 考虑旋转
    */
   getBBox(): IBox {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
@@ -103,15 +104,15 @@ export class Graph {
       return this.getBBoxWithoutRotation();
     }
 
-    const { x: tlX, y: tlY } = transformRotate(x, y, rotation, cx, cy); // 左上
-    const { x: trX, y: trY } = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const { x: brX, y: brY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const { x: blX, y: blY } = transformRotate(x, y2, rotation, cx, cy); // 右下
+    const { x: nwX, y: nwY } = transformRotate(x, y, rotation, cx, cy); // 左上
+    const { x: neX, y: neY } = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const { x: seX, y: seY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const { x: swX, y: swY } = transformRotate(x, y2, rotation, cx, cy); // 右下
 
-    const minX = Math.min(tlX, trX, brX, blX);
-    const minY = Math.min(tlY, trY, brY, blY);
-    const maxX = Math.max(tlX, trX, brX, blX);
-    const maxY = Math.max(tlY, trY, brY, blY);
+    const minX = Math.min(nwX, neX, seX, swX);
+    const minY = Math.min(nwY, neY, seY, swY);
+    const maxX = Math.max(nwX, neX, seX, swX);
+    const maxY = Math.max(nwY, neY, seY, swY);
     return {
       x: minX,
       y: minY,
@@ -151,13 +152,38 @@ export class Graph {
       maxY,
     };
   }
+  getBboxVerts(): [IPoint, IPoint, IPoint, IPoint] {
+    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
 
+    const rotation = this.rotation;
+    if (!rotation) {
+      return [
+        { x: x, y: y },
+        { x: x2, y: y },
+        { x: x2, y: y2 },
+        { x: x, y: y2 },
+      ];
+    }
+
+    const nw = transformRotate(x, y, rotation, cx, cy); // 左上
+    const ne = transformRotate(x2, y, rotation, cx, cy); // 右上
+    const se = transformRotate(x2, y2, rotation, cx, cy); // 右下
+    const sw = transformRotate(x, y2, rotation, cx, cy); // 右下
+
+    return [nw, ne, se, sw];
+  }
   getBBoxWithoutRotation() {
     return {
       x: this.x,
       y: this.y,
       width: this.width,
       height: this.height,
+    };
+  }
+  getCenter() {
+    return {
+      x: this.x + this.width / 2,
+      y: this.y + this.height / 2,
     };
   }
   setRotateXY(rotatedX: number, rotatedY: number) {
