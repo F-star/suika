@@ -278,9 +278,9 @@ export class SceneGraph {
     const composedBBox = getRectsBBox(...bBoxes);
     return isPointInRect(point, composedBBox);
   }
-  getTopHitElement(hitPointer: IPoint): Rect | null {
+  getTopHitElement(hitPointer: IPoint): Graph | null {
     for (let i = this.children.length - 1; i >= 0; i--) {
-      const element: Rect = this.children[i];
+      const element: Graph = this.children[i];
       const bBox = element.getBBoxWithoutRotation();
 
       // "点击点" 根据图形进行 反旋转旋转

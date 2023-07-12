@@ -1,28 +1,31 @@
 import { Editor } from './editor';
-import { IBox2 } from '../type';
-import { bboxToBboxWithMid, isRectIntersect2 } from '../utils/graphics';
+import { IPoint, IVerticalLine, IHorizontalLine } from '../type';
+import {
+  bboxToBbox2,
+  bboxToBboxWithMid,
+  isRectIntersect2,
+  pointsToHLines,
+  pointsToVLines,
+} from '../utils/graphics';
 import { getClosestValInSortedArr } from '../utils/common';
 import { drawLine, drawXShape } from '../utils/canvas';
-
-interface IVerticalLine {
-  x: number;
-  ys: number[];
-}
-
-interface IHorizontalLine {
-  y: number;
-  xs: number[];
-}
+import { arrMap, forEach } from '../utils/array_util';
 
 /**
  * reference line
  */
 export class RefLine {
-  private hLineMap = new Map<number, number[]>(); // 参考图形产生的垂直参照线，y 相同（作为 key），x 值不同（作为 value）
-  private vLineMap = new Map<number, number[]>(); // 参考图形产生的水平照线，x 相同（作为 key），y 值不同（作为 value）
+  /**
+   * 参考图形产生的垂直参照线。对于其中的同一条线，x 相同（作为 key），y 不同（作为 value）
+   */
+  private vRefLineMap = new Map<number, Set<number>>();
+  /**
+   * 参考图形产生的水平照线，对于其中的同一条线，y 相同（作为 key），x 不同（作为 value）
+   */
+  private hRefLineMap = new Map<number, Set<number>>();
 
-  private sortedXs: number[] = []; // 对 hLineMap 的 key 排序
-  private sortedYs: number[] = []; // 对 vLineMap 的 key 排序
+  private sortedXs: number[] = []; // 对 vRefLineMap 的 key 排序
+  private sortedYs: number[] = []; // 对 hRefLineMap 的 key 排序
 
   private toDrawVLines: IVerticalLine[] = []; // 等待绘制的垂直参照线
   private toDrawHLines: IHorizontalLine[] = []; // 等待绘制的水平参照线
@@ -32,8 +35,8 @@ export class RefLine {
   cacheXYToBbox() {
     this.clear();
 
-    const hLineMap = this.hLineMap;
-    const vLineMap = this.vLineMap;
+    const vRefLineMap = this.vRefLineMap;
+    const hRefLineMap = this.hRefLineMap;
 
     const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox2();
@@ -47,51 +50,115 @@ export class RefLine {
         continue;
       }
 
-      this.addBboxToMap(hLineMap, bbox.minX, [bbox.minY, bbox.maxY]);
-      this.addBboxToMap(hLineMap, bbox.midX, [bbox.minY, bbox.maxY]);
-      this.addBboxToMap(hLineMap, bbox.maxX, [bbox.minY, bbox.maxY]);
+      // bbox 中水平线
+      this.addBboxToMap(vRefLineMap, bbox.midX, [bbox.minY, bbox.maxY]);
+      // bbox 中垂直线
+      this.addBboxToMap(hRefLineMap, bbox.midY, [bbox.minX, bbox.maxX]);
 
-      this.addBboxToMap(vLineMap, bbox.minY, [bbox.minX, bbox.maxX]);
-      this.addBboxToMap(vLineMap, bbox.midY, [bbox.minX, bbox.maxX]);
-      this.addBboxToMap(vLineMap, bbox.maxY, [bbox.minX, bbox.maxX]);
+      /**
+       * 获取旋转后4个顶点的坐标
+       *      top
+       *     /   \
+       *   /       \
+       * left      right
+       *   \       /
+       *    \    /
+       *    bottom
+       *
+       * special when rotate 90 degree:
+       *
+       * top(left) ---------- right(top)
+       *      |                 |
+       * left(bottom) ------- bottom(right)
+       *
+       * top 和 bottom 要绘制水平参考线，不要绘制垂直参照线
+       * left 和 right 要绘制垂直参照线，不要绘制水平参照线
+       */
+      const bboxVerts = graph.getBboxVerts();
+      const top = bboxVerts.filter((p) => p.x === bbox.minX);
+      const bottom = bboxVerts.filter((p) => p.x === bbox.maxX);
+      const left = bboxVerts.filter((p) => p.y === bbox.minY);
+      const right = bboxVerts.filter((p) => p.y === bbox.maxY);
+
+      // top 和 bottom 要绘制水平参考线，不要绘制垂直参照线
+      [...top, ...bottom].forEach((p) => {
+        this.addBboxToMap(vRefLineMap, p.x, [p.y]);
+      });
+      // left 和 right 要绘制垂直参照线，不要绘制水平参照线
+      [...left, ...right].forEach((p) => {
+        this.addBboxToMap(hRefLineMap, p.y, [p.x]);
+      });
     }
 
-    this.sortedXs = Array.from(hLineMap.keys()).sort((a, b) => a - b);
-    this.sortedYs = Array.from(vLineMap.keys()).sort((a, b) => a - b);
+    this.sortedXs = Array.from(vRefLineMap.keys()).sort((a, b) => a - b);
+    this.sortedYs = Array.from(hRefLineMap.keys()).sort((a, b) => a - b);
   }
   clear() {
-    this.hLineMap.clear();
-    this.vLineMap.clear();
+    this.vRefLineMap.clear();
+    this.hRefLineMap.clear();
     this.sortedXs = [];
     this.sortedYs = [];
     this.toDrawVLines = [];
     this.toDrawHLines = [];
   }
   private addBboxToMap(
-    m: Map<number, number[]>,
+    m: Map<number, Set<number>>,
     xOrY: number,
     xsOrYs: number[],
   ) {
     const line = m.get(xOrY);
     if (line) {
-      line.push(...xsOrYs);
+      forEach(xsOrYs, (xOrY) => {
+        line.add(xOrY);
+      });
     } else {
-      m.set(xOrY, [...xsOrYs]);
+      m.set(xOrY, new Set(xsOrYs));
     }
   }
 
-  // update ref line
-  // and return offset
-  updateRefLine(_targetBbox: IBox2): {
+  private getTargetPointFromSelect() {
+    let targetPoints: IPoint[] = [];
+    // 选中的为单个图形，要以旋转后的 4 个顶点和中心点为目标线
+    if (this.editor.selectedElements.size() === 1) {
+      const [targetGraph] = this.editor.selectedElements.getItems();
+      targetPoints = [...targetGraph.getBboxVerts(), targetGraph.getCenter()];
+    } else {
+      const targetBbox = bboxToBboxWithMid(
+        bboxToBbox2(this.editor.selectedElements.getBBox()!),
+      );
+      targetPoints = [
+        { x: targetBbox.minX, y: targetBbox.minY },
+        { x: targetBbox.minX, y: targetBbox.maxY },
+
+        { x: targetBbox.maxX, y: targetBbox.minY },
+        { x: targetBbox.maxX, y: targetBbox.maxY },
+
+        { x: targetBbox.midX, y: targetBbox.midY },
+      ];
+    }
+    return targetPoints;
+  }
+
+  /**
+   * update ref line
+   * and return offset
+   */
+  updateRefLine(): {
     offsetX: number;
     offsetY: number;
   } {
+    const targetPoints = this.getTargetPointFromSelect();
+
     this.toDrawVLines = [];
     this.toDrawHLines = [];
-    const targetBbox = bboxToBboxWithMid(_targetBbox);
 
-    const hLineMap = this.hLineMap;
-    const vLineMap = this.vLineMap;
+    let vTargetLines = pointsToVLines(targetPoints); // 目标矩形的垂直线
+    let vTargetLineKeys = Array.from(vTargetLines.keys()); // 目标矩形的垂直线的 x 坐标
+    let hTargetLines = pointsToHLines(targetPoints); // 目标矩形的水平线
+    let hTargetLineKeys = Array.from(hTargetLines.keys()); // 目标矩形的水平线的 y 坐标
+
+    const vRefLineMap = this.vRefLineMap;
+    const hRefLineMap = this.hRefLineMap;
     const sortedXs = this.sortedXs;
     const sortedYs = this.sortedYs;
 
@@ -103,27 +170,23 @@ export class RefLine {
     let offsetX: number | undefined = undefined;
     let offsetY: number | undefined = undefined;
 
-    // closest x
-    const closestMinX = getClosestValInSortedArr(sortedXs, targetBbox.minX);
-    const closestMidX = getClosestValInSortedArr(sortedXs, targetBbox.midX);
-    const closestMaxX = getClosestValInSortedArr(sortedXs, targetBbox.maxX);
+    const closestXs = arrMap(vTargetLineKeys, (x) =>
+      getClosestValInSortedArr(sortedXs, x),
+    );
+    // 目标矩形的每个 x 坐标离它们最近的参照线的差值
+    const closestXDiffs = arrMap(vTargetLineKeys, (x, i) => closestXs[i] - x);
+    const closestXDist = Math.min(
+      ...arrMap(closestXDiffs, (item) => Math.abs(item)),
+    );
 
-    const distMinX = Math.abs(closestMinX - targetBbox.minX);
-    const distMidX = Math.abs(closestMidX - targetBbox.midX);
-    const distMaxX = Math.abs(closestMaxX - targetBbox.maxX);
-
-    const closestXDist = Math.min(distMinX, distMidX, distMaxX);
-
-    // closest y
-    const closestMinY = getClosestValInSortedArr(sortedYs, targetBbox.minY);
-    const closestMidY = getClosestValInSortedArr(sortedYs, targetBbox.midY);
-    const closestMaxY = getClosestValInSortedArr(sortedYs, targetBbox.maxY);
-
-    const distMinY = Math.abs(closestMinY - targetBbox.minY);
-    const distMidY = Math.abs(closestMidY - targetBbox.midY);
-    const distMaxY = Math.abs(closestMaxY - targetBbox.maxY);
-
-    const closestYDist = Math.min(distMinY, distMidY, distMaxY);
+    const closestYs = arrMap(hTargetLineKeys, (y) =>
+      getClosestValInSortedArr(sortedYs, y),
+    );
+    // 目标矩形的每个 y 坐标离它们最近的参照线的差值
+    const closestYDiffs = arrMap(hTargetLineKeys, (y, i) => closestYs[i] - y);
+    const closestYDist = Math.min(
+      ...arrMap(closestYDiffs, (item) => Math.abs(item)),
+    );
 
     const isEqualNum = (a: number, b: number) => Math.abs(a - b) < 0.00001;
 
@@ -131,126 +194,74 @@ export class RefLine {
       this.editor.setting.get('refLineTolerance') /
       this.editor.zoomManager.getZoom();
 
-    // 先确认偏移值 offsetX
+    // 确定最终偏移值 offsetX
     if (closestXDist <= tol) {
-      if (isEqualNum(closestXDist, distMinX)) {
-        offsetX = closestMinX - targetBbox.minX;
-      } else if (isEqualNum(closestXDist, distMidX)) {
-        offsetX = closestMidX - targetBbox.midX;
-      } else if (isEqualNum(closestXDist, distMaxX)) {
-        offsetX = closestMaxX - targetBbox.maxX;
-      } else {
+      for (let i = 0; i < closestXDiffs.length; i++) {
+        if (isEqualNum(closestXDist, Math.abs(closestXDiffs[i]))) {
+          offsetX = closestXDiffs[i];
+          break;
+        }
+      }
+      if (offsetX === undefined) {
         throw new Error('it should not reach here, please put a issue to us');
       }
     }
 
-    // 先确认偏移值 offsetY
+    // 再确认偏移值 offsetY
     if (closestYDist <= tol) {
-      if (isEqualNum(closestYDist, distMinY)) {
-        offsetY = closestMinY - targetBbox.minY;
-      } else if (isEqualNum(closestYDist, distMidY)) {
-        offsetY = closestMidY - targetBbox.midY;
-      } else if (isEqualNum(closestYDist, distMaxY)) {
-        offsetY = closestMaxY - targetBbox.maxY;
-      } else {
+      for (let i = 0; i < closestYDiffs.length; i++) {
+        if (isEqualNum(closestYDist, Math.abs(closestYDiffs[i]))) {
+          offsetY = closestYDiffs[i];
+          break;
+        }
+      }
+      if (offsetY === undefined) {
         throw new Error('it should not reach here, please put a issue to us');
       }
     }
 
-    const correctedTargetBbox = { ...targetBbox };
-    if (offsetX !== undefined) {
-      correctedTargetBbox.minX += offsetX;
-      correctedTargetBbox.midX += offsetX;
-      correctedTargetBbox.maxX += offsetX;
-    }
-    if (offsetY !== undefined) {
-      correctedTargetBbox.minY += offsetY;
-      correctedTargetBbox.midY += offsetY;
-      correctedTargetBbox.maxY += offsetY;
-    }
+    const correctedTargetPoints: IPoint[] = arrMap(targetPoints, (p) => ({
+      x: p.x + (offsetX ?? 0),
+      y: p.y + (offsetY ?? 0),
+    }));
+
+    vTargetLines = pointsToVLines(correctedTargetPoints);
+    vTargetLineKeys = Array.from(vTargetLines.keys()); // 对应 x
 
     if (offsetX !== undefined) {
-      /*************** 左垂直的参考线 ************/
-      if (isEqualNum(offsetX, closestMinX - targetBbox.minX)) {
-        const vLine: IVerticalLine = {
-          x: closestMinX,
-          ys: [],
-        };
+      /*************** 标记需要绘制的垂直参考线 ************/
+      forEach(vTargetLineKeys, (y, i) => {
+        if (isEqualNum(offsetX!, closestXDiffs[i])) {
+          const vLine: IVerticalLine = {
+            x: closestXs[i],
+            ys: [],
+          };
 
-        vLine.ys.push(correctedTargetBbox.minY);
-        vLine.ys.push(correctedTargetBbox.maxY);
-        vLine.ys.push(...hLineMap.get(closestMinX)!);
-
-        this.toDrawVLines.push(vLine);
-      }
-
-      /*************** 中间垂直的参考线 ************/
-      if (isEqualNum(offsetX, closestMidX - targetBbox.midX)) {
-        const vLine: IVerticalLine = {
-          x: closestMidX,
-          ys: [],
-        };
-
-        vLine.ys.push(correctedTargetBbox.midY);
-        vLine.ys.push(...hLineMap.get(closestMidX)!);
-
-        this.toDrawVLines.push(vLine);
-      }
-
-      /*************** 右垂直的参考线 ************/
-      if (isEqualNum(offsetX, closestMaxX - targetBbox.maxX)) {
-        const vLine: IVerticalLine = {
-          x: closestMaxX,
-          ys: [],
-        };
-
-        vLine.ys.push(correctedTargetBbox.minY);
-        vLine.ys.push(correctedTargetBbox.maxY);
-        vLine.ys.push(...hLineMap.get(closestMaxX)!);
-
-        this.toDrawVLines.push(vLine);
-      }
+          vLine.ys.push(...vTargetLines.get(y)!);
+          vLine.ys.push(...Array.from(vRefLineMap.get(y)!));
+          this.toDrawVLines.push(vLine);
+        }
+      });
     }
 
     if (offsetY !== undefined) {
-      /*************** 上水平的参考线 ************/
-      if (isEqualNum(offsetY, closestMinY - targetBbox.minY)) {
-        const hLine: IHorizontalLine = {
-          y: closestMinY,
-          xs: [],
-        };
+      /*************** 标记需要绘制的水平参考线 ************/
+      hTargetLines = pointsToHLines(correctedTargetPoints);
+      hTargetLineKeys = Array.from(hTargetLines.keys()); // 对应 y
 
-        hLine.xs.push(correctedTargetBbox.minX);
-        hLine.xs.push(correctedTargetBbox.maxX);
-        hLine.xs.push(...vLineMap.get(closestMinY)!);
+      forEach(hTargetLineKeys, (x, i) => {
+        if (isEqualNum(offsetY!, closestYDiffs[i])) {
+          const hLine: IHorizontalLine = {
+            y: closestYs[i],
+            xs: [],
+          };
 
-        this.toDrawHLines.push(hLine);
-      }
-      /*************** 中间水平的参考线 ************/
-      if (isEqualNum(offsetY, closestMidY - targetBbox.midY)) {
-        const hLine: IHorizontalLine = {
-          y: closestMidY,
-          xs: [],
-        };
+          hLine.xs.push(...hTargetLines.get(x)!);
+          hLine.xs.push(...Array.from(hRefLineMap.get(x)!));
 
-        hLine.xs.push(correctedTargetBbox.midX);
-        hLine.xs.push(...vLineMap.get(closestMidY)!);
-
-        this.toDrawHLines.push(hLine);
-      }
-      /*************** 下水平的参考线 ************/
-      if (isEqualNum(offsetY, closestMaxY - targetBbox.maxY)) {
-        const hLine: IHorizontalLine = {
-          y: closestMaxY,
-          xs: [],
-        };
-
-        hLine.xs.push(correctedTargetBbox.minX);
-        hLine.xs.push(correctedTargetBbox.maxX);
-        hLine.xs.push(...vLineMap.get(closestMaxY)!);
-
-        this.toDrawHLines.push(hLine);
-      }
+          this.toDrawHLines.push(hLine);
+        }
+      });
     }
 
     return { offsetX: offsetX ?? 0, offsetY: offsetY ?? 0 };
