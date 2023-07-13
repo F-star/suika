@@ -62,33 +62,17 @@ export function getRectsBBox(...rects: IRect[]): IBox {
   if (rects.length === 0) {
     throw new Error('the count of rect can not be 0');
   }
-  const first = rects[0];
-  let x = first.x;
-  let y = first.y;
-  let x2 = x + first.width;
-  let y2 = y + first.height;
-  for (let i = 1, len = rects.length; i < len; i++) {
-    const rect = rects[i];
-    if (rect.x < x) {
-      x = rect.x;
-    }
-    if (rect.y < y) {
-      y = rect.y;
-    }
-    const _x2 = rect.x + rect.width;
-    if (_x2 > x2) {
-      x2 = _x2;
-    }
-    const _y2 = rect.y + rect.height;
-    if (_y2 > y2) {
-      y2 = _y2;
-    }
-  }
+
+  const minX = Math.min(...rects.map((rect) => rect.x));
+  const minY = Math.min(...rects.map((rect) => rect.y));
+  const maxX = Math.max(...rects.map((rect) => rect.x + rect.width));
+  const maxY = Math.max(...rects.map((rect) => rect.y + rect.height));
+
   return {
-    x,
-    y,
-    width: x2 - x,
-    height: y2 - y,
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
   };
 }
 
