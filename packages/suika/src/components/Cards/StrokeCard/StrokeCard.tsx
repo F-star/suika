@@ -8,58 +8,58 @@ import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { TextureCard } from '../TextureCard';
 
-export const FillCard: FC = () => {
+export const StrokeCard: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
 
-  const [fill, setFill] = useState<ITexture[]>([]);
+  const [strokes, setStrokes] = useState<ITexture[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const prevFills = useRef<ITexture[][]>([]);
+  const prevStrokes = useRef<ITexture[][]>([]);
 
   /**
-   * update fill and return a new fill
+   * update stroke and return a new stroke
    */
-  const updateSelectedFills = (newTexture: ITexture) => {
+  const updateSelectedStrokes = (newTexture: ITexture) => {
     if (!editor) return;
 
-    const newFills = [...fill];
+    const newStrokes = [...strokes];
 
-    newFills[activeIndex] = newTexture;
-    setFill(newFills);
+    newStrokes[activeIndex] = newTexture;
+    setStrokes(newStrokes);
 
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.fill = cloneDeep(newFills);
+      item.stroke = cloneDeep(newStrokes);
     });
 
-    return newFills;
+    return newStrokes;
   };
 
   useEffect(() => {
     if (editor) {
-      prevFills.current = editor.selectedElements
+      prevStrokes.current = editor.selectedElements
         .getItems()
-        .map((el) => cloneDeep(el.fill));
+        .map((el) => cloneDeep(el.stroke));
 
       const handler = () => {
         const selectedElements = editor.selectedElements.getItems();
         if (selectedElements.length > 0) {
           /**
-           * 目前一个图形只支持一个 fill
-           * 显示 fill 值时，如果有的图形没有 fill，将其排除。
-           * 添加颜色时，如果有的图形不存在 fill，赋值给它。
+           * 目前一个图形只支持一个 stroke
+           * 显示 stroke 值时，如果有的图形没有 stroke，将其排除。
+           * 添加颜色时，如果有的图形不存在 stroke，赋值给它。
            */
-          let newFill = selectedElements[0].fill;
+          let newStrokes = selectedElements[0].stroke;
           for (let i = 1, len = selectedElements.length; i < len; i++) {
-            const currentFill = selectedElements[i].fill;
-            if (!isEqual(newFill, currentFill)) {
+            const currentStrokes = selectedElements[i].stroke;
+            if (!isEqual(newStrokes, currentStrokes)) {
               // TODO: 标记为不相同，作为文案提示
-              newFill = [];
+              newStrokes = [];
               break;
             }
           }
-          setFill(newFill);
+          setStrokes(newStrokes);
         }
       };
       editor.sceneGraph.on('render', handler);
@@ -71,31 +71,33 @@ export const FillCard: FC = () => {
 
   return (
     <TextureCard
-      title={intl.formatMessage({ id: 'fill' })}
-      textures={fill}
+      title={intl.formatMessage({ id: 'stroke' })}
+      textures={strokes}
       onChange={(newTexture) => {
         if (!editor) return;
-        updateSelectedFills(newTexture);
+        updateSelectedStrokes(newTexture);
         editor.sceneGraph.render();
       }}
       onChangeComplete={(newTexture) => {
         if (!editor) return;
-        const newFill = updateSelectedFills(newTexture);
+        const newStrokes = updateSelectedStrokes(newTexture);
         const selectedElements = editor.selectedElements.getItems();
 
         editor.commandManager.pushCommand(
           new SetElementsAttrs(
-            'Update Fill',
+            'Update Stroke',
             selectedElements,
-            { fill: newFill },
+            { stroke: newStrokes },
             // prev value
             selectedElements.map((item, index) => ({
-              fill: cloneDeep(prevFills.current[index]),
+              stroke: cloneDeep(prevStrokes.current[index]),
             })),
           ),
         );
 
-        prevFills.current = selectedElements.map((el) => cloneDeep(el.fill));
+        prevStrokes.current = selectedElements.map((el) =>
+          cloneDeep(el.stroke),
+        );
 
         editor.sceneGraph.render();
       }}

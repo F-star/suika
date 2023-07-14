@@ -11,7 +11,7 @@ export class Ellipse extends Graph {
   constructor(options: EllipseAttrs) {
     super({ ...options, type: GraphType.Ellipse });
   }
-  fillTexture(ctx: CanvasRenderingContext2D): void {
+  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D): void {
     const cx = this.x + this.width / 2;
     const cy = this.y + this.height / 2;
 
@@ -30,6 +30,16 @@ export class Ellipse extends Graph {
         this.fillImage(ctx, texture);
       }
     }
+
+    for (const texture of this.stroke) {
+      if (texture.type === TextureType.Solid) {
+        ctx.strokeStyle = parseRGBAStr(texture.attrs);
+        ctx.stroke();
+      } else if (texture.type === TextureType.Image) {
+        // TODO:
+      }
+    }
+
     ctx.closePath();
   }
 }

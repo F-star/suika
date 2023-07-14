@@ -1,6 +1,7 @@
 export const en = {
   delete: 'Delete',
   fill: 'Fill',
+  stroke: 'Stroke',
   mixed: 'Mixed',
   noSelectedShapes: 'No Selected Shapes',
 
