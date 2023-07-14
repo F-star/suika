@@ -79,7 +79,7 @@ export class ZoomManager {
       y: -viewport.height / 2,
     });
   }
-  private zoomBoxToFit(composedBBox: IBox) {
+  private zoomBoxToFit(composedBBox: IBox, maxZoom?: number) {
     const padding = this.editor.setting.get('zoomToFixPadding');
     const viewport = this.editor.viewportManager.getViewport();
 
@@ -109,6 +109,10 @@ export class ZoomManager {
       newZoom = vw / composedBBox.width;
     }
 
+    if (maxZoom && newZoom > maxZoom) {
+      newZoom = maxZoom;
+    }
+
     const newViewportX =
       composedBBox.x - (viewport.width / newZoom - composedBBox.width) / 2;
     const newViewportY =
@@ -128,13 +132,13 @@ export class ZoomManager {
       this.zoomBoxToFit(selectionBox);
     }
   }
-  zoomToFit() {
+  zoomToFit(maxZoom?: number) {
     if (this.editor.sceneGraph.children.length === 0) {
       this.reset();
       return;
     }
     const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
-    this.zoomBoxToFit(getRectsBBox(...bboxs));
+    this.zoomBoxToFit(getRectsBBox(...bboxs), maxZoom);
   }
   getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();
