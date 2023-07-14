@@ -3,6 +3,7 @@ import { en } from './en';
 export const zh: typeof en = {
   delete: '删除',
   fill: '填充',
+  stroke: '描边',
   mixed: '混合',
   noSelectedShapes: '没有选中的图形',
 

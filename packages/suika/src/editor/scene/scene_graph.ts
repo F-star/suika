@@ -120,7 +120,7 @@ export class SceneGraph {
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       ctx.save();
       const element = visibleElements[i];
-      element.fillTexture(ctx);
+      element.renderFillAndStrokeTexture(ctx);
       ctx.restore();
     }
 

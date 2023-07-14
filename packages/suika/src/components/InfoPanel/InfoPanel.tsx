@@ -6,6 +6,7 @@ import ElementsInfoCards from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
 import './style.scss';
 import { FormattedMessage } from 'react-intl';
+import { StrokeCard } from '../Cards/StrokeCard';
 
 enum PanelType {
   Global = 'Global',
@@ -37,6 +38,7 @@ export const InfoPanel: FC = () => {
           <AlignCard />
           <ElementsInfoCards />
           <FillCard />
+          <StrokeCard />
         </>
       )}
       {type === PanelType.Global && (

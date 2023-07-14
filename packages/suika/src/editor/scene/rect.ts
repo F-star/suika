@@ -48,7 +48,7 @@ export class Rect extends Graph {
     };
   }
 
-  fillTexture(ctx: CanvasRenderingContext2D) {
+  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;
@@ -69,6 +69,22 @@ export class Rect extends Graph {
         }
       }
     }
-    ctx.closePath();
+    if (this.strokeWidth) {
+      ctx.lineWidth = this.strokeWidth;
+      for (const texture of this.stroke) {
+        switch (texture.type) {
+          case TextureType.Solid: {
+            ctx.strokeStyle = parseRGBAStr(texture.attrs);
+            ctx.stroke();
+            break;
+          }
+          case TextureType.Image: {
+            // TODO: stroke image
+          }
+        }
+      }
+
+      ctx.closePath();
+    }
   }
 }

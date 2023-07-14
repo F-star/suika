@@ -20,7 +20,7 @@ export interface GraphAttrs {
   height: number;
   // 颜色
   fill?: ITexture[];
-  stroke?: string;
+  stroke?: ITexture[];
   strokeWidth?: number;
   // transform 相关
   rotation?: number;
@@ -36,7 +36,7 @@ export class Graph {
   height: number;
   // color
   fill: ITexture[] = [];
-  stroke?: string;
+  stroke: ITexture[] = [];
   strokeWidth?: number;
   // transform
   rotation?: number;
@@ -61,6 +61,9 @@ export class Graph {
     }
     if (options.stroke) {
       this.stroke = options.stroke;
+    }
+    if (options.strokeWidth) {
+      this.strokeWidth = options.strokeWidth;
     }
     if (options.rotation) {
       this.rotation = options.rotation;
@@ -198,7 +201,12 @@ export class Graph {
     this.y -= dy;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fillTexture(ctx: CanvasRenderingContext2D) {
+  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D) {
+    throw new Error('Method not implemented.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  strokeTexture(ctx: CanvasRenderingContext2D) {
     throw new Error('Method not implemented.');
   }
 

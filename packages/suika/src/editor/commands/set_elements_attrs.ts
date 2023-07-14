@@ -9,6 +9,7 @@ type IAttrs = Partial<{
   height: number;
   rotation: number;
   fill: ITexture[];
+  stroke: ITexture[];
 }>;
 
 /**
