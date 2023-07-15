@@ -1,4 +1,31 @@
 .suika {
+  .suika-custom-ruler-input-box {
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    margin: 2px 4px;
+    border-radius: 2px;
+    width: 100px;
+    height: 28px;
+    text-align: center;
+    &:hover {
+      border-color: #e6e6e6;
+    }
+    &:focus-within {
+      border-color: #0d99ff;
+      outline: 1px solid #0d99ff;
+    }
+
+    .suika-input-prefix {
+      display: block;
+      line-height: 28px;
+      text-align: center;
+      color: #b3b3b3;
+    }
+  }
+
   input.custom-rule-input {
     border: none;
     outline: none;

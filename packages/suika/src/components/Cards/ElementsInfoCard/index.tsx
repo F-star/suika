@@ -100,11 +100,11 @@ const ElementsInfoCards: FC = () => {
   return (
     <BaseCard>
       <div className="element-info-attrs-row">
-        <div className="field">
-          <span>X</span>
-          <NumberInput
-            value={rotatedX}
-            onBlur={(newRotatedX) => {
+        {[
+          {
+            label: 'X',
+            value: rotatedX,
+            onBlur: (newRotatedX: number) => {
               if (editor) {
                 const elements = editor.selectedElements.getItems();
                 MutateElementsAndRecord.setRotateX(
@@ -114,14 +114,12 @@ const ElementsInfoCards: FC = () => {
                 );
                 editor.sceneGraph.render();
               }
-            }}
-          />
-        </div>
-        <div className="field">
-          <span>Y</span>
-          <NumberInput
-            value={rotatedY}
-            onBlur={(newRotatedY) => {
+            },
+          },
+          {
+            label: 'Y',
+            value: rotatedY,
+            onBlur: (newRotatedY: number) => {
               if (editor) {
                 const elements = editor.selectedElements.getItems();
                 MutateElementsAndRecord.setRotateY(
@@ -131,16 +129,18 @@ const ElementsInfoCards: FC = () => {
                 );
                 editor.sceneGraph.render();
               }
-            }}
-          />
-        </div>
+            },
+          },
+        ].map((item) => (
+          <AttrInput {...item} key={item.label} />
+        ))}
       </div>
       <div className="element-info-attrs-row">
-        <div className="field">
-          <span>W</span>
-          <NumberInput
-            value={width}
-            onBlur={(newWidth) => {
+        {[
+          {
+            label: 'W',
+            value: width,
+            onBlur: (newWidth: number) => {
               if (editor) {
                 if (newWidth <= 0) {
                   newWidth = 1;
@@ -149,14 +149,12 @@ const ElementsInfoCards: FC = () => {
                 MutateElementsAndRecord.setWidth(editor, elements, newWidth);
                 editor.sceneGraph.render();
               }
-            }}
-          />
-        </div>
-        <div className="field">
-          <span>H</span>
-          <NumberInput
-            value={height}
-            onBlur={(newHeight) => {
+            },
+          },
+          {
+            label: 'H',
+            value: height,
+            onBlur: (newHeight: number) => {
               if (editor) {
                 if (newHeight <= 0) {
                   newHeight = 1;
@@ -165,32 +163,45 @@ const ElementsInfoCards: FC = () => {
                 MutateElementsAndRecord.setHeight(editor, elements, newHeight);
                 editor.sceneGraph.render();
               }
-            }}
-          />
-        </div>
+            },
+          },
+        ].map((item) => (
+          <AttrInput {...item} key={item.label} />
+        ))}
       </div>
       <div className="element-info-attrs-row">
-        <div className="field">
-          <span>R</span>
-          <NumberInput
-            value={rotation}
-            onBlur={(newRotation) => {
-              if (editor) {
-                newRotation = normalizeAngle(degree2Radian(newRotation));
-
-                const elements = editor.selectedElements.getItems();
-                MutateElementsAndRecord.setRotation(
-                  editor,
-                  elements,
-                  newRotation,
-                );
-                editor.sceneGraph.render();
-              }
-            }}
-          />
-        </div>
+        <AttrInput
+          label="R"
+          value={rotation}
+          onBlur={(newRotation) => {
+            if (editor) {
+              newRotation = normalizeAngle(degree2Radian(newRotation));
+              const elements = editor.selectedElements.getItems();
+              MutateElementsAndRecord.setRotation(
+                editor,
+                elements,
+                newRotation,
+              );
+              editor.sceneGraph.render();
+            }
+          }}
+        />
       </div>
     </BaseCard>
+  );
+};
+
+const AttrInput: FC<{
+  label: string;
+  value: string | number;
+  onBlur: (newValue: number) => void;
+}> = (props) => {
+  return (
+    <NumberInput
+      prefix={<span className="suika-info-attrs-label">{props.label}</span>}
+      value={props.value}
+      onBlur={props.onBlur}
+    />
   );
 };
 

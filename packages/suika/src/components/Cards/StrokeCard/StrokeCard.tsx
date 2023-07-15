@@ -19,12 +19,12 @@ export const StrokeCard: FC = () => {
   /**
    * update stroke and return a new stroke
    */
-  const updateSelectedStrokes = (newTexture: ITexture) => {
+  const updateSelectedStrokes = (newTexture: ITexture, index: number) => {
     if (!editor) return;
 
     const newStrokes = [...strokes];
 
-    newStrokes[activeIndex] = newTexture;
+    newStrokes[index] = newTexture;
     setStrokes(newStrokes);
 
     const selectItems = editor.selectedElements.getItems();
@@ -73,14 +73,14 @@ export const StrokeCard: FC = () => {
     <TextureCard
       title={intl.formatMessage({ id: 'stroke' })}
       textures={strokes}
-      onChange={(newTexture) => {
+      onChange={(newTexture, i) => {
         if (!editor) return;
-        updateSelectedStrokes(newTexture);
+        updateSelectedStrokes(newTexture, i);
         editor.sceneGraph.render();
       }}
-      onChangeComplete={(newTexture) => {
+      onChangeComplete={(newTexture, i) => {
         if (!editor) return;
-        const newStrokes = updateSelectedStrokes(newTexture);
+        const newStrokes = updateSelectedStrokes(newTexture, i);
         const selectedElements = editor.selectedElements.getItems();
 
         editor.commandManager.pushCommand(

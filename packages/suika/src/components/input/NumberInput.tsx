@@ -5,9 +5,10 @@ import CustomRuleInput from './CustomRuleInput';
 interface INumberInputProps {
   value: string | number;
   onBlur: (newValue: number) => void;
+  prefix?: React.ReactNode;
 }
 
-const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
+const NumberInput: FC<INumberInputProps> = ({ value, onBlur, prefix }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -18,6 +19,7 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur }) => {
 
   return (
     <CustomRuleInput
+      prefix={prefix}
       parser={(str) => {
         str = str.trim();
         const number = parseToNumber(str);
