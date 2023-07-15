@@ -19,12 +19,12 @@ export const FillCard: FC = () => {
   /**
    * update fill and return a new fill
    */
-  const updateSelectedFills = (newTexture: ITexture) => {
+  const updateSelectedFill = (newTexture: ITexture, index: number) => {
     if (!editor) return;
 
     const newFills = [...fill];
 
-    newFills[activeIndex] = newTexture;
+    newFills[index] = newTexture;
     setFill(newFills);
 
     const selectItems = editor.selectedElements.getItems();
@@ -73,14 +73,14 @@ export const FillCard: FC = () => {
     <TextureCard
       title={intl.formatMessage({ id: 'fill' })}
       textures={fill}
-      onChange={(newTexture) => {
+      onChange={(newTexture, i) => {
         if (!editor) return;
-        updateSelectedFills(newTexture);
+        updateSelectedFill(newTexture, i);
         editor.sceneGraph.render();
       }}
-      onChangeComplete={(newTexture) => {
+      onChangeComplete={(newTexture, i) => {
         if (!editor) return;
-        const newFill = updateSelectedFills(newTexture);
+        const newFill = updateSelectedFill(newTexture, i);
         const selectedElements = editor.selectedElements.getItems();
 
         editor.commandManager.pushCommand(
@@ -89,8 +89,8 @@ export const FillCard: FC = () => {
             selectedElements,
             { fill: newFill },
             // prev value
-            selectedElements.map((item, index) => ({
-              fill: cloneDeep(prevFills.current[index]),
+            selectedElements.map((item, i) => ({
+              fill: cloneDeep(prevFills.current[i]),
             })),
           ),
         );

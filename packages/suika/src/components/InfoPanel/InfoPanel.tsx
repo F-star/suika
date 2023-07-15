@@ -37,8 +37,8 @@ export const InfoPanel: FC = () => {
         <>
           <AlignCard />
           <ElementsInfoCards />
-          <FillCard />
-          <StrokeCard />
+          <FillCard key="fill" />
+          <StrokeCard key="stroke" />
         </>
       )}
       {type === PanelType.Global && (
