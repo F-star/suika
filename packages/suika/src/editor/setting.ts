@@ -27,6 +27,7 @@ export class Setting {
     guideBBoxStroke: '#1592fe',
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
+    selectionMode: 'intersect' as 'intersect' | 'contain',
 
     /**** 变形相关 ****/
     handleRotationStroke: '#1592fe',
