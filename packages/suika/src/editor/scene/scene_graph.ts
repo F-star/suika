@@ -305,11 +305,19 @@ export class SceneGraph {
       return [];
     }
 
+    const selectionMode = this.editor.setting.get('selectionMode');
     const elements = this.children;
     const containedElements: Graph[] = [];
-    for (let i = 0, len = elements.length; i < len; i++) {
-      if (isRectContain(selection, elements[i].getBBox())) {
-        containedElements.push(elements[i]);
+    // for (let i = 0, len = elements.length; i < len; i++) {
+    for (const el of elements) {
+      let isSelected = false;
+      if (selectionMode === 'contain') {
+        isSelected = isRectContain(selection, el.getBBox());
+      } else {
+        isSelected = isRectIntersect(selection, el.getBBox());
+      }
+      if (isSelected) {
+        containedElements.push(el);
       }
     }
     return containedElements;
