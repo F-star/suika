@@ -1,8 +1,7 @@
+import { HALF_PI } from '../constant';
 import { rotateInCanvas } from '../utils/canvas';
 import { getClosestTimesVal, nearestPixelVal } from '../utils/common';
 import { Editor } from './editor';
-
-const HALF_PI = Math.PI / 2;
 
 const getStepByZoom = (zoom: number) => {
   /**
