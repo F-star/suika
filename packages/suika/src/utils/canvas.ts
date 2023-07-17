@@ -1,3 +1,5 @@
+import { DOUBLE_PI } from '../constant';
+
 /**
  * Canvas API 简单封装
  */
@@ -12,7 +14,7 @@ export const drawCircle = (
   radius: number,
 ) => {
   ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.arc(cx, cy, radius, 0, DOUBLE_PI);
   ctx.stroke();
   ctx.fill();
   ctx.closePath();

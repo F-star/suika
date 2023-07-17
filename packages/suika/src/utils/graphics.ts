@@ -1,3 +1,4 @@
+import { DOUBLE_PI } from '../constant';
 import { IBox, IBox2, IBoxWithMid, ICircle, IPoint, IRect } from '../type';
 import { transformRotate } from './transform';
 
@@ -26,10 +27,9 @@ export const normalizeRect = ({ x, y, width, height }: IRect) => {
 /**
  * 标准化角度
  */
-const PI_DOUBLE = 2 * Math.PI;
 export const normalizeAngle = (angle: number): number => {
-  if (angle >= PI_DOUBLE) {
-    return angle % PI_DOUBLE;
+  if (angle >= DOUBLE_PI) {
+    return angle % DOUBLE_PI;
   }
   return angle;
 };
@@ -145,7 +145,7 @@ export function calcVectorRadian(cx: number, cy: number, x: number, y: number) {
   let radian = Math.acos(dotProduct / d);
 
   if (x < cx) {
-    radian = Math.PI * 2 - radian;
+    radian = DOUBLE_PI - radian;
   }
   return radian;
 }

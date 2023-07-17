@@ -28,7 +28,7 @@ export function transform(
 }
 
 /**
- * 旋转
+ * rotate
  */
 export function transformRotate(
   x: number,

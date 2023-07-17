@@ -26,6 +26,7 @@ import { forEach } from '../../utils/array_util';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
 import { TextGraph } from './text';
+import { HALF_PI } from '../../constant';
 
 interface Events {
   render(): void;
@@ -308,13 +309,70 @@ export class SceneGraph {
     const selectionMode = this.editor.setting.get('selectionMode');
     const elements = this.children;
     const containedElements: Graph[] = [];
-    // for (let i = 0, len = elements.length; i < len; i++) {
     for (const el of elements) {
       let isSelected = false;
       if (selectionMode === 'contain') {
         isSelected = isRectContain(selection, el.getBBox());
       } else {
-        isSelected = isRectIntersect(selection, el.getBBox());
+        // intersect mode
+        // if selection mode is invalid, rollback to intersect mode
+
+        // AABB intersect
+        if (!isRectIntersect(selection, el.getBBox())) {
+          isSelected = false;
+        } else {
+          if (!el.rotation || el.rotation % HALF_PI == 0) {
+            isSelected = true;
+          } else {
+            // OBB intersect
+            // use SAT algorithm to check intersect
+            const { x: cx, y: cy } = el.getCenter();
+            const r = -el.rotation;
+            const s1 = transformRotate(selection.x, selection.y, r, cx, cy);
+            const s2 = transformRotate(
+              selection.x + selection.width,
+              selection.y + selection.height,
+              r,
+              cx,
+              cy,
+            );
+            const s3 = transformRotate(
+              selection.x + selection.width,
+              selection.y,
+              r,
+              cx,
+              cy,
+            );
+            const s4 = transformRotate(
+              selection.x,
+              selection.y + selection.height,
+              r,
+              cx,
+              cy,
+            );
+
+            const rotatedSelectionX = Math.min(s1.x, s2.x, s3.x, s4.x);
+            const rotatedSelectionY = Math.min(s1.y, s2.y, s3.y, s4.y);
+            const rotatedSelectionWidth =
+              Math.max(s1.x, s2.x, s3.x, s4.x) - rotatedSelectionX;
+            const rotatedSelectionHeight =
+              Math.max(s1.y, s2.y, s3.y, s4.y) - rotatedSelectionY;
+
+            const rotatedSelection = {
+              x: rotatedSelectionX,
+              y: rotatedSelectionY,
+              width: rotatedSelectionWidth,
+              height: rotatedSelectionHeight,
+            };
+
+            isSelected = isRectIntersect(rotatedSelection, {
+              x: el.x,
+              y: el.y,
+              width: el.width,
+              height: el.height,
+            });
+          }
+        }
       }
       if (isSelected) {
         containedElements.push(el);
