@@ -6,3 +6,4 @@ export * from './close-outlined';
 export * from './tool';
 export * from './check-outlined';
 export * from './social';
+export * from './remove-outlined';

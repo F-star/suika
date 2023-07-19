@@ -22,3 +22,17 @@ export const arrMap = <T, U>(
   }
   return ret;
 };
+
+/**
+ * map with revert
+ */
+export const arrMapRevert = <T, U>(
+  array: T[],
+  cb: (item: T, index: number) => U,
+): U[] => {
+  const ret: U[] = [];
+  for (let i = array.length - 1; i >= 0; i--) {
+    ret.push(cb(array[i], i));
+  }
+  return ret;
+};

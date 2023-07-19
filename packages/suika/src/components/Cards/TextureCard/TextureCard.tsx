@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import {
   parseHexToRGB,
   parseRGBAStr,
@@ -6,7 +6,7 @@ import {
 } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
 import './TextureCard.scss';
-import { FormattedMessage } from 'react-intl';
+// import { FormattedMessage } from 'react-intl';
 import {
   DEFAULT_IMAGE_SRC,
   IRGBA,
@@ -15,9 +15,10 @@ import {
   TextureType,
 } from '../../../editor/texture';
 import { TexturePicker } from '../../ColorPicker/TexturePicker';
-import { Popover } from '@suika/components';
+import { IconButton, Popover } from '@suika/components';
 import { ColorHexInput } from '../../input/ColorHexInput';
-import { AddOutlined } from '@suika/icons';
+import { AddOutlined, RemoveOutlined } from '@suika/icons';
+import { arrMapRevert } from '../../../utils/array_util';
 
 const isNearWhite = (rgba: IRGBA, threshold = 85) => {
   const { r, g, b } = rgba;
@@ -34,18 +35,21 @@ interface IProps {
   onChange: (fill: ITexture, index: number) => void;
   onChangeComplete: (fill: ITexture, index: number) => void;
 
-  activeIndex: number;
-  setActiveIndex: (index: number) => void;
+  onDelete: (index: number) => void;
+  onAdd: () => void;
 }
 
 export const TextureCard: FC<IProps> = ({
   title,
   textures,
-  activeIndex,
-  setActiveIndex,
   onChange,
   onChangeComplete,
+
+  onDelete,
+  onAdd,
 }) => {
+  const [activeIndex, setActiveIndex] = useState(-1);
+
   const pickerPopover = (
     <TexturePicker
       texture={textures[activeIndex]}
@@ -59,10 +63,22 @@ export const TextureCard: FC<IProps> = ({
 
   if (textures.length == 0) {
     return (
-      <BaseCard title={title}>
-        <div style={{ marginLeft: 16 }}>
+      <BaseCard
+        title={title}
+        headerAction={
+          <IconButton
+            onClick={() => {
+              onAdd();
+            }}
+          >
+            <AddOutlined />
+          </IconButton>
+        }
+      >
+        TODO: different types with empty and different types with filled
+        {/* <div style={{ marginLeft: 16 }}>
           <FormattedMessage id="mixed" />
-        </div>
+        </div> */}
       </BaseCard>
     );
   }
@@ -76,12 +92,12 @@ export const TextureCard: FC<IProps> = ({
       <BaseCard
         title={title}
         headerAction={
-          <div className="suika-texture-card-add-btn">
+          <IconButton onClick={onAdd}>
             <AddOutlined />
-          </div>
+          </IconButton>
         }
       >
-        {textures.map((texture, index) => {
+        {arrMapRevert(textures, (texture, index) => {
           /** SOLID **/
           if (texture.type === TextureType.Solid) {
             return (
@@ -118,9 +134,13 @@ export const TextureCard: FC<IProps> = ({
                     }
                   }}
                 />
+                <IconButton onClick={() => onDelete(index)}>
+                  <RemoveOutlined />
+                </IconButton>
               </div>
             );
           }
+
           /** IMAGE */
           if (texture.type === TextureType.Image) {
             return (
@@ -135,6 +155,7 @@ export const TextureCard: FC<IProps> = ({
                     style={{
                       backgroundImage: `url(${texture.attrs.src})`,
                       objectFit: 'contain',
+                      marginLeft: 4,
                       width: '100%',
                       height: '100%',
                     }}
@@ -142,6 +163,9 @@ export const TextureCard: FC<IProps> = ({
                     src={texture.attrs.src || DEFAULT_IMAGE_SRC}
                   />
                 </div>
+                <IconButton onClick={() => onDelete(index)}>
+                  <RemoveOutlined />
+                </IconButton>
               </div>
             );
           }
