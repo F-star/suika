@@ -128,8 +128,6 @@ export abstract class DrawShapeTool implements ITool {
       const element = new this.ShapeCtor({
         ...rect,
         fill: [cloneDeep(this.editor.setting.get('firstFill'))],
-        stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
-        strokeWidth: this.editor.setting.get('strokeWidth'),
       });
       sceneGraph.addItems([element]);
 
