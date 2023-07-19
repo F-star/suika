@@ -75,7 +75,7 @@ export const TextureCard: FC<IProps> = ({
           </IconButton>
         }
       >
-        TODO: different types with empty and different types with filled
+        {/* TODO: different types with empty and different types with filled */}
         {/* <div style={{ marginLeft: 16 }}>
           <FormattedMessage id="mixed" />
         </div> */}
@@ -146,7 +146,7 @@ export const TextureCard: FC<IProps> = ({
             return (
               <div className="fill-item" key={index}>
                 <div
-                  className="color-block"
+                  className="img-block"
                   onClick={() => {
                     setActiveIndex(index);
                   }}
