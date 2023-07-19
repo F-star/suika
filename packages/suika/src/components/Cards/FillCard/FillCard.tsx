@@ -7,13 +7,13 @@ import { ITexture } from '../../../editor/texture';
 import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { TextureCard } from '../TextureCard';
+import { Graph } from '../../../editor/scene/graph';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
 
   const [fill, setFill] = useState<ITexture[]>([]);
-  const [activeIndex, setActiveIndex] = useState(-1);
   const prevFills = useRef<ITexture[][]>([]);
 
   /**
@@ -34,6 +34,59 @@ export const FillCard: FC = () => {
     });
 
     return newFills;
+  };
+
+  const addFill = () => {
+    if (!editor) return;
+
+    const newTexture = cloneDeep(
+      editor.setting.get(fill.length ? 'addedTexture' : 'firstFill'),
+    );
+    const newFills = [...fill, newTexture];
+    setFill(newFills);
+
+    const selectItems = editor.selectedElements.getItems();
+    selectItems.forEach((item) => {
+      item.fill = cloneDeep(newFills);
+    });
+    pushToHistory('Add Fill', selectItems, newFills);
+    editor?.sceneGraph.render();
+  };
+
+  const deleteFill = (index: number) => {
+    if (!editor) return;
+
+    const newFills = fill.filter((_, i) => i !== index);
+    setFill(newFills);
+
+    const selectItems = editor.selectedElements.getItems();
+    selectItems.forEach((item) => {
+      item.fill = cloneDeep(newFills);
+    });
+    pushToHistory('Update Fill', selectItems, newFills);
+    editor.sceneGraph.render();
+  };
+
+  const pushToHistory = (
+    cmdDesc: string,
+    selectedElements: Graph[],
+    newStroke: ITexture[],
+  ) => {
+    if (!editor) return;
+
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        cmdDesc,
+        selectedElements,
+        { fill: newStroke },
+        // prev value
+        selectedElements.map((_, i) => ({
+          fill: cloneDeep(prevFills.current[i]),
+        })),
+      ),
+    );
+
+    prevFills.current = selectedElements.map((el) => cloneDeep(el.fill));
   };
 
   useEffect(() => {
@@ -81,26 +134,17 @@ export const FillCard: FC = () => {
       onChangeComplete={(newTexture, i) => {
         if (!editor) return;
         const newFill = updateSelectedFill(newTexture, i);
-        const selectedElements = editor.selectedElements.getItems();
 
-        editor.commandManager.pushCommand(
-          new SetElementsAttrs(
-            'Update Fill',
-            selectedElements,
-            { fill: newFill },
-            // prev value
-            selectedElements.map((item, i) => ({
-              fill: cloneDeep(prevFills.current[i]),
-            })),
-          ),
+        pushToHistory(
+          'Delete fill',
+          editor.selectedElements.getItems(),
+          newFill!,
         );
-
-        prevFills.current = selectedElements.map((el) => cloneDeep(el.fill));
 
         editor.sceneGraph.render();
       }}
-      activeIndex={activeIndex}
-      setActiveIndex={setActiveIndex}
+      onAdd={addFill}
+      onDelete={deleteFill}
     />
   );
 };

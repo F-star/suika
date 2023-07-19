@@ -9,20 +9,22 @@ export class Setting {
   private eventEmitter = new EventEmitter<Events>();
   private value = {
     canvasBgColor: '#f4f4f4',
-    fill: [
-      {
-        type: TextureType.Solid,
-        attrs: { r: 217, g: 217, b: 217, a: 1 },
-      },
-    ] as ITexture[],
 
-    stroke: [
-      {
-        type: TextureType.Solid,
-        attrs: { r: 0, g: 0, b: 0, a: 1 },
-      },
-    ] as ITexture[],
+    firstStroke: {
+      type: TextureType.Solid,
+      attrs: { r: 0, g: 0, b: 0, a: 1 },
+    } as ITexture,
     strokeWidth: 1,
+
+    firstFill: {
+      type: TextureType.Solid,
+      attrs: { r: 217, g: 217, b: 217, a: 1 },
+    } as ITexture,
+
+    addedTexture: {
+      type: TextureType.Solid,
+      attrs: { r: 0, g: 0, b: 0, a: 0.2 },
+    } as ITexture,
 
     guideBBoxStroke: '#1592fe',
     selectionStroke: '#0f8eff',

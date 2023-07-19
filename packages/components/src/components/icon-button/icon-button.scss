@@ -1,0 +1,14 @@
+.sk-icon-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  color: #191919;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}

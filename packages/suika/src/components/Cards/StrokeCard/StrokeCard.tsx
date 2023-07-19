@@ -7,13 +7,13 @@ import { ITexture } from '../../../editor/texture';
 import cloneDeep from 'lodash.clonedeep';
 import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
 import { TextureCard } from '../TextureCard';
+import { Graph } from '../../../editor/scene/graph';
 
 export const StrokeCard: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
 
   const [strokes, setStrokes] = useState<ITexture[]>([]);
-  const [activeIndex, setActiveIndex] = useState(-1);
   const prevStrokes = useRef<ITexture[][]>([]);
 
   /**
@@ -34,6 +34,59 @@ export const StrokeCard: FC = () => {
     });
 
     return newStrokes;
+  };
+
+  const addStroke = () => {
+    if (!editor) return;
+
+    const newTexture = cloneDeep(
+      editor.setting.get(strokes.length ? 'addedTexture' : 'firstStroke'),
+    );
+    const newStrokes = [...strokes, newTexture];
+    setStrokes(newStrokes);
+
+    const selectItems = editor.selectedElements.getItems();
+    selectItems.forEach((item) => {
+      item.stroke = cloneDeep(newStrokes);
+    });
+    pushToHistory('Add Stroke', selectItems, newStrokes);
+    editor?.sceneGraph.render();
+  };
+
+  const deleteStroke = (index: number) => {
+    if (!editor) return;
+
+    const newStrokes = strokes.filter((_, i) => i !== index);
+    setStrokes(newStrokes);
+
+    const selectItems = editor.selectedElements.getItems();
+    selectItems.forEach((item) => {
+      item.stroke = cloneDeep(newStrokes);
+    });
+    pushToHistory('Update Stroke', selectItems, newStrokes);
+    editor.sceneGraph.render();
+  };
+
+  const pushToHistory = (
+    cmdDesc: string,
+    selectedElements: Graph[],
+    newStroke: ITexture[],
+  ) => {
+    if (!editor) return;
+
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        cmdDesc,
+        selectedElements,
+        { stroke: newStroke },
+        // prev value
+        selectedElements.map((_, i) => ({
+          stroke: cloneDeep(prevStrokes.current[i]),
+        })),
+      ),
+    );
+
+    prevStrokes.current = selectedElements.map((el) => cloneDeep(el.fill));
   };
 
   useEffect(() => {
@@ -81,28 +134,16 @@ export const StrokeCard: FC = () => {
       onChangeComplete={(newTexture, i) => {
         if (!editor) return;
         const newStrokes = updateSelectedStrokes(newTexture, i);
-        const selectedElements = editor.selectedElements.getItems();
 
-        editor.commandManager.pushCommand(
-          new SetElementsAttrs(
-            'Update Stroke',
-            selectedElements,
-            { stroke: newStrokes },
-            // prev value
-            selectedElements.map((item, index) => ({
-              stroke: cloneDeep(prevStrokes.current[index]),
-            })),
-          ),
+        pushToHistory(
+          'Delete Stroke',
+          editor.selectedElements.getItems(),
+          newStrokes!,
         );
-
-        prevStrokes.current = selectedElements.map((el) =>
-          cloneDeep(el.stroke),
-        );
-
         editor.sceneGraph.render();
       }}
-      activeIndex={activeIndex}
-      setActiveIndex={setActiveIndex}
+      onAdd={addStroke}
+      onDelete={deleteStroke}
     />
   );
 };
