@@ -199,8 +199,15 @@ export class Graph {
     this.x = x;
     this.y = y;
   }
-  hitTest(x: number, y: number) {
+  hitTest(x: number, y: number, padding = 0) {
     const bBox = this.getBBoxWithoutRotation();
+
+    if (padding) {
+      bBox.x -= padding;
+      bBox.y -= padding;
+      bBox.width += padding * 2;
+      bBox.height += padding * 2;
+    }
 
     const [cx, cy] = getRectCenterPoint(bBox);
     const rotatedHitPoint = this.rotation

@@ -281,10 +281,14 @@ export class SceneGraph {
     return isPointInRect(point, composedBBox);
   }
   getTopHitElement(x: number, y: number): Graph | null {
+    const padding =
+      this.editor.setting.get('selectionHitPadding') /
+      this.editor.zoomManager.getZoom();
+
     // TODO: optimize, use r-tree to reduce time complexity
     for (let i = this.children.length - 1; i >= 0; i--) {
       const el = this.children[i];
-      if (el.hitTest(x, y)) {
+      if (el.hitTest(x, y, padding)) {
         return el;
       }
     }

@@ -8,8 +8,8 @@ interface Events {
 export class Setting {
   private eventEmitter = new EventEmitter<Events>();
   private value = {
+    /***** texture ****/
     canvasBgColor: '#f4f4f4',
-
     firstStroke: {
       type: TextureType.Solid,
       attrs: { r: 0, g: 0, b: 0, a: 1 },
@@ -31,14 +31,17 @@ export class Setting {
     selectionFill: '#0f8eff33',
     selectionMode: 'intersect' as 'intersect' | 'contain',
 
-    /**** 变形相关 ****/
+    // 点选时，加一个 padding，使得点选更容易
+    selectionHitPadding: 4,
+
+    /******** transform ********/
     handleRotationStroke: '#1592fe',
     handleRotationFill: '#fff',
     handleStrokeWidth: 2,
     handleSize: 6,
     handleRotationLineLength: 15,
 
-    /** default font **/
+    /********* text ********/
     defaultFontSize: 12,
     textFill: [
       {
