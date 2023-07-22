@@ -7,7 +7,7 @@ import { IBaseTool } from '../type';
  * 绘制选区
  */
 export class DrawSelectionBox implements IBaseTool {
-  private lastPointer: IPoint = { x: -1, y: -1 };
+  private lastPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
 
   constructor(private editor: Editor) {}
@@ -27,18 +27,16 @@ export class DrawSelectionBox implements IBaseTool {
     }
 
     const pos = this.editor.getCursorXY(e);
-    this.lastPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
+    this.lastPoint = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     this.editor.sceneGraph.render();
     // 设置选区
-    this.editor.sceneGraph.setSelection(this.lastPointer);
+    this.editor.sceneGraph.setSelection(this.lastPoint);
   }
   drag(e: PointerEvent) {
-    const pos = this.editor.getCursorXY(e);
-    const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
+    const point = this.editor.getSceneCursorXY(e);
 
-    const box = getRectByTwoCoord(this.lastPointer, pointer);
-
+    const box = getRectByTwoCoord(this.lastPoint, point);
     this.editor.sceneGraph.setSelection(box);
     this.editor.sceneGraph.render();
   }

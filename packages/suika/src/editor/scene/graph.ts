@@ -6,6 +6,7 @@ import {
   getAbsoluteCoords,
   getElementRotatedXY,
   getRectCenterPoint,
+  isPointInRect,
 } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
@@ -187,7 +188,7 @@ export class Graph {
     };
   }
   setRotateXY(rotatedX: number, rotatedY: number) {
-    const [cx, cy] = getRectCenterPoint(this);
+    const { x: cx, y: cy } = this.getCenter();
     const { x, y } = transformRotate(
       rotatedX,
       rotatedY,
@@ -197,6 +198,16 @@ export class Graph {
     );
     this.x = x;
     this.y = y;
+  }
+  hitTest(x: number, y: number) {
+    const bBox = this.getBBoxWithoutRotation();
+
+    const [cx, cy] = getRectCenterPoint(bBox);
+    const rotatedHitPoint = this.rotation
+      ? transformRotate(x, y, -this.rotation, cx, cy)
+      : { x, y };
+
+    return isPointInRect(rotatedHitPoint, bBox);
   }
   setRotatedX(rotatedX: number) {
     const { x: prevRotatedX } = getElementRotatedXY(this);

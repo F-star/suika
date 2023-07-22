@@ -11,7 +11,7 @@ import { IBaseTool } from '../type';
  * scale element
  */
 export class SelectScaleTool implements IBaseTool {
-  private startPointer: IPoint = { x: -1, y: -1 };
+  private startPoint: IPoint = { x: -1, y: -1 };
   private handleName!: Exclude<HandleName, 'rotation'>;
   private prevElements: Array<{
     x: number;
@@ -34,9 +34,9 @@ export class SelectScaleTool implements IBaseTool {
     //
   }
   start(e: PointerEvent) {
-    this.startPointer = this.editor.getSceneCursorXY(e);
+    this.startPoint = this.editor.getSceneCursorXY(e);
     const handleName = this.editor.sceneGraph.transformHandle.getNameByPoint(
-      this.startPointer,
+      this.startPoint,
     );
 
     this.prevElements = arrMap(

@@ -1,10 +1,10 @@
-import { IRect, GraphType } from '../../type';
+import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
 import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
 
-export interface RectAttrs extends GraphAttrs, IRect {}
+export type RectAttrs = GraphAttrs;
 
 export class Rect extends Graph {
   constructor(options: RectAttrs) {
@@ -54,8 +54,7 @@ export class Rect extends Graph {
           }
         }
       }
-
-      ctx.closePath();
     }
+    ctx.closePath();
   }
 }

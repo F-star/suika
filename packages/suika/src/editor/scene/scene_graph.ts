@@ -27,6 +27,7 @@ import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
 import { TextGraph } from './text';
 import { HALF_PI } from '../../constant';
+import { Line } from './line';
 
 interface Events {
   render(): void;
@@ -279,19 +280,11 @@ export class SceneGraph {
     const composedBBox = getRectsBBox(...bBoxes);
     return isPointInRect(point, composedBBox);
   }
-  getTopHitElement(hitPointer: IPoint): Graph | null {
-    for (let i = this.children.length - 1; i >= 0; i--) {
-      const element: Graph = this.children[i];
-      const bBox = element.getBBoxWithoutRotation();
-
-      // "点击点" 根据图形进行 反旋转旋转
-      const [cx, cy] = getRectCenterPoint(bBox);
-      const rotatedHitPointer = element.rotation
-        ? transformRotate(hitPointer.x, hitPointer.y, -element.rotation, cx, cy)
-        : hitPointer;
-
-      if (isPointInRect(rotatedHitPointer, bBox)) {
-        return element;
+  getTopHitElement(x: number, y: number): Graph | null {
+    // TODO: optimize, use r-tree to reduce time complexity
+    for (const el of this.children) {
+      if (el.hitTest(x, y)) {
+        return el;
       }
     }
     return null;
@@ -309,6 +302,7 @@ export class SceneGraph {
     const selectionMode = this.editor.setting.get('selectionMode');
     const elements = this.children;
     const containedElements: Graph[] = [];
+    // TODO: optimize, use r-tree to reduce time complexity
     for (const el of elements) {
       let isSelected = false;
       if (selectionMode === 'contain') {
@@ -407,6 +401,7 @@ export class SceneGraph {
       [GraphType.Graph]: Graph,
       [GraphType.Rect]: Rect,
       [GraphType.Ellipse]: Ellipse,
+      [GraphType.Line]: Line,
       [GraphType.Text]: TextGraph,
     };
 

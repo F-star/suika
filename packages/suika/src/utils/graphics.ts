@@ -27,11 +27,12 @@ export const normalizeRect = ({ x, y, width, height }: IRect) => {
 /**
  * 标准化角度
  */
-export const normalizeAngle = (angle: number): number => {
-  if (angle >= DOUBLE_PI) {
-    return angle % DOUBLE_PI;
+export const normalizeRadian = (radian: number): number => {
+  radian = radian % DOUBLE_PI;
+  if (radian < 0) {
+    radian += DOUBLE_PI;
   }
-  return angle;
+  return radian;
 };
 
 /**

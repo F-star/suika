@@ -1,11 +1,10 @@
 import { Graph } from '../scene/graph';
-import { IPoint } from '../../type';
+import { IPoint, IRect } from '../../type';
 import { noop } from '../../utils/common';
 import { normalizeRect } from '../../utils/graphics';
 import { AddShapeCommand } from '../commands/add_shape';
 import { Editor } from '../editor';
 import { ITool } from './type';
-import cloneDeep from 'lodash.clonedeep';
 
 export abstract class DrawShapeTool implements ITool {
   static type = 'drawShape';
@@ -13,17 +12,16 @@ export abstract class DrawShapeTool implements ITool {
   commandDesc = 'Add Shape';
   hotkey = '';
 
-  ShapeCtor: typeof Graph = Graph;
+  protected drawingShape: Graph | null = null;
 
-  startPointer: IPoint = { x: -1, y: -1 };
-  lastDragPointer!: IPoint;
-  lastDragPointerInViewport!: IPoint;
-  drawingShape: Graph | null = null;
+  private startPoint: IPoint = { x: -1, y: -1 };
+  private lastDragPoint!: IPoint;
+  private lastDragPointInViewport!: IPoint;
 
-  isDragging = false;
-  unbindEvent: () => void = noop;
+  private isDragging = false;
+  private unbindEvent: () => void = noop;
 
-  constructor(private editor: Editor) {}
+  constructor(protected editor: Editor) {}
   active() {
     const editor = this.editor;
     editor.setCursor('crosshair');
@@ -41,9 +39,9 @@ export abstract class DrawShapeTool implements ITool {
         return;
       }
       if (this.isDragging) {
-        this.lastDragPointer = editor.viewportCoordsToScene(
-          this.lastDragPointerInViewport.x,
-          this.lastDragPointerInViewport.y,
+        this.lastDragPoint = editor.viewportCoordsToScene(
+          this.lastDragPointInViewport.x,
+          this.lastDragPointInViewport.y,
           this.editor.setting.get('snapToPixelGrid'),
         );
         this.updateRect();
@@ -68,10 +66,8 @@ export abstract class DrawShapeTool implements ITool {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
-    const pos = this.editor.getCursorXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(
-      pos.x,
-      pos.y,
+    this.startPoint = this.editor.getSceneCursorXY(
+      e,
       this.editor.setting.get('snapToPixelGrid'),
     );
     this.drawingShape = null;
@@ -84,31 +80,46 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
     this.isDragging = true;
-    this.lastDragPointerInViewport = this.editor.getCursorXY(e);
-    const pos = this.editor.getCursorXY(e);
-    this.lastDragPointer = this.editor.viewportCoordsToScene(
-      pos.x,
-      pos.y,
+    this.lastDragPointInViewport = this.editor.getCursorXY(e);
+
+    this.lastDragPoint = this.editor.getSceneCursorXY(
+      e,
       this.editor.setting.get('snapToPixelGrid'),
     );
     this.updateRect();
   }
+  /**
+   * create graph, and give the original rect (width may be negative)
+   * noMove: if true, the graph will not move when drag
+   */
+  protected abstract createGraph(rect: IRect, noMove?: boolean): Graph | null;
+  /**
+   * update graph, and give the original rect (width may be negative)
+   */
+  protected updateGraph(rect: IRect) {
+    rect = normalizeRect(rect);
+    const drawingShape = this.drawingShape!;
+    drawingShape.x = rect.x;
+    drawingShape.y = rect.y;
+    drawingShape.width = rect.width;
+    drawingShape.height = rect.height;
+  }
   private updateRect() {
-    const { x, y } = this.lastDragPointer;
+    const { x, y } = this.lastDragPoint;
     const sceneGraph = this.editor.sceneGraph;
-    const { x: startX, y: startY } = this.startPointer;
+    const { x: startX, y: startY } = this.startPoint;
 
     const width = x - startX;
     const height = y - startY;
 
-    let rect = {
+    const rect = {
       x: startX,
       y: startY,
-      width,
-      height,
+      width, // width may be negative
+      height, // height may be negative
     };
 
-    // 按住 shift 绘制正方形
+    // pressing Shift to draw a square
     if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(width) > Math.abs(height)) {
         rect.height = Math.sign(height) * Math.abs(width);
@@ -117,18 +128,10 @@ export abstract class DrawShapeTool implements ITool {
       }
     }
 
-    rect = normalizeRect(rect);
-
     if (this.drawingShape) {
-      this.drawingShape.x = rect.x;
-      this.drawingShape.y = rect.y;
-      this.drawingShape.width = rect.width;
-      this.drawingShape.height = rect.height;
+      this.updateGraph(rect);
     } else {
-      const element = new this.ShapeCtor({
-        ...rect,
-        fill: [cloneDeep(this.editor.setting.get('firstFill'))],
-      });
+      const element = this.createGraph(rect)!;
       sceneGraph.addItems([element]);
 
       this.drawingShape = element;
@@ -141,39 +144,46 @@ export abstract class DrawShapeTool implements ITool {
       return;
     }
 
-    const pos = this.editor.getCursorXY(e);
-    const endPointer = this.editor.viewportCoordsToScene(
-      pos.x,
-      pos.y,
+    const endPoint = this.editor.getSceneCursorXY(
+      e,
       this.editor.setting.get('snapToPixelGrid'),
     );
+
     if (this.drawingShape === null) {
-      const { x: cx, y: cy } = endPointer;
-      const width = this.editor.setting.get('drawRectDefaultWidth');
-      const height = this.editor.setting.get('drawRectDefaultHeight');
+      const { x: cx, y: cy } = endPoint;
+      const width = this.editor.setting.get('drawGraphDefaultWidth');
+      const height = this.editor.setting.get('drawGraphDefaultHeight');
 
-      this.drawingShape = new this.ShapeCtor({
-        x: cx - width / 2,
-        y: cy - height / 2,
-        width,
-        height,
-        fill: [cloneDeep(this.editor.setting.get('firstStroke'))],
-      });
-      this.editor.sceneGraph.addItems([this.drawingShape]);
+      this.drawingShape = this.createGraph(
+        {
+          x: cx - width / 2,
+          y: cy - height / 2,
+          width,
+          height,
+        },
+        true,
+      );
+      if (this.drawingShape) {
+        this.editor.sceneGraph.addItems([this.drawingShape]);
 
-      this.editor.selectedElements.setItems([this.drawingShape]);
-      this.editor.sceneGraph.render();
+        this.editor.selectedElements.setItems([this.drawingShape]);
+        this.editor.sceneGraph.render();
+      }
     }
 
-    this.editor.commandManager.pushCommand(
-      new AddShapeCommand(this.commandDesc, this.editor, [this.drawingShape]),
-    );
+    if (this.drawingShape) {
+      this.editor.commandManager.pushCommand(
+        new AddShapeCommand(this.commandDesc, this.editor, [this.drawingShape]),
+      );
+    }
   }
 
   afterEnd() {
     this.isDragging = false;
     this.editor.hostEventManager.enableDelete();
     this.editor.hostEventManager.enableContextmenu();
-    this.editor.toolManager.setActiveTool('select');
+    if (this.drawingShape) {
+      this.editor.toolManager.setActiveTool('select');
+    }
   }
 }

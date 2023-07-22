@@ -4,7 +4,7 @@ import { getClosestTimesVal } from '../../../utils/common';
 import {
   calcVectorRadian,
   getRectCenterPoint,
-  normalizeAngle,
+  normalizeRadian,
 } from '../../../utils/graphics';
 import { transformRotate } from '../../../utils/transform';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
@@ -16,8 +16,7 @@ import { IBaseTool } from '../type';
  * 旋转元素场景
  */
 export class SelectRotationTool implements IBaseTool {
-  private startPointer: IPoint = { x: -1, y: -1 }; // 暂时用不上
-  private lastPointer: IPoint | null = null;
+  private lastPoint: IPoint | null = null;
   private dRotation = 0; // 按下，然后释放的整个过程中，产生的相对角度
 
   private selectedElementsBBoxCenter: [x: number, y: number] | null = null;
@@ -40,13 +39,8 @@ export class SelectRotationTool implements IBaseTool {
   inactive() {
     hotkeys.unbind('*', this.shiftPressHandler);
   }
-  start(e: PointerEvent) {
-    const viewportPos = this.editor.getCursorXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(
-      viewportPos.x,
-      viewportPos.y,
-    );
-    this.lastPointer = null;
+  start() {
+    this.lastPoint = null;
     this.dRotation = 0;
 
     const selectedElements = this.editor.selectedElements.getItems();
@@ -71,17 +65,12 @@ export class SelectRotationTool implements IBaseTool {
       : null;
   }
   drag(e: PointerEvent) {
-    const viewportPos = this.editor.getCursorXY(e);
-    this.lastPointer = this.editor.viewportCoordsToScene(
-      viewportPos.x,
-      viewportPos.y,
-    );
-
+    this.lastPoint = this.editor.getSceneCursorXY(e);
     this.rotateSelectedElements();
   }
   private rotateSelectedElements() {
-    const lastPointer = this.lastPointer;
-    if (!lastPointer) return;
+    const lastPoint = this.lastPoint;
+    if (!lastPoint) return;
 
     const selectedElements = this.editor.selectedElements.getItems();
     /**** 旋转单个元素 ****/
@@ -93,7 +82,7 @@ export class SelectRotationTool implements IBaseTool {
 
       // 计算向量夹角
       // https://blog.fstars.wang/posts/calc-vector-angle/
-      let dRotation = calcVectorRadian(cx, cy, lastPointer.x, lastPointer.y);
+      let dRotation = calcVectorRadian(cx, cy, lastPoint.x, lastPoint.y);
       if (this.editor.hostEventManager.isShiftPressing) {
         const lockRotation = this.editor.setting.get('lockRotation');
         dRotation = getClosestTimesVal(dRotation, lockRotation);
@@ -111,8 +100,8 @@ export class SelectRotationTool implements IBaseTool {
         let dRotation = calcVectorRadian(
           cxInSelectedElementsBBox,
           cyInSelectedElementsBBox,
-          lastPointer.x,
-          lastPointer.y,
+          lastPoint.x,
+          lastPoint.y,
         );
         if (this.editor.hostEventManager.isShiftPressing) {
           const lockRotation = this.editor.setting.get('lockRotation');
@@ -125,7 +114,7 @@ export class SelectRotationTool implements IBaseTool {
         for (let i = 0, len = selectedElements.length; i < len; i++) {
           const el = selectedElements[i];
           // 计算新的旋转角度
-          el.rotation = normalizeAngle(this.prevRotations[i] + dRotation);
+          el.rotation = normalizeRadian(this.prevRotations[i] + dRotation);
 
           const [cx, cy] = prevElementCenters[i];
           const { x: newCx, y: newCy } = transformRotate(

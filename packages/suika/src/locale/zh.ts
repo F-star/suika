@@ -4,7 +4,7 @@ export const zh: typeof en = {
   delete: '删除',
   fill: '填充',
   stroke: '描边',
-  mixed: '混合',
+  mixed: '多值',
   noSelectedShapes: '没有选中的图形',
 
   uploadFile: '上传文件',
@@ -12,6 +12,7 @@ export const zh: typeof en = {
   'tool.select': '选择',
   'tool.rectangle': '矩形',
   'tool.ellipse': '圆',
+  'tool.line': '直线',
   'tool.text': '文字',
   'tool.hand': '拖拽画布',
   'command.undo': '撤销',

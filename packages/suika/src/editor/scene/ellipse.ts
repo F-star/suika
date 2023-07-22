@@ -1,11 +1,11 @@
 import { DOUBLE_PI } from '../../constant';
-import { IBox, GraphType } from '../../type';
+import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
 import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
 
-export interface EllipseAttrs extends GraphAttrs, IBox {}
+export type EllipseAttrs = GraphAttrs;
 
 export class Ellipse extends Graph {
   constructor(options: EllipseAttrs) {
@@ -31,12 +31,14 @@ export class Ellipse extends Graph {
       }
     }
 
-    for (const texture of this.stroke) {
-      if (texture.type === TextureType.Solid) {
-        ctx.strokeStyle = parseRGBAStr(texture.attrs);
-        ctx.stroke();
-      } else if (texture.type === TextureType.Image) {
-        // TODO:
+    if (this.strokeWidth) {
+      for (const texture of this.stroke) {
+        if (texture.type === TextureType.Solid) {
+          ctx.strokeStyle = parseRGBAStr(texture.attrs);
+          ctx.stroke();
+        } else if (texture.type === TextureType.Image) {
+          // TODO:
+        }
       }
     }
 

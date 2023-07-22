@@ -5,7 +5,7 @@ import { remainDecimal } from '../../../utils/common';
 import {
   degree2Radian,
   getElementRotatedXY,
-  normalizeAngle,
+  normalizeRadian,
   radian2Degree,
 } from '../../../utils/graphics';
 import { BaseCard } from '../BaseCard';
@@ -175,7 +175,7 @@ const ElementsInfoCards: FC = () => {
           value={rotation}
           onBlur={(newRotation) => {
             if (editor) {
-              newRotation = normalizeAngle(degree2Radian(newRotation));
+              newRotation = normalizeRadian(degree2Radian(newRotation));
               const elements = editor.selectedElements.getItems();
               MutateElementsAndRecord.setRotation(
                 editor,

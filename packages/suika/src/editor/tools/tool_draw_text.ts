@@ -2,13 +2,13 @@ import { Editor } from '../editor';
 import { ITool } from './type';
 
 export class DrawTextTool implements ITool {
-  static type = 'drawText';
-  type = 'drawText';
-  hotkey = 't';
+  static readonly type = 'drawText';
+  readonly type = 'drawText';
+  readonly hotkey = 't';
 
   constructor(private editor: Editor) {}
   active() {
-    this.editor.setCursor('text');
+    this.editor.setCursor('crosshair');
   }
   inactive() {
     this.editor.setCursor('');
