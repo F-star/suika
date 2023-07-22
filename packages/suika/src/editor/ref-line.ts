@@ -257,7 +257,7 @@ export class RefLine {
           };
 
           hLine.xs.push(...hTargetLines.get(x)!);
-          hLine.xs.push(...Array.from(hRefLineMap.get(x)!));
+          hLine.xs.push(...Array.from(hRefLineMap.get(x) ?? []));
 
           this.toDrawHLines.push(hLine);
         }
