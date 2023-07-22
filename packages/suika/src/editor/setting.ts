@@ -53,8 +53,8 @@ export class Setting {
     zoomMax: 256,
     zoomMin: 0.02,
 
-    drawRectDefaultWidth: 100, // 绘制矩形工具，如果不拖拽就不会产生宽高。此时提供矩形的宽度
-    drawRectDefaultHeight: 100, // 高度，同上
+    drawGraphDefaultWidth: 100, // drawing graph default width if no drag
+    drawGraphDefaultHeight: 100, // default height
 
     /**** 标尺相关 ****/
     enableRuler: true,

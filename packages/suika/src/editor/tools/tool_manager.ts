@@ -7,7 +7,8 @@ import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawRectTool } from './tool_draw_rect';
 import { SelectTool } from './tool_select';
 import { ITool } from './type';
-import { DrawTextTool } from './tool_text';
+import { DrawTextTool } from './tool_draw_text';
+import { DrawLineTool } from './tool_draw_line';
 
 interface Events {
   change(type: string): void;
@@ -27,8 +28,9 @@ export class ToolManager {
     this.registerToolAndHotKey(new SelectTool(editor));
     this.registerToolAndHotKey(new DrawRectTool(editor));
     this.registerToolAndHotKey(new DrawEllipseTool(editor));
-    this.registerToolAndHotKey(new DragCanvasTool(editor));
+    this.registerToolAndHotKey(new DrawLineTool(editor));
     this.registerToolAndHotKey(new DrawTextTool(editor));
+    this.registerToolAndHotKey(new DragCanvasTool(editor));
 
     this.setActiveTool(SelectTool.type);
 

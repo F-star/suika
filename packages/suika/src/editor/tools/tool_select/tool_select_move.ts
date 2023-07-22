@@ -10,9 +10,9 @@ import { IBaseTool } from '../type';
  * move selected elements
  */
 export class SelectMoveTool implements IBaseTool {
-  private startPointer: IPoint = { x: -1, y: -1 };
+  private startPoint: IPoint = { x: -1, y: -1 };
   private startPoints: IPoint[] = [];
-  private dragPointer!: IPoint;
+  private dragPoint!: IPoint;
   private dx = 0;
   private dy = 0;
   private prevBBoxPos: IPoint = { x: -1, y: -1 };
@@ -23,7 +23,7 @@ export class SelectMoveTool implements IBaseTool {
   active() {
     const hotkeysManager = this.editor.hostEventManager;
     const moveWhenToggleShift = () => {
-      if (this.dragPointer) {
+      if (this.dragPoint) {
         this.move();
       }
     };
@@ -36,11 +36,7 @@ export class SelectMoveTool implements IBaseTool {
     this.unbindEvents();
   }
   start(e: PointerEvent) {
-    const viewportPos = this.editor.getCursorXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(
-      viewportPos.x,
-      viewportPos.y,
-    );
+    this.startPoint = this.editor.getSceneCursorXY(e);
     const selectedElements = this.editor.selectedElements.getItems();
     this.startPoints = selectedElements.map((element) => ({
       x: element.x,
@@ -58,18 +54,18 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.refLine.cacheXYToBbox();
   }
   drag(e: PointerEvent) {
-    this.dragPointer = this.editor.getCursorXY(e);
+    this.dragPoint = this.editor.getCursorXY(e);
     this.move();
   }
   private move() {
     this.editor.sceneGraph.showOutline = false;
     const { x, y } = this.editor.viewportCoordsToScene(
-      this.dragPointer.x,
-      this.dragPointer.y,
+      this.dragPoint.x,
+      this.dragPoint.y,
     );
 
-    let dx = (this.dx = x - this.startPointer.x);
-    let dy = (this.dy = y - this.startPointer.y);
+    let dx = (this.dx = x - this.startPoint.x);
+    let dy = (this.dy = y - this.startPoint.y);
 
     if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(dx) > Math.abs(dy)) {

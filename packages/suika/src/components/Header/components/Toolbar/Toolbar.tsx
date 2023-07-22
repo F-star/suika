@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import {
   EllipseOutlined,
   HandOutlined,
+  LineOutlined,
   RectOutlined,
   SelectOutlined,
   TextFilled,
@@ -47,6 +48,12 @@ export const ToolBar = () => {
             hotkey: 'O',
             intlId: 'tool.ellipse',
             icon: <EllipseOutlined />,
+          },
+          {
+            name: 'drawLine',
+            hotkey: 'L',
+            intlId: 'tool.line',
+            icon: <LineOutlined />,
           },
           {
             name: 'drawText',

@@ -14,7 +14,7 @@ export class SelectTool implements ITool {
   type = 'select';
   hotkey = 'v';
 
-  startPointer: IPoint = { x: -1, y: -1 };
+  startPoint: IPoint = { x: -1, y: -1 };
   drawingRect: Rect | null = null;
   currStrategy: IBaseTool | null = null;
   // 策略
@@ -46,9 +46,7 @@ export class SelectTool implements ITool {
     if (this.editor.hostEventManager.isSpacePressing) {
       return;
     }
-    const pos = this.editor.getCursorXY(e);
-    const pointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
-
+    const pointer = this.editor.getSceneCursorXY(e);
     const transformHandleName =
       this.editor.sceneGraph.transformHandle.getNameByPoint(pointer);
 
@@ -79,12 +77,11 @@ export class SelectTool implements ITool {
     const selectedElements = this.editor.selectedElements;
     const isShiftPressing = this.editor.hostEventManager.isShiftPressing;
 
-    const pos = this.editor.getCursorXY(e);
-    this.startPointer = this.editor.viewportCoordsToScene(pos.x, pos.y);
+    this.startPoint = this.editor.getSceneCursorXY(e);
 
     // 0. 点中 handle（旋转点）
     const handleName = sceneGraph.transformHandle.getNameByPoint(
-      this.startPointer,
+      this.startPoint,
     );
     // if (handleName) {
     if (handleName === 'rotation') {
@@ -99,11 +96,14 @@ export class SelectTool implements ITool {
     // 1. 点击落在选中盒中
     else if (
       !isShiftPressing &&
-      sceneGraph.isPointInSelectedBox(this.startPointer)
+      sceneGraph.isPointInSelectedBox(this.startPoint)
     ) {
       this.currStrategy = this.strategyMove;
     } else {
-      const topHitElement = sceneGraph.getTopHitElement(this.startPointer);
+      const topHitElement = sceneGraph.getTopHitElement(
+        this.startPoint.x,
+        this.startPoint.y,
+      );
       // 2. 点中一个元素 （FIXME: 没考虑描边的情况）
       if (topHitElement) {
         // 按住 shift 键的选中，添加或移除一个选中元素

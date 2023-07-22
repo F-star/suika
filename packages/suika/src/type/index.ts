@@ -45,6 +45,7 @@ export enum GraphType {
   Rect = 'Rect',
   Ellipse = 'Ellipse',
   Text = 'Text',
+  Line = 'Line',
 }
 
 /**
