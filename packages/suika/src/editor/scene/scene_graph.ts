@@ -282,7 +282,8 @@ export class SceneGraph {
   }
   getTopHitElement(x: number, y: number): Graph | null {
     // TODO: optimize, use r-tree to reduce time complexity
-    for (const el of this.children) {
+    for (let i = this.children.length - 1; i >= 0; i--) {
+      const el = this.children[i];
       if (el.hitTest(x, y)) {
         return el;
       }
