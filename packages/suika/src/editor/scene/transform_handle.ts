@@ -186,51 +186,53 @@ export class TransformHandle {
       };
     }
   }
-  getNameByPoint(point: IPoint) {
+  getNameByPoint(hitPoint: IPoint) {
     const handle = this.handle;
     if (!handle) {
       return undefined;
     }
-    if (this.isInRotationHandle(point)) {
+    if (this.isInRotationHandle(hitPoint)) {
       return 'rotation';
     }
 
     // 选中图形的旋转角度。。
     const elRotation = this.editor.selectedElements.getRotation();
     const setting = this.editor.setting;
-    const size = setting.get('handleSize') + setting.get('handleStrokeWidth');
+    const zoom = this.editor.zoomManager.getZoom();
+    const size = setting.get('handleSize') / zoom;
 
     // 是否在缩放控制点上
     let key: keyof typeof handle;
     for (key in handle) {
-      if (key === 'rotation' && this.isInRotationHandle(point)) {
-        return key;
+      if (key === 'rotation') {
+        continue;
       }
 
-      const scalePoint = handle[key];
+      const ctrlPoint = handle[key];
 
-      let rotatedX = point.x;
-      let rotatedY = point.y;
+      let rotatedHitPointX = hitPoint.x;
+      let rotatedHitPointY = hitPoint.y;
       if (elRotation) {
-        const rotatedPoint = transformRotate(
-          point.x,
-          point.y,
+        const rotatedHitPoint = transformRotate(
+          hitPoint.x,
+          hitPoint.y,
           elRotation,
-          scalePoint.x,
-          scalePoint.y,
+          ctrlPoint.x,
+          ctrlPoint.y,
         );
-        rotatedX = rotatedPoint.x;
-        rotatedY = rotatedPoint.y;
+        rotatedHitPointX = rotatedHitPoint.x;
+        rotatedHitPointY = rotatedHitPoint.y;
       }
       if (
         isPointInRect(
-          { x: rotatedX, y: rotatedY },
+          { x: rotatedHitPointX, y: rotatedHitPointY },
           {
-            x: scalePoint.x - size / 2,
-            y: scalePoint.y - size / 2,
+            x: ctrlPoint.x - size / 2,
+            y: ctrlPoint.y - size / 2,
             width: size,
             height: size,
           },
+          setting.get('handleStrokePadding') / zoom,
         )
       ) {
         return key;
@@ -247,7 +249,7 @@ export class TransformHandle {
     const zoom = this.editor.zoomManager.getZoom();
 
     const size = this.editor.setting.get('handleSize');
-    const padding = 4;
+    const padding = this.editor.setting.get('handleStrokePadding');
     return isPointInCircle(point, {
       x: rotationPoint.x,
       y: rotationPoint.y,

@@ -38,6 +38,7 @@ export class Setting {
     handleRotationStroke: '#1592fe',
     handleRotationFill: '#fff',
     handleStrokeWidth: 2,
+    handleStrokePadding: 4,
     handleSize: 6,
     handleRotationLineLength: 15,
 
