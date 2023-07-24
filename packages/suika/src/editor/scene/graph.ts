@@ -201,20 +201,12 @@ export class Graph {
   }
   hitTest(x: number, y: number, padding = 0) {
     const bBox = this.getBBoxWithoutRotation();
-
-    if (padding) {
-      bBox.x -= padding;
-      bBox.y -= padding;
-      bBox.width += padding * 2;
-      bBox.height += padding * 2;
-    }
-
     const [cx, cy] = getRectCenterPoint(bBox);
     const rotatedHitPoint = this.rotation
       ? transformRotate(x, y, -this.rotation, cx, cy)
       : { x, y };
 
-    return isPointInRect(rotatedHitPoint, bBox);
+    return isPointInRect(rotatedHitPoint, bBox, padding);
   }
   setRotatedX(rotatedX: number) {
     const { x: prevRotatedX } = getElementRotatedXY(this);
