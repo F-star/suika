@@ -192,7 +192,13 @@ export const StrokeCard: FC = () => {
         <div style={{ padding: '0 8px' }}>
           <NumberInput
             prefix={
-              <div style={{ padding: '0 4px', color: '#b3b3b3' }}>
+              <div
+                style={{
+                  paddingLeft: '3px',
+                  color: '#b3b3b3',
+                  display: 'flex',
+                }}
+              >
                 <LineWidthOutlined />
               </div>
             }
