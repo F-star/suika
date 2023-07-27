@@ -122,9 +122,9 @@ export abstract class DrawShapeTool implements ITool {
     // pressing Shift to draw a square
     if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(width) > Math.abs(height)) {
-        rect.height = Math.sign(height) * Math.abs(width);
+        rect.height = (Math.sign(height) || 1) * Math.abs(width);
       } else {
-        rect.width = Math.sign(width) * Math.abs(height);
+        rect.width = (Math.sign(width) || 1) * Math.abs(height);
       }
     }
 
