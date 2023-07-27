@@ -7,3 +7,4 @@ export * from './tool';
 export * from './check-outlined';
 export * from './social';
 export * from './remove-outlined';
+export * from './line-width-outlined';

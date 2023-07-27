@@ -21,7 +21,6 @@ export class DrawRectTool extends DrawShapeTool implements ITool {
     return new Rect({
       ...rect,
       fill: [cloneDeep(this.editor.setting.get('firstFill'))],
-      strokeWidth: this.editor.setting.get('strokeWidth'),
     });
   }
 }

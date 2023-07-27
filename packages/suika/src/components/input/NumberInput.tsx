@@ -4,11 +4,12 @@ import CustomRuleInput from './CustomRuleInput';
 
 interface INumberInputProps {
   value: string | number;
+  min?: number;
   onBlur: (newValue: number) => void;
   prefix?: React.ReactNode;
 }
 
-const NumberInput: FC<INumberInputProps> = ({ value, onBlur, prefix }) => {
+const NumberInput: FC<INumberInputProps> = ({ value, min, onBlur, prefix }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const NumberInput: FC<INumberInputProps> = ({ value, onBlur, prefix }) => {
         }
       }}
       value={value}
-      onBlur={(newVal) => onBlur(Number(newVal))}
+      onBlur={(newVal) => onBlur(Math.max(min ?? -Infinity, Number(newVal)))}
     />
   );
 };

@@ -37,6 +37,8 @@ interface IProps {
 
   onDelete: (index: number) => void;
   onAdd: () => void;
+
+  appendedContent?: React.ReactNode;
 }
 
 export const TextureCard: FC<IProps> = ({
@@ -47,6 +49,8 @@ export const TextureCard: FC<IProps> = ({
 
   onDelete,
   onAdd,
+
+  appendedContent,
 }) => {
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -170,6 +174,7 @@ export const TextureCard: FC<IProps> = ({
             );
           }
         })}
+        {appendedContent}
       </BaseCard>
     </Popover>
   );
