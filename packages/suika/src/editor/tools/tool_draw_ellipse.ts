@@ -21,7 +21,6 @@ export class DrawEllipseTool extends DrawShapeTool implements ITool {
     return new Ellipse({
       ...rect,
       fill: [cloneDeep(this.editor.setting.get('firstFill'))],
-      strokeWidth: this.editor.setting.get('strokeWidth'),
     });
   }
 }

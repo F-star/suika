@@ -2,7 +2,7 @@ import { Graph } from '../scene/graph';
 import { ITexture } from '../texture';
 import { ICommand } from './type';
 
-type IAttrs = Partial<{
+export type ISetElementsAttrsType = Partial<{
   x: number;
   y: number;
   width: number;
@@ -10,6 +10,7 @@ type IAttrs = Partial<{
   rotation: number;
   fill: ITexture[];
   stroke: ITexture[];
+  strokeWidth: number;
 }>;
 
 /**
@@ -20,8 +21,8 @@ export class SetElementsAttrs implements ICommand {
   constructor(
     public desc: string,
     private elements: Graph[],
-    private attrs: IAttrs | IAttrs[],
-    private prevAttrs: IAttrs[],
+    private attrs: ISetElementsAttrsType | ISetElementsAttrsType[],
+    private prevAttrs: ISetElementsAttrsType[],
   ) {
     if (elements.length !== prevAttrs.length) {
       throw new Error('elements 和 preAttrs 数量不匹配');
