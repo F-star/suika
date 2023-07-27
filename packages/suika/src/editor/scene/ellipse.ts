@@ -32,6 +32,7 @@ export class Ellipse extends Graph {
     }
 
     if (this.strokeWidth) {
+      ctx.lineWidth = this.strokeWidth;
       for (const texture of this.stroke) {
         if (texture.type === TextureType.Solid) {
           ctx.strokeStyle = parseRGBAStr(texture.attrs);
