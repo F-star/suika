@@ -4,8 +4,9 @@ import { Line } from '../scene/line';
 import { DrawShapeTool } from './tool_draw_shape';
 import { ITool } from './type';
 import { IRect } from '../../type';
-import { normalizeRadian } from '../../utils/graphics';
+import { calcVectorRadian, normalizeRadian } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
+import { HALF_PI } from '../../constant';
 
 export class DrawLineTool extends DrawShapeTool implements ITool {
   static readonly type = 'drawLine';
@@ -29,6 +30,32 @@ export class DrawLineTool extends DrawShapeTool implements ITool {
       stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
       strokeWidth: this.editor.setting.get('strokeWidth'),
     });
+  }
+
+  protected adjustSizeWhenShiftPressing(rect: IRect) {
+    const radian = calcVectorRadian(
+      rect.x,
+      rect.y,
+      rect.x + rect.width,
+      rect.y + rect.height,
+    );
+
+    const { width, height } = rect;
+    const remainder = radian % HALF_PI;
+    if (remainder < Math.PI / 8 || remainder > (Math.PI * 3) / 8) {
+      if (Math.abs(width) > Math.abs(height)) {
+        rect.height = 0;
+      } else {
+        rect.width = 0;
+      }
+    } else {
+      const min = Math.min(Math.abs(width), Math.abs(height));
+      const max = Math.max(Math.abs(width), Math.abs(height));
+      const size = min + (max - min) / 2;
+
+      rect.height = (Math.sign(height) || 1) * size;
+      rect.width = (Math.sign(width) || 1) * size;
+    }
   }
 
   protected updateGraph(rect: IRect) {

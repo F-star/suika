@@ -62,6 +62,7 @@ export abstract class DrawShapeTool implements ITool {
   moveExcludeDrag() {
     // do nothing;
   }
+
   start(e: PointerEvent) {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
@@ -73,6 +74,7 @@ export abstract class DrawShapeTool implements ITool {
     this.drawingShape = null;
     this.isDragging = false;
   }
+
   drag(e: PointerEvent) {
     this.editor.hostEventManager.disableDelete();
     this.editor.hostEventManager.disableContextmenu();
@@ -81,7 +83,6 @@ export abstract class DrawShapeTool implements ITool {
     }
     this.isDragging = true;
     this.lastDragPointInViewport = this.editor.getCursorXY(e);
-
     this.lastDragPoint = this.editor.getSceneCursorXY(
       e,
       this.editor.setting.get('snapToPixelGrid'),
@@ -93,6 +94,17 @@ export abstract class DrawShapeTool implements ITool {
    * noMove: if true, the graph will not move when drag
    */
   protected abstract createGraph(rect: IRect, noMove?: boolean): Graph | null;
+
+  protected adjustSizeWhenShiftPressing(rect: IRect) {
+    // pressing Shift to draw a square
+    const { width, height } = rect;
+    if (Math.abs(width) > Math.abs(height)) {
+      rect.height = (Math.sign(height) || 1) * Math.abs(width);
+    } else {
+      rect.width = (Math.sign(width) || 1) * Math.abs(height);
+    }
+  }
+
   /**
    * update graph, and give the original rect (width may be negative)
    */
@@ -104,6 +116,7 @@ export abstract class DrawShapeTool implements ITool {
     drawingShape.width = rect.width;
     drawingShape.height = rect.height;
   }
+
   private updateRect() {
     const { x, y } = this.lastDragPoint;
     const sceneGraph = this.editor.sceneGraph;
@@ -121,11 +134,7 @@ export abstract class DrawShapeTool implements ITool {
 
     // pressing Shift to draw a square
     if (this.editor.hostEventManager.isShiftPressing) {
-      if (Math.abs(width) > Math.abs(height)) {
-        rect.height = (Math.sign(height) || 1) * Math.abs(width);
-      } else {
-        rect.width = (Math.sign(width) || 1) * Math.abs(height);
-      }
+      this.adjustSizeWhenShiftPressing(rect);
     }
 
     if (this.drawingShape) {
@@ -139,6 +148,7 @@ export abstract class DrawShapeTool implements ITool {
     this.editor.selectedElements.setItems([this.drawingShape]);
     sceneGraph.render();
   }
+
   end(e: PointerEvent) {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
