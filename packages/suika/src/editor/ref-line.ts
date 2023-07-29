@@ -238,7 +238,7 @@ export class RefLine {
           };
 
           vLine.ys.push(...vTargetLines.get(y)!);
-          vLine.ys.push(...Array.from(vRefLineMap.get(y)!));
+          vLine.ys.push(...Array.from(vRefLineMap.get(y)! ?? []));
           this.toDrawVLines.push(vLine);
         }
       });
