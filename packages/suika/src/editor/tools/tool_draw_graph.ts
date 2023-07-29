@@ -98,11 +98,9 @@ export abstract class DrawGraphTool implements ITool {
   protected adjustSizeWhenShiftPressing(rect: IRect) {
     // pressing Shift to draw a square
     const { width, height } = rect;
-    if (Math.abs(width) > Math.abs(height)) {
-      rect.height = (Math.sign(height) || 1) * Math.abs(width);
-    } else {
-      rect.width = (Math.sign(width) || 1) * Math.abs(height);
-    }
+    const size = Math.max(Math.abs(width), Math.abs(height));
+    rect.height = (Math.sign(height) || 1) * size;
+    rect.width = (Math.sign(width) || 1) * size;
   }
 
   /**
