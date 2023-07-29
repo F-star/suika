@@ -6,13 +6,13 @@ import { AddShapeCommand } from '../commands/add_shape';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
-export abstract class DrawShapeTool implements ITool {
-  static type = 'drawShape';
-  type = 'drawShape';
-  commandDesc = 'Add Shape';
+export abstract class DrawGraphTool implements ITool {
+  static type = 'drawGraph';
+  type = 'drawGraph';
+  commandDesc = 'Add Graph';
   hotkey = '';
 
-  protected drawingShape: Graph | null = null;
+  protected drawingGraph: Graph | null = null;
 
   private startPoint: IPoint = { x: -1, y: -1 };
   private lastDragPoint!: IPoint;
@@ -71,7 +71,7 @@ export abstract class DrawShapeTool implements ITool {
       e,
       this.editor.setting.get('snapToPixelGrid'),
     );
-    this.drawingShape = null;
+    this.drawingGraph = null;
     this.isDragging = false;
   }
 
@@ -110,7 +110,7 @@ export abstract class DrawShapeTool implements ITool {
    */
   protected updateGraph(rect: IRect) {
     rect = normalizeRect(rect);
-    const drawingShape = this.drawingShape!;
+    const drawingShape = this.drawingGraph!;
     drawingShape.x = rect.x;
     drawingShape.y = rect.y;
     drawingShape.width = rect.width;
@@ -137,15 +137,15 @@ export abstract class DrawShapeTool implements ITool {
       this.adjustSizeWhenShiftPressing(rect);
     }
 
-    if (this.drawingShape) {
+    if (this.drawingGraph) {
       this.updateGraph(rect);
     } else {
       const element = this.createGraph(rect)!;
       sceneGraph.addItems([element]);
 
-      this.drawingShape = element;
+      this.drawingGraph = element;
     }
-    this.editor.selectedElements.setItems([this.drawingShape]);
+    this.editor.selectedElements.setItems([this.drawingGraph]);
     sceneGraph.render();
   }
 
@@ -159,12 +159,12 @@ export abstract class DrawShapeTool implements ITool {
       this.editor.setting.get('snapToPixelGrid'),
     );
 
-    if (this.drawingShape === null) {
+    if (this.drawingGraph === null) {
       const { x: cx, y: cy } = endPoint;
       const width = this.editor.setting.get('drawGraphDefaultWidth');
       const height = this.editor.setting.get('drawGraphDefaultHeight');
 
-      this.drawingShape = this.createGraph(
+      this.drawingGraph = this.createGraph(
         {
           x: cx - width / 2,
           y: cy - height / 2,
@@ -173,17 +173,17 @@ export abstract class DrawShapeTool implements ITool {
         },
         true,
       );
-      if (this.drawingShape) {
-        this.editor.sceneGraph.addItems([this.drawingShape]);
+      if (this.drawingGraph) {
+        this.editor.sceneGraph.addItems([this.drawingGraph]);
 
-        this.editor.selectedElements.setItems([this.drawingShape]);
+        this.editor.selectedElements.setItems([this.drawingGraph]);
         this.editor.sceneGraph.render();
       }
     }
 
-    if (this.drawingShape) {
+    if (this.drawingGraph) {
       this.editor.commandManager.pushCommand(
-        new AddShapeCommand(this.commandDesc, this.editor, [this.drawingShape]),
+        new AddShapeCommand(this.commandDesc, this.editor, [this.drawingGraph]),
       );
     }
   }
@@ -192,7 +192,7 @@ export abstract class DrawShapeTool implements ITool {
     this.isDragging = false;
     this.editor.hostEventManager.enableDelete();
     this.editor.hostEventManager.enableContextmenu();
-    if (this.drawingShape) {
+    if (this.drawingGraph) {
       this.editor.toolManager.setActiveTool('select');
     }
   }

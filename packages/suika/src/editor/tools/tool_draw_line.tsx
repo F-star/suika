@@ -1,14 +1,14 @@
 import cloneDeep from 'lodash.clonedeep';
 import { Editor } from '../editor';
 import { Line } from '../scene/line';
-import { DrawShapeTool } from './tool_draw_shape';
+import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 import { IRect } from '../../type';
 import { calcVectorRadian, normalizeRadian } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { HALF_PI } from '../../constant';
 
-export class DrawLineTool extends DrawShapeTool implements ITool {
+export class DrawLineTool extends DrawGraphTool implements ITool {
   static readonly type = 'drawLine';
   readonly type = 'drawLine';
   readonly hotkey = 'l';
@@ -60,7 +60,7 @@ export class DrawLineTool extends DrawShapeTool implements ITool {
 
   protected updateGraph(rect: IRect) {
     const attrs = this.calcAttrs(rect);
-    Object.assign(this.drawingShape!, attrs);
+    Object.assign(this.drawingGraph!, attrs);
   }
 
   private calcAttrs({ x, y, width, height }: IRect) {

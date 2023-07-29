@@ -1,12 +1,12 @@
 import { Ellipse } from '../scene/ellipse';
 import { Editor } from '../editor';
-import { DrawShapeTool } from './tool_draw_shape';
+import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 import cloneDeep from 'lodash.clonedeep';
 import { IRect } from '../../type';
 import { normalizeRect } from '../../utils/graphics';
 
-export class DrawEllipseTool extends DrawShapeTool implements ITool {
+export class DrawEllipseTool extends DrawGraphTool implements ITool {
   static readonly type = 'drawEllipse';
   readonly type = 'drawEllipse';
   readonly hotkey = 'o';
