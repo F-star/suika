@@ -15,5 +15,9 @@ export const Default: Story = {
   args: {
     content: <div style={{ padding: 8 }}>This is content</div>,
     children: <span style={{ marginLeft: 100 }}>Click me.</span>,
+    open: true,
+    onOpenChange: () => {
+      //
+    },
   },
 };
