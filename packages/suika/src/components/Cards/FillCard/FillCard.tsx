@@ -136,7 +136,7 @@ export const FillCard: FC = () => {
         const newFill = updateSelectedFill(newTexture, i);
 
         pushToHistory(
-          'Delete fill',
+          'Update fill',
           editor.selectedElements.getItems(),
           newFill!,
         );

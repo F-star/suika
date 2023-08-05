@@ -140,7 +140,7 @@ export class ZoomManager {
     const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
     this.zoomBoxToFit(getRectsBBox(...bboxs), maxZoom);
   }
-  getCanvasCenter() {
+  private getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();
     return {
       x: width / 2,

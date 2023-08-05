@@ -6,7 +6,6 @@ import {
 } from '../../../utils/color';
 import { BaseCard } from '../BaseCard';
 import './TextureCard.scss';
-// import { FormattedMessage } from 'react-intl';
 import {
   DEFAULT_IMAGE_SRC,
   IRGBA,
@@ -90,8 +89,14 @@ export const TextureCard: FC<IProps> = ({
   return (
     <Popover
       open={activeIndex >= 0}
+      onOpenChange={(val) => {
+        if (!val) {
+          setActiveIndex(-1);
+        }
+      }}
       content={activeIndex >= 0 && pickerPopover}
       placement="left-start"
+      offset={2}
     >
       <BaseCard
         title={title}
@@ -116,7 +121,7 @@ export const TextureCard: FC<IProps> = ({
                           ? '0 0 0 1px rgba(0,0,0,0.1) inset'
                           : undefined,
                       }}
-                      onClick={() => {
+                      onMouseDown={() => {
                         setActiveIndex(index);
                       }}
                     />
@@ -159,7 +164,6 @@ export const TextureCard: FC<IProps> = ({
                     style={{
                       backgroundImage: `url(${texture.attrs.src})`,
                       objectFit: 'contain',
-                      marginLeft: 4,
                       width: '100%',
                       height: '100%',
                     }}

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import './popover.scss';
 
 import {
@@ -6,7 +6,7 @@ import {
   Placement,
   autoUpdate,
   flip,
-  offset,
+  offset as floatUiOffset,
   useClick,
   useDismiss,
   useFloating,
@@ -17,37 +17,35 @@ interface PopoverProps {
   placement?: Placement;
   content: React.ReactNode;
   children: React.ReactElement;
+  offset?: number;
 
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const Popover: FC<PopoverProps> = ({
   placement = 'bottom',
   content,
   children,
+  offset = 5,
+
   open,
   onOpenChange,
 }) => {
-  const [isOpen, setIsOpen] = useState(open ?? false);
-
   const { x, y, strategy, refs, context } = useFloating({
     placement: placement,
-    open: isOpen,
-    onOpenChange: (open) => {
-      setIsOpen(open);
-      onOpenChange?.(open);
-    },
+    open,
+    onOpenChange,
     whileElementsMounted: autoUpdate,
     middleware: [
       flip({
         fallbackAxisSideDirection: 'end',
       }),
-      offset(5),
+      floatUiOffset(offset),
     ],
   });
 
-  const click = useClick(context);
+  const click = useClick(context, { event: 'mousedown' });
   const dismiss = useDismiss(context);
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
@@ -55,20 +53,14 @@ export const Popover: FC<PopoverProps> = ({
     dismiss,
   ]);
 
-  const showPopover = () => {
-    if (open === undefined) {
-      return isOpen;
-    }
-    return open;
-  };
-
   return (
     <>
+      {/* TODO: remove span container el */}
       <span ref={refs.setReference} {...getReferenceProps()}>
         {children}
       </span>
       <FloatingPortal>
-        {showPopover() && (
+        {open && (
           <div
             ref={refs.setFloating}
             className="sk-popover-content"
