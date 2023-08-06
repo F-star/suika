@@ -236,8 +236,12 @@ export class Graph {
     this.x -= dx;
     this.y -= dy;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D) {
+  renderFillAndStrokeTexture(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ctx: CanvasRenderingContext2D,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    smooth: boolean,
+  ) {
     throw new Error('Method not implemented.');
   }
 
@@ -246,18 +250,25 @@ export class Graph {
     throw new Error('Method not implemented.');
   }
 
-  fillImage(ctx: CanvasRenderingContext2D, texture: TextureImage) {
+  fillImage(
+    ctx: CanvasRenderingContext2D,
+    texture: TextureImage,
+    smooth: boolean,
+  ) {
     const src = texture.attrs.src;
     const width = this.width;
     const height = this.height;
     let img: CanvasImageSource;
+
+    // anti-aliasing
+    ctx.imageSmoothingEnabled = smooth;
+
     if (src) {
       img = new Image();
       img.src = src;
       // TODO: rerender when image loaded, but notice endless loop
     } else {
       img = DEFAULT_IMAGE;
-      ctx.imageSmoothingEnabled = false;
     }
 
     // reference: https://mp.weixin.qq.com/s/TSpZv_0VJtxPTCCzEqDl8Q

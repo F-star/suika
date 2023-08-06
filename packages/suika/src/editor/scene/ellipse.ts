@@ -11,7 +11,10 @@ export class Ellipse extends Graph {
   constructor(options: EllipseAttrs) {
     super({ ...options, type: GraphType.Ellipse });
   }
-  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D): void {
+  renderFillAndStrokeTexture(
+    ctx: CanvasRenderingContext2D,
+    smooth: boolean,
+  ): void {
     const cx = this.x + this.width / 2;
     const cy = this.y + this.height / 2;
 
@@ -27,7 +30,7 @@ export class Ellipse extends Graph {
         ctx.fill();
       } else if (texture.type === TextureType.Image) {
         ctx.clip();
-        this.fillImage(ctx, texture);
+        this.fillImage(ctx, texture, smooth);
       }
     }
 

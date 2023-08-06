@@ -122,7 +122,9 @@ export class SceneGraph {
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       ctx.save();
       const element = visibleElements[i];
-      element.renderFillAndStrokeTexture(ctx);
+      // 抗锯齿
+      const smooth = zoom <= 1;
+      element.renderFillAndStrokeTexture(ctx, smooth);
       ctx.restore();
     }
 
