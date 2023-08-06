@@ -268,6 +268,7 @@ export class Graph {
       img.src = src;
       // TODO: rerender when image loaded, but notice endless loop
     } else {
+      ctx.imageSmoothingEnabled = false;
       img = DEFAULT_IMAGE;
     }
 
