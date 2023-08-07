@@ -17,12 +17,21 @@ export const ContextMenu: FC = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [canRedo, setCanRedo] = useState(false);
   const [canUndo, setCanUdo] = useState(false);
+  const [showCopy, setShowCopy] = useState(false);
 
   useEffect(() => {
     if (editor) {
       // 监听 editor 的 contextmenu 事件
       const handleContextmenu = (pos: IPoint) => {
         if (!visible) {
+          setShowCopy(
+            editor.sceneGraph.isPointInSelectedBox(
+              editor.getSceneCursorXY({
+                clientX: pos.x,
+                clientY: pos.y,
+              }),
+            ),
+          );
           setVisible(true);
           setPos(pos);
         }
@@ -48,6 +57,36 @@ export const ContextMenu: FC = () => {
   const renderNoSelectContextMenu = () => {
     return (
       <>
+        {showCopy && (
+          <ContextMenuItem
+            onClick={() => {
+              setVisible(false);
+              if (editor) {
+                editor.clipboard.copy();
+              }
+            }}
+          >
+            <FormattedMessage id="command.copy" />
+          </ContextMenuItem>
+        )}
+        <ContextMenuItem
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              const scenePos = editor.getSceneCursorXY(
+                {
+                  clientX: pos.x,
+                  clientY: pos.y,
+                },
+                true,
+              );
+              editor.clipboard.pasteAt(scenePos.x, scenePos.y);
+            }
+          }}
+        >
+          <FormattedMessage id="command.pasteHere" />
+        </ContextMenuItem>
+        <ContextMenuSep />
         <ContextMenuItem
           disabled={!canUndo}
           onClick={() => {

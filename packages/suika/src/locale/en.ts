@@ -13,6 +13,8 @@ export const en = {
   'tool.line': 'Line',
   'tool.text': 'Text',
   'tool.hand': 'Hand',
+  'command.copy': 'Copy',
+  'command.pasteHere': 'Paste here',
   'command.undo': 'Undo',
   'command.redo': 'Redo',
   'arrange.forward': 'Forward',

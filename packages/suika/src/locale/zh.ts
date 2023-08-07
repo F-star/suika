@@ -15,6 +15,8 @@ export const zh: typeof en = {
   'tool.line': '直线',
   'tool.text': '文字',
   'tool.hand': '拖拽画布',
+  'command.copy': '复制',
+  'command.pasteHere': '粘贴到此处',
   'command.undo': '撤销',
   'command.redo': '重做',
   'arrange.forward': '上移一层',
