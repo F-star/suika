@@ -44,6 +44,14 @@ export class ViewportManager {
       this.eventEmitter.emit('xOrYChange', x as number, y as number);
     }
   }
+  getCenter() {
+    const { x, y, width, height } = this.getViewport();
+    const zoom = this.editor.zoomManager.getZoom();
+    return {
+      x: x + width / 2 / zoom,
+      y: y + height / 2 / zoom,
+    };
+  }
   translate(dx: number, dy: number) {
     this.scrollX += dx;
     this.scrollY += dy;

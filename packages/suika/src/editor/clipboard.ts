@@ -13,15 +13,7 @@ export class ClipboardManager {
 
   bindEvents() {
     const copyHandler = () => {
-      const snapshot = this.getSelectedItemsSnapshot();
-      if (!snapshot) {
-        return;
-      }
-
-      // TODO: write to blob data
-      navigator.clipboard.writeText(snapshot).then(() => {
-        console.log('copied');
-      });
+      this.copy();
     };
 
     const pasteHandler = (e: Event) => {
@@ -44,6 +36,27 @@ export class ClipboardManager {
     };
   }
 
+  copy() {
+    const snapshot = this.getSelectedItemsSnapshot();
+    if (!snapshot) {
+      return;
+    }
+
+    // TODO: write to blob data
+    navigator.clipboard.writeText(snapshot).then(() => {
+      console.log('copied');
+    });
+  }
+
+  /**
+   * paste at special coords
+   */
+  pasteAt(x: number, y: number) {
+    navigator.clipboard.readText().then((pastedData) => {
+      this.addGraphsFromClipboard(pastedData, x, y);
+    });
+  }
+
   private getSelectedItemsSnapshot() {
     const selectedItems = this.editor.selectedElements.getItems();
     if (selectedItems.length === 0) {
@@ -62,19 +75,26 @@ export class ClipboardManager {
     });
   }
 
-  private addGraphsFromClipboard(dataStr: string) {
+  private addGraphsFromClipboard(dataStr: string): void;
+  private addGraphsFromClipboard(dataStr: string, x: number, y: number): void;
+  private addGraphsFromClipboard(dataStr: string, x?: number, y?: number) {
     let pastedData: IEditorPaperData | null = null;
     try {
       pastedData = JSON.parse(dataStr);
     } catch (e) {
+      // TODO: create text graph from pastedData
       return;
     }
-    // TODO: more validate pastedData format
+
+    // TODO: more format validate
     if (
-      !pastedData ||
-      !pastedData.appVersion.startsWith('suika-editor') ||
-      !pastedData.data
+      !(
+        pastedData &&
+        pastedData.appVersion.startsWith('suika-editor') &&
+        pastedData.data
+      )
     ) {
+      // TODO: create text graph from pastedData
       return;
     }
 
@@ -89,18 +109,23 @@ export class ClipboardManager {
       new AddShapeCommand('pasted graphs', editor, pastedGraphs),
     );
     editor.selectedElements.setItems(pastedGraphs);
-    /*********** cross paper case ***********/
-    if (pastedData.paperId !== this.editor.paperId) {
-      // TODO: make pasted graphs center
-      // move to origin temporarily
-      const bbox = editor.selectedElements.getBBox()!;
-      const dx = -bbox.x;
-      const dy = -bbox.y;
+
+    const bbox = editor.selectedElements.getBBox()!;
+    if (
+      (x === undefined || y === undefined) &&
+      pastedData.paperId !== editor.paperId
+    ) {
+      const vwCenter = this.editor.viewportManager.getCenter();
+      x = vwCenter.x - bbox.width / 2;
+      y = vwCenter.y - bbox.height / 2;
+    }
+
+    if (x !== undefined && y !== undefined) {
+      const dx = x - bbox.x;
+      const dy = y - bbox.y;
       if (dx || dy) {
         Graph.dMove(pastedGraphs, dx, dy);
       }
-
-      editor.zoomManager.zoomToSelection();
     }
     editor.sceneGraph.render();
   }
