@@ -12,7 +12,7 @@ import { IBaseTool } from '../type';
 export class SelectMoveTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private startPoints: IPoint[] = [];
-  private dragPoint!: IPoint;
+  private dragPoint: IPoint | null = null;
   private dx = 0;
   private dy = 0;
   private prevBBoxPos: IPoint = { x: -1, y: -1 };
@@ -60,8 +60,8 @@ export class SelectMoveTool implements IBaseTool {
   private move() {
     this.editor.sceneGraph.showOutline = false;
     const { x, y } = this.editor.viewportCoordsToScene(
-      this.dragPoint.x,
-      this.dragPoint.y,
+      this.dragPoint!.x,
+      this.dragPoint!.y,
     );
 
     let dx = (this.dx = x - this.startPoint.x);
@@ -123,6 +123,8 @@ export class SelectMoveTool implements IBaseTool {
     }
   }
   afterEnd() {
+    this.dragPoint = null;
+
     this.editor.sceneGraph.showOutline = true;
     this.editor.refLine.clear();
     this.editor.sceneGraph.render();
