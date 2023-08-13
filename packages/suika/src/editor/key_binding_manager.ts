@@ -66,20 +66,23 @@ export class KeyBindingManager {
     for (const keyBinding of this.keyBindingMap.values()) {
       // match when
       if (!keyBinding.when || keyBinding.when(ctx)) {
-        isMatch =
-          // match windows os
-          (isWindows &&
-            keyBinding.winKey &&
-            this.isKeyMatch(keyBinding.winKey, e)) ||
-          // match other os
-          this.isKeyMatch(keyBinding.key, e);
-
-        if (isMatch) {
-          e.preventDefault();
-          console.log(`[${getKeyStr(e)}] => ${keyBinding.actionName}`);
-          keyBinding.action(e);
-          break;
+        // match windows os
+        if (isWindows) {
+          if (keyBinding.winKey && this.isKeyMatch(keyBinding.winKey, e)) {
+            isMatch = true;
+          }
         }
+        // match other os
+        else if (this.isKeyMatch(keyBinding.key, e)) {
+          isMatch = true;
+        }
+      }
+
+      if (isMatch) {
+        e.preventDefault();
+        console.log(`[${getKeyStr(e)}] => ${keyBinding.actionName}`);
+        keyBinding.action(e);
+        break;
       }
     }
 
