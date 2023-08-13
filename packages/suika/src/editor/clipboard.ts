@@ -34,14 +34,8 @@ export class ClipboardManager {
     };
 
     this.editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'KeyC',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'KeyC',
-      },
+      key: { metaKey: true, keyCode: 'KeyC' },
+      winKey: { ctrlKey: true, keyCode: 'KeyC' },
       actionName: 'Copy',
       action: copyHandler,
     });

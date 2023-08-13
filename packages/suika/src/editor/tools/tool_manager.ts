@@ -133,9 +133,7 @@ export class ToolManager {
     this.hotkeyMap.forEach((type, key) => {
       key = `Key${key.toUpperCase()}`;
       this.editor.keybindingManager.register({
-        key: {
-          keyCode: key,
-        },
+        key: { keyCode: key },
         actionName: type,
         action: () => {
           this.setActiveTool(type);
