@@ -8,6 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import { ArrowDownOutlined } from '@suika/icons';
 import './ZoomActions.scss';
 import { ZoomInput } from './components/ZoomInput';
+import { isWindows } from '../../utils/common';
+import { MessageIds } from '../../locale/types';
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);
@@ -65,24 +67,28 @@ export const ZoomActions: FC = () => {
             [
               {
                 id: 'zoom.zoomIn',
+                suffix: isWindows ? 'Ctrl++' : '⌘+',
                 action: () => {
                   editor?.zoomManager.zoomIn();
                 },
               },
               {
                 id: 'zoom.zoomOut',
+                suffix: isWindows ? 'Ctrl+-' : '⌘-',
                 action: () => {
                   editor?.zoomManager.zoomOut();
                 },
               },
               {
                 id: 'zoom.zoomToFit',
+                suffix: isWindows ? 'Shift+1' : '⇧1',
                 action: () => {
                   editor?.zoomManager.zoomToFit();
                 },
               },
               {
                 id: 'zoom.zoomToSelection',
+                suffix: isWindows ? 'Shift+2' : '⇧2',
                 action: () => {
                   editor?.zoomManager.zoomToSelection();
                 },
@@ -95,6 +101,7 @@ export const ZoomActions: FC = () => {
               },
               {
                 id: 'zoom.zoomTo100',
+                suffix: isWindows ? 'Ctrl+0' : '⌘0',
                 action: () => {
                   editor?.zoomManager.setZoomAndUpdateViewport(1);
                 },
@@ -105,10 +112,11 @@ export const ZoomActions: FC = () => {
                   editor?.zoomManager.setZoomAndUpdateViewport(2);
                 },
               },
-            ] as const
+            ] as { id: MessageIds; suffix?: string; action(): void }[]
           ).map((item) => {
             return (
               <ActionItem
+                suffix={item.suffix}
                 key={item.id}
                 onClick={() => {
                   item.action();
@@ -149,6 +157,7 @@ export const ZoomActions: FC = () => {
           </ActionItem>
           <ActionItem
             check={setting.enableRuler}
+            suffix={isWindows ? 'Shift+R' : '⇧R'}
             onClick={() => {
               if (editor) {
                 const enableRuler = editor.setting.get('enableRuler');

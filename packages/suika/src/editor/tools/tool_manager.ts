@@ -1,4 +1,3 @@
-import hotkeys from 'hotkeys-js';
 import { noop } from '../../utils/common';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
@@ -16,12 +15,17 @@ interface Events {
 
 export class ToolManager {
   toolMap = new Map<string, ITool>();
+  /**
+   * hotkey => tool type
+   */
   hotkeyMap = new Map<string, string>();
 
   currentTool: ITool | null = null;
   eventEmitter = new EventEmitter<Events>();
 
   enableSwitchTool = true;
+
+  isDragging = false;
 
   _unbindEvent: () => void;
   constructor(private editor: Editor) {
@@ -54,12 +58,11 @@ export class ToolManager {
     // (1) drag block strategy
     let isPressing = false;
     let startPos: [x: number, y: number] = [0, 0];
-    let isEnableDrag = false;
     let startWithLeftMouse = false;
 
     const handleDown = (e: PointerEvent) => {
       isPressing = true;
-      isEnableDrag = false;
+      this.isDragging = false;
       startWithLeftMouse = false;
       if (e.button !== 0) {
         // must be left mouse button
@@ -88,12 +91,12 @@ export class ToolManager {
         const dy = e.clientY - startPos[1];
         const dragBlockStep = this.editor.setting.get('dragBlockStep');
         if (
-          !isEnableDrag &&
+          !this.isDragging &&
           (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep)
         ) {
-          isEnableDrag = true;
+          this.isDragging = true;
         }
-        if (isEnableDrag) {
+        if (this.isDragging) {
           this.enableSwitchTool = false;
           this.editor.hostEventManager.disableDragBySpace();
           this.currentTool.drag(e);
@@ -115,38 +118,35 @@ export class ToolManager {
       if (isPressing) {
         this.editor.hostEventManager.enableDragBySpace();
         isPressing = false;
-        this.currentTool.end(e, isEnableDrag);
+        this.currentTool.end(e, this.isDragging);
         this.currentTool.afterEnd();
       }
 
-      isEnableDrag = false;
+      this.isDragging = false;
     };
     const canvas = this.editor.canvasElement;
     canvas.addEventListener('pointerdown', handleDown);
     window.addEventListener('pointermove', handleMove);
     window.addEventListener('pointerup', handleUp);
 
-    // (2) tool hotkey
-    const handler = (e: KeyboardEvent) => {
-      const key = e.key;
-      if (
-        !e.shiftKey &&
-        !e.ctrlKey &&
-        !e.altKey &&
-        !e.metaKey &&
-        this.hotkeyMap.has(key)
-      ) {
-        const type = this.hotkeyMap.get(key)!;
-        this.setActiveTool(type);
-      }
-    };
-    hotkeys('*', { keydown: true }, handler);
+    // (2) tool hotkey binding
+    this.hotkeyMap.forEach((type, key) => {
+      key = `Key${key.toUpperCase()}`;
+      this.editor.keybindingManager.register({
+        key: {
+          keyCode: key,
+        },
+        actionName: type,
+        action: () => {
+          this.setActiveTool(type);
+        },
+      });
+    });
 
     return function unbindEvent() {
       canvas.removeEventListener('pointerdown', handleDown);
       window.removeEventListener('pointermove', handleMove);
       window.removeEventListener('pointerup', handleUp);
-      hotkeys.unbind('*', handler);
     };
   }
   unbindEvent() {

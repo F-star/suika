@@ -169,6 +169,10 @@ class SelectedElements {
     }
     this.editor.sceneGraph.render();
   }
+
+  selectAll() {
+    this.setItems([...this.editor.sceneGraph.children]);
+  }
 }
 
 export default SelectedElements;

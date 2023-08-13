@@ -23,7 +23,7 @@ export const en = {
   'arrange.back': 'Send to Back',
 
   'zoom.zoomIn': 'Zoom in',
-  'zoom.zoomOut': 'zoom out',
+  'zoom.zoomOut': 'Zoom out',
   'zoom.zoomToFit': 'Zoom to fit',
   'zoom.zoomToSelection': 'Zoom to selection',
   'zoom.zoomTo50': 'Zoom to 50%',

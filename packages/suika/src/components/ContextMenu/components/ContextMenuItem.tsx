@@ -3,11 +3,17 @@ import './ContextMenuItem.scss';
 import classNames from 'classnames';
 
 interface IProps extends PropsWithChildren {
+  suffix?: string;
   disabled?: boolean;
   onClick(): void;
 }
 
-const ContextMenuItem: FC<IProps> = ({ children, disabled, onClick }) => {
+const ContextMenuItem: FC<IProps> = ({
+  children,
+  suffix,
+  disabled,
+  onClick,
+}) => {
   return (
     <div
       className={classNames('suika-context-menu-item', {
@@ -16,6 +22,7 @@ const ContextMenuItem: FC<IProps> = ({ children, disabled, onClick }) => {
       onClick={onClick}
     >
       {children}
+      {suffix && <span>{suffix}</span>}
     </div>
   );
 };
