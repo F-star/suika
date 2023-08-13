@@ -17,14 +17,8 @@ export class CommandKeyBinding {
     // undo
     const undoAction = () => editor.commandManager.undo();
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'KeyZ',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'KeyZ',
-      },
+      key: { metaKey: true, keyCode: 'KeyZ' },
+      winKey: { ctrlKey: true, keyCode: 'KeyZ' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Undo',
       action: undoAction,
@@ -33,16 +27,8 @@ export class CommandKeyBinding {
     // redo
     const redoAction = () => editor.commandManager.redo();
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        shiftKey: true,
-        keyCode: 'KeyZ',
-      },
-      winKey: {
-        ctrlKey: true,
-        shiftKey: true,
-        keyCode: 'KeyZ',
-      },
+      key: { metaKey: true, shiftKey: true, keyCode: 'KeyZ' },
+      winKey: { ctrlKey: true, shiftKey: true, keyCode: 'KeyZ' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Redo',
       action: redoAction,
@@ -57,14 +43,7 @@ export class CommandKeyBinding {
       }
     };
     editor.keybindingManager.register({
-      key: [
-        {
-          keyCode: 'Backspace',
-        },
-        {
-          keyCode: 'Delete',
-        },
-      ],
+      key: [{ keyCode: 'Backspace' }, { keyCode: 'Delete' }],
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Delete',
       action: deleteAction,
@@ -76,14 +55,8 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'KeyA',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'KeyA',
-      },
+      key: { metaKey: true, keyCode: 'KeyA' },
+      winKey: { ctrlKey: true, keyCode: 'KeyA' },
       actionName: 'Select All',
       action: selectAllAction,
     });
@@ -94,9 +67,7 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        keyCode: 'Escape',
-      },
+      key: { keyCode: 'Escape' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Cancel Select',
       action: cancelSelectAction,
@@ -108,10 +79,7 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        shiftKey: true,
-        keyCode: 'KeyR',
-      },
+      key: { shiftKey: true, keyCode: 'KeyR' },
       actionName: 'Toggle Rulers',
       action: toggleRulersAction,
     });
@@ -122,10 +90,7 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        shiftKey: true,
-        keyCode: 'Digit1',
-      },
+      key: { shiftKey: true, keyCode: 'Digit1' },
       actionName: 'Zoom To Fit',
       action: zoomToFitAction,
     });
@@ -136,10 +101,7 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        shiftKey: true,
-        keyCode: 'Digit2',
-      },
+      key: { shiftKey: true, keyCode: 'Digit2' },
       actionName: 'Zoom To Selection',
       action: zoomToSelectionAction,
     });
@@ -150,14 +112,8 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'Equal',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'Equal',
-      },
+      key: { metaKey: true, keyCode: 'Equal' },
+      winKey: { ctrlKey: true, keyCode: 'Equal' },
       actionName: 'Zoom In',
       action: zoomInAction,
     });
@@ -168,14 +124,8 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'Minus',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'Minus',
-      },
+      key: { metaKey: true, keyCode: 'Minus' },
+      winKey: { ctrlKey: true, keyCode: 'Minus' },
       actionName: 'Zoom Out',
       action: zoomOutAction,
     });
@@ -187,24 +137,12 @@ export class CommandKeyBinding {
     };
     editor.keybindingManager.register({
       key: [
-        {
-          metaKey: true,
-          keyCode: 'Digit0',
-        },
-        {
-          shiftKey: true,
-          keyCode: 'Digit0',
-        },
+        { metaKey: true, keyCode: 'Digit0' },
+        { shiftKey: true, keyCode: 'Digit0' },
       ],
       winKey: [
-        {
-          ctrlKey: true,
-          keyCode: 'Digit0',
-        },
-        {
-          shiftKey: true,
-          keyCode: 'Digit0',
-        },
+        { ctrlKey: true, keyCode: 'Digit0' },
+        { shiftKey: true, keyCode: 'Digit0' },
       ],
       actionName: 'Zoom To 100%',
       action: zoomTo100,
@@ -217,9 +155,7 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        keyCode: 'BracketRight',
-      },
+      key: { keyCode: 'BracketRight' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Front',
       action: frontAction,
@@ -231,9 +167,7 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        keyCode: 'BracketLeft',
-      },
+      key: { keyCode: 'BracketLeft' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Back',
       action: backAction,
@@ -245,14 +179,8 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'BracketRight',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'BracketRight',
-      },
+      key: { metaKey: true, keyCode: 'BracketRight' },
+      winKey: { ctrlKey: true, keyCode: 'BracketRight' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Forward',
       action: forwardAction,
@@ -264,15 +192,8 @@ export class CommandKeyBinding {
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
-      key: {
-        metaKey: true,
-        keyCode: 'BracketLeft',
-      },
-      winKey: {
-        ctrlKey: true,
-        keyCode: 'BracketLeft',
-      },
-
+      key: { metaKey: true, keyCode: 'BracketLeft' },
+      winKey: { ctrlKey: true, keyCode: 'BracketLeft' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Backward',
       action: backwardAction,

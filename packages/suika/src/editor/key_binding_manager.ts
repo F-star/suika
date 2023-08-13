@@ -119,6 +119,20 @@ export class KeyBindingManager {
     return id;
   }
 
+  registerWithHighPrior(keybinding: IKeyBinding) {
+    const id = this.id;
+
+    const map = new Map<number, IKeyBinding>();
+    map.set(id, keybinding);
+
+    for (const [key, val] of this.keyBindingMap) {
+      map.set(key, val);
+    }
+    this.keyBindingMap = map;
+    this.id++;
+    return id;
+  }
+
   unregister(id: number) {
     this.keyBindingMap.delete(id);
   }
