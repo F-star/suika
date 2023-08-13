@@ -5,7 +5,7 @@ import {
   viewportCoordsToSceneUtil,
 } from '../utils/common';
 import { CommandManager } from './commands/command_manager';
-import HostEventManager from './host_event_manager';
+import { HostEventManager } from './host_event_manager';
 import Ruler from './ruler';
 import SelectedElements from './selected_elements';
 import { Setting } from './setting';
@@ -15,8 +15,9 @@ import { ZoomManager } from './zoom_manager';
 import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { GraphAttrs } from './scene/graph';
 import { TextEditor } from './text/text_editor';
-import { RefLine } from './ref-line';
+import { RefLine } from './ref_line';
 import { ClipboardManager } from './clipboard';
+import { KeyBindingManager } from './key_binding_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -44,6 +45,7 @@ export class Editor {
   commandManager: CommandManager;
   zoomManager: ZoomManager;
 
+  keybindingManager: KeyBindingManager;
   hostEventManager: HostEventManager;
   clipboard: ClipboardManager;
 
@@ -67,6 +69,9 @@ export class Editor {
     if (options.offsetY) {
       this.setting.set('offsetY', options.offsetY);
     }
+
+    this.keybindingManager = new KeyBindingManager(this);
+    this.keybindingManager.bindEvent();
 
     this.sceneGraph = new SceneGraph(this);
 
@@ -117,6 +122,7 @@ export class Editor {
   destroy() {
     this.containerElement.removeChild(this.canvasElement);
     this.textEditor.destroy();
+    this.keybindingManager.destroy();
     this.hostEventManager.destroy();
     this.clipboard.destroy();
     this.toolManager.unbindEvent();

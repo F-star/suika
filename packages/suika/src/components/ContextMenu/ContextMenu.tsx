@@ -7,6 +7,7 @@ import ContextMenuSep from './components/ContextMenuSep';
 import './ContextMenu.scss';
 import { FormattedMessage } from 'react-intl';
 import { IHistoryStatus } from '../../editor/commands/command_manager';
+import { isWindows } from '../../utils/common';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;
@@ -59,6 +60,7 @@ export const ContextMenu: FC = () => {
       <>
         {showCopy && (
           <ContextMenuItem
+            suffix={isWindows ? 'Ctrl+C' : '⌘C'}
             onClick={() => {
               setVisible(false);
               if (editor) {
@@ -88,6 +90,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+Z' : '⌘Z'}
           disabled={!canUndo}
           onClick={() => {
             setVisible(false);
@@ -99,6 +102,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="command.undo" />
         </ContextMenuItem>
         <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+Shift+Z' : '⇧⌘Z'}
           disabled={!canRedo}
           onClick={() => {
             setVisible(false);
@@ -121,6 +125,7 @@ export const ContextMenu: FC = () => {
       <>
         <ContextMenuSep />
         <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+]' : '⌘]'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -131,6 +136,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="arrange.forward" />
         </ContextMenuItem>
         <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+[' : '⌘['}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -141,6 +147,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="arrange.backward" />
         </ContextMenuItem>
         <ContextMenuItem
+          suffix="]"
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -151,6 +158,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="arrange.front" />
         </ContextMenuItem>
         <ContextMenuItem
+          suffix="["
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -163,6 +171,7 @@ export const ContextMenu: FC = () => {
 
         <ContextMenuSep />
         <ContextMenuItem
+          suffix={isWindows ? 'Backspace' : '⌫'}
           onClick={() => {
             setVisible(false);
             if (editor) {

@@ -1,23 +1,29 @@
 .suika {
-  .action-item {
+  .suika-action-item-wrap {
     display: flex;
+    justify-content: space-between;
     align-items: center;
 
     padding: 0 8px;
     height: 24px;
     line-height: 24px;
-    font-size: 14px;
+    font-size: 12px;
 
     cursor: pointer;
-
-    .icon-box {
-      width: 24px;
-      height: 24px;
-    }
 
     &:hover {
       color: #fff;
       background-color: #0f8fff;
+    }
+
+    .suika-action-item {
+      display: flex;
+      align-items: center;
+
+      .suika-icon-box {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 }

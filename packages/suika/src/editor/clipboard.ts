@@ -9,9 +9,16 @@ import { Graph } from './scene/graph';
 
 export class ClipboardManager {
   private unbindEvents = noop;
+  private hasBindEvents = false;
   constructor(private editor: Editor) {}
 
   bindEvents() {
+    if (this.hasBindEvents) {
+      console.log('ClipboardManager has bind events, please destroy first');
+      return;
+    }
+    this.hasBindEvents = true;
+
     const copyHandler = () => {
       this.copy();
     };
@@ -26,7 +33,19 @@ export class ClipboardManager {
       this.addGraphsFromClipboard(pastedData);
     };
 
-    hotkeys('cmd+c, ctrl+c', copyHandler);
+    this.editor.keybindingManager.register({
+      key: {
+        metaKey: true,
+        keyCode: 'KeyC',
+      },
+      winKey: {
+        ctrlKey: true,
+        keyCode: 'KeyC',
+      },
+      actionName: 'Copy',
+      action: copyHandler,
+    });
+
     // TODO: paste by content menu
     window.addEventListener('paste', pasteHandler);
 
@@ -131,6 +150,7 @@ export class ClipboardManager {
   }
 
   destroy() {
+    this.hasBindEvents = false;
     this.unbindEvents();
   }
 }
