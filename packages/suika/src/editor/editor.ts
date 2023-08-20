@@ -18,6 +18,7 @@ import { TextEditor } from './text/text_editor';
 import { RefLine } from './ref_line';
 import { ClipboardManager } from './clipboard';
 import { KeyBindingManager } from './key_binding_manager';
+import { PerfMonitor } from './perf_monitor';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -55,6 +56,7 @@ export class Editor {
   textEditor: TextEditor;
 
   autoSaveGraphs: AutoSaveGraphs;
+  perfMonitor: PerfMonitor;
 
   constructor(options: IEditorOptions) {
     this.containerElement = options.containerElement;
@@ -111,6 +113,11 @@ export class Editor {
 
     this.zoomManager.zoomToFit(1);
 
+    this.perfMonitor = new PerfMonitor();
+    if (process.env.NODE_ENV === 'development') {
+      this.perfMonitor.start(this.containerElement);
+    }
+
     /**
      * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
      * 所以下面的 render 要异步执行
@@ -127,6 +134,9 @@ export class Editor {
     this.clipboard.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
+    if (process.env.NODE_ENV === 'development') {
+      this.perfMonitor.destroy();
+    }
   }
   setCursor(cursor: string) {
     this.canvasElement.style.cursor = cursor;
