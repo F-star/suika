@@ -19,6 +19,7 @@ import { RefLine } from './ref_line';
 import { ClipboardManager } from './clipboard';
 import { KeyBindingManager } from './key_binding_manager';
 import { PerfMonitor } from './perf_monitor';
+import { CursorManger, ICursor } from './cursor_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -47,6 +48,7 @@ export class Editor {
   commandManager: CommandManager;
   zoomManager: ZoomManager;
 
+  cursorManager: CursorManger;
   keybindingManager: KeyBindingManager;
   hostEventManager: HostEventManager;
   clipboard: ClipboardManager;
@@ -78,6 +80,7 @@ export class Editor {
 
     this.sceneGraph = new SceneGraph(this);
 
+    this.cursorManager = new CursorManger(this);
     this.viewportManager = new ViewportManager(this);
 
     this.toolManager = new ToolManager(this);
@@ -137,11 +140,11 @@ export class Editor {
     this.toolManager.destroy();
     this.perfMonitor.destroy();
   }
-  setCursor(cursor: string) {
-    this.canvasElement.style.cursor = cursor;
+  setCursor(cursor: ICursor) {
+    this.cursorManager.setCursor(cursor);
   }
   getCursor() {
-    return this.canvasElement.style.cursor;
+    return this.cursorManager.getCursor();
   }
   /**
    * 视口坐标 转 场景坐标

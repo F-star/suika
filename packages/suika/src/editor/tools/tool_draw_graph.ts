@@ -55,8 +55,7 @@ export abstract class DrawGraphTool implements ITool {
     };
   }
   inactive() {
-    this.editor.setCursor('');
-
+    this.editor.setCursor('default');
     this.unbindEvent();
   }
   moveExcludeDrag() {
