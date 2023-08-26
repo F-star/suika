@@ -24,6 +24,7 @@ const Editor: FC = () => {
         height: document.body.clientHeight - topMargin,
         offsetY: 48,
         offsetX: 240,
+        showPerfMonitor: false,
       });
       (window as any).editor = editor;
 

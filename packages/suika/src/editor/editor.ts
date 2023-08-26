@@ -26,6 +26,7 @@ interface IEditorOptions {
   height: number;
   offsetX?: number;
   offsetY?: number;
+  showPerfMonitor?: boolean;
 }
 
 export class Editor {
@@ -114,7 +115,7 @@ export class Editor {
     this.zoomManager.zoomToFit(1);
 
     this.perfMonitor = new PerfMonitor();
-    if (process.env.NODE_ENV === 'development') {
+    if (options.showPerfMonitor) {
       this.perfMonitor.start(this.containerElement);
     }
 
@@ -134,9 +135,7 @@ export class Editor {
     this.clipboard.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
-    if (process.env.NODE_ENV === 'development') {
-      this.perfMonitor.destroy();
-    }
+    this.perfMonitor.destroy();
   }
   setCursor(cursor: string) {
     this.canvasElement.style.cursor = cursor;
