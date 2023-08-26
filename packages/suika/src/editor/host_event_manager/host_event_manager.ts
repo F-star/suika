@@ -4,6 +4,7 @@ import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
 import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
 import { CommandKeyBinding } from './command_key_binding';
+import { ICursor } from '../cursor_manager';
 
 interface Events {
   shiftToggle(): void;
@@ -28,7 +29,7 @@ export class HostEventManager {
   private moveGraphsKeyBinding: MoveGraphsKeyBinding;
   private commandKeyBinding: CommandKeyBinding;
 
-  private prevCursor = '';
+  private prevCursor: ICursor = 'default';
   private eventEmitter = new EventEmitter<Events>();
   private unbindHandlers: Array<() => void> = [];
 

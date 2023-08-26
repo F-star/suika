@@ -11,7 +11,7 @@ export class DrawTextTool implements ITool {
     this.editor.setCursor('crosshair');
   }
   inactive() {
-    this.editor.setCursor('');
+    this.editor.setCursor('default');
   }
   moveExcludeDrag() {
     // do nothing

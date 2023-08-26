@@ -17,7 +17,7 @@ export class DragCanvasTool implements ITool {
     this.editor.setCursor('grab');
   }
   inactive() {
-    this.editor.setCursor('');
+    this.editor.setCursor('default');
   }
   moveExcludeDrag() {
     // do nothing;

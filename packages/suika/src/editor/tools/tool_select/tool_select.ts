@@ -8,6 +8,7 @@ import { DrawSelectionBox } from './tool_select_selection';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectScaleTool } from './tool_select_scale';
+import { ICursor } from '../../cursor_manager';
 
 export class SelectTool implements ITool {
   static type = 'select';
@@ -34,10 +35,10 @@ export class SelectTool implements ITool {
     this.strategySelectScale = new SelectScaleTool(editor);
   }
   active() {
-    this.editor.setCursor('');
+    this.editor.setCursor('default');
   }
   inactive() {
-    this.editor.setCursor('');
+    this.editor.setCursor('default');
 
     this.editor.selectedElements.clear();
     this.editor.sceneGraph.render();
@@ -50,11 +51,11 @@ export class SelectTool implements ITool {
     const transformHandleName =
       this.editor.sceneGraph.transformHandle.getNameByPoint(pointer);
 
-    let cursor = '';
+    let cursor: ICursor = 'default';
     if (transformHandleName === 'rotation') {
       cursor = 'grab';
     } else if (transformHandleName === 'se') {
-      cursor = 'nwse-resize';
+      cursor = { type: 'resize', rotation: 112.5 };
     }
     this.editor.setCursor(cursor);
   }, 50);
@@ -167,7 +168,7 @@ export class SelectTool implements ITool {
   }
   afterEnd() {
     if (!this.editor.hostEventManager.isDraggingCanvasBySpace) {
-      this.editor.setCursor('');
+      this.editor.setCursor('default');
     }
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
