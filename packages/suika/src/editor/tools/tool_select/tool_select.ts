@@ -55,7 +55,7 @@ export class SelectTool implements ITool {
     if (transformHandleName === 'rotation') {
       cursor = 'grab';
     } else if (transformHandleName === 'se') {
-      cursor = { type: 'resize', rotation: 112.5 };
+      cursor = { type: 'resize', degree: 112.5 };
     }
     this.editor.setCursor(cursor);
   }, 50);
