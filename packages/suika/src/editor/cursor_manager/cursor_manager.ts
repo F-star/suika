@@ -54,9 +54,9 @@ export class CursorManger {
           // degree: 0 ~ 179. 0 is from top to bottom , 90 is from left to right
           const degree = cursor.degree % 180;
           if (degree < 22.5) {
-            styleCursor = 'nesw-resize';
+            styleCursor = 'ns-resize';
           } else if (degree < 67.5) {
-            styleCursor = 'ew-resize';
+            styleCursor = 'nesw-resize';
           } else if (degree < 112.5) {
             styleCursor = 'ew-resize';
           } else if (degree < 157.5) {

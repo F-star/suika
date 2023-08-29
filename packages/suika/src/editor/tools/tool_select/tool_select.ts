@@ -8,7 +8,6 @@ import { DrawSelectionBox } from './tool_select_selection';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectScaleTool } from './tool_select_scale';
-import { ICursor } from '../../cursor_manager';
 
 export class SelectTool implements ITool {
   static type = 'select';
@@ -48,16 +47,10 @@ export class SelectTool implements ITool {
       return;
     }
     const pointer = this.editor.getSceneCursorXY(e);
-    const transformHandleName =
+    const { cursor } =
       this.editor.sceneGraph.transformHandle.getNameByPoint(pointer);
 
-    let cursor: ICursor = 'default';
-    if (transformHandleName === 'rotation') {
-      cursor = 'grab';
-    } else if (transformHandleName === 'se') {
-      cursor = { type: 'resize', degree: 112.5 };
-    }
-    this.editor.setCursor(cursor);
+    this.editor.setCursor(cursor || 'default');
   }, 50);
   start(e: PointerEvent) {
     this.currStrategy = null;
@@ -81,7 +74,7 @@ export class SelectTool implements ITool {
     this.startPoint = this.editor.getSceneCursorXY(e);
 
     // 0. 点中 handle（旋转点）
-    const handleName = sceneGraph.transformHandle.getNameByPoint(
+    const { handleName } = sceneGraph.transformHandle.getNameByPoint(
       this.startPoint,
     );
     // if (handleName) {

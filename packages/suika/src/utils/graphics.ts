@@ -133,7 +133,7 @@ export function getRectCenterPoint({
 }
 
 /**
- * 求向量到右侧轴(x正半轴)的夹角
+ * 求向量到上边(y负半轴)的夹角
  * 范围在 [0, Math.PI * 2)
  */
 export function calcVectorRadian(cx: number, cy: number, x: number, y: number) {
