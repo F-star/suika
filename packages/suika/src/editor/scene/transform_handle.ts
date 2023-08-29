@@ -5,8 +5,15 @@ import {
   drawSquareWithCenter,
   rotateInCanvas,
 } from '../../utils/canvas';
-import { isPointInCircle, isPointInRect } from '../../utils/graphics';
+import {
+  calcVectorRadian,
+  getRectCenterPoint,
+  isPointInCircle,
+  isPointInRect,
+  radian2Degree,
+} from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
+import { ICursor } from '../cursor_manager';
 
 export type HandleName = 'rotation' | 'nw' | 'ne' | 'se' | 'sw';
 
@@ -23,11 +30,19 @@ export class TransformHandle {
     se: IPoint;
     sw: IPoint;
   } | null = null;
+  private center: IPoint | null = null;
 
   constructor(private editor: Editor) {}
   draw(selectedElementsBBox: IRect | null) {
     const handle = this.getTransformHandle(selectedElementsBBox);
     this.handle = handle;
+
+    if (selectedElementsBBox) {
+      const [x, y] = getRectCenterPoint(selectedElementsBBox);
+      this.center = { x, y };
+    } else {
+      this.center = null;
+    }
 
     if (handle) {
       const ctx = this.editor.ctx;
@@ -186,13 +201,16 @@ export class TransformHandle {
       };
     }
   }
-  getNameByPoint(hitPoint: IPoint) {
+  getNameByPoint(hitPoint: IPoint): {
+    handleName: HandleName | undefined;
+    cursor?: ICursor;
+  } {
     const handle = this.handle;
     if (!handle) {
-      return undefined;
+      return { handleName: undefined };
     }
     if (this.isInRotationHandle(hitPoint)) {
-      return 'rotation';
+      return { handleName: 'rotation', cursor: 'grab' };
     }
 
     // 选中图形的旋转角度。。
@@ -235,10 +253,23 @@ export class TransformHandle {
           setting.get('handleStrokePadding') / zoom,
         )
       ) {
-        return key;
+        const degree = radian2Degree(
+          calcVectorRadian(
+            this.center!.x,
+            this.center!.y,
+            ctrlPoint.x,
+            ctrlPoint.y,
+          ) % Math.PI,
+        );
+        return {
+          handleName: key,
+          cursor: { type: 'resize', degree },
+        };
       }
     }
+    return { handleName: undefined };
   }
+
   private isInRotationHandle(point: IPoint) {
     const transformHandle = this.handle;
     if (!transformHandle) {

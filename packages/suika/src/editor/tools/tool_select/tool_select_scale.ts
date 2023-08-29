@@ -35,9 +35,8 @@ export class SelectScaleTool implements IBaseTool {
   }
   start(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
-    const handleName = this.editor.sceneGraph.transformHandle.getNameByPoint(
-      this.startPoint,
-    );
+    const { handleName } =
+      this.editor.sceneGraph.transformHandle.getNameByPoint(this.startPoint);
 
     this.prevElements = arrMap(
       this.editor.selectedElements.getItems(),
