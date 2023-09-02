@@ -139,7 +139,7 @@ const ElementsInfoCards: FC = () => {
         {[
           {
             label: 'W',
-            value: width,
+            value: typeof width === 'number' ? remainDecimal(width, 2) : width,
             onBlur: (newWidth: number) => {
               if (editor) {
                 if (newWidth <= 0) {
@@ -153,7 +153,8 @@ const ElementsInfoCards: FC = () => {
           },
           {
             label: 'H',
-            value: height,
+            value:
+              typeof height === 'number' ? remainDecimal(height, 2) : height,
             onBlur: (newHeight: number) => {
               if (editor) {
                 if (newHeight <= 0) {

@@ -1,7 +1,5 @@
 import { IPoint } from '../../../type';
 import { arrMap } from '../../../utils/array_util';
-import { remainDecimal } from '../../../utils/common';
-import { transformRotate } from '../../../utils/transform';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { HandleName } from '../../scene/transform_handle';
@@ -10,7 +8,7 @@ import { IBaseTool } from '../type';
 /**
  * scale element
  */
-export class SelectScaleTool implements IBaseTool {
+export class SelectResizeTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private handleName!: Exclude<HandleName, 'rotation'>;
   private prevElements: Array<{
@@ -54,7 +52,7 @@ export class SelectScaleTool implements IBaseTool {
     this.handleName = handleName;
     switch (handleName) {
       case 'se':
-        this.referencePoint = this.editor.sceneGraph.transformHandle.handle!.nw;
+        this.referencePoint = this.editor.sceneGraph.transformHandle.handle!.nw; // maybe unnecessary
         break;
       // TODO: other handle
     }
@@ -63,55 +61,14 @@ export class SelectScaleTool implements IBaseTool {
     this.editor.commandManager.disableRedoUndo();
     this.editor.hostEventManager.disableDelete();
 
-    let lastPoint = this.editor.getSceneCursorXY(e);
-    let referencePoint = this.referencePoint;
+    const lastPoint = this.editor.getSceneCursorXY(e);
     const selectItems = this.editor.selectedElements.getItems();
     // 右下角
     if (this.handleName === 'se') {
       // 转换回来
-      if (selectItems.length === 1 && selectItems[0].rotation) {
-        const cx = (lastPoint.x + this.referencePoint.x) / 2;
-        const cy = (lastPoint.y + this.referencePoint.y) / 2;
-        lastPoint = transformRotate(
-          lastPoint.x,
-          lastPoint.y,
-          -selectItems[0].rotation,
-          cx,
-          cy,
-        );
-        referencePoint = transformRotate(
-          referencePoint.x,
-          referencePoint.y,
-          -selectItems[0].rotation,
-          cx,
-          cy,
-        );
+      if (selectItems.length === 1) {
+        selectItems[0].setSE(lastPoint, this.prevElements[0]);
       }
-    }
-
-    let width = lastPoint.x - referencePoint.x;
-    let height = lastPoint.y - referencePoint.y;
-
-    // for (const item of selectItems) {
-    //   item.width = width;
-    //   item.height = height;
-    // }
-
-    if (width === 0 || height === 0) {
-      return;
-    }
-
-    for (const item of selectItems) {
-      if (width < 0) {
-        width = 1;
-      }
-      if (height < 0) {
-        height = 1;
-      }
-      item.resizeAndKeepRotatedXY({
-        width: remainDecimal(width, 5),
-        height: remainDecimal(height, 5),
-      });
     }
 
     this.editor.sceneGraph.render();

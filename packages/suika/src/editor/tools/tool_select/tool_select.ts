@@ -7,7 +7,7 @@ import { IBaseTool, ITool } from '../type';
 import { DrawSelectionBox } from './tool_select_selection';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
-import { SelectScaleTool } from './tool_select_scale';
+import { SelectResizeTool } from './tool_select_resize';
 
 export class SelectTool implements ITool {
   static type = 'select';
@@ -21,7 +21,7 @@ export class SelectTool implements ITool {
   strategyMove: SelectMoveTool;
   strategyDrawSelectionBox: DrawSelectionBox;
   strategySelectRotation: SelectRotationTool;
-  strategySelectScale: SelectScaleTool;
+  strategySelectResize: SelectResizeTool;
 
   // 鼠标按下时选中的元素，在鼠标释放时可能会用到。shift 取消一个元素时需要使用
   topHitElementWhenStart: Graph | null = null;
@@ -31,7 +31,7 @@ export class SelectTool implements ITool {
     this.strategyMove = new SelectMoveTool(editor);
     this.strategyDrawSelectionBox = new DrawSelectionBox(editor);
     this.strategySelectRotation = new SelectRotationTool(editor);
-    this.strategySelectScale = new SelectScaleTool(editor);
+    this.strategySelectResize = new SelectResizeTool(editor);
   }
   active() {
     this.editor.setCursor('default');
@@ -81,9 +81,9 @@ export class SelectTool implements ITool {
     if (handleName === 'rotation') {
       this.currStrategy = this.strategySelectRotation;
     }
-    // TODO: now only support se scale handle
+    // TODO: now only support se resize handle
     else if (handleName === 'se') {
-      this.currStrategy = this.strategySelectScale;
+      this.currStrategy = this.strategySelectResize;
     }
     // }
 
