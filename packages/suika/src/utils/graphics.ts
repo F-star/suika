@@ -1,5 +1,5 @@
 import { DOUBLE_PI } from '../constant';
-import { IBox, IBox2, IBoxWithMid, ICircle, IPoint, IRect } from '../type';
+import { IBox, IBox2, IBox2WithMid, ICircle, IPoint, IRect } from '../type';
 import { transformRotate } from './transform';
 
 /**
@@ -208,7 +208,7 @@ export const bboxToBbox2 = (bbox: IBox): IBox2 => {
   };
 };
 
-export const bboxToBboxWithMid = (box: IBox2): IBoxWithMid => {
+export const bboxToBboxWithMid = (box: IBox2): IBox2WithMid => {
   return {
     ...box,
     midX: box.minX / 2 + box.maxX / 2,

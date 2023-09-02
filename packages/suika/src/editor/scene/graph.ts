@@ -1,12 +1,19 @@
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { IBox, IBox2, GraphType, IPoint } from '../../type';
+import {
+  IBox,
+  IBox2,
+  GraphType,
+  IPoint,
+  IBox2WithRotation as IBoxWithRotation,
+} from '../../type';
 import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
 import {
   getAbsoluteCoords,
   getElementRotatedXY,
   getRectCenterPoint,
   isPointInRect,
+  normalizeRect,
 } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
@@ -215,6 +222,59 @@ export class Graph {
   setRotatedY(rotatedY: number) {
     const { y: prevRotatedY } = getElementRotatedXY(this);
     this.y = this.y + rotatedY - prevRotatedY;
+  }
+  // 基于原来的矩形移动右下角（不会进行镜像翻转）
+  static setSE(newPos: IPoint, oldBox: IBoxWithRotation): IBox {
+    // TODO: should reduce complex, when rotation is 0
+    // 1. calculate new width and height
+    const [cx, cy] = getRectCenterPoint(oldBox);
+    const { x: x2, y: y2 } = transformRotate(
+      newPos.x,
+      newPos.y,
+      -oldBox.rotation || 0,
+      cx,
+      cy,
+    );
+    const width = x2 - oldBox.x;
+    const height = y2 - oldBox.y;
+    // 2. correct x and y (compare rotatedX/rotatedY)
+    const { x: preRotatedX, y: preRotatedY } = transformRotate(
+      oldBox.x,
+      oldBox.y,
+      oldBox.rotation || 0,
+      cx,
+      cy,
+    );
+    const { x: rotatedX, y: rotatedY } = transformRotate(
+      oldBox.x,
+      oldBox.y,
+      oldBox.rotation || 0,
+      (oldBox.x + x2) / 2,
+      (oldBox.y + y2) / 2,
+    );
+    const dx = rotatedX - preRotatedX;
+    const dy = rotatedY - preRotatedY;
+    const x = oldBox.x - dx;
+    const y = oldBox.y - dy;
+
+    return normalizeRect({
+      x,
+      y,
+      width,
+      height,
+    });
+  }
+  // update southeast (right-bottom) point
+  setSE(newPos: IPoint, startBox?: IBoxWithRotation) {
+    startBox = startBox ?? {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      rotation: this.rotation ?? 0,
+    };
+    const newBox = Graph.setSE(newPos, startBox);
+    this.setAttrs(newBox);
   }
   resizeAndKeepRotatedXY({
     width,
