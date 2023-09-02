@@ -299,6 +299,11 @@ export class SceneGraph {
   setSelection(partialRect: Partial<IRect>) {
     this.selection = Object.assign({}, this.selection, partialRect);
   }
+  /**
+   * get elements in selection
+   *
+   * reference: https://mp.weixin.qq.com/s/u0PUOeTryZ11eM2P2Kxwsg
+   */
   getElementsInSelection() {
     const selection = this.selection;
     if (selection === null) {

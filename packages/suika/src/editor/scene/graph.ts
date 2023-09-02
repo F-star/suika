@@ -309,7 +309,11 @@ export class Graph {
   strokeTexture(ctx: CanvasRenderingContext2D) {
     throw new Error('Method not implemented.');
   }
-
+  /**
+   * fill image
+   *
+   * reference: https://mp.weixin.qq.com/s/TSpZv_0VJtxPTCCzEqDl8Q
+   */
   fillImage(
     ctx: CanvasRenderingContext2D,
     texture: TextureImage,

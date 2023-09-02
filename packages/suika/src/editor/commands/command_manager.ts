@@ -12,6 +12,11 @@ interface Events {
   beforeExecCmd(): void;
 }
 
+/**
+ * Command Manager
+ *
+ * reference: https://mp.weixin.qq.com/s/JBhXeFPTw8O34vOtk05cQg
+ */
 export class CommandManager {
   redoStack: ICommand[] = [];
   undoStack: ICommand[] = [];

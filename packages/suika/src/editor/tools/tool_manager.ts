@@ -13,6 +13,11 @@ interface Events {
   change(type: string): void;
 }
 
+/**
+ * Tool Manager
+ *
+ * reference: https://mp.weixin.qq.com/s/ZkZZoscN6N7_ykhC9rOpdQ
+ */
 export class ToolManager {
   toolMap = new Map<string, ITool>();
   /**
@@ -54,6 +59,11 @@ export class ToolManager {
   getActiveToolName() {
     return this.currentTool?.type;
   }
+  /**
+   * bind event
+   *
+   * about dragBlockStep: https://mp.weixin.qq.com/s/05lbcYIJ8qwP8EHCXzgnqA
+   */
   private bindEvent() {
     // (1) drag block strategy
     let isPressing = false;

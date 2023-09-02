@@ -42,6 +42,8 @@ const getKeyStr = (e: KeyboardEvent) => {
 
 /**
  * key binding manager
+ *
+ * reference: https://mp.weixin.qq.com/s/Rwnxh3f9rqMpz_ZQx5CM2Q
  */
 export class KeyBindingManager {
   private keyBindingMap = new Map<number, IKeyBinding>();

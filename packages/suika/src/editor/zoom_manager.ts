@@ -40,6 +40,11 @@ export class ZoomManager {
     this.setZoom(zoom);
     this.adjustScroll(undefined, undefined, prevZoom);
   }
+  /**
+   * zoom in
+   *
+   * reference: https://mp.weixin.qq.com/s/UDnIxjYEsTop51gW7fwxMw
+   */
   zoomIn(): void;
   zoomIn(cx: number, cy: number): void;
   zoomIn(cx?: number, cy?: number) {
@@ -132,6 +137,10 @@ export class ZoomManager {
       this.zoomBoxToFit(selectionBox);
     }
   }
+  /**
+   * zoom to fit all elements
+   * reference: https://mp.weixin.qq.com/s/XtNEl1dWCYkTIKStne4A4w
+   */
   zoomToFit(maxZoom?: number) {
     if (this.editor.sceneGraph.children.length === 0) {
       this.reset();

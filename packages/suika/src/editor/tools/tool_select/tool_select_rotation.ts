@@ -12,8 +12,10 @@ import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 
 /**
- * 选中工具的
- * 旋转元素场景
+ * select tool
+ * sub case: rotate selected elements
+ *
+ * reference: https://mp.weixin.qq.com/s/WEpYS08H44qsU4qFQx6j8Q
  */
 export class SelectRotationTool implements IBaseTool {
   private lastPoint: IPoint | null = null;

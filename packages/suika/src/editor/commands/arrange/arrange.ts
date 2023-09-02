@@ -9,7 +9,11 @@ export enum ArrangeType {
   Forward = 'Forward',
   Backward = 'Backward',
 }
-
+/**
+ * Arrange
+ *
+ * reference: https://mp.weixin.qq.com/s/OBITvCA6OM8_nBgU_Vh9qA
+ */
 export class ArrangeCmd implements ICommand {
   private movedGraphSet: Set<Graph>;
   private prevGraphs: Graph[] = []; // TODO: optimize space complexity

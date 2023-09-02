@@ -7,6 +7,11 @@ import { AddShapeCommand } from './commands/add_shape';
 import { IEditorPaperData } from '../type';
 import { Graph } from './scene/graph';
 
+/**
+ * Clipboard Manager
+ *
+ * reference: https://mp.weixin.qq.com/s/kHyltZNHeh6lXqtoP6orUQ
+ */
 export class ClipboardManager {
   private unbindEvents = noop;
   private hasBindEvents = false;

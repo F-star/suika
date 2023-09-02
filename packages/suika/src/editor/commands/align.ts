@@ -8,9 +8,14 @@ export enum AlignType {
   Right = 'Right',
   Top = 'Top',
   VCenter = 'VCenter',
-  Bottom = 'Bottom'
+  Bottom = 'Bottom',
 }
 
+/**
+ * Align Command
+ *
+ * reference: https://mp.weixin.qq.com/s/9mGZYP_EPL7r-JVjOwyotw
+ */
 export class AlignCmd implements ICommand {
   dx: number[] = [];
   dy: number[] = [];
@@ -18,7 +23,7 @@ export class AlignCmd implements ICommand {
     public desc: string,
     private editor: Editor,
     private elements: Graph[],
-    type: AlignType
+    type: AlignType,
   ) {
     if (elements.length < 2) {
       throw new Error('you can not algin zero or one element');
@@ -38,7 +43,7 @@ export class AlignCmd implements ICommand {
         minY: Number.MAX_SAFE_INTEGER,
         maxX: Number.MIN_SAFE_INTEGER,
         maxY: Number.MIN_SAFE_INTEGER,
-      }
+      },
     );
 
     switch (type) {

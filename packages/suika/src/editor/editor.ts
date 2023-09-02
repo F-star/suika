@@ -147,7 +147,9 @@ export class Editor {
     return this.cursorManager.getCursor();
   }
   /**
-   * 视口坐标 转 场景坐标
+   * viewport coords to scene coords
+   *
+   * reference: https://mp.weixin.qq.com/s/uvVXZKIMn1bjVZvUSyYZXA
    */
   viewportCoordsToScene(x: number, y: number, round = false) {
     const zoom = this.zoomManager.getZoom();

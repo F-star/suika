@@ -17,6 +17,8 @@ export function parseRGBStr({ r, g, b }: { r: number; g: number; b: number }) {
 }
 /**
  * normalize hex to `RRGGBB` string format
+ *
+ * reference: https://mp.weixin.qq.com/s/RWlsT-5wPTD7-OpMiVhqiA
  */
 export const normalizeHex = (hex: string) => {
   hex = hex.toUpperCase();

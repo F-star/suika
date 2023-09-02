@@ -27,6 +27,11 @@ const getStepByZoom = (zoom: number) => {
   return steps[0];
 };
 
+/**
+ * Ruler
+ *
+ * reference: https://mp.weixin.qq.com/s/RlNTitV3XTEKHfwpOKAQ0g
+ */
 class Ruler {
   visible = false;
 

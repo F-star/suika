@@ -6,6 +6,11 @@ import { AddShapeCommand } from '../commands/add_shape';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
+/**
+ * Draw Graph Tool
+ *
+ * reference: https://mp.weixin.qq.com/s/lD1qlGus3pRvT5ZfdH0_lg
+ */
 export abstract class DrawGraphTool implements ITool {
   static type = 'drawGraph';
   type = 'drawGraph';

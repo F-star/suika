@@ -13,6 +13,8 @@ import { arrMap, forEach } from '../utils/array_util';
 
 /**
  * reference line
+ *
+ * reference: https://mp.weixin.qq.com/s/-IjHEw_W0JjnSRD224Orig
  */
 export class RefLine {
   /**

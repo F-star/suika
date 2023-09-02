@@ -9,6 +9,11 @@ import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectResizeTool } from './tool_select_resize';
 
+/**
+ * Select Tool
+ *
+ * reference: https://mp.weixin.qq.com/s/lXv5_bisMHVHqtv2DwflwA
+ */
 export class SelectTool implements ITool {
   static type = 'select';
   type = 'select';
