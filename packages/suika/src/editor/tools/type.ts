@@ -20,5 +20,5 @@ export interface IBaseTool {
   /**
    * init state when finish a drag loop
    */
-  afterEnd: () => void;
+  afterEnd: (event: PointerEvent) => void;
 }

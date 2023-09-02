@@ -1,3 +1,4 @@
+import { normalizeDegree } from '../../utils/graphics';
 import { Editor } from '../editor';
 import './cursor.scss';
 
@@ -52,7 +53,7 @@ export class CursorManger {
       } else {
         if (cursor.type === 'resize') {
           // degree: 0 ~ 179. 0 is from top to bottom , 90 is from left to right
-          const degree = cursor.degree % 180;
+          const degree = normalizeDegree(cursor.degree) % 180;
           if (degree < 22.5) {
             styleCursor = 'ns-resize';
           } else if (degree < 67.5) {
