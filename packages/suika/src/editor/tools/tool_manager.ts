@@ -129,7 +129,7 @@ export class ToolManager {
         this.editor.hostEventManager.enableDragBySpace();
         isPressing = false;
         this.currentTool.end(e, this.isDragging);
-        this.currentTool.afterEnd();
+        this.currentTool.afterEnd(e);
       }
 
       this.isDragging = false;

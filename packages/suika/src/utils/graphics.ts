@@ -24,15 +24,20 @@ export const normalizeRect = ({ x, y, width, height }: IRect) => {
   return getRectByTwoCoord({ x, y }, { x: x2, y: y2 });
 };
 
-/**
- * 标准化角度
- */
 export const normalizeRadian = (radian: number): number => {
   radian = radian % DOUBLE_PI;
   if (radian < 0) {
     radian += DOUBLE_PI;
   }
   return radian;
+};
+
+export const normalizeDegree = (degree: number): number => {
+  degree = degree % 360;
+  if (degree < 0) {
+    degree += 360;
+  }
+  return degree;
 };
 
 /**

@@ -47,7 +47,10 @@ export class SelectTool implements ITool {
     this.editor.selectedElements.clear();
     this.editor.sceneGraph.render();
   }
-  moveExcludeDrag = throttle((e: PointerEvent) => {
+  moveExcludeDrag(e: PointerEvent) {
+    this.setCursorByMouse(e);
+  }
+  setCursorByMouse = throttle((e: PointerEvent) => {
     if (this.editor.hostEventManager.isSpacePressing) {
       return;
     }
@@ -164,13 +167,15 @@ export class SelectTool implements ITool {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
   }
-  afterEnd() {
+  afterEnd(e: PointerEvent) {
     if (!this.editor.hostEventManager.isDraggingCanvasBySpace) {
       this.editor.setCursor('default');
     }
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
-    this.currStrategy?.afterEnd();
+    this.currStrategy?.afterEnd(e);
+
     this.currStrategy = null;
+    this.setCursorByMouse(e);
   }
 }

@@ -6,7 +6,6 @@ import {
   rotateInCanvas,
 } from '../../utils/canvas';
 import {
-  calcVectorRadian,
   getRectCenterPoint,
   isPointInCircle,
   isPointInRect,
@@ -253,21 +252,23 @@ export class TransformHandle {
           setting.get('handleStrokePadding') / zoom,
         )
       ) {
-        const degree = radian2Degree(
-          calcVectorRadian(
-            this.center!.x,
-            this.center!.y,
-            ctrlPoint.x,
-            ctrlPoint.y,
-          ) % Math.PI,
-        );
         return {
           handleName: key,
-          cursor: { type: 'resize', degree },
+          cursor: this.getCursor(key),
         };
       }
     }
     return { handleName: undefined };
+  }
+
+  getCursor(type: HandleName): ICursor {
+    if (type === 'rotation') {
+      return 'grab';
+    }
+    const degree =
+      radian2Degree(this.editor.selectedElements.getRotation()) +
+      (type === 'se' || type === 'nw' ? -45 : 45);
+    return { type: 'resize', degree };
   }
 
   private isInRotationHandle(point: IPoint) {
