@@ -63,12 +63,14 @@ export class SelectResizeTool implements IBaseTool {
 
     const lastPoint = this.editor.getSceneCursorXY(e);
     const selectItems = this.editor.selectedElements.getItems();
-    // 右下角
-    if (this.handleName === 'se') {
-      // 转换回来
-      if (selectItems.length === 1) {
-        selectItems[0].setSE(lastPoint, this.prevElements[0]);
-      }
+    if (selectItems.length === 1) {
+      selectItems[0].movePoint(
+        this.handleName,
+        lastPoint,
+        this.prevElements[0],
+      );
+    } else {
+      // TODO: multi elements case
     }
 
     this.editor.sceneGraph.render();

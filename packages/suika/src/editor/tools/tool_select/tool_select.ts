@@ -85,15 +85,13 @@ export class SelectTool implements ITool {
     const { handleName } = sceneGraph.transformHandle.getNameByPoint(
       this.startPoint,
     );
-    // if (handleName) {
-    if (handleName === 'rotation') {
-      this.currStrategy = this.strategySelectRotation;
+    if (handleName) {
+      if (handleName === 'rotation') {
+        this.currStrategy = this.strategySelectRotation;
+      } else {
+        this.currStrategy = this.strategySelectResize;
+      }
     }
-    // TODO: now only support se resize handle
-    else if (handleName === 'se') {
-      this.currStrategy = this.strategySelectResize;
-    }
-    // }
 
     // 1. 点击落在选中盒中
     else if (

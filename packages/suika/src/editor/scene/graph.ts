@@ -223,78 +223,90 @@ export class Graph {
     const { y: prevRotatedY } = getElementRotatedXY(this);
     this.y = this.y + rotatedY - prevRotatedY;
   }
-  // 基于原来的矩形移动右下角（不会进行镜像翻转）
-  static setSE(newPos: IPoint, oldBox: IBoxWithRotation): IBox {
-    // TODO: should reduce complex, when rotation is 0
+  movePoint(
+    type: 'se' | 'ne' | 'nw' | 'sw',
+    newPos: IPoint,
+    oldBox: IBoxWithRotation,
+  ) {
     // 1. calculate new width and height
     const [cx, cy] = getRectCenterPoint(oldBox);
-    const { x: x2, y: y2 } = transformRotate(
+    const { x: posX, y: poxY } = transformRotate(
       newPos.x,
       newPos.y,
-      -oldBox.rotation || 0,
+      -(oldBox.rotation || 0),
       cx,
       cy,
     );
-    const width = x2 - oldBox.x;
-    const height = y2 - oldBox.y;
-    // 2. correct x and y (compare rotatedX/rotatedY)
-    const { x: preRotatedX, y: preRotatedY } = transformRotate(
-      oldBox.x,
-      oldBox.y,
+    let width = 0;
+    let height = 0;
+    if (type === 'se') {
+      width = posX - oldBox.x;
+      height = poxY - oldBox.y;
+    } else if (type === 'ne') {
+      width = posX - oldBox.x;
+      height = oldBox.y + oldBox.height - poxY;
+    } else if (type === 'nw') {
+      width = oldBox.x + oldBox.width - posX;
+      height = oldBox.y + oldBox.height - poxY;
+    } else if (type === 'sw') {
+      width = oldBox.x + oldBox.width - posX;
+      height = poxY - oldBox.y;
+    }
+
+    // 2. correct x and y
+    let prevOriginX = 0;
+    let prevOriginY = 0;
+    let originX = 0;
+    let originY = 0;
+    if (type === 'se') {
+      prevOriginX = oldBox.x;
+      prevOriginY = oldBox.y;
+      originX = oldBox.x;
+      originY = oldBox.y;
+    } else if (type === 'ne') {
+      prevOriginX = oldBox.x;
+      prevOriginY = oldBox.y + oldBox.height;
+      originX = oldBox.x;
+      originY = oldBox.y + height;
+    } else if (type === 'nw') {
+      prevOriginX = oldBox.x + oldBox.width;
+      prevOriginY = oldBox.y + oldBox.height;
+      originX = oldBox.x + width;
+      originY = oldBox.y + height;
+    } else if (type === 'sw') {
+      prevOriginX = oldBox.x + oldBox.width;
+      prevOriginY = oldBox.y;
+      originX = oldBox.x + width;
+      originY = oldBox.y;
+    }
+
+    const { x: prevRotatedOriginX, y: prevRotatedOriginY } = transformRotate(
+      prevOriginX,
+      prevOriginY,
       oldBox.rotation || 0,
       cx,
       cy,
     );
-    const { x: rotatedX, y: rotatedY } = transformRotate(
-      oldBox.x,
-      oldBox.y,
+    const { x: rotatedOriginX, y: rotatedOriginY } = transformRotate(
+      originX,
+      originY,
       oldBox.rotation || 0,
-      (oldBox.x + x2) / 2,
-      (oldBox.y + y2) / 2,
+      oldBox.x + width / 2,
+      oldBox.y + height / 2,
     );
-    const dx = rotatedX - preRotatedX;
-    const dy = rotatedY - preRotatedY;
+    const dx = rotatedOriginX - prevRotatedOriginX;
+    const dy = rotatedOriginY - prevRotatedOriginY;
     const x = oldBox.x - dx;
     const y = oldBox.y - dy;
 
-    return normalizeRect({
-      x,
-      y,
-      width,
-      height,
-    });
-  }
-  // update southeast (right-bottom) point
-  setSE(newPos: IPoint, startBox?: IBoxWithRotation) {
-    startBox = startBox ?? {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      rotation: this.rotation ?? 0,
-    };
-    const newBox = Graph.setSE(newPos, startBox);
-    this.setAttrs(newBox);
-  }
-  resizeAndKeepRotatedXY({
-    width,
-    height,
-  }: {
-    width?: number;
-    height?: number;
-  }) {
-    const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(this);
-    if (width) {
-      this.width = width;
-    }
-    if (height) {
-      this.height = height;
-    }
-    const { x: rotatedX, y: rotatedY } = getElementRotatedXY(this);
-    const dx = rotatedX - preRotatedX;
-    const dy = rotatedY - preRotatedY;
-    this.x -= dx;
-    this.y -= dy;
+    this.setAttrs(
+      normalizeRect({
+        x,
+        y,
+        width,
+        height,
+      }),
+    );
   }
   renderFillAndStrokeTexture(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
