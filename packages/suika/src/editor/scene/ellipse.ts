@@ -2,6 +2,7 @@ import { DOUBLE_PI } from '../../constant';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
+import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
 
@@ -13,6 +14,7 @@ export class Ellipse extends Graph {
   }
   renderFillAndStrokeTexture(
     ctx: CanvasRenderingContext2D,
+    imgManager: ImgManager,
     smooth: boolean,
   ): void {
     const cx = this.x + this.width / 2;
@@ -30,7 +32,7 @@ export class Ellipse extends Graph {
         ctx.fill();
       } else if (texture.type === TextureType.Image) {
         ctx.clip();
-        this.fillImage(ctx, texture, smooth);
+        this.fillImage(ctx, texture, imgManager, smooth);
       }
     }
 

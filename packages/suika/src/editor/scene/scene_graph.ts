@@ -119,12 +119,13 @@ export class SceneGraph {
     ctx.scale(dpr * zoom, dpr * zoom);
     ctx.translate(dx, dy);
 
+    const imgManager = this.editor.imgManager;
     for (let i = 0, len = visibleElements.length; i < len; i++) {
       ctx.save();
       const element = visibleElements[i];
       // 抗锯齿
       const smooth = zoom <= 1;
-      element.renderFillAndStrokeTexture(ctx, smooth);
+      element.renderFillAndStrokeTexture(ctx, imgManager, smooth);
       ctx.restore();
     }
 

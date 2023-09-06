@@ -20,6 +20,7 @@ import { ClipboardManager } from './clipboard';
 import { KeyBindingManager } from './key_binding_manager';
 import { PerfMonitor } from './perf_monitor';
 import { CursorManger, ICursor } from './cursor_manager';
+import { ImgManager } from './Img_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -47,6 +48,7 @@ export class Editor {
   toolManager: ToolManager;
   commandManager: CommandManager;
   zoomManager: ZoomManager;
+  imgManager: ImgManager;
 
   cursorManager: CursorManger;
   keybindingManager: KeyBindingManager;
@@ -86,6 +88,7 @@ export class Editor {
     this.toolManager = new ToolManager(this);
     this.commandManager = new CommandManager(this);
     this.zoomManager = new ZoomManager(this);
+    this.imgManager = new ImgManager();
 
     this.selectedElements = new SelectedElements(this);
     this.ruler = new Ruler(this);
@@ -99,6 +102,11 @@ export class Editor {
     this.clipboard.bindEvents();
 
     this.autoSaveGraphs = new AutoSaveGraphs(this);
+
+    this.imgManager.eventEmitter.on('added', () => {
+      this.sceneGraph.render();
+    });
+
     const data = this.autoSaveGraphs.load();
     if (data) {
       this.sceneGraph.load(data.data);

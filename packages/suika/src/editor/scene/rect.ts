@@ -1,6 +1,7 @@
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
+import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
 
@@ -19,7 +20,11 @@ export class Rect extends Graph {
     };
   }
 
-  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D, smooth: boolean) {
+  renderFillAndStrokeTexture(
+    ctx: CanvasRenderingContext2D,
+    imgManager: ImgManager,
+    smooth: boolean,
+  ) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;
@@ -36,7 +41,7 @@ export class Rect extends Graph {
           break;
         }
         case TextureType.Image: {
-          this.fillImage(ctx, texture, smooth);
+          this.fillImage(ctx, texture, imgManager, smooth);
         }
       }
     }

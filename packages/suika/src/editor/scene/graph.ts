@@ -17,6 +17,7 @@ import {
 } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
+import { ImgManager } from '../Img_manager';
 
 export interface GraphAttrs {
   type?: GraphType;
@@ -312,6 +313,8 @@ export class Graph {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: CanvasRenderingContext2D,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    imgManager: ImgManager,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     smooth: boolean,
   ) {
     throw new Error('Method not implemented.');
@@ -326,26 +329,30 @@ export class Graph {
    *
    * reference: https://mp.weixin.qq.com/s/TSpZv_0VJtxPTCCzEqDl8Q
    */
-  fillImage(
+  protected fillImage(
     ctx: CanvasRenderingContext2D,
     texture: TextureImage,
+    imgManager: ImgManager,
     smooth: boolean,
   ) {
     const src = texture.attrs.src;
     const width = this.width;
     const height = this.height;
-    let img: CanvasImageSource;
+    let img: CanvasImageSource | undefined = undefined;
 
     // anti-aliasing
     ctx.imageSmoothingEnabled = smooth;
 
     if (src) {
-      img = new Image();
-      img.src = src;
-      // TODO: rerender when image loaded, but notice endless loop
+      imgManager.addImg(src);
+      img = imgManager.getImg(src);
     } else {
       ctx.imageSmoothingEnabled = false;
       img = DEFAULT_IMAGE;
+    }
+
+    if (!img) {
+      return;
     }
 
     // reference: https://mp.weixin.qq.com/s/TSpZv_0VJtxPTCCzEqDl8Q
