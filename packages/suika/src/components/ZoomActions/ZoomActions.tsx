@@ -131,6 +131,7 @@ export const ZoomActions: FC = () => {
           <div className="separator" />
           <ActionItem
             check={setting.enablePixelGrid}
+            suffix={isWindows ? "Ctrl+'" : "⌘'"}
             onClick={() => {
               if (editor) {
                 const enablePixelGrid = editor.setting.get('enablePixelGrid');
@@ -144,6 +145,7 @@ export const ZoomActions: FC = () => {
           </ActionItem>
           <ActionItem
             check={setting.snapToPixelGrid}
+            suffix={isWindows ? "Ctrl+Shift+'" : "⌘⇧'"}
             onClick={() => {
               if (editor) {
                 const snapToPixelGrid = editor.setting.get('snapToPixelGrid');

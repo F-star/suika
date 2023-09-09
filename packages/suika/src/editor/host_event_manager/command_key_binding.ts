@@ -73,6 +73,7 @@ export class CommandKeyBinding {
       action: cancelSelectAction,
     });
 
+    /********** Ruler **********/
     // toggle ruler
     const toggleRulersAction = () => {
       editor.setting.set('enableRuler', !editor.setting.get('enableRuler'));
@@ -84,6 +85,7 @@ export class CommandKeyBinding {
       action: toggleRulersAction,
     });
 
+    /*************** Zoom **************/
     // zoom to fix
     const zoomToFitAction = () => {
       editor.zoomManager.zoomToFit();
@@ -148,7 +150,38 @@ export class CommandKeyBinding {
       action: zoomTo100,
     });
 
-    // arrange
+    /*************** Grid **************/
+    // toggle grid
+    const toggleGridAction = () => {
+      editor.setting.set(
+        'enablePixelGrid',
+        !editor.setting.get('enablePixelGrid'),
+      );
+      editor.sceneGraph.render();
+    };
+    editor.keybindingManager.register({
+      key: { metaKey: true, keyCode: 'Quote' },
+      winKey: { ctrlKey: true, keyCode: 'Quote' },
+      actionName: 'Toggle Grid',
+      action: toggleGridAction,
+    });
+
+    // snap to grid
+    const snapToGridAction = () => {
+      editor.setting.set(
+        'snapToPixelGrid',
+        !editor.setting.get('snapToPixelGrid'),
+      );
+      editor.sceneGraph.render();
+    };
+    editor.keybindingManager.register({
+      key: { shiftKey: true, metaKey: true, keyCode: 'Quote' },
+      winKey: { shiftKey: true, ctrlKey: true, keyCode: 'Quote' },
+      actionName: 'Snap To Grid',
+      action: snapToGridAction,
+    });
+
+    /********** Arrange *******/
     // front
     const frontAction = () => {
       editor.selectedElements.arrange(ArrangeType.Front);
