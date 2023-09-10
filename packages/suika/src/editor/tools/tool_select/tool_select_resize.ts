@@ -1,5 +1,6 @@
 import { IPoint } from '../../../type';
 import { arrMap } from '../../../utils/array_util';
+import { noop } from '../../../utils/common';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { HandleName } from '../../scene/transform_handle';
@@ -18,14 +19,23 @@ export class SelectResizeTool implements IBaseTool {
     height: number;
     rotation: number;
   }> = [];
+  private lastPoint: IPoint | null = null;
+  private unbind = noop;
 
   constructor(private editor: Editor) {}
 
   active() {
-    // do nothing
+    const handler = () => {
+      this.resize();
+    };
+    this.editor.hostEventManager.on('shiftToggle', handler);
+
+    this.unbind = () => {
+      this.editor.hostEventManager.off('shiftToggle', handler);
+    };
   }
   inactive() {
-    // do nothing
+    this.unbind();
   }
   start(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
@@ -51,13 +61,19 @@ export class SelectResizeTool implements IBaseTool {
     this.editor.commandManager.disableRedoUndo();
     this.editor.hostEventManager.disableDelete();
 
-    const lastPoint = this.editor.getSceneCursorXY(e);
+    this.lastPoint = this.editor.getSceneCursorXY(e);
+    this.resize();
+  }
+  private resize() {
+    if (!this.lastPoint) return;
+
     const selectItems = this.editor.selectedElements.getItems();
     if (selectItems.length === 1) {
       selectItems[0].movePoint(
         this.handleName,
-        lastPoint,
+        this.lastPoint,
         this.prevElements[0],
+        this.editor.hostEventManager.isShiftPressing,
       );
     } else {
       // TODO: multi elements case
@@ -90,5 +106,6 @@ export class SelectResizeTool implements IBaseTool {
   }
   afterEnd() {
     this.prevElements = [];
+    this.lastPoint = null;
   }
 }

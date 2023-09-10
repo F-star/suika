@@ -228,6 +228,7 @@ export class Graph {
     type: 'se' | 'ne' | 'nw' | 'sw',
     newPos: IPoint,
     oldBox: IBoxWithRotation,
+    keepRatio = false,
   ) {
     // 1. calculate new width and height
     const [cx, cy] = getRectCenterPoint(oldBox);
@@ -252,6 +253,16 @@ export class Graph {
     } else if (type === 'sw') {
       width = oldBox.x + oldBox.width - posX;
       height = poxY - oldBox.y;
+    }
+
+    if (keepRatio) {
+      const ratio = oldBox.width / oldBox.height;
+      const newRatio = Math.abs(width / height);
+      if (newRatio > ratio) {
+        height = (Math.sign(height) * Math.abs(width)) / ratio;
+      } else {
+        width = Math.sign(width) * Math.abs(height) * ratio;
+      }
     }
 
     // 2. correct x and y
