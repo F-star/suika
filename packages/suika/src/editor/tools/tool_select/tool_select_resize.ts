@@ -18,18 +18,14 @@ export class SelectResizeTool implements IBaseTool {
     height: number;
     rotation: number;
   }> = [];
-  /**
-   * 参照点
-   */
-  private referencePoint: IPoint = { x: -1, y: -1 };
 
   constructor(private editor: Editor) {}
 
   active() {
-    //
+    // do nothing
   }
   inactive() {
-    //
+    // do nothing
   }
   start(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
@@ -50,12 +46,6 @@ export class SelectResizeTool implements IBaseTool {
       throw new Error(`handleName ${handleName} is invalid`);
     }
     this.handleName = handleName;
-    switch (handleName) {
-      case 'se':
-        this.referencePoint = this.editor.sceneGraph.transformHandle.handle!.nw; // maybe unnecessary
-        break;
-      // TODO: other handle
-    }
   }
   drag(e: PointerEvent) {
     this.editor.commandManager.disableRedoUndo();
