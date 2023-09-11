@@ -8,6 +8,7 @@ import { ICursor } from '../cursor_manager';
 
 interface Events {
   shiftToggle(): void;
+  altToggle(): void;
   contextmenu(point: IPoint): void;
 }
 
@@ -17,6 +18,7 @@ interface Events {
 export class HostEventManager {
   isShiftPressing = false;
   isCtrlPressing = false;
+  isAltPressing = false;
   isCommandPressing = false;
   isSpacePressing = false;
 
@@ -66,6 +68,19 @@ export class HostEventManager {
           this.isCtrlPressing = true;
         } else if (event.type === 'keyup') {
           this.isCtrlPressing = false;
+        }
+      }
+      if (hotkeys.alt) {
+        event.preventDefault();
+        const prev = this.isAltPressing;
+        if (event.type === 'keydown') {
+          this.isAltPressing = true;
+        } else if (event.type === 'keyup') {
+          this.isAltPressing = false;
+        }
+
+        if (prev !== this.isAltPressing) {
+          this.eventEmitter.emit('altToggle');
         }
       }
       if (hotkeys.command) {

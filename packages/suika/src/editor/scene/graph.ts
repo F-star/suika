@@ -229,6 +229,7 @@ export class Graph {
     newPos: IPoint,
     oldBox: IBoxWithRotation,
     keepRatio = false,
+    scaleFromCenter = false,
   ) {
     // 1. calculate new width and height
     const [cx, cy] = getRectCenterPoint(oldBox);
@@ -241,18 +242,45 @@ export class Graph {
     );
     let width = 0;
     let height = 0;
-    if (type === 'se') {
-      width = posX - oldBox.x;
-      height = poxY - oldBox.y;
-    } else if (type === 'ne') {
-      width = posX - oldBox.x;
-      height = oldBox.y + oldBox.height - poxY;
-    } else if (type === 'nw') {
-      width = oldBox.x + oldBox.width - posX;
-      height = oldBox.y + oldBox.height - poxY;
-    } else if (type === 'sw') {
-      width = oldBox.x + oldBox.width - posX;
-      height = poxY - oldBox.y;
+    switch (type) {
+      case 'se':
+        if (scaleFromCenter) {
+          width = (posX - cx) * 2;
+          height = (poxY - cy) * 2;
+        } else {
+          width = posX - oldBox.x;
+          height = poxY - oldBox.y;
+        }
+        break;
+      case 'ne':
+        if (scaleFromCenter) {
+          width = (posX - cx) * 2;
+          height = (cy - poxY) * 2;
+        } else {
+          width = posX - oldBox.x;
+          height = oldBox.y + oldBox.height - poxY;
+        }
+        break;
+      case 'nw':
+        if (scaleFromCenter) {
+          width = (cx - posX) * 2;
+          height = (cy - poxY) * 2;
+        } else {
+          width = oldBox.x + oldBox.width - posX;
+          height = oldBox.y + oldBox.height - poxY;
+        }
+        break;
+      case 'sw':
+        if (scaleFromCenter) {
+          width = (cx - posX) * 2;
+          height = (poxY - cy) * 2;
+        } else {
+          width = oldBox.x + oldBox.width - posX;
+          height = poxY - oldBox.y;
+        }
+        break;
+      default:
+        throw new Error(`movePoint type ${type} is invalid`);
     }
 
     if (keepRatio) {
@@ -270,26 +298,38 @@ export class Graph {
     let prevOriginY = 0;
     let originX = 0;
     let originY = 0;
-    if (type === 'se') {
-      prevOriginX = oldBox.x;
-      prevOriginY = oldBox.y;
-      originX = oldBox.x;
-      originY = oldBox.y;
-    } else if (type === 'ne') {
-      prevOriginX = oldBox.x;
-      prevOriginY = oldBox.y + oldBox.height;
-      originX = oldBox.x;
-      originY = oldBox.y + height;
-    } else if (type === 'nw') {
-      prevOriginX = oldBox.x + oldBox.width;
-      prevOriginY = oldBox.y + oldBox.height;
-      originX = oldBox.x + width;
-      originY = oldBox.y + height;
-    } else if (type === 'sw') {
-      prevOriginX = oldBox.x + oldBox.width;
-      prevOriginY = oldBox.y;
-      originX = oldBox.x + width;
-      originY = oldBox.y;
+    if (scaleFromCenter) {
+      prevOriginX = cx;
+      prevOriginY = cy;
+      originX = oldBox.x + width / 2;
+      originY = oldBox.y + height / 2;
+    } else {
+      switch (type) {
+        case 'se':
+          prevOriginX = oldBox.x;
+          prevOriginY = oldBox.y;
+          originX = oldBox.x;
+          originY = oldBox.y;
+          break;
+        case 'ne':
+          prevOriginX = oldBox.x;
+          prevOriginY = oldBox.y + oldBox.height;
+          originX = oldBox.x;
+          originY = oldBox.y + height;
+          break;
+        case 'nw':
+          prevOriginX = oldBox.x + oldBox.width;
+          prevOriginY = oldBox.y + oldBox.height;
+          originX = oldBox.x + width;
+          originY = oldBox.y + height;
+          break;
+        case 'sw':
+          prevOriginX = oldBox.x + oldBox.width;
+          prevOriginY = oldBox.y;
+          originX = oldBox.x + width;
+          originY = oldBox.y;
+          break;
+      }
     }
 
     const { x: prevRotatedOriginX, y: prevRotatedOriginY } = transformRotate(

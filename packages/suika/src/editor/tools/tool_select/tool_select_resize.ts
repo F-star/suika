@@ -29,13 +29,16 @@ export class SelectResizeTool implements IBaseTool {
       this.resize();
     };
     this.editor.hostEventManager.on('shiftToggle', handler);
+    this.editor.hostEventManager.on('altToggle', handler);
 
     this.unbind = () => {
       this.editor.hostEventManager.off('shiftToggle', handler);
+      this.editor.hostEventManager.off('altToggle', handler);
     };
   }
   inactive() {
     this.unbind();
+    this.unbind = noop;
   }
   start(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
@@ -74,6 +77,7 @@ export class SelectResizeTool implements IBaseTool {
         this.lastPoint,
         this.prevElements[0],
         this.editor.hostEventManager.isShiftPressing,
+        this.editor.hostEventManager.isAltPressing,
       );
     } else {
       // TODO: multi elements case
