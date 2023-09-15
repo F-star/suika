@@ -32,12 +32,13 @@ export abstract class DrawGraphTool implements ITool {
     editor.setCursor('crosshair');
 
     const hotkeysManager = editor.hostEventManager;
-    const updateRectWhenShiftToggle = () => {
+    const updateRect = () => {
       if (this.isDragging) {
         this.updateRect();
       }
     };
-    hotkeysManager.on('shiftToggle', updateRectWhenShiftToggle);
+    hotkeysManager.on('shiftToggle', updateRect);
+    hotkeysManager.on('altToggle', updateRect);
 
     const updateRectWhenViewportTranslate = () => {
       if (editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -55,7 +56,8 @@ export abstract class DrawGraphTool implements ITool {
     editor.viewportManager.on('xOrYChange', updateRectWhenViewportTranslate);
 
     this.unbindEvent = () => {
-      hotkeysManager.off('shiftToggle', updateRectWhenShiftToggle);
+      hotkeysManager.off('shiftToggle', updateRect);
+      hotkeysManager.off('altToggle', updateRect);
       editor.viewportManager.off('xOrYChange', updateRectWhenViewportTranslate);
     };
   }
@@ -120,6 +122,8 @@ export abstract class DrawGraphTool implements ITool {
   }
 
   private updateRect() {
+    if (!this.isDragging) return;
+
     const { x, y } = this.lastDragPoint;
     const sceneGraph = this.editor.sceneGraph;
     const { x: startX, y: startY } = this.startPoint;
@@ -127,16 +131,39 @@ export abstract class DrawGraphTool implements ITool {
     const width = x - startX;
     const height = y - startY;
 
-    const rect = {
+    let rect = {
       x: startX,
       y: startY,
       width, // width may be negative
       height, // height may be negative
     };
 
-    // pressing Shift to draw a square
-    if (this.editor.hostEventManager.isShiftPressing) {
+    // whether to set the starting point as the center of the graph
+    const isStartPtAsCenter = this.editor.hostEventManager.isAltPressing;
+    // whether to keep the graph square
+    const keepSquare = this.editor.hostEventManager.isShiftPressing;
+
+    let cx = 0;
+    let cy = 0;
+    if (isStartPtAsCenter) {
+      cx = rect.x + rect.width / 2;
+      cy = rect.y + rect.height / 2;
+
+      rect = {
+        x: rect.x - width,
+        y: rect.y - height,
+        width: rect.width * 2,
+        height: rect.height * 2,
+      };
+    }
+
+    if (keepSquare) {
       this.adjustSizeWhenShiftPressing(rect);
+    }
+
+    if (isStartPtAsCenter) {
+      rect.x = cx - rect.width / 2;
+      rect.y = cy - rect.height / 2;
     }
 
     if (this.drawingGraph) {
