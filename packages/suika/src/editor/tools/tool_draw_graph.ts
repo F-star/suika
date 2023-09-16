@@ -146,15 +146,15 @@ export abstract class DrawGraphTool implements ITool {
     let cx = 0;
     let cy = 0;
     if (isStartPtAsCenter) {
-      cx = rect.x + rect.width / 2;
-      cy = rect.y + rect.height / 2;
-
       rect = {
         x: rect.x - width,
         y: rect.y - height,
         width: rect.width * 2,
         height: rect.height * 2,
       };
+
+      cx = rect.x + rect.width / 2;
+      cy = rect.y + rect.height / 2;
     }
 
     if (keepSquare) {
