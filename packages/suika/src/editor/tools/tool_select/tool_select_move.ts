@@ -103,11 +103,24 @@ export class SelectMoveTool implements IBaseTool {
 
     this.editor.sceneGraph.render();
   }
-  end(e: PointerEvent, isEnableDrag: boolean) {
-    const selectedElements = this.editor.selectedElements.getItems();
-    if (selectedElements.length === 0 || !isEnableDrag) {
+  end(e: PointerEvent, isDragHappened: boolean) {
+    const selectedItems = this.editor.selectedElements.getItems();
+    if (selectedItems.length === 0) {
       // 移动的时候元素被删除了，或者撤销导致为空
       // TODO: 属性复原
+      return;
+    }
+    if (!isDragHappened) {
+      // clear selected elements if click on blank area and not dragging
+      const point = this.editor.getSceneCursorXY(e);
+      const topHitElement = this.editor.sceneGraph.getTopHitElement(
+        point.x,
+        point.y,
+      );
+      if (!topHitElement && !this.editor.hostEventManager.isShiftPressing) {
+        this.editor.selectedElements.clear();
+      }
+
       return;
     }
 
@@ -115,7 +128,7 @@ export class SelectMoveTool implements IBaseTool {
       this.editor.commandManager.pushCommand(
         new MoveElementsCommand(
           'Move Elements',
-          selectedElements,
+          selectedItems,
           this.dx,
           this.dy,
         ),

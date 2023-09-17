@@ -13,10 +13,10 @@ export interface IBaseTool {
   /**
    *
    * @param event
-   * @param isEnableDrag is drag happened
+   * @param isDragHappened is drag happened
    * @returns
    */
-  end: (event: PointerEvent, isEnableDrag: boolean) => void;
+  end: (event: PointerEvent, isDragHappened: boolean) => void;
   /**
    * init state when finish a drag loop
    */

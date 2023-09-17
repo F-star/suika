@@ -85,9 +85,9 @@ export class SelectResizeTool implements IBaseTool {
 
     this.editor.sceneGraph.render();
   }
-  end(e: PointerEvent, isEnableDrag: boolean) {
+  end(e: PointerEvent, isDragHappened: boolean) {
     const items = this.editor.selectedElements.getItems();
-    if (items.length === 0 || !isEnableDrag) {
+    if (items.length === 0 || !isDragHappened) {
       return;
     }
     this.editor.commandManager.pushCommand(

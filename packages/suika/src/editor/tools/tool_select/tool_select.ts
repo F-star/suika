@@ -146,7 +146,7 @@ export class SelectTool implements ITool {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
   }
-  end(e: PointerEvent, isEnableDrag: boolean) {
+  end(e: PointerEvent, isDragHappened: boolean) {
     const currStrategy = this.currStrategy;
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -159,7 +159,7 @@ export class SelectTool implements ITool {
     }
 
     if (currStrategy) {
-      currStrategy.end(e, isEnableDrag);
+      currStrategy.end(e, isDragHappened);
       currStrategy.inactive();
     } else {
       throw new Error('没有根据判断选择策略，代码有问题');
