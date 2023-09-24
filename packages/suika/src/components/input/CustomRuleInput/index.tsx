@@ -50,6 +50,7 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = ({
             const str = inputRef.current.value.trim();
             const newValue = parser(str, value);
             if (newValue !== false) {
+              e.target.value = String(newValue);
               onBlur(newValue);
             } else {
               e.target.value = String(value);

@@ -9,7 +9,12 @@ interface INumberInputProps {
   prefix?: React.ReactNode;
 }
 
-const NumberInput: FC<INumberInputProps> = ({ value, min, onBlur, prefix }) => {
+const NumberInput: FC<INumberInputProps> = ({
+  value,
+  min = -Infinity,
+  onBlur,
+  prefix,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -23,15 +28,16 @@ const NumberInput: FC<INumberInputProps> = ({ value, min, onBlur, prefix }) => {
       prefix={prefix}
       parser={(str) => {
         str = str.trim();
-        const number = parseToNumber(str);
-        if (!Number.isNaN(number) && number !== value) {
-          return String(number);
+        let num = parseToNumber(str);
+        if (!Number.isNaN(num) && num !== value) {
+          num = Math.max(min, num);
+          return String(num);
         } else {
           return false;
         }
       }}
       value={value}
-      onBlur={(newVal) => onBlur(Math.max(min ?? -Infinity, Number(newVal)))}
+      onBlur={(newVal) => onBlur(Number(newVal))}
     />
   );
 };

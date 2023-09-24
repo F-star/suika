@@ -139,12 +139,10 @@ const ElementsInfoCards: FC = () => {
         {[
           {
             label: 'W',
+            min: 1,
             value: typeof width === 'number' ? remainDecimal(width, 2) : width,
             onBlur: (newWidth: number) => {
               if (editor) {
-                if (newWidth <= 0) {
-                  newWidth = 1;
-                }
                 const elements = editor.selectedElements.getItems();
                 MutateElementsAndRecord.setWidth(editor, elements, newWidth);
                 editor.sceneGraph.render();
@@ -153,13 +151,11 @@ const ElementsInfoCards: FC = () => {
           },
           {
             label: 'H',
+            min: 1,
             value:
               typeof height === 'number' ? remainDecimal(height, 2) : height,
             onBlur: (newHeight: number) => {
               if (editor) {
-                if (newHeight <= 0) {
-                  newHeight = 1;
-                }
                 const elements = editor.selectedElements.getItems();
                 MutateElementsAndRecord.setHeight(editor, elements, newHeight);
                 editor.sceneGraph.render();
@@ -194,6 +190,7 @@ const ElementsInfoCards: FC = () => {
 
 const AttrInput: FC<{
   label: string;
+  min?: number;
   value: string | number;
   onBlur: (newValue: number) => void;
 }> = (props) => {
@@ -201,6 +198,7 @@ const AttrInput: FC<{
     <NumberInput
       prefix={<span className="suika-info-attrs-label">{props.label}</span>}
       value={props.value}
+      min={props.min}
       onBlur={props.onBlur}
     />
   );
