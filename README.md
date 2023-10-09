@@ -31,6 +31,13 @@ pnpm run dev
 
 https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap
 
+
+## chat
+
+建了个图形编辑器交流的 **微信群**，很多都是业内人士。
+
+如果你是做图形编辑器开发或是感兴趣的，可以加我微信 frstars，备注 “图形编辑器群”，我拉你进群。
+
 ## Post
 
 Some Chinese language articles on how to develop a graphic editor.
@@ -38,10 +45,6 @@ Some Chinese language articles on how to develop a graphic editor.
 如果你想学习如何开发 Web 图形编辑器，看这个文章合集：[链接](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0NTc2NTEyNA==&action=getalbum&album_id=2965704900049485826#wechat_redirect)
 
 另外可以关注我的公众号，持续更新图形编辑器相关文章。
-
-## chat
-
-建了个图形编辑器交流的微信群，很多都是业内人士。如果你是做图形编辑器开发或是感兴趣的，可以加我微信 frstars，备注 “图形编辑器群”，我拉你进群。
 
 <img 
   width="550px"
