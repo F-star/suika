@@ -125,6 +125,17 @@ export const ContextMenu: FC = () => {
       <>
         <ContextMenuSep />
         <ContextMenuItem
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              editor.selectedElements.group();
+            }
+          }}
+        >
+          <FormattedMessage id="group" />
+        </ContextMenuItem>
+        <ContextMenuSep />
+        <ContextMenuItem
           suffix={isWindows ? 'Ctrl+]' : '⌘]'}
           onClick={() => {
             setVisible(false);

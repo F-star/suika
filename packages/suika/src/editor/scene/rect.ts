@@ -11,20 +11,8 @@ export class Rect extends Graph {
   constructor(options: RectAttrs) {
     super({ ...options, type: GraphType.Rect });
   }
-  getBBoxWithoutRotation() {
-    return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-    };
-  }
 
-  renderFillAndStrokeTexture(
-    ctx: CanvasRenderingContext2D,
-    imgManager: ImgManager,
-    smooth: boolean,
-  ) {
+  draw(ctx: CanvasRenderingContext2D, imgManager: ImgManager, smooth: boolean) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;

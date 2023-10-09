@@ -23,6 +23,7 @@
     "ahooks": "^3.7.4",
     "classnames": "^2.3.2",
     "hotkeys-js": "^3.10.1",
+    "immer": "^10.0.3",
     "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",

@@ -21,6 +21,7 @@ import { KeyBindingManager } from './key_binding_manager';
 import { PerfMonitor } from './perf_monitor';
 import { CursorManger, ICursor } from './cursor_manager';
 import { ImgManager } from './Img_manager';
+import { GroupManager } from './group_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -40,6 +41,7 @@ export class Editor {
   paperId: string;
 
   sceneGraph: SceneGraph;
+  groupManager: GroupManager;
 
   setting: Setting;
 
@@ -81,6 +83,7 @@ export class Editor {
     this.keybindingManager.bindEvent();
 
     this.sceneGraph = new SceneGraph(this);
+    this.groupManager = new GroupManager(this);
 
     this.cursorManager = new CursorManger(this);
     this.viewportManager = new ViewportManager(this);
@@ -109,6 +112,9 @@ export class Editor {
 
     const data = this.autoSaveGraphs.load();
     if (data) {
+      if (data.groups) {
+        this.groupManager.load(data.groups);
+      }
       this.sceneGraph.load(data.data);
       this.paperId = data.paperId;
     }

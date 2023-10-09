@@ -13,7 +13,6 @@ import {
   getRectCenterPoint,
   getRectsBBox,
   isPointInRect,
-  isRectContain,
   isRectIntersect,
 } from '../../utils/graphics';
 import rafThrottle from '../../utils/raf_throttle';
@@ -22,12 +21,19 @@ import { Ellipse } from './ellipse';
 import { Graph, GraphAttrs } from './graph';
 import { Rect } from './rect';
 import { TransformHandle } from './transform_handle';
-import { forEach } from '../../utils/array_util';
+import { arrMap, forEach } from '../../utils/array_util';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
 import { TextGraph } from './text';
-import { HALF_PI } from '../../constant';
 import { Line } from './line';
+
+const graphCtorMap = {
+  [GraphType.Graph]: Graph,
+  [GraphType.Rect]: Rect,
+  [GraphType.Ellipse]: Ellipse,
+  [GraphType.Line]: Line,
+  [GraphType.Text]: TextGraph,
+};
 
 interface Events {
   render(): void;
@@ -61,9 +67,15 @@ export class SceneGraph {
       this.children.splice(idx, 0, ...element);
     }
   }
-  getElementById(id: string) {
-    return this.children.find((item) => item.id === id);
+
+  getElementById(id: string): Graph | undefined {
+    return this.getElementsByIds(new Set([id]))[0];
   }
+
+  getElementsByIds(ids: Set<string>) {
+    return this.children.filter((item) => ids.has(item.id));
+  }
+
   removeItems(elements: Graph[]) {
     if (elements.length > 1) {
       forEach(elements, (element) => {
@@ -125,7 +137,7 @@ export class SceneGraph {
       const element = visibleElements[i];
       // 抗锯齿
       const smooth = zoom <= 1;
-      element.renderFillAndStrokeTexture(ctx, imgManager, smooth);
+      element.draw(ctx, imgManager, smooth);
       ctx.restore();
     }
 
@@ -202,9 +214,7 @@ export class SceneGraph {
     }
     const selectedElements = this.editor.selectedElements.getItems();
 
-    const bBoxes = selectedElements.map((element) =>
-      element.getBBoxWithoutRotation(),
-    );
+    const bBoxes = selectedElements.map((element) => element.getRect());
 
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
@@ -266,9 +276,7 @@ export class SceneGraph {
     let bBoxes: IBox[];
     // 【单个元素被选中】求不考虑旋转的 bBox，将其和旋转后的角度比较
     if (selectedElements.length === 1) {
-      bBoxes = selectedElements.map((element) =>
-        element.getBBoxWithoutRotation(),
-      );
+      bBoxes = selectedElements.map((element) => element.getRect());
       // 单个元素，要考虑旋转
       const element = selectedElements[0];
       const [cx, cy] = getRectCenterPoint(element);
@@ -288,14 +296,16 @@ export class SceneGraph {
       this.editor.setting.get('selectionHitPadding') /
       this.editor.zoomManager.getZoom();
 
+    let topHitElement: Graph | null = null;
     // TODO: optimize, use r-tree to reduce time complexity
     for (let i = this.children.length - 1; i >= 0; i--) {
       const el = this.children[i];
       if (el.hitTest(x, y, padding)) {
-        return el;
+        topHitElement = el;
+        break;
       }
     }
-    return null;
+    return topHitElement;
   }
   setSelection(partialRect: Partial<IRect>) {
     this.selection = Object.assign({}, this.selection, partialRect);
@@ -319,67 +329,9 @@ export class SceneGraph {
     for (const el of elements) {
       let isSelected = false;
       if (selectionMode === 'contain') {
-        isSelected = isRectContain(selection, el.getBBox());
+        isSelected = el.containWithRect(selection);
       } else {
-        // intersect mode
-        // if selection mode is invalid, rollback to intersect mode
-
-        // AABB intersect
-        if (!isRectIntersect(selection, el.getBBox())) {
-          isSelected = false;
-        } else {
-          if (!el.rotation || el.rotation % HALF_PI == 0) {
-            isSelected = true;
-          } else {
-            // OBB intersect
-            // use SAT algorithm to check intersect
-            const { x: cx, y: cy } = el.getCenter();
-            const r = -el.rotation;
-            const s1 = transformRotate(selection.x, selection.y, r, cx, cy);
-            const s2 = transformRotate(
-              selection.x + selection.width,
-              selection.y + selection.height,
-              r,
-              cx,
-              cy,
-            );
-            const s3 = transformRotate(
-              selection.x + selection.width,
-              selection.y,
-              r,
-              cx,
-              cy,
-            );
-            const s4 = transformRotate(
-              selection.x,
-              selection.y + selection.height,
-              r,
-              cx,
-              cy,
-            );
-
-            const rotatedSelectionX = Math.min(s1.x, s2.x, s3.x, s4.x);
-            const rotatedSelectionY = Math.min(s1.y, s2.y, s3.y, s4.y);
-            const rotatedSelectionWidth =
-              Math.max(s1.x, s2.x, s3.x, s4.x) - rotatedSelectionX;
-            const rotatedSelectionHeight =
-              Math.max(s1.y, s2.y, s3.y, s4.y) - rotatedSelectionY;
-
-            const rotatedSelection = {
-              x: rotatedSelectionX,
-              y: rotatedSelectionY,
-              width: rotatedSelectionWidth,
-              height: rotatedSelectionHeight,
-            };
-
-            isSelected = isRectIntersect(rotatedSelection, {
-              x: el.x,
-              y: el.y,
-              width: el.width,
-              height: el.height,
-            });
-          }
-        }
+        isSelected = el.intersectWithRect(selection);
       }
       if (isSelected) {
         containedElements.push(el);
@@ -389,13 +341,51 @@ export class SceneGraph {
   }
 
   /**
-   * get simple info (for layer panel)
+   * get tree data with simple info (for layer panel)
    */
-  getObjects() {
-    const children = this.children;
+  toObjects() {
+    const graphs = this.children;
     const objects: IObject[] = [];
-    forEach(children, (item) => {
-      objects.push({ id: item.id, name: item.objectName });
+
+    const groupManager = this.editor.groupManager;
+    const groupObjectMap = new Map<string, IObject & { children: IObject[] }>();
+
+    forEach(graphs, (item) => {
+      const obj = item.toObject();
+      const groupIds = Array.from(groupManager.getGraphGroupIds(item.id));
+
+      if (groupIds.length === 0) {
+        objects.push(obj);
+        return;
+      }
+
+      /**
+       * create group object
+       */
+      let prevGroupObj: (IObject & { children: IObject[] }) | null = null;
+      for (const groupId of groupIds) {
+        const groupObj = groupObjectMap.get(groupId);
+
+        if (!groupObj) {
+          const group = groupManager.getGroup(groupId);
+          if (!group) {
+            throw new Error('group not found');
+          }
+          const groupObj = { ...group.toObject(), children: [] };
+          groupObjectMap.set(groupId, groupObj);
+          if (!prevGroupObj) {
+            objects.push(groupObj);
+          }
+        }
+
+        const currGroupObj = groupObjectMap.get(groupId)!;
+        if (prevGroupObj && !prevGroupObj.children.includes(currGroupObj)) {
+          prevGroupObj.children.push(currGroupObj);
+        }
+        prevGroupObj = currGroupObj;
+      }
+
+      prevGroupObj!.children.push(obj);
     });
     return objects;
   }
@@ -404,24 +394,17 @@ export class SceneGraph {
     const paperData: IEditorPaperData = {
       appVersion: 'suika-editor_0.0.1',
       paperId: this.editor.paperId,
-      data: JSON.stringify(this.children),
+      groups: this.editor.groupManager.export(),
+      data: JSON.stringify(arrMap(this.children, (item) => item.toJSON())),
     };
     return JSON.stringify(paperData);
   }
 
   addGraphsByStr(str: string) {
-    const ctorMap = {
-      [GraphType.Graph]: Graph,
-      [GraphType.Rect]: Rect,
-      [GraphType.Ellipse]: Ellipse,
-      [GraphType.Line]: Line,
-      [GraphType.Text]: TextGraph,
-    };
-
     const data: GraphAttrs[] = JSON.parse(str);
     const newChildren = data.map((attrs) => {
       const type = attrs.type;
-      const Ctor = ctorMap[type!];
+      const Ctor = graphCtorMap[type!];
 
       if (!Ctor) {
         throw new Error('found wrong type of graph');

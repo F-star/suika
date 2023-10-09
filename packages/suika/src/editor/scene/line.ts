@@ -20,7 +20,7 @@ export class Line extends Graph {
     this.height = 0;
   }
 
-  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     const { x, y, width, rotation } = this;
     if (rotation) {
       const { x: cx, y: cy } = this.getCenter();

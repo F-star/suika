@@ -1,3 +1,5 @@
+import { IGroupsData } from '../editor/group_manager';
+
 export interface IRect {
   x: number;
   y: number;
@@ -42,6 +44,7 @@ export interface IPoint {
 export interface IObject {
   id: string;
   name: string;
+  children?: IObject[];
 }
 
 export enum GraphType {
@@ -50,6 +53,7 @@ export enum GraphType {
   Ellipse = 'Ellipse',
   Text = 'Text',
   Line = 'Line',
+  // Group = 'Group',
 }
 
 /**
@@ -65,6 +69,7 @@ export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export interface IEditorPaperData {
   appVersion: string;
   paperId: string;
+  groups: IGroupsData;
   data: string;
 }
 

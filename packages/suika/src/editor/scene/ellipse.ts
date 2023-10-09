@@ -12,7 +12,7 @@ export class Ellipse extends Graph {
   constructor(options: EllipseAttrs) {
     super({ ...options, type: GraphType.Ellipse });
   }
-  renderFillAndStrokeTexture(
+  draw(
     ctx: CanvasRenderingContext2D,
     imgManager: ImgManager,
     smooth: boolean,

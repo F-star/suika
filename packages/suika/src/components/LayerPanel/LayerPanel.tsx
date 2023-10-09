@@ -1,8 +1,8 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
 import { IObject } from '../../type';
-import LayerItem from './LayerItem/LayerItem';
 import './LayerPanel.scss';
+import { Tree } from './LayerItem/tree';
 
 export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);
@@ -11,10 +11,10 @@ export const LayerPanel: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      setObjects(editor.sceneGraph.getObjects()); // init
+      setObjects(editor.sceneGraph.toObjects());
 
       editor.sceneGraph.on('render', () => {
-        setObjects(editor.sceneGraph.getObjects());
+        setObjects(editor.sceneGraph.toObjects());
         setSelectedIds(editor.selectedElements.getIdSet());
       });
     }
@@ -39,18 +39,7 @@ export const LayerPanel: FC = () => {
 
   return (
     <div className="layer-panel" onClick={(e) => handleClick(e)}>
-      {objects
-        .map((item) => (
-          <LayerItem
-            active={selectedIds.has(item.id)}
-            key={item.id}
-            layerId={item.id}
-          >
-            {' '}
-            {item.name}
-          </LayerItem>
-        ))
-        .reverse()}
+      <Tree treeData={objects} activeIds={Array.from(selectedIds)} />
     </div>
   );
 };
