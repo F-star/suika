@@ -38,4 +38,6 @@ export const zh: typeof en = {
 
   'textureType.solid': '纯色',
   'textureType.image': '图片',
+
+  group: '创建编组',
 };

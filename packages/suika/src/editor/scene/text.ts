@@ -48,7 +48,7 @@ export class TextGraph extends Graph {
     };
   }
 
-  renderFillAndStrokeTexture(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;

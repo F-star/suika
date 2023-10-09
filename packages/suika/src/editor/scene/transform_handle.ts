@@ -115,8 +115,7 @@ export class TransformHandle {
     // 单个元素
     if (selectedElements.length === 1) {
       const singleSelectedElement = selectedElements[0];
-      const { x, y, width, height } =
-        singleSelectedElement.getBBoxWithoutRotation();
+      const { x, y, width, height } = singleSelectedElement.getRect();
       // 旋转控制点
       let rotation = {
         x: x + width / 2,

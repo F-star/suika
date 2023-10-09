@@ -36,4 +36,6 @@ export const en = {
 
   'textureType.solid': 'Solid',
   'textureType.image': 'Image',
+
+  group: 'Group selection',
 };

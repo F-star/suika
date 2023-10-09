@@ -7,6 +7,7 @@ import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
 import { AlignCmd, AlignType } from './commands/align';
 import { ArrangeCmd, ArrangeType } from './commands/arrange';
+import { GroupElements } from './commands/group';
 
 interface Events {
   itemsChange(items: Graph[]): void;
@@ -31,20 +32,7 @@ class SelectedElements {
     return new Set(this.items.map((item) => item.id));
   }
   setItemsById(ids: Set<string>) {
-    const items: Graph[] = [];
-    let count = ids.size;
-
-    const allGraphs = this.editor.sceneGraph.children;
-    for (let i = 0; i < allGraphs.length; i++) {
-      const item = allGraphs[i];
-      if (ids.has(item.id)) {
-        items.push(item);
-        count--;
-        if (count === 0) {
-          break;
-        }
-      }
-    }
+    const items = this.editor.sceneGraph.getElementsByIds(ids);
 
     if (items.length === 0) {
       console.warn('can not find element by id');
@@ -172,6 +160,16 @@ class SelectedElements {
 
   selectAll() {
     this.setItems([...this.editor.sceneGraph.children]);
+  }
+
+  group() {
+    if (this.size() === 0) {
+      console.warn('can not group, no element');
+      return;
+    }
+    this.editor.commandManager.pushCommand(
+      new GroupElements('Group Elements', this.editor, this.items),
+    );
   }
 }
 

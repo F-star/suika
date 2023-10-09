@@ -25,7 +25,9 @@ export class SetElementsAttrs implements ICommand {
     private prevAttrs: ISetElementsAttrsType[],
   ) {
     if (elements.length !== prevAttrs.length) {
-      throw new Error('elements 和 preAttrs 数量不匹配');
+      throw new Error(
+        `elements 和 preAttrs 数量不匹配 ${elements.length} ${prevAttrs.length}`,
+      );
     }
   }
   redo() {

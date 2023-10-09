@@ -138,7 +138,6 @@ export const TextureCard: FC<IProps> = ({
                           a: texture.attrs.a,
                         },
                       };
-                      console.log('newHex', newHex, newSolidTexture);
                       onChangeComplete(newSolidTexture, index);
                     }
                   }}

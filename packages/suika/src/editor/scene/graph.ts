@@ -6,6 +6,7 @@ import {
   GraphType,
   IPoint,
   IBox2WithRotation as IBoxWithRotation,
+  IRect,
 } from '../../type';
 import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
 import {
@@ -13,11 +14,15 @@ import {
   getElementRotatedXY,
   getRectCenterPoint,
   isPointInRect,
+  isRectContain,
+  isRectIntersect,
+  normalizeRadian,
   normalizeRect,
 } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';
+import { HALF_PI } from '../../constant';
 
 export interface GraphAttrs {
   type?: GraphType;
@@ -39,8 +44,8 @@ export class Graph {
   type = GraphType.Graph;
   id: string;
   objectName: string;
-  x: number;
-  y: number;
+  protected _x: number;
+  protected _y: number;
   width: number;
   height: number;
   // color
@@ -49,6 +54,20 @@ export class Graph {
   strokeWidth?: number;
   // transform
   rotation?: number;
+
+  get x() {
+    return this._x;
+  }
+  set x(val: number) {
+    this._x = val;
+  }
+  get y() {
+    return this._y;
+  }
+  set y(val: number) {
+    this._y = val;
+  }
+
   constructor(options: GraphAttrs) {
     this.type = options.type ?? this.type;
     this.id = options.id ?? genId();
@@ -60,8 +79,8 @@ export class Graph {
       this.objectName = objectNameGenerator.gen(options.type ?? this.type);
     }
 
-    this.x = options.x;
-    this.y = options.y;
+    this._x = options.x;
+    this._y = options.y;
     this.width = options.width;
     this.height = options.height;
 
@@ -104,13 +123,13 @@ export class Graph {
 
   /**
    * 计算包围盒（不考虑 strokeWidth）
-   * 考虑旋转
+   * 考虑旋转 (旋转后的正交包围盒)
    */
   getBBox(): IBox {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
     const rotation = this.rotation;
     if (!rotation) {
-      return this.getBBoxWithoutRotation();
+      return this.getRect();
     }
 
     const { x: nwX, y: nwY } = transformRotate(x, y, rotation, cx, cy); // 左上
@@ -136,7 +155,7 @@ export class Graph {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
     const rotation = this.rotation;
     if (!rotation) {
-      const box = this.getBBoxWithoutRotation();
+      const box = this.getRect();
       return {
         minX: box.x,
         minY: box.y,
@@ -181,7 +200,11 @@ export class Graph {
 
     return [nw, ne, se, sw];
   }
-  getBBoxWithoutRotation() {
+
+  /**
+   * get bbox before rotation
+   */
+  getRect() {
     return {
       x: this.x,
       y: this.y,
@@ -208,7 +231,7 @@ export class Graph {
     this.y = y;
   }
   hitTest(x: number, y: number, padding = 0) {
-    const bBox = this.getBBoxWithoutRotation();
+    const bBox = this.getRect();
     const [cx, cy] = getRectCenterPoint(bBox);
     const rotatedHitPoint = this.rotation
       ? transformRotate(x, y, -this.rotation, cx, cy)
@@ -216,6 +239,67 @@ export class Graph {
 
     return isPointInRect(rotatedHitPoint, bBox, padding);
   }
+
+  /**
+   * whether the element intersect with the rect
+   */
+  intersectWithRect(rect: IRect) {
+    let isIntersected = false;
+    if (!isRectIntersect(rect, this.getBBox())) {
+      isIntersected = false;
+    } else {
+      if (!this.rotation || this.rotation % HALF_PI == 0) {
+        isIntersected = true;
+      } else {
+        // OBB intersect
+        // use SAT algorithm to check intersect
+        const { x: cx, y: cy } = this.getCenter();
+        const r = -this.rotation;
+        const s1 = transformRotate(rect.x, rect.y, r, cx, cy);
+        const s2 = transformRotate(
+          rect.x + rect.width,
+          rect.y + rect.height,
+          r,
+          cx,
+          cy,
+        );
+        const s3 = transformRotate(rect.x + rect.width, rect.y, r, cx, cy);
+        const s4 = transformRotate(rect.x, rect.y + rect.height, r, cx, cy);
+
+        const rotatedSelectionX = Math.min(s1.x, s2.x, s3.x, s4.x);
+        const rotatedSelectionY = Math.min(s1.y, s2.y, s3.y, s4.y);
+        const rotatedSelectionWidth =
+          Math.max(s1.x, s2.x, s3.x, s4.x) - rotatedSelectionX;
+        const rotatedSelectionHeight =
+          Math.max(s1.y, s2.y, s3.y, s4.y) - rotatedSelectionY;
+
+        const rotatedSelection = {
+          x: rotatedSelectionX,
+          y: rotatedSelectionY,
+          width: rotatedSelectionWidth,
+          height: rotatedSelectionHeight,
+        };
+
+        isIntersected = isRectIntersect(rotatedSelection, {
+          x: this.x,
+          y: this.y,
+          width: this.width,
+          height: this.height,
+        });
+      }
+    }
+
+    return isIntersected;
+  }
+
+  /**
+   * whether the element contain with the rect
+   */
+  containWithRect(rect: IRect) {
+    const bbox = this.getBBox();
+    return isRectContain(rect, bbox) || isRectContain(bbox, rect);
+  }
+
   setRotatedX(rotatedX: number) {
     const { x: prevRotatedX } = getElementRotatedXY(this);
     this.x = this.x + rotatedX - prevRotatedX;
@@ -360,7 +444,7 @@ export class Graph {
       }),
     );
   }
-  renderFillAndStrokeTexture(
+  draw(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: CanvasRenderingContext2D,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -430,6 +514,53 @@ export class Graph {
       graph.x += dx;
       graph.y += dy;
     }
+  }
+
+  toJSON() {
+    return {
+      type: this.type,
+      id: this.id,
+      objectName: this.objectName,
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      fill: this.fill,
+      stroke: this.stroke,
+      strokeWidth: this.strokeWidth,
+      rotation: this.rotation,
+    };
+  }
+
+  /**
+   * get simple info (for layer panel)
+   */
+  toObject() {
+    return {
+      type: this.type,
+      id: this.id,
+      name: this.objectName,
+    };
+  }
+
+  /**
+   * add dRotate to rotation
+   */
+  dRotate(dRotation: number, initAttrs: IBoxWithRotation, center: IPoint) {
+    this.rotation = normalizeRadian(initAttrs.rotation + dRotation);
+
+    const [graphCx, graphCy] = getRectCenterPoint(initAttrs);
+
+    const { x, y } = transformRotate(
+      graphCx,
+      graphCy,
+      dRotation,
+      center.x,
+      center.y,
+    );
+
+    this.x = x - initAttrs.width / 2;
+    this.y = y - initAttrs.height / 2;
   }
 }
 
