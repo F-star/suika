@@ -39,6 +39,10 @@ Some Chinese language articles on how to develop a graphic editor.
 
 另外可以关注我的公众号，持续更新图形编辑器相关文章。
 
+## chat
+
+建了个图形编辑器交流的微信群，很多都是业内人士。如果你是做图形编辑器开发或是感兴趣的，可以加我微信 frstars，备注 “图形编辑器群”，我拉你进群。
+
 <img 
   width="550px"
   src="https://user-images.githubusercontent.com/18698939/219853531-e39e1537-99e6-40bf-a56f-81330fca3180.png" 
