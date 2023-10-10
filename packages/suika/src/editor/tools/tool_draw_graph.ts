@@ -70,9 +70,6 @@ export abstract class DrawGraphTool implements ITool {
   }
 
   start(e: PointerEvent) {
-    if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
-      return;
-    }
     this.startPoint = this.editor.getSceneCursorXY(
       e,
       this.editor.setting.get('snapToPixelGrid'),

@@ -74,11 +74,11 @@ export class ToolManager {
       isPressing = true;
       this.isDragging = false;
       startWithLeftMouse = false;
-      if (e.button !== 0) {
-        // must be left mouse button
-        return;
-      }
-      if (this.editor.textEditor.isEditing()) {
+      if (
+        e.button !== 0 || // is not left mouse
+        this.editor.textEditor.isEditing() || // is editing text mode
+        this.editor.hostEventManager.isSpacePressing // is dragging canvas mode
+      ) {
         return;
       }
 
