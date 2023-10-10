@@ -1,12 +1,15 @@
 import { FC, useEffect, useRef } from 'react';
 import { parseToNumber } from '../../utils/common';
 import CustomRuleInput from './CustomRuleInput';
+import { isNumberStr } from '../../utils/valid';
 
 interface INumberInputProps {
   value: string | number;
   min?: number;
   onBlur: (newValue: number) => void;
   prefix?: React.ReactNode;
+  /** suffix string after input value, such like ° => 12.34° */
+  suffixValue?: string;
 }
 
 const NumberInput: FC<INumberInputProps> = ({
@@ -14,6 +17,7 @@ const NumberInput: FC<INumberInputProps> = ({
   min = -Infinity,
   onBlur,
   prefix,
+  suffixValue = '',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,6 +32,10 @@ const NumberInput: FC<INumberInputProps> = ({
       prefix={prefix}
       parser={(str) => {
         str = str.trim();
+        if (suffixValue && str.endsWith(suffixValue)) {
+          str = str.slice(0, -suffixValue.length);
+        }
+
         let num = parseToNumber(str);
         if (!Number.isNaN(num) && num !== value) {
           num = Math.max(min, num);
@@ -36,7 +44,7 @@ const NumberInput: FC<INumberInputProps> = ({
           return false;
         }
       }}
-      value={value}
+      value={isNumberStr(String(value)) ? value + suffixValue : value}
       onBlur={(newVal) => onBlur(Number(newVal))}
     />
   );

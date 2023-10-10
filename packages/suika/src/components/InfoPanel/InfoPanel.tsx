@@ -2,7 +2,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
 import { GraphAttrs } from '../../editor/scene/graph';
 import { AlignCard } from '../Cards/AlignCard';
-import ElementsInfoCards from '../Cards/ElementsInfoCard';
+import { ElementsInfoCards } from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
 import './style.scss';
 import { FormattedMessage } from 'react-intl';
