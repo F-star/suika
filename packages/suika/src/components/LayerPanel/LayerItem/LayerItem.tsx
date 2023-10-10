@@ -19,10 +19,14 @@ const LayerItem: FC<IProps> = ({
   activeIds = [],
   level = 0,
 }) => {
+  const prefixWidth = level * 16;
   return (
     <>
       <div className={classNames('layer-item', { active })} data-layer-id={id}>
-        <div style={{ width: level * 16 }} />
+        <div
+          style={{ width: prefixWidth, minWidth: prefixWidth }}
+          data-layer-id={id}
+        />
         {name}
       </div>
       {children && (

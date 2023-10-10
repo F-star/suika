@@ -7,8 +7,10 @@
     height: 32px;
     line-height: 30px;
     font-size: 12px;
-
     color: #333;
+
+    white-space: nowrap;
+    overflow: hidden;
 
     &:hover {
       border-color: #0f8fff;
