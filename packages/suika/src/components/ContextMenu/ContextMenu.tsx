@@ -125,7 +125,7 @@ export const ContextMenu: FC = () => {
       <>
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+C' : '⌘C'}
+          suffix={isWindows ? 'Ctrl+G' : '⌘G'}
           onClick={() => {
             setVisible(false);
             if (editor) {
