@@ -231,6 +231,20 @@ export class CommandKeyBinding {
       actionName: 'Backward',
       action: backwardAction,
     });
+
+    /*************** group **************/
+    // group
+    const groupAction = () => {
+      editor.selectedElements.group();
+      editor.sceneGraph.render();
+    };
+    editor.keybindingManager.register({
+      key: { metaKey: true, keyCode: 'KeyG' },
+      winKey: { ctrlKey: true, keyCode: 'KeyG' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'Group',
+      action: groupAction,
+    });
   }
 
   destroy() {
