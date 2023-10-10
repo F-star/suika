@@ -20,7 +20,9 @@ export const LayerPanel: FC = () => {
     }
   }, [editor]);
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleMouseDown = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
     if (!editor) return;
     const target = event.target;
 
@@ -38,7 +40,7 @@ export const LayerPanel: FC = () => {
   };
 
   return (
-    <div className="layer-panel" onClick={(e) => handleClick(e)}>
+    <div className="layer-panel" onMouseDown={(e) => handleMouseDown(e)}>
       <Tree treeData={objects} activeIds={Array.from(selectedIds)} />
     </div>
   );
