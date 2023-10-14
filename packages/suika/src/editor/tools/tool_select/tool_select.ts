@@ -1,6 +1,5 @@
 import throttle from 'lodash.throttle';
 import { Graph } from '../../scene/graph';
-import { Rect } from '../../scene/rect';
 import { IPoint } from '../../../type';
 import { Editor } from '../../editor';
 import { IBaseTool, ITool } from '../type';
@@ -19,18 +18,30 @@ export class SelectTool implements ITool {
   type = 'select';
   hotkey = 'v';
 
-  startPoint: IPoint = { x: -1, y: -1 };
-  drawingRect: Rect | null = null;
-  currStrategy: IBaseTool | null = null;
+  private startPoint: IPoint = { x: -1, y: -1 };
+  private currStrategy: IBaseTool | null = null;
   // 策略
-  strategyMove: SelectMoveTool;
-  strategyDrawSelectionBox: DrawSelectionBox;
-  strategySelectRotation: SelectRotationTool;
-  strategySelectResize: SelectResizeTool;
+  private strategyMove: SelectMoveTool;
+  private strategyDrawSelectionBox: DrawSelectionBox;
+  private strategySelectRotation: SelectRotationTool;
+  private strategySelectResize: SelectResizeTool;
 
   // 鼠标按下时选中的元素，在鼠标释放时可能会用到。shift 取消一个元素时需要使用
-  topHitElementWhenStart: Graph | null = null;
-  isDragHappened = false; // 发生过拖拽
+  private topHitElementWhenStart: Graph | null = null;
+  private isDragHappened = false; // 发生过拖拽
+
+  private handleHoverItemChange = () => {
+    if (!this.editor.toolManager.isDragging) {
+      this.editor.sceneGraph.render();
+    }
+  };
+
+  private handleSpaceToggle = (press: boolean) => {
+    if (press) {
+      this.editor.selectedElements.setHoverItem(null);
+    }
+    // TODO: resetHoverItem after drag canvas end
+  };
 
   constructor(private editor: Editor) {
     this.strategyMove = new SelectMoveTool(editor);
@@ -40,30 +51,55 @@ export class SelectTool implements ITool {
   }
   active() {
     this.editor.setCursor('default');
+
+    this.editor.selectedElements.on(
+      'hoverItemChange',
+      this.handleHoverItemChange,
+    );
+    this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
   }
   inactive() {
     this.editor.setCursor('default');
 
+    this.editor.selectedElements.off(
+      'hoverItemChange',
+      this.handleHoverItemChange,
+    );
+    this.editor.hostEventManager.off('spaceToggle', this.handleSpaceToggle);
+
     this.editor.selectedElements.clear();
     this.editor.sceneGraph.render();
   }
+
   moveExcludeDrag(e: PointerEvent) {
-    this.setCursorByMouse(e);
+    this.updateCursorAndHlHoverGraph(e);
   }
-  setCursorByMouse = throttle((e: PointerEvent) => {
+
+  private updateCursorAndHlHoverGraph = throttle((e: PointerEvent) => {
     if (this.editor.hostEventManager.isSpacePressing) {
       return;
     }
     const pointer = this.editor.getSceneCursorXY(e);
     const { cursor } =
       this.editor.sceneGraph.transformHandle.getNameByPoint(pointer);
-
     this.editor.setCursor(cursor || 'default');
-  }, 50);
+
+    if (cursor) {
+      this.editor.selectedElements.setHoverItem(null);
+    } else {
+      const topHitElement = this.editor.sceneGraph.getTopHitElement(
+        pointer.x,
+        pointer.y,
+      );
+      this.editor.selectedElements.setHoverItem(topHitElement);
+    }
+  }, 20);
+
   start(e: PointerEvent) {
     this.currStrategy = null;
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
+    this.editor.selectedElements.setHoverItem(null);
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
@@ -174,6 +210,7 @@ export class SelectTool implements ITool {
     this.currStrategy?.afterEnd(e);
 
     this.currStrategy = null;
-    this.setCursorByMouse(e);
+    this.updateCursorAndHlHoverGraph(e);
+    this.editor.selectedElements.setHoverItem(null);
   }
 }

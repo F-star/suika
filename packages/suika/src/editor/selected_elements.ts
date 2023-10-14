@@ -11,10 +11,12 @@ import { GroupElements } from './commands/group';
 
 interface Events {
   itemsChange(items: Graph[]): void;
+  hoverItemChange(item: Graph | null, prevItem: Graph | null): void;
 }
 
 class SelectedElements {
   private items: Graph[] = [];
+  private hoverItem: Graph | null = null;
   private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
@@ -40,6 +42,11 @@ class SelectedElements {
       this.setItems(items);
     }
   }
+
+  hasItem(item: Graph) {
+    return this.items.includes(item);
+  }
+
   clear() {
     this.items = [];
     this.eventEmitter.emit('itemsChange', this.items);
@@ -101,12 +108,15 @@ class SelectedElements {
     }
     return this.items[0].rotation || 0;
   }
-  on(eventName: 'itemsChange', handler: (items: Graph[]) => void) {
+
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'itemsChange', handler: (items: Graph[]) => void) {
+
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
+
   removeFromScene() {
     if (this.isEmpty()) {
       return;
@@ -139,11 +149,6 @@ class SelectedElements {
       console.warn("can't arrange, no element");
     }
 
-    /**
-     * TODO:
-     * if the selected graphs had already in the top, stop exec front command
-     * also other arrange type
-     */
     if (
       ArrangeCmd.shouldExecCmd(
         type,
@@ -170,6 +175,18 @@ class SelectedElements {
     this.editor.commandManager.pushCommand(
       new GroupElements('Group Elements', this.editor, this.items),
     );
+  }
+
+  setHoverItem(graph: Graph | null) {
+    const prevHoverItem = this.hoverItem;
+    this.hoverItem = graph;
+    if (prevHoverItem !== graph) {
+      this.eventEmitter.emit('hoverItemChange', graph, this.hoverItem);
+    }
+  }
+
+  getHoverItem(): Graph | null {
+    return this.hoverItem;
   }
 }
 

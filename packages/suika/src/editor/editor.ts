@@ -88,7 +88,6 @@ export class Editor {
     this.cursorManager = new CursorManger(this);
     this.viewportManager = new ViewportManager(this);
 
-    this.toolManager = new ToolManager(this);
     this.commandManager = new CommandManager(this);
     this.zoomManager = new ZoomManager(this);
     this.imgManager = new ImgManager();
@@ -100,6 +99,8 @@ export class Editor {
 
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
+
+    this.toolManager = new ToolManager(this);
 
     this.clipboard = new ClipboardManager(this);
     this.clipboard.bindEvents();

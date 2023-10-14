@@ -141,14 +141,14 @@ export class SceneGraph {
       ctx.restore();
     }
 
-    /******************* 绘制辅助线层 ********************/
+    /********** draw guide line *********/
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
     const selectedElementsBBox = this.editor.selectedElements.getBBox();
 
-    // 1. draw pixel grid
+    /** draw pixel grid */
     if (
       setting.get('enablePixelGrid') &&
       zoom >= this.editor.setting.get('minPixelGridZoom')
@@ -156,12 +156,22 @@ export class SceneGraph {
       this.grid.draw();
     }
 
-    // 2. draw selected elements bbox
-    if (this.showOutline) {
-      this.highLightSelectedBox(selectedElementsBBox);
+    /** draw hover graph outline */
+    if (setting.get('highlightLayersOnHover')) {
+      const hoverGraph = this.editor.selectedElements.getHoverItem();
+      if (hoverGraph && !this.editor.selectedElements.hasItem(hoverGraph)) {
+        const strokeWidth = setting.get('hoverOutlineStrokeWidth');
+        this.drawGraphsOutline([hoverGraph], { strokeWidth: strokeWidth });
+      }
     }
 
-    // 3. draw selectionBox
+    /** draw selected elements bbox */
+    if (this.showOutline) {
+      this.drawSelectedBox(selectedElementsBBox);
+      this.drawGraphsOutline(this.editor.selectedElements.getItems());
+    }
+
+    /** draw selection */
     if (this.selection) {
       ctx.save();
       ctx.strokeStyle = setting.get('selectionStroke');
@@ -184,14 +194,14 @@ export class SceneGraph {
       ctx.restore();
     }
 
-    // 4. draw transform handle
+    /** draw transform handle */
     if (this.showOutline) {
       this.transformHandle.draw(selectedElementsBBox);
     }
 
     this.editor.refLine.drawRefLine(ctx);
 
-    // 5. drawing rulers
+    /** drawing rulers */
     if (setting.get('enableRuler')) {
       this.editor.ruler.draw();
     }
@@ -200,33 +210,28 @@ export class SceneGraph {
 
     this.eventEmitter.emit('render');
   });
-  /**
-   * 光标是否落在旋转控制点上
-   */
 
-  /**
-   * 绘制每个元素的轮廓，以及包围它们的包围盒
-   */
-  private highLightSelectedBox(selectedElementsBBox: IBox | null) {
-    /******* 绘制每个元素的包围盒（FIXME: 改为绘制轮廓） *******/
-    if (selectedElementsBBox === null) {
+  private drawGraphsOutline(
+    graphs: Graph[],
+    options?: { strokeWidth: number },
+  ) {
+    if (graphs.length === 0) {
       return;
     }
-    const selectedElements = this.editor.selectedElements.getItems();
 
-    const bBoxes = selectedElements.map((element) => element.getRect());
-
+    const bBoxes = graphs.map((element) => element.getRect());
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
 
     ctx.save();
-    // TODO: 椭圆图形，要绘制圆形轮廓
+    ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
+    if (options?.strokeWidth) {
+      ctx.lineWidth = options.strokeWidth;
+    }
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
       const bBox = bBoxes[i];
-      ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
-
-      const currElement = selectedElements[i];
+      const currElement = graphs[i];
       if (currElement.rotation) {
         const [cx, cy] = getRectCenterPoint(bBox);
         const { x: cxInViewport, y: cyInViewport } =
@@ -243,7 +248,21 @@ export class SceneGraph {
       );
       ctx.restore();
     }
+    ctx.restore();
+  }
 
+  /**
+   * 绘制每个元素的轮廓，以及包围它们的包围盒
+   */
+  private drawSelectedBox(selectedElementsBBox: IBox | null) {
+    if (selectedElementsBBox === null) {
+      return;
+    }
+    const selectedElements = this.editor.selectedElements.getItems();
+    const zoom = this.editor.zoomManager.getZoom();
+    const ctx = this.editor.ctx;
+
+    ctx.save();
     /********** 绘制多个图形组成的包围盒 *********/
     // 只有单个选中元素，不绘制选中盒
 

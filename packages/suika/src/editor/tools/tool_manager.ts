@@ -71,7 +71,7 @@ export class ToolManager {
     let startWithLeftMouse = false;
 
     const handleDown = (e: PointerEvent) => {
-      isPressing = true;
+      isPressing = false;
       this.isDragging = false;
       startWithLeftMouse = false;
       if (
@@ -82,6 +82,7 @@ export class ToolManager {
         return;
       }
 
+      isPressing = true;
       startWithLeftMouse = true;
       if (!this.currentTool) {
         throw new Error('there is no active tool');
