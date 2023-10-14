@@ -7,8 +7,9 @@ import { CommandKeyBinding } from './command_key_binding';
 import { ICursor } from '../cursor_manager';
 
 interface Events {
-  shiftToggle(): void;
-  altToggle(): void;
+  shiftToggle(press: boolean): void;
+  altToggle(press: boolean): void;
+  spaceToggle(press: boolean): void;
   contextmenu(point: IPoint): void;
 }
 
@@ -60,7 +61,7 @@ export class HostEventManager {
         }
 
         if (prev !== this.isShiftPressing) {
-          this.eventEmitter.emit('shiftToggle');
+          this.eventEmitter.emit('shiftToggle', this.isShiftPressing);
         }
       }
       if (hotkeys.ctrl) {
@@ -80,7 +81,7 @@ export class HostEventManager {
         }
 
         if (prev !== this.isAltPressing) {
-          this.eventEmitter.emit('altToggle');
+          this.eventEmitter.emit('altToggle', this.isAltPressing);
         }
       }
       if (hotkeys.command) {
@@ -98,6 +99,10 @@ export class HostEventManager {
         this.isSpacePressing = true;
       } else if (event.type === 'keyup') {
         this.isSpacePressing = false;
+      }
+
+      if (prev !== this.isSpacePressing) {
+        this.eventEmitter.emit('spaceToggle', this.isSpacePressing);
       }
 
       // 按住按键会不停触发响应函数，下面这种写法则只会在按下和释放时分别执行一次

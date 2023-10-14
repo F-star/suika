@@ -34,6 +34,9 @@ export class Setting {
     // 点选时，加一个 padding，使得点选更容易
     selectionHitPadding: 4,
 
+    highlightLayersOnHover: true,
+    hoverOutlineStrokeWidth: 2,
+
     /******** transform ********/
     handleRotationStroke: '#1592fe',
     handleRotationFill: '#fff',
