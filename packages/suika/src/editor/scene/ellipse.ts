@@ -12,6 +12,15 @@ export class Ellipse extends Graph {
   constructor(options: EllipseAttrs) {
     super({ ...options, type: GraphType.Ellipse });
   }
+
+  override hitTest(x: number, y: number, padding = 0) {
+    const cx = this.x + this.width / 2;
+    const cy = this.y + this.height / 2;
+    const w = this.width / 2 + padding;
+    const h = this.height / 2 + padding;
+    return (x - cx) ** 2 / w ** 2 + (y - cy) ** 2 / h ** 2 <= 1;
+  }
+
   draw(
     ctx: CanvasRenderingContext2D,
     imgManager: ImgManager,
