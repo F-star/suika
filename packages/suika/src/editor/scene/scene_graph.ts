@@ -174,18 +174,20 @@ export class SceneGraph {
         !this.editor.selectedElements.hasItem(hoverGraph)
       ) {
         const strokeWidth = setting.get('hoverOutlineStrokeWidth');
-        this.drawGraphsOutline([hoverGraph], { strokeWidth: strokeWidth });
+        this.drawGraphsBbox([hoverGraph], { strokeWidth: strokeWidth });
       }
     }
 
     /** draw selected elements bbox */
     if (this.showOutline) {
-      this.drawSelectedBox(selectedElementsBBox);
-      this.drawGraphsOutline(
+      this.drawGraphsBbox(
         this.editor.selectedElements
           .getItems()
           .filter((item) => item.getVisible()),
       );
+      // TODO: draw outline
+      // for performance consideration, currently only draw bounding box
+      this.drawMixedSelectedBox(selectedElementsBBox);
     }
 
     /** draw selection */
@@ -228,9 +230,9 @@ export class SceneGraph {
     this.eventEmitter.emit('render');
   });
 
-  private drawGraphsOutline(
+  private drawGraphsBbox(
     graphs: Graph[],
-    options?: { strokeWidth: number },
+    options?: { strokeWidth?: number; stroke?: string },
   ) {
     if (graphs.length === 0) {
       return;
@@ -245,6 +247,10 @@ export class SceneGraph {
     if (options?.strokeWidth) {
       ctx.lineWidth = options.strokeWidth;
     }
+    if (options?.stroke) {
+      ctx.strokeStyle = options.stroke;
+    }
+
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
       const bBox = bBoxes[i];
@@ -268,10 +274,8 @@ export class SceneGraph {
     ctx.restore();
   }
 
-  /**
-   * 绘制每个元素的轮廓，以及包围它们的包围盒
-   */
-  private drawSelectedBox(selectedElementsBBox: IBox | null) {
+  /** draw the mixed bounding box of selected elements */
+  private drawMixedSelectedBox(selectedElementsBBox: IBox | null) {
     if (selectedElementsBBox === null) {
       return;
     }
@@ -279,19 +283,26 @@ export class SceneGraph {
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
 
+    const stroke = this.editor.setting.get('guideBBoxStroke');
+
     ctx.save();
-    ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
-    const { x: xInViewport, y: yInViewport } =
-      this.editor.sceneCoordsToViewport(
-        selectedElementsBBox.x,
-        selectedElementsBBox.y,
+    if (this.editor.selectedElements.size() === 1) {
+      this.drawGraphsBbox(this.editor.selectedElements.getItems(), { stroke });
+    } else {
+      ctx.strokeStyle = stroke;
+      const { x: xInViewport, y: yInViewport } =
+        this.editor.sceneCoordsToViewport(
+          selectedElementsBBox.x,
+          selectedElementsBBox.y,
+        );
+      ctx.strokeRect(
+        xInViewport,
+        yInViewport,
+        selectedElementsBBox.width * zoom,
+        selectedElementsBBox.height * zoom,
       );
-    ctx.strokeRect(
-      xInViewport,
-      yInViewport,
-      selectedElementsBBox.width * zoom,
-      selectedElementsBBox.height * zoom,
-    );
+    }
+
     ctx.restore();
   }
   /**
