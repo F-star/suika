@@ -60,12 +60,22 @@ export class SceneGraph {
     this.transformHandle = new TransformHandle(editor);
     this.grid = new Grid(editor);
   }
+
   addItems(element: Graph[], idx?: number) {
     if (idx === undefined) {
       this.children.push(...element);
     } else {
       this.children.splice(idx, 0, ...element);
     }
+  }
+
+  getItems() {
+    return this.children;
+  }
+
+  getVisibleItems() {
+    // TODO: cache if items are not changed
+    return this.children.filter((item) => item.getVisible());
   }
 
   getElementById(id: string): Graph | undefined {
@@ -102,14 +112,13 @@ export class SceneGraph {
     const zoom = this.editor.zoomManager.getZoom();
     const viewportBoxInScene = this.editor.viewportManager.getBbox();
 
-    const visibleElements: Graph[] = [];
+    const visibleGraphs = this.getVisibleItems();
+    const visibleGraphsInViewport: Graph[] = [];
     // 1. 找出视口下所有元素
     // 暂时都认为是矩形
-    for (let i = 0, len = this.children.length; i < len; i++) {
-      const shape = this.children[i];
-
-      if (isRectIntersect(shape.getBBox(), viewportBoxInScene)) {
-        visibleElements.push(shape);
+    for (const graph of visibleGraphs) {
+      if (isRectIntersect(graph.getBBox(), viewportBoxInScene)) {
+        visibleGraphsInViewport.push(graph);
       }
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -132,9 +141,9 @@ export class SceneGraph {
     ctx.translate(dx, dy);
 
     const imgManager = this.editor.imgManager;
-    for (let i = 0, len = visibleElements.length; i < len; i++) {
+    for (let i = 0, len = visibleGraphsInViewport.length; i < len; i++) {
       ctx.save();
-      const element = visibleElements[i];
+      const element = visibleGraphsInViewport[i];
       // 抗锯齿
       const smooth = zoom <= 1;
       element.draw(ctx, imgManager, smooth);
@@ -159,7 +168,11 @@ export class SceneGraph {
     /** draw hover graph outline */
     if (setting.get('highlightLayersOnHover')) {
       const hoverGraph = this.editor.selectedElements.getHoverItem();
-      if (hoverGraph && !this.editor.selectedElements.hasItem(hoverGraph)) {
+      if (
+        hoverGraph &&
+        hoverGraph.getVisible() &&
+        !this.editor.selectedElements.hasItem(hoverGraph)
+      ) {
         const strokeWidth = setting.get('hoverOutlineStrokeWidth');
         this.drawGraphsOutline([hoverGraph], { strokeWidth: strokeWidth });
       }
@@ -168,7 +181,11 @@ export class SceneGraph {
     /** draw selected elements bbox */
     if (this.showOutline) {
       this.drawSelectedBox(selectedElementsBBox);
-      this.drawGraphsOutline(this.editor.selectedElements.getItems());
+      this.drawGraphsOutline(
+        this.editor.selectedElements
+          .getItems()
+          .filter((item) => item.getVisible()),
+      );
     }
 
     /** draw selection */
@@ -319,7 +336,7 @@ export class SceneGraph {
     // TODO: optimize, use r-tree to reduce time complexity
     for (let i = this.children.length - 1; i >= 0; i--) {
       const el = this.children[i];
-      if (el.hitTest(x, y, padding)) {
+      if (el.getVisible() && el.hitTest(x, y, padding)) {
         topHitElement = el;
         break;
       }
@@ -342,7 +359,7 @@ export class SceneGraph {
     }
 
     const selectionMode = this.editor.setting.get('selectionMode');
-    const elements = this.children;
+    const elements = this.getVisibleItems();
     const containedElements: Graph[] = [];
     // TODO: optimize, use r-tree to reduce time complexity
     for (const el of elements) {

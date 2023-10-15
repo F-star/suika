@@ -3,6 +3,7 @@ import { EditorContext } from '../../context';
 import { IObject } from '../../type';
 import './LayerPanel.scss';
 import { Tree } from './LayerItem/tree';
+import { MutateGraphsAndRecord } from '../../editor/service/mutate_graphs_and_record';
 
 export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);
@@ -39,9 +40,23 @@ export const LayerPanel: FC = () => {
     }
   };
 
+  const toggleVisible = (id: string | number) => {
+    if (editor) {
+      const graph = editor.sceneGraph.getElementById(id as string);
+      if (graph) {
+        MutateGraphsAndRecord.toggleVisible(editor, [graph]);
+        editor.sceneGraph.render();
+      }
+    }
+  };
+
   return (
     <div className="layer-panel" onMouseDown={(e) => handleMouseDown(e)}>
-      <Tree treeData={objects} activeIds={Array.from(selectedIds)} />
+      <Tree
+        treeData={objects}
+        activeIds={Array.from(selectedIds)}
+        toggleVisible={toggleVisible}
+      />
     </div>
   );
 };

@@ -1,5 +1,3 @@
-import { SetElementsAttrs } from '../commands/set_elements_attrs';
-import { Editor } from '../editor';
 import {
   IBox,
   IBox2,
@@ -38,6 +36,7 @@ export interface GraphAttrs {
   strokeWidth?: number;
   // transform 相关
   rotation?: number;
+  visible?: boolean;
 }
 
 export class Graph {
@@ -54,6 +53,7 @@ export class Graph {
   strokeWidth?: number;
   // transform
   rotation?: number;
+  visible?: boolean;
 
   get x() {
     return this._x;
@@ -96,6 +96,9 @@ export class Graph {
     if (options.rotation) {
       this.rotation = options.rotation;
     }
+    if (options.visible !== undefined) {
+      this.visible = options.visible;
+    }
   }
   getAttrs(): GraphAttrs {
     return {
@@ -110,6 +113,7 @@ export class Graph {
       stroke: this.stroke,
       strokeWidth: this.strokeWidth,
       rotation: this.rotation,
+      visible: this.visible,
     };
   }
   setAttrs(attrs: Partial<GraphAttrs>) {
@@ -529,7 +533,12 @@ export class Graph {
       stroke: this.stroke,
       strokeWidth: this.strokeWidth,
       rotation: this.rotation,
+      visible: this.visible,
     };
+  }
+
+  getVisible() {
+    return this.visible ?? true;
   }
 
   /**
@@ -538,6 +547,7 @@ export class Graph {
   toObject() {
     return {
       type: this.type,
+      visible: this.getVisible(),
       id: this.id,
       name: this.objectName,
     };
@@ -563,126 +573,3 @@ export class Graph {
     this.y = y - initAttrs.height / 2;
   }
 }
-
-/**
- * 修改元素并保存到历史记录
- */
-
-export const MutateElementsAndRecord = {
-  setRotateX(editor: Editor, elements: Graph[], rotatedX: number) {
-    if (elements.length === 0) {
-      return;
-    }
-    // 1. 计算新的 x
-    const prevXs: { x: number }[] = new Array(elements.length);
-    for (let i = 0, len = elements.length; i < len; i++) {
-      const element = elements[i];
-      prevXs[i] = { x: element.x };
-      element.setRotatedX(rotatedX);
-    }
-    // 2. 保存到历史记录
-    editor.commandManager.pushCommand(
-      new SetElementsAttrs(
-        'Update X of Elements',
-        elements,
-        elements.map((el) => ({ x: el.x })),
-        prevXs,
-      ),
-    );
-  },
-  setRotateY(editor: Editor, elements: Graph[], rotatedY: number) {
-    if (elements.length === 0) {
-      return;
-    }
-    // 1. 计算新的 x
-    const prevXs: { y: number }[] = new Array(elements.length);
-    for (let i = 0, len = elements.length; i < len; i++) {
-      const element = elements[i];
-      prevXs[i] = { y: element.y };
-      element.setRotatedY(rotatedY);
-    }
-    // 2. 保存到历史记录
-    editor.commandManager.pushCommand(
-      new SetElementsAttrs(
-        'Update Y of Elements',
-        elements,
-        elements.map((el) => ({ y: el.y })),
-        prevXs,
-      ),
-    );
-  },
-  setWidth(editor: Editor, elements: Graph[], width: number) {
-    if (elements.length === 0) {
-      return;
-    }
-
-    const prevAttrs = elements.map((el) => ({
-      x: el.x,
-      y: el.y,
-      width: el.width,
-    }));
-    elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(el);
-      el.width = width;
-      const { x: rotatedX, y: rotatedY } = getElementRotatedXY(el);
-      const dx = rotatedX - preRotatedX;
-      const dy = rotatedY - preRotatedY;
-      el.x -= dx;
-      el.y -= dy;
-    });
-    editor.commandManager.pushCommand(
-      new SetElementsAttrs(
-        'Update Width of Elements',
-        elements,
-        elements.map((el) => ({ width: el.width, x: el.x, y: el.y })),
-        prevAttrs,
-      ),
-    );
-  },
-  setHeight(editor: Editor, elements: Graph[], height: number) {
-    if (elements.length === 0) {
-      return;
-    }
-
-    const prevAttrs = elements.map((el) => ({
-      x: el.x,
-      y: el.y,
-      height: el.height,
-    }));
-    elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(el);
-      el.height = height;
-      const { x: rotatedX, y: rotatedY } = getElementRotatedXY(el);
-      const dx = rotatedX - preRotatedX;
-      const dy = rotatedY - preRotatedY;
-      el.x -= dx;
-      el.y -= dy;
-    });
-    editor.commandManager.pushCommand(
-      new SetElementsAttrs(
-        'update Height of Elements',
-        elements,
-        elements.map((el) => ({ height: el.height, x: el.x, y: el.y })),
-        prevAttrs,
-      ),
-    );
-  },
-  setRotation(editor: Editor, elements: Graph[], rotation: number) {
-    if (elements.length === 0) {
-      return;
-    }
-
-    const prevAttrs = elements.map((el) => ({ rotation: el.rotation || 0 }));
-    elements.forEach((el) => {
-      el.rotation = rotation;
-    });
-    editor.commandManager.pushCommand(
-      new SetElementsAttrs(
-        'update Rotation',
-        elements,
-        { rotation },
-        prevAttrs,
-      ),
-    );
-  },
-};

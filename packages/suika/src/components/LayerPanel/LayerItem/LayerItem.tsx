@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { FC } from 'react';
 import './LayerItem.scss';
+import { HideOutlined, ShowOutlined } from '@suika/icons';
 
 interface IProps {
   id: string | number;
@@ -9,6 +10,9 @@ interface IProps {
   active?: boolean;
   level?: number;
   activeIds?: (string | number)[];
+  hoverId?: string | number;
+  visible?: boolean;
+  toggleVisible?: (id: string | number) => void;
 }
 
 const LayerItem: FC<IProps> = ({
@@ -18,16 +22,34 @@ const LayerItem: FC<IProps> = ({
   id,
   activeIds = [],
   level = 0,
+  visible = true,
+  toggleVisible,
 }) => {
-  const prefixWidth = level * 16;
+  const indentWidth = level * 16;
   return (
     <>
-      <div className={classNames('layer-item', { active })} data-layer-id={id}>
+      <div
+        className={classNames('sk-layer-item', {
+          'sk-active': active,
+          'sk-hidden': !visible,
+        })}
+        data-layer-id={id}
+      >
         <div
-          style={{ width: prefixWidth, minWidth: prefixWidth }}
+          style={{ width: indentWidth, minWidth: indentWidth }}
           data-layer-id={id}
         />
         {name}
+        <div className="sk-layer-item-actions">
+          <span
+            style={{ fontSize: 0 }}
+            onClick={() => {
+              toggleVisible && toggleVisible(id);
+            }}
+          >
+            {visible ? <ShowOutlined /> : <HideOutlined />}
+          </span>
+        </div>
       </div>
       {children && (
         <div className="layer-item-children">

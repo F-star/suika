@@ -43,6 +43,8 @@ export interface IPoint {
 
 export interface IObject {
   id: string;
+  type: string;
+  visible: boolean;
   name: string;
   children?: IObject[];
 }

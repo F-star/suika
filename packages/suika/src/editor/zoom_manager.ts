@@ -142,11 +142,12 @@ export class ZoomManager {
    * reference: https://mp.weixin.qq.com/s/XtNEl1dWCYkTIKStne4A4w
    */
   zoomToFit(maxZoom?: number) {
-    if (this.editor.sceneGraph.children.length === 0) {
+    const visibleGraphs = this.editor.sceneGraph.getVisibleItems();
+    if (visibleGraphs.length === 0) {
       this.reset();
       return;
     }
-    const bboxs = this.editor.sceneGraph.children.map((item) => item.getBBox());
+    const bboxs = visibleGraphs.map((item) => item.getBBox());
     this.zoomBoxToFit(getRectsBBox(...bboxs), maxZoom);
   }
   private getCanvasCenter() {

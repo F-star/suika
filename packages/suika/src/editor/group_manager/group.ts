@@ -24,6 +24,8 @@ export class Group implements IGroupAttrs {
   toObject(): IObject {
     return {
       id: this.id,
+      type: 'group',
+      visible: true,
       name: this.objectName,
     };
   }

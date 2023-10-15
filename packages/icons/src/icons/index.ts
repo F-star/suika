@@ -8,3 +8,5 @@ export * from './check-outlined';
 export * from './social';
 export * from './remove-outlined';
 export * from './line-width-outlined';
+export * from './show-outlined';
+export * from './hide-outlined';

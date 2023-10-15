@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
-import { MutateElementsAndRecord } from '../../../editor/scene/graph';
+import { MutateGraphsAndRecord } from '../../../editor/service/mutate_graphs_and_record';
 import { remainDecimal } from '../../../utils/common';
 import {
   degree2Radian,
@@ -107,11 +107,7 @@ export const ElementsInfoCards: FC = () => {
             onBlur: (newRotatedX: number) => {
               if (editor) {
                 const elements = editor.selectedElements.getItems();
-                MutateElementsAndRecord.setRotateX(
-                  editor,
-                  elements,
-                  newRotatedX,
-                );
+                MutateGraphsAndRecord.setRotateX(editor, elements, newRotatedX);
                 editor.sceneGraph.render();
               }
             },
@@ -122,11 +118,7 @@ export const ElementsInfoCards: FC = () => {
             onBlur: (newRotatedY: number) => {
               if (editor) {
                 const elements = editor.selectedElements.getItems();
-                MutateElementsAndRecord.setRotateY(
-                  editor,
-                  elements,
-                  newRotatedY,
-                );
+                MutateGraphsAndRecord.setRotateY(editor, elements, newRotatedY);
                 editor.sceneGraph.render();
               }
             },
@@ -144,7 +136,7 @@ export const ElementsInfoCards: FC = () => {
             onBlur: (newWidth: number) => {
               if (editor) {
                 const elements = editor.selectedElements.getItems();
-                MutateElementsAndRecord.setWidth(editor, elements, newWidth);
+                MutateGraphsAndRecord.setWidth(editor, elements, newWidth);
                 editor.sceneGraph.render();
               }
             },
@@ -157,7 +149,7 @@ export const ElementsInfoCards: FC = () => {
             onBlur: (newHeight: number) => {
               if (editor) {
                 const elements = editor.selectedElements.getItems();
-                MutateElementsAndRecord.setHeight(editor, elements, newHeight);
+                MutateGraphsAndRecord.setHeight(editor, elements, newHeight);
                 editor.sceneGraph.render();
               }
             },
@@ -175,11 +167,7 @@ export const ElementsInfoCards: FC = () => {
             if (editor) {
               newRotation = normalizeRadian(degree2Radian(newRotation));
               const elements = editor.selectedElements.getItems();
-              MutateElementsAndRecord.setRotation(
-                editor,
-                elements,
-                newRotation,
-              );
+              MutateGraphsAndRecord.setRotation(editor, elements, newRotation);
               editor.sceneGraph.render();
             }
           }}
