@@ -275,29 +275,23 @@ export class SceneGraph {
     if (selectedElementsBBox === null) {
       return;
     }
-    const selectedElements = this.editor.selectedElements.getItems();
+
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
 
     ctx.save();
-    /********** 绘制多个图形组成的包围盒 *********/
-    // 只有单个选中元素，不绘制选中盒
-
-    // 多个选中元素时，才绘制选中盒
-    if (selectedElements.length > 1) {
-      ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
-      const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(
-          selectedElementsBBox.x,
-          selectedElementsBBox.y,
-        );
-      ctx.strokeRect(
-        xInViewport,
-        yInViewport,
-        selectedElementsBBox.width * zoom,
-        selectedElementsBBox.height * zoom,
+    ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
+    const { x: xInViewport, y: yInViewport } =
+      this.editor.sceneCoordsToViewport(
+        selectedElementsBBox.x,
+        selectedElementsBBox.y,
       );
-    }
+    ctx.strokeRect(
+      xInViewport,
+      yInViewport,
+      selectedElementsBBox.width * zoom,
+      selectedElementsBBox.height * zoom,
+    );
     ctx.restore();
   }
   /**
