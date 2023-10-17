@@ -1,3 +1,6 @@
+
+![image](https://github.com/F-star/suika/assets/18698939/cda4efad-097e-4693-b424-b4f2b3fc9909)
+
 # Suika
 
 Suika, an open-source vector graphics editor based on Canvas, similar to Figma.
@@ -6,16 +9,14 @@ Suika, an open-source vector graphics editor based on Canvas, similar to Figma.
 
 [Suika Editor](https://blog.fstars.wang/app/suika/)
 
-![image](https://github.com/F-star/suika/assets/18698939/46ec7396-ecab-4caa-a0da-f77cf9ba773e)
-
 ## Feature
 
 - Graphics editing
-- Tools: select, rectangle, ellipse, line, hand
+- Tools: select, rectangle, ellipse, line, hand, text, hand...
 - Zoom, arrange, align, fill, stroke...
 - KeyBinding, copy / paste
-- Grid, attch
-- Undo / Redo
+- Pixel grid, Snap to pixiel grid, ruler
+- History: undo / Redo
 - Localization (i18n)
 
 ## Develop
@@ -32,7 +33,7 @@ pnpm run dev
 https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap
 
 
-## chat
+## Chat
 
 建了个图形编辑器交流的 **微信群**，很多都是业内人士。
 
