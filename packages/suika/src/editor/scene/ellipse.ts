@@ -2,6 +2,7 @@ import { DOUBLE_PI } from '../../constant';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
+import { transformRotate } from '../../utils/transform';
 import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
@@ -18,7 +19,16 @@ export class Ellipse extends Graph {
     const cy = this.y + this.height / 2;
     const w = this.width / 2 + padding;
     const h = this.height / 2 + padding;
-    return (x - cx) ** 2 / w ** 2 + (y - cy) ** 2 / h ** 2 <= 1;
+
+    const rotatedHitPoint = this.rotation
+      ? transformRotate(x, y, -this.rotation, cx, cy)
+      : { x, y };
+
+    return (
+      (rotatedHitPoint.x - cx) ** 2 / w ** 2 +
+        (rotatedHitPoint.y - cy) ** 2 / h ** 2 <=
+      1
+    );
   }
 
   draw(
