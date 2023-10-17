@@ -76,4 +76,11 @@ export class TextGraph extends Graph {
 
     ctx.fillText(this.content, this.x, this.y);
   }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      content: this.content,
+    };
+  }
 }
