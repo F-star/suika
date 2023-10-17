@@ -8,6 +8,7 @@ import './ContextMenu.scss';
 import { FormattedMessage } from 'react-intl';
 import { IHistoryStatus } from '../../editor/commands/command_manager';
 import { isWindows } from '../../utils/common';
+import { MutateGraphsAndRecord } from '../../editor/service/mutate_graphs_and_record';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;
@@ -181,6 +182,22 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="arrange.back" />
         </ContextMenuItem>
 
+        <ContextMenuSep />
+        <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+Shift+H' : '⇧⌘H'}
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              MutateGraphsAndRecord.toggleVisible(
+                editor,
+                editor.selectedElements.getItems(),
+              );
+              editor.sceneGraph.render();
+            }
+          }}
+        >
+          <FormattedMessage id="showOrHide" />
+        </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
           suffix={isWindows ? 'Backspace' : '⌫'}

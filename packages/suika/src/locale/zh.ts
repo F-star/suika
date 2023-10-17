@@ -40,4 +40,5 @@ export const zh: typeof en = {
   'textureType.image': '图片',
 
   group: '创建编组',
+  showOrHide: '显示/隐藏',
 };

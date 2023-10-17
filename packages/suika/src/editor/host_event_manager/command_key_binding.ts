@@ -1,5 +1,6 @@
 import { ArrangeType } from '../commands/arrange';
 import { Editor } from '../editor';
+import { MutateGraphsAndRecord } from '../service/mutate_graphs_and_record';
 
 export class CommandKeyBinding {
   private isBound = false;
@@ -244,6 +245,23 @@ export class CommandKeyBinding {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Group',
       action: groupAction,
+    });
+
+    /******* show/hide *****/
+    // show/hide
+    const showOrHideAction = () => {
+      MutateGraphsAndRecord.toggleVisible(
+        editor,
+        editor.selectedElements.getItems(),
+      );
+      editor.sceneGraph.render();
+    };
+    editor.keybindingManager.register({
+      key: { metaKey: true, shiftKey: true, keyCode: 'KeyH' },
+      winKey: { ctrlKey: true, shiftKey: true, keyCode: 'KeyH' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'Show/Hide',
+      action: showOrHideAction,
     });
   }
 

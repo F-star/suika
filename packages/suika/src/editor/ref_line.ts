@@ -42,7 +42,7 @@ export class RefLine {
 
     const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox2();
-    for (const graph of this.editor.sceneGraph.children) {
+    for (const graph of this.editor.sceneGraph.getVisibleItems()) {
       if (selectIdSet.has(graph.id)) {
         continue;
       }

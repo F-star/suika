@@ -38,4 +38,6 @@ export const en = {
   'textureType.image': 'Image',
 
   group: 'Group selection',
+
+  showOrHide: 'Show/Hide',
 };
