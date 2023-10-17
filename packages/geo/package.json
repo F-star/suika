@@ -1,0 +1,12 @@
+{
+  "name": "@suika/geo",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {
+    "vite": "^4.2.0"
+  }
+}
