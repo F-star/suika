@@ -4,15 +4,16 @@ import './LayerItem.scss';
 import { HideOutlined, ShowOutlined } from '@suika/icons';
 
 interface IProps {
-  id: string | number;
+  id: string;
   name: string;
   children?: IProps[];
   active?: boolean;
   level?: number;
-  activeIds?: (string | number)[];
-  hoverId?: string | number;
+  activeIds?: string[];
+  hoverId?: string;
   visible?: boolean;
-  toggleVisible?: (id: string | number) => void;
+  toggleVisible?: (id: string) => void;
+  setHoverId?: (id: string) => void;
 }
 
 const LayerItem: FC<IProps> = ({
@@ -22,8 +23,10 @@ const LayerItem: FC<IProps> = ({
   id,
   activeIds = [],
   level = 0,
+  hoverId,
   visible = true,
   toggleVisible,
+  setHoverId,
 }) => {
   const indentWidth = level * 16;
   return (
@@ -32,8 +35,13 @@ const LayerItem: FC<IProps> = ({
         className={classNames('sk-layer-item', {
           'sk-active': active,
           'sk-hidden': !visible,
+          'sk-hover': hoverId === id,
         })}
         data-layer-id={id}
+        onMouseEnter={() => {
+          // TODO:
+          // setHoverId && setHoverId(id);
+        }}
       >
         <div
           style={{ width: indentWidth, minWidth: indentWidth }}
@@ -62,6 +70,10 @@ const LayerItem: FC<IProps> = ({
               level={level + 1}
               children={item.children}
               activeIds={activeIds}
+              hoverId={hoverId}
+              visible={item.visible}
+              toggleVisible={toggleVisible}
+              setHoverId={setHoverId}
             />
           ))}
         </div>

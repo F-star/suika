@@ -13,19 +13,26 @@
     white-space: nowrap;
     overflow: hidden;
 
-    &:hover {
-      border-color: #0f8fff;
-    }
-    &.sk-active {
-      background-color: #e1f2ff;
-    }
     &.sk-hidden {
       color: rgba(0, 0, 0, 0.3);
     }
 
+    &:hover,
+    &.sk-hover {
+      border-color: #0f8fff;
+      .sk-layer-item-actions {
+        display: flex;
+      }
+    }
+
+    &.sk-active {
+      background-color: #e1f2ff;
+      border-color: transparent;
+    }
+
     .sk-layer-item-actions {
       margin-left: auto;
-      display: flex;
+      display: none;
       align-items: center;
       height: 20px;
     }

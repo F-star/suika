@@ -2,7 +2,7 @@ import { FC } from 'react';
 import LayerItem from './LayerItem';
 
 interface ITreeNode {
-  id: string | number;
+  id: string;
   type: string;
   visible: boolean;
   name: string;
@@ -11,9 +11,10 @@ interface ITreeNode {
 
 interface IProps {
   treeData: ITreeNode[];
-  activeIds?: (string | number)[];
-  hoverId?: string | number;
-  toggleVisible?: (id: string | number) => void;
+  activeIds?: string[];
+  hoverId?: string;
+  toggleVisible?: (id: string) => void;
+  setHoverId?: (id: string) => void;
 }
 
 export const Tree: FC<IProps> = ({
@@ -21,6 +22,7 @@ export const Tree: FC<IProps> = ({
   activeIds = [],
   hoverId,
   toggleVisible,
+  setHoverId,
 }) => {
   return (
     <div>
@@ -35,6 +37,7 @@ export const Tree: FC<IProps> = ({
           hoverId={hoverId}
           visible={item.visible}
           toggleVisible={toggleVisible}
+          setHoverId={setHoverId}
         />
       ))}
     </div>
