@@ -1,5 +1,4 @@
-
-![image](https://github.com/F-star/suika/assets/18698939/cda4efad-097e-4693-b424-b4f2b3fc9909)
+![Screenshot](screenshot.png)
 
 # Suika
 
@@ -31,7 +30,6 @@ pnpm run dev
 编辑器内核的类结构设计：
 
 https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap
-
 
 ## Chat
 
