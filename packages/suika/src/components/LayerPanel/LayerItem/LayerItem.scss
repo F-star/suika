@@ -21,8 +21,14 @@
     &:hover:not(.sk-editing),
     &.sk-hover {
       border-color: #0f8fff;
+      .sk-action-btn {
+        display: block;
+      }
+    }
+
+    &.sk-editing {
       .sk-layer-item-actions {
-        display: flex;
+        display: none;
       }
     }
 
@@ -50,14 +56,22 @@
       color: #333;
       border: 1px solid #0d99ff;
       outline: 1px solid #0d99ff;
+
+      cursor: default;
     }
 
     .sk-layer-item-actions {
       margin-left: auto;
-      padding-right: 8px;
-      display: none;
+      padding-right: 4px;
+      display: flex;
       align-items: center;
       height: 20px;
+
+      .sk-action-btn {
+        display: none;
+        margin-right: 4px;
+        font-size: 0;
+      }
     }
   }
 }

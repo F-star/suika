@@ -1,7 +1,12 @@
 import classNames from 'classnames';
 import { FC, useRef, useState } from 'react';
 import './LayerItem.scss';
-import { HideOutlined, ShowOutlined } from '@suika/icons';
+import {
+  HideOutlined,
+  // LockFilled,
+  ShowOutlined,
+  // UnlockFilled,
+} from '@suika/icons';
 
 interface IProps {
   id: string;
@@ -64,13 +69,16 @@ const LayerItem: FC<IProps> = ({
     setIsEditing(false);
   };
 
+  const isHover = hoverId === id;
+  // const lock = false;
+
   return (
     <>
       <div
         className={classNames('sk-layer-item', {
           'sk-active': active,
           'sk-hidden': !visible,
-          'sk-hover': hoverId === id,
+          'sk-hover': isHover,
           'sk-editing': isEditing,
         })}
         onMouseDown={(e) => {
@@ -96,9 +104,36 @@ const LayerItem: FC<IProps> = ({
             onBlur={handleBlur}
           />
         )}
-        <div className="sk-layer-item-actions">
+        {/* icon area */}
+        <div
+          className="sk-layer-item-actions"
+          onMouseDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          {/* lock icon */}
+          {/* <span
+            className="sk-action-btn"
+            style={{
+              display: lock ? 'block' : undefined,
+            }}
+            onClick={() => {
+              //
+            }}
+          >
+            {visible ? <LockFilled /> : <UnlockFilled />}
+          </span> */}
+
+          {/* visible icon */}
+          {/* 
+            1. default hide icon when visible
+            2. show icon when invisible
+            3. but always show when hovering
+          */}
           <span
-            style={{ fontSize: 0 }}
+            className="sk-action-btn"
+            style={{
+              display: !visible ? 'block' : undefined,
+            }}
             onClick={() => {
               toggleVisible && toggleVisible(id);
             }}
