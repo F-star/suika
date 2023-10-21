@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FC, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import './LayerItem.scss';
 import {
   HideOutlined,
@@ -44,6 +44,12 @@ const LayerItem: FC<IProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [layoutName, setLayoutName] = useState(name);
+
+  useEffect(() => {
+    setLayoutName(name);
+  }, [name]);
+
   const handleDbClick = () => {
     setIsEditing(true);
     setTimeout(() => {
@@ -64,7 +70,10 @@ const LayerItem: FC<IProps> = ({
   const handleBlur = () => {
     const inputVal = inputRef.current?.value;
     if (inputVal) {
-      setName && setName(id, inputVal);
+      if (setName) {
+        setName(id, inputVal);
+        setLayoutName(inputVal);
+      }
     }
     setIsEditing(false);
   };
@@ -93,7 +102,7 @@ const LayerItem: FC<IProps> = ({
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
         {!isEditing && (
           <span key={'span'} className="sk-layout-name">
-            {name}
+            {layoutName}
           </span>
         )}
         {isEditing && (
