@@ -52,54 +52,25 @@ export class HostEventManager {
   private bindModifiersRecordEvent() {
     // record if shift, ctrl, command is pressed
     hotkeys('*', { keydown: true, keyup: true }, (event) => {
-      if (hotkeys.shift) {
-        const prev = this.isShiftPressing;
-        if (event.type === 'keydown') {
-          this.isShiftPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isShiftPressing = false;
-        }
+      const prevShift = this.isShiftPressing;
+      const prevAlt = this.isAltPressing;
 
-        if (prev !== this.isShiftPressing) {
-          this.eventEmitter.emit('shiftToggle', this.isShiftPressing);
-        }
-      }
-      if (hotkeys.ctrl) {
-        if (event.type === 'keydown') {
-          this.isCtrlPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isCtrlPressing = false;
-        }
-      }
-      if (hotkeys.alt) {
-        event.preventDefault();
-        const prev = this.isAltPressing;
-        if (event.type === 'keydown') {
-          this.isAltPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isAltPressing = false;
-        }
+      this.isShiftPressing = event.shiftKey;
+      this.isCtrlPressing = event.ctrlKey;
+      this.isAltPressing = event.altKey;
+      this.isCommandPressing = event.metaKey;
 
-        if (prev !== this.isAltPressing) {
-          this.eventEmitter.emit('altToggle', this.isAltPressing);
-        }
+      if (prevShift !== this.isShiftPressing) {
+        this.eventEmitter.emit('shiftToggle', this.isShiftPressing);
       }
-      if (hotkeys.command) {
-        if (event.type === 'keydown') {
-          this.isCommandPressing = true;
-        } else if (event.type === 'keyup') {
-          this.isCommandPressing = false;
-        }
+      if (prevAlt !== this.isAltPressing) {
+        this.eventEmitter.emit('altToggle', this.isAltPressing);
       }
     });
 
     hotkeys('space', { keydown: true, keyup: true }, (event) => {
       const prev = this.isSpacePressing;
-      if (event.type === 'keydown') {
-        this.isSpacePressing = true;
-      } else if (event.type === 'keyup') {
-        this.isSpacePressing = false;
-      }
+      this.isSpacePressing = event.type === 'keydown';
 
       if (prev !== this.isSpacePressing) {
         this.eventEmitter.emit('spaceToggle', this.isSpacePressing);
