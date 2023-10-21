@@ -27,23 +27,17 @@ export const LayerPanel: FC = () => {
     }
   }, [editor]);
 
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  const setSelectedGraph = (
+    objId: string,
+    event: React.MouseEvent<Element, MouseEvent>,
   ) => {
     if (!editor) return;
-    const target = event.target;
-
-    if (target instanceof HTMLElement && target.hasAttribute('data-layer-id')) {
-      const objId = target.getAttribute('data-layer-id');
-      if (objId) {
-        if (event.ctrlKey || event.metaKey) {
-          editor.selectedElements.toggleItemById(objId);
-        } else {
-          editor.selectedElements.setItemsById(new Set([objId]));
-        }
-        editor.sceneGraph.render();
-      }
+    if (event.ctrlKey || event.metaKey) {
+      editor.selectedElements.toggleItemById(objId);
+    } else {
+      editor.selectedElements.setItemsById(new Set([objId]));
     }
+    editor.sceneGraph.render();
   };
 
   const setEditorHoverId = (id: string) => {
@@ -51,6 +45,16 @@ export const LayerPanel: FC = () => {
       const graph = editor.sceneGraph.getElementById(id);
       if (graph) {
         editor.selectedElements.setHoverItem(graph);
+        editor.sceneGraph.render();
+      }
+    }
+  };
+
+  const setName = (id: string, newName: string) => {
+    if (editor) {
+      const graph = editor.sceneGraph.getElementById(id);
+      if (graph && graph.objectName !== newName) {
+        MutateGraphsAndRecord.setGraphName(editor, graph, newName);
         editor.sceneGraph.render();
       }
     }
@@ -67,13 +71,15 @@ export const LayerPanel: FC = () => {
   };
 
   return (
-    <div className="layer-panel" onMouseDown={(e) => handleMouseDown(e)}>
+    <div className="layer-panel">
       <Tree
         treeData={objects}
         activeIds={Array.from(selectedIds)}
         hoverId={hoverId}
         toggleVisible={toggleVisible}
         setHoverId={setEditorHoverId}
+        setName={setName}
+        setSelectedGraph={setSelectedGraph}
       />
     </div>
   );

@@ -11,10 +11,15 @@ interface ITreeNode {
 
 interface IProps {
   treeData: ITreeNode[];
-  activeIds?: string[];
-  hoverId?: string;
-  toggleVisible?: (id: string) => void;
-  setHoverId?: (id: string) => void;
+  activeIds: string[];
+  hoverId: string;
+  toggleVisible: (id: string) => void;
+  setHoverId: (id: string) => void;
+  setName: (id: string, newName: string) => void;
+  setSelectedGraph: (
+    objId: string,
+    event: React.MouseEvent<Element, MouseEvent>,
+  ) => void;
 }
 
 export const Tree: FC<IProps> = ({
@@ -23,6 +28,8 @@ export const Tree: FC<IProps> = ({
   hoverId,
   toggleVisible,
   setHoverId,
+  setName,
+  setSelectedGraph,
 }) => {
   return (
     <div>
@@ -38,6 +45,8 @@ export const Tree: FC<IProps> = ({
           visible={item.visible}
           toggleVisible={toggleVisible}
           setHoverId={setHoverId}
+          setName={setName}
+          setSelectedGraph={setSelectedGraph}
         />
       ))}
     </div>

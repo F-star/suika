@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FC } from 'react';
+import { FC, useRef, useState } from 'react';
 import './LayerItem.scss';
 import { HideOutlined, ShowOutlined } from '@suika/icons';
 
@@ -14,6 +14,11 @@ interface IProps {
   visible?: boolean;
   toggleVisible?: (id: string) => void;
   setHoverId?: (id: string) => void;
+  setName?: (id: string, newName: string) => void;
+  setSelectedGraph?: (
+    objId: string,
+    event: React.MouseEvent<Element, MouseEvent>,
+  ) => void;
 }
 
 const LayerItem: FC<IProps> = ({
@@ -27,8 +32,38 @@ const LayerItem: FC<IProps> = ({
   visible = true,
   toggleVisible,
   setHoverId,
+  setName,
+  setSelectedGraph,
 }) => {
   const indentWidth = level * 16;
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDbClick = () => {
+    setIsEditing(true);
+    setTimeout(() => {
+      const inputEl = inputRef.current;
+      if (inputEl) {
+        inputEl.value = name;
+        inputEl.select();
+      }
+    }, 0);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+      e.currentTarget.blur();
+    }
+  };
+
+  const handleBlur = () => {
+    const inputVal = inputRef.current?.value;
+    if (inputVal) {
+      setName && setName(id, inputVal);
+    }
+    setIsEditing(false);
+  };
+
   return (
     <>
       <div
@@ -36,18 +71,31 @@ const LayerItem: FC<IProps> = ({
           'sk-active': active,
           'sk-hidden': !visible,
           'sk-hover': hoverId === id,
+          'sk-editing': isEditing,
         })}
-        data-layer-id={id}
+        onMouseDown={(e) => {
+          setSelectedGraph && setSelectedGraph(id, e);
+        }}
         onMouseEnter={() => {
-          // TODO:
+          // TODO: setHoverId when mouse enter
           // setHoverId && setHoverId(id);
         }}
+        onDoubleClick={handleDbClick}
       >
-        <div
-          style={{ width: indentWidth, minWidth: indentWidth }}
-          data-layer-id={id}
-        />
-        {name}
+        <div style={{ width: indentWidth, minWidth: indentWidth }} />
+        {!isEditing && (
+          <span key={'span'} className="sk-layout-name">
+            {name}
+          </span>
+        )}
+        {isEditing && (
+          <input
+            ref={inputRef}
+            onMouseDown={(e) => e.stopPropagation()}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+          />
+        )}
         <div className="sk-layer-item-actions">
           <span
             style={{ fontSize: 0 }}
@@ -74,6 +122,7 @@ const LayerItem: FC<IProps> = ({
               visible={item.visible}
               toggleVisible={toggleVisible}
               setHoverId={setHoverId}
+              setSelectedGraph={setSelectedGraph}
             />
           ))}
         </div>

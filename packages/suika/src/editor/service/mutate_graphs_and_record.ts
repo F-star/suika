@@ -145,4 +145,17 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
+  /** set name of graph */
+  setGraphName(editor: Editor, graph: Graph, objectName: string) {
+    const prevAttrs = [{ objectName: graph.objectName }];
+    graph.objectName = objectName;
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        'update name of graph',
+        [graph],
+        { objectName },
+        prevAttrs,
+      ),
+    );
+  },
 };
