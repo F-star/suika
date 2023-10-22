@@ -22,6 +22,13 @@ export abstract class DrawGraphTool implements ITool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private lastDragPoint!: IPoint;
   private lastDragPointInViewport!: IPoint;
+  /** lastPoint with snap when dragging */
+  private lastMousePoint!: IPoint;
+  /**
+   * use to calculate the offset, to change the graph's start point
+   */
+  private startPointWhenSpaceDown: IPoint | null = null;
+  private lastDragPointWhenSpaceDown: IPoint | null = null;
 
   private isDragging = false;
   private unbindEvent: () => void = noop;
@@ -39,6 +46,20 @@ export abstract class DrawGraphTool implements ITool {
     };
     hotkeysManager.on('shiftToggle', updateRect);
     hotkeysManager.on('altToggle', updateRect);
+
+    // 记录空格键按下时的坐标位置
+    const handleSpaceToggle = (isDown: boolean) => {
+      if (this.isDragging && isDown) {
+        this.startPointWhenSpaceDown = this.startPoint;
+        this.lastDragPointWhenSpaceDown = this.lastMousePoint;
+        this.updateRect();
+      } else {
+        this.startPointWhenSpaceDown = null;
+        this.lastDragPointWhenSpaceDown = null;
+      }
+      console.log('handleSpaceToggle', isDown);
+    };
+    hotkeysManager.on('spaceToggle', handleSpaceToggle);
 
     const updateRectWhenViewportTranslate = () => {
       if (editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -59,6 +80,7 @@ export abstract class DrawGraphTool implements ITool {
       hotkeysManager.off('shiftToggle', updateRect);
       hotkeysManager.off('altToggle', updateRect);
       editor.viewportManager.off('xOrYChange', updateRectWhenViewportTranslate);
+      hotkeysManager.off('spaceToggle', handleSpaceToggle);
     };
   }
   inactive() {
@@ -76,6 +98,8 @@ export abstract class DrawGraphTool implements ITool {
     );
     this.drawingGraph = null;
     this.isDragging = false;
+    this.startPointWhenSpaceDown = null;
+    this.lastDragPointWhenSpaceDown = null;
   }
 
   drag(e: PointerEvent) {
@@ -86,7 +110,7 @@ export abstract class DrawGraphTool implements ITool {
     }
     this.isDragging = true;
     this.lastDragPointInViewport = this.editor.getCursorXY(e);
-    this.lastDragPoint = this.editor.getSceneCursorXY(
+    this.lastDragPoint = this.lastMousePoint = this.editor.getSceneCursorXY(
       e,
       this.editor.setting.get('snapToPixelGrid'),
     );
@@ -118,11 +142,24 @@ export abstract class DrawGraphTool implements ITool {
     drawingShape.height = rect.height;
   }
 
+  /** update drawing rect object */
   private updateRect() {
     if (!this.isDragging) return;
 
     const { x, y } = this.lastDragPoint;
     const sceneGraph = this.editor.sceneGraph;
+
+    if (this.startPointWhenSpaceDown && this.lastDragPointWhenSpaceDown) {
+      const { x: sx, y: sy } = this.startPointWhenSpaceDown;
+      const { x: lx, y: ly } = this.lastDragPointWhenSpaceDown;
+      const dx = x - lx;
+      const dy = y - ly;
+      this.startPoint = {
+        x: sx + dx,
+        y: sy + dy,
+      };
+    }
+
     const { x: startX, y: startY } = this.startPoint;
 
     const width = x - startX;
@@ -221,5 +258,7 @@ export abstract class DrawGraphTool implements ITool {
     if (this.drawingGraph) {
       this.editor.toolManager.setActiveTool('select');
     }
+    this.startPointWhenSpaceDown = null;
+    this.lastDragPointWhenSpaceDown = null;
   }
 }

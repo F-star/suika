@@ -54,11 +54,13 @@ export class HostEventManager {
     hotkeys('*', { keydown: true, keyup: true }, (event) => {
       const prevShift = this.isShiftPressing;
       const prevAlt = this.isAltPressing;
+      const prev = this.isSpacePressing;
 
       this.isShiftPressing = event.shiftKey;
       this.isCtrlPressing = event.ctrlKey;
       this.isAltPressing = event.altKey;
       this.isCommandPressing = event.metaKey;
+      this.isSpacePressing = event.code === 'Space' && event.type === 'keydown';
 
       if (prevShift !== this.isShiftPressing) {
         this.eventEmitter.emit('shiftToggle', this.isShiftPressing);
@@ -66,16 +68,11 @@ export class HostEventManager {
       if (prevAlt !== this.isAltPressing) {
         this.eventEmitter.emit('altToggle', this.isAltPressing);
       }
-    });
-
-    hotkeys('space', { keydown: true, keyup: true }, (event) => {
-      const prev = this.isSpacePressing;
-      this.isSpacePressing = event.type === 'keydown';
-
       if (prev !== this.isSpacePressing) {
         this.eventEmitter.emit('spaceToggle', this.isSpacePressing);
       }
 
+      // TODO: move to correct position
       // 按住按键会不停触发响应函数，下面这种写法则只会在按下和释放时分别执行一次
       if (this.isEnableDragCanvasBySpace && prev !== this.isSpacePressing) {
         if (this.isSpacePressing) {
