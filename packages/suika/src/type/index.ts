@@ -45,6 +45,7 @@ export interface IObject {
   id: string;
   type: string;
   visible: boolean;
+  lock: boolean;
   name: string;
   children?: IObject[];
 }

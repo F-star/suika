@@ -25,8 +25,9 @@ export class Group implements IGroupAttrs {
     return {
       id: this.id,
       type: 'group',
-      visible: true,
       name: this.objectName,
+      visible: true,
+      lock: false,
     };
   }
 }

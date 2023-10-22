@@ -27,7 +27,10 @@ class SelectedElements {
       this.eventEmitter.emit('itemsChange', items);
     }
   }
-  getItems() {
+  getItems({ excludeLocked = false } = {}): Graph[] {
+    if (excludeLocked) {
+      return this.items.filter((item) => !item.getLock());
+    }
     return [...this.items];
   }
   getIdSet() {
@@ -41,6 +44,10 @@ class SelectedElements {
     } else {
       this.setItems(items);
     }
+  }
+
+  isLockedSingleGraph() {
+    return this.items.length === 1 && this.items[0].getLock();
   }
 
   hasItem(item: Graph) {
@@ -164,7 +171,9 @@ class SelectedElements {
   }
 
   selectAll() {
-    this.setItems([...this.editor.sceneGraph.children]);
+    this.setItems(
+      this.editor.sceneGraph.children.filter((item) => !item.getLock()),
+    );
   }
 
   group() {

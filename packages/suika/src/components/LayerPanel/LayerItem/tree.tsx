@@ -1,25 +1,12 @@
 import { FC } from 'react';
 import LayerItem from './LayerItem';
+import { IObject } from '../../../type';
+import { IBaseEvents } from './type';
 
-interface ITreeNode {
-  id: string;
-  type: string;
-  visible: boolean;
-  name: string;
-  children?: ITreeNode[];
-}
-
-interface IProps {
-  treeData: ITreeNode[];
+interface IProps extends IBaseEvents {
+  treeData: IObject[];
   activeIds: string[];
   hoverId: string;
-  toggleVisible: (id: string) => void;
-  setHoverId: (id: string) => void;
-  setName: (id: string, newName: string) => void;
-  setSelectedGraph: (
-    objId: string,
-    event: React.MouseEvent<Element, MouseEvent>,
-  ) => void;
 }
 
 export const Tree: FC<IProps> = ({
@@ -27,6 +14,7 @@ export const Tree: FC<IProps> = ({
   activeIds = [],
   hoverId,
   toggleVisible,
+  toggleLock,
   setHoverId,
   setName,
   setSelectedGraph,
@@ -43,7 +31,9 @@ export const Tree: FC<IProps> = ({
           activeIds={activeIds}
           hoverId={hoverId}
           visible={item.visible}
+          lock={item.lock}
           toggleVisible={toggleVisible}
+          toggleLock={toggleLock}
           setHoverId={setHoverId}
           setName={setName}
           setSelectedGraph={setSelectedGraph}

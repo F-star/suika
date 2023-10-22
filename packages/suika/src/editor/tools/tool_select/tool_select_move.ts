@@ -37,7 +37,9 @@ export class SelectMoveTool implements IBaseTool {
   }
   start(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
-    const selectedElements = this.editor.selectedElements.getItems();
+    const selectedElements = this.editor.selectedElements.getItems({
+      excludeLocked: true,
+    });
     this.startPoints = selectedElements.map((element) => ({
       x: element.x,
       y: element.y,
@@ -85,7 +87,9 @@ export class SelectMoveTool implements IBaseTool {
         dy = Math.round(this.prevBBoxPos.y + dy) - this.prevBBoxPos.y;
     }
 
-    const selectedElements = this.editor.selectedElements.getItems();
+    const selectedElements = this.editor.selectedElements.getItems({
+      excludeLocked: true,
+    });
     const startPoints = this.startPoints;
     for (let i = 0, len = selectedElements.length; i < len; i++) {
       selectedElements[i].x = startPoints[i].x + dx;
@@ -104,7 +108,9 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.render();
   }
   end(e: PointerEvent, isDragHappened: boolean) {
-    const selectedItems = this.editor.selectedElements.getItems();
+    const selectedItems = this.editor.selectedElements.getItems({
+      excludeLocked: true,
+    });
     if (selectedItems.length === 0) {
       // 移动的时候元素被删除了，或者撤销导致为空
       // TODO: 属性复原

@@ -3,27 +3,23 @@ import { FC, useEffect, useRef, useState } from 'react';
 import './LayerItem.scss';
 import {
   HideOutlined,
-  // LockFilled,
+  LockFilled,
   ShowOutlined,
-  // UnlockFilled,
+  UnlockFilled,
 } from '@suika/icons';
+import { IObject } from '../../../type';
+import { IBaseEvents } from './type';
 
-interface IProps {
+interface IProps extends IBaseEvents {
   id: string;
   name: string;
-  children?: IProps[];
+  children?: IObject[];
   active?: boolean;
   level?: number;
   activeIds?: string[];
   hoverId?: string;
-  visible?: boolean;
-  toggleVisible?: (id: string) => void;
-  setHoverId?: (id: string) => void;
-  setName?: (id: string, newName: string) => void;
-  setSelectedGraph?: (
-    objId: string,
-    event: React.MouseEvent<Element, MouseEvent>,
-  ) => void;
+  visible: boolean;
+  lock: boolean;
 }
 
 const LayerItem: FC<IProps> = ({
@@ -34,8 +30,10 @@ const LayerItem: FC<IProps> = ({
   activeIds = [],
   level = 0,
   hoverId,
-  visible = true,
+  visible,
+  lock,
   toggleVisible,
+  toggleLock,
   setHoverId,
   setName,
   setSelectedGraph,
@@ -113,26 +111,26 @@ const LayerItem: FC<IProps> = ({
             onBlur={handleBlur}
           />
         )}
-        {/* icon area */}
+        {/* icon button area */}
         <div
           className="sk-layer-item-actions"
           onMouseDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
-          {/* lock icon */}
-          {/* <span
+          {/* lock button */}
+          <span
             className="sk-action-btn"
             style={{
-              display: lock ? 'block' : undefined,
+              visibility: lock ? 'visible' : undefined,
             }}
-            onClick={() => {
-              //
+            onMouseDown={() => {
+              toggleLock(id);
             }}
           >
-            {visible ? <LockFilled /> : <UnlockFilled />}
-          </span> */}
+            {lock ? <LockFilled /> : <UnlockFilled />}
+          </span>
 
-          {/* visible icon */}
+          {/* visible button */}
           {/* 
             1. default hide icon when visible
             2. show icon when invisible
@@ -141,9 +139,9 @@ const LayerItem: FC<IProps> = ({
           <span
             className="sk-action-btn"
             style={{
-              display: !visible ? 'block' : undefined,
+              visibility: !visible ? 'visible' : undefined,
             }}
-            onClick={() => {
+            onMouseDown={() => {
               toggleVisible && toggleVisible(id);
             }}
           >
@@ -164,7 +162,10 @@ const LayerItem: FC<IProps> = ({
               activeIds={activeIds}
               hoverId={hoverId}
               visible={item.visible}
+              lock={item.lock}
+              setName={setName}
               toggleVisible={toggleVisible}
+              toggleLock={toggleLock}
               setHoverId={setHoverId}
               setSelectedGraph={setSelectedGraph}
             />

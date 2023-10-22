@@ -310,7 +310,10 @@ export class SceneGraph {
    */
   isPointInSelectedBox(point: IPoint) {
     const selectedElements = this.editor.selectedElements.getItems();
-    if (selectedElements.length === 0) {
+    if (
+      selectedElements.length === 0 ||
+      this.editor.selectedElements.isLockedSingleGraph()
+    ) {
       return false;
     }
 
@@ -341,7 +344,7 @@ export class SceneGraph {
     // TODO: optimize, use r-tree to reduce time complexity
     for (let i = this.children.length - 1; i >= 0; i--) {
       const el = this.children[i];
-      if (el.getVisible() && el.hitTest(x, y, padding)) {
+      if (el.getVisible() && !el.getLock() && el.hitTest(x, y, padding)) {
         topHitElement = el;
         break;
       }
@@ -368,6 +371,9 @@ export class SceneGraph {
     const containedElements: Graph[] = [];
     // TODO: optimize, use r-tree to reduce time complexity
     for (const el of elements) {
+      if (el.getLock()) {
+        continue;
+      }
       let isSelected = false;
       if (selectionMode === 'contain') {
         isSelected = el.containWithRect(selection);

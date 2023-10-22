@@ -70,6 +70,16 @@ export const LayerPanel: FC = () => {
     }
   };
 
+  const toggleLock = (id: string) => {
+    if (editor) {
+      const graph = editor.sceneGraph.getElementById(id);
+      if (graph) {
+        MutateGraphsAndRecord.toggleLock(editor, [graph]);
+        editor.sceneGraph.render();
+      }
+    }
+  };
+
   return (
     <div className="layer-panel">
       <Tree
@@ -77,6 +87,7 @@ export const LayerPanel: FC = () => {
         activeIds={Array.from(selectedIds)}
         hoverId={hoverId}
         toggleVisible={toggleVisible}
+        toggleLock={toggleLock}
         setHoverId={setEditorHoverId}
         setName={setName}
         setSelectedGraph={setSelectedGraph}

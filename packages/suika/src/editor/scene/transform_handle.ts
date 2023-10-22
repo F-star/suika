@@ -43,7 +43,7 @@ export class TransformHandle {
       this.center = null;
     }
 
-    if (handle) {
+    if (handle && !this.editor.selectedElements.isLockedSingleGraph()) {
       const ctx = this.editor.ctx;
       const setting = this.editor.setting;
 
@@ -199,12 +199,14 @@ export class TransformHandle {
       };
     }
   }
+
   getNameByPoint(hitPoint: IPoint): {
     handleName: HandleName | undefined;
     cursor?: ICursor;
   } {
     const handle = this.handle;
-    if (!handle) {
+
+    if (!handle || this.editor.selectedElements.isLockedSingleGraph()) {
       return { handleName: undefined };
     }
     if (this.isInRotationHandle(hitPoint)) {
@@ -260,7 +262,7 @@ export class TransformHandle {
     return { handleName: undefined };
   }
 
-  getCursor(type: HandleName): ICursor {
+  private getCursor(type: HandleName): ICursor {
     if (type === 'rotation') {
       return 'grab';
     }

@@ -22,7 +22,7 @@
     &.sk-hover {
       border-color: #0f8fff;
       .sk-action-btn {
-        display: block;
+        visibility: visible;
       }
     }
 
@@ -68,8 +68,10 @@
       height: 20px;
 
       .sk-action-btn {
-        display: none;
+        visibility: hidden;
         margin-right: 4px;
+        width: 16px;
+        height: 16px;
         font-size: 0;
       }
     }
