@@ -131,7 +131,7 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    const newVisible = !graphs.some((item) => item.getVisible());
+    const newVisible = !graphs.some((item) => item.visible);
     const prevAttrs = graphs.map((el) => ({ visible: el.visible }));
     graphs.forEach((el) => {
       el.visible = newVisible;
@@ -145,6 +145,29 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
+  /**
+   * lock / unlock
+   */
+  toggleLock(editor: Editor, graphs: Graph[]) {
+    if (graphs.length === 0) {
+      return;
+    }
+
+    const newLock = !graphs.some((item) => item.lock);
+    const prevAttrs = graphs.map((el) => ({ lock: el.lock }));
+    graphs.forEach((el) => {
+      el.lock = newLock;
+    });
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        'update lock of graphs',
+        graphs,
+        { lock: newLock },
+        prevAttrs,
+      ),
+    );
+  },
+
   /** set name of graph */
   setGraphName(editor: Editor, graph: Graph, objectName: string) {
     const prevAttrs = [{ objectName: graph.objectName }];

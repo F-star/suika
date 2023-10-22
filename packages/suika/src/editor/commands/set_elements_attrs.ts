@@ -11,8 +11,9 @@ export type ISetElementsAttrsType = Partial<{
   fill: ITexture[];
   stroke: ITexture[];
   strokeWidth: number;
-  visible: boolean;
   objectName: string;
+  visible: boolean;
+  lock: boolean;
 }>;
 
 /**

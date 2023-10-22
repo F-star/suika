@@ -57,7 +57,6 @@ export abstract class DrawGraphTool implements ITool {
         this.startPointWhenSpaceDown = null;
         this.lastDragPointWhenSpaceDown = null;
       }
-      console.log('handleSpaceToggle', isDown);
     };
     hotkeysManager.on('spaceToggle', handleSpaceToggle);
 

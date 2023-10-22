@@ -37,6 +37,7 @@ export interface GraphAttrs {
   // transform 相关
   rotation?: number;
   visible?: boolean;
+  lock?: boolean;
 }
 
 export class Graph {
@@ -54,6 +55,7 @@ export class Graph {
   // transform
   rotation?: number;
   visible?: boolean;
+  lock?: boolean;
 
   get x() {
     return this._x;
@@ -98,6 +100,9 @@ export class Graph {
     }
     if (options.visible !== undefined) {
       this.visible = options.visible;
+    }
+    if (options.lock !== undefined) {
+      this.lock = options.lock;
     }
   }
   getAttrs(): GraphAttrs {
@@ -534,11 +539,16 @@ export class Graph {
       strokeWidth: this.strokeWidth,
       rotation: this.rotation,
       visible: this.visible,
+      lock: this.lock,
     };
   }
 
   getVisible() {
     return this.visible ?? true;
+  }
+
+  getLock() {
+    return this.lock ?? false;
   }
 
   /**
@@ -547,9 +557,10 @@ export class Graph {
   toObject() {
     return {
       type: this.type,
-      visible: this.getVisible(),
       id: this.id,
       name: this.objectName,
+      visible: this.getVisible(),
+      lock: this.getLock(),
     };
   }
 
