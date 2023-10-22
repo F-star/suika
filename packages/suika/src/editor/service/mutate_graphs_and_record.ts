@@ -131,7 +131,8 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    const newVisible = !graphs.some((item) => item.visible);
+    // if at least one graph is hidden, show all graphs; otherwise, hide all graphs
+    const newVisible = graphs.some((item) => !item.getVisible());
     const prevAttrs = graphs.map((el) => ({ visible: el.visible }));
     graphs.forEach((el) => {
       el.visible = newVisible;
@@ -153,7 +154,7 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    const newLock = !graphs.some((item) => item.lock);
+    const newLock = !graphs.some((item) => item.getLock());
     const prevAttrs = graphs.map((el) => ({ lock: el.lock }));
     graphs.forEach((el) => {
       el.lock = newLock;
