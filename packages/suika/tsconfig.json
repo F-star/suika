@@ -15,6 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "noImplicitOverride": true,
     "paths": {
       "@suika/icons": ["../icons/src"],
       "@suika/components": ["../components/src"]

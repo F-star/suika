@@ -20,7 +20,7 @@ export class Line extends Graph {
     this.height = 0;
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  override draw(ctx: CanvasRenderingContext2D) {
     const { x, y, width, rotation } = this;
     if (rotation) {
       const { x: cx, y: cy } = this.getCenter();

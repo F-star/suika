@@ -9,9 +9,9 @@ import { transformRotate } from '../../utils/transform';
 import { HALF_PI } from '../../constant';
 
 export class DrawLineTool extends DrawGraphTool implements ITool {
-  static readonly type = 'drawLine';
-  readonly type = 'drawLine';
-  readonly hotkey = 'l';
+  static override readonly type = 'drawLine';
+  override readonly type = 'drawLine';
+  override readonly hotkey = 'l';
 
   constructor(editor: Editor) {
     super(editor);
@@ -32,7 +32,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
     });
   }
 
-  protected adjustSizeWhenShiftPressing(rect: IRect) {
+  protected override adjustSizeWhenShiftPressing(rect: IRect) {
     const radian = calcVectorRadian(
       rect.x,
       rect.y,
@@ -58,7 +58,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
     }
   }
 
-  protected updateGraph(rect: IRect) {
+  protected override updateGraph(rect: IRect) {
     const attrs = this.calcAttrs(rect);
     Object.assign(this.drawingGraph!, attrs);
   }

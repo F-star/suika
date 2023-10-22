@@ -39,7 +39,7 @@ export class TextGraph extends Graph {
     this.content = options.content;
     this.fontSize = options.fontSize;
   }
-  getAttrs() {
+  override getAttrs() {
     return {
       ...super.getAttrs(),
       content: this.content,
@@ -48,7 +48,7 @@ export class TextGraph extends Graph {
     };
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  override draw(ctx: CanvasRenderingContext2D) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;
@@ -77,7 +77,7 @@ export class TextGraph extends Graph {
     ctx.fillText(this.content, this.x, this.y);
   }
 
-  toJSON() {
+  override toJSON() {
     return {
       ...super.toJSON(),
       content: this.content,

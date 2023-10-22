@@ -12,7 +12,11 @@ export class Rect extends Graph {
     super({ ...options, type: GraphType.Rect });
   }
 
-  draw(ctx: CanvasRenderingContext2D, imgManager: ImgManager, smooth: boolean) {
+  override draw(
+    ctx: CanvasRenderingContext2D,
+    imgManager: ImgManager,
+    smooth: boolean,
+  ) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;

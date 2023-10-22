@@ -31,7 +31,7 @@ export class Ellipse extends Graph {
     );
   }
 
-  draw(
+  override draw(
     ctx: CanvasRenderingContext2D,
     imgManager: ImgManager,
     smooth: boolean,

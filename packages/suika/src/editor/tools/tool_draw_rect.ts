@@ -7,9 +7,9 @@ import { IRect } from '../../type';
 import { normalizeRect } from '../../utils/graphics';
 
 export class DrawRectTool extends DrawGraphTool implements ITool {
-  static readonly type = 'drawRect';
-  readonly type = 'drawRect';
-  readonly hotkey = 'r';
+  static override readonly type = 'drawRect';
+  override readonly type = 'drawRect';
+  override readonly hotkey = 'r';
 
   constructor(editor: Editor) {
     super(editor);
