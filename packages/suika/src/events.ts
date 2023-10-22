@@ -1,4 +1,4 @@
-import { SupportedLocale } from './locale/types';
+import { SupportedLocale } from './locale';
 import EventEmitter from './utils/event_emitter';
 
 interface Events {

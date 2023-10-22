@@ -9,7 +9,7 @@ import { ArrowDownOutlined } from '@suika/icons';
 import './ZoomActions.scss';
 import { ZoomInput } from './components/ZoomInput';
 import { isWindows } from '../../utils/common';
-import { MessageIds } from '../../locale/types';
+import { MessageIds } from '../../locale';
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);

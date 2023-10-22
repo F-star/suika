@@ -1,11 +1,10 @@
 import { IntlProvider } from 'react-intl';
 import './App.css';
 import Editor from './components/Editor';
-import { zh } from './locale/zh';
-import { en } from './locale/en';
+import { zh, en } from './locale';
 import { useEffect, useState } from 'react';
 import { appEventEmitter } from './events';
-import { SupportedLocale } from './locale/types';
+import { SupportedLocale } from './locale';
 
 // FIXME: terrible code
 if (process.env.NODE_ENV !== 'development') {
