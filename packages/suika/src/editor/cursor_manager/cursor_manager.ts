@@ -1,4 +1,4 @@
-import { normalizeDegree } from '../../utils/graphics';
+import { normalizeDegree } from '@suika/geo';
 import { Editor } from '../editor';
 import './cursor.scss';
 

@@ -9,12 +9,8 @@ import {
 } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
-import {
-  getRectCenterPoint,
-  getRectsBBox,
-  isPointInRect,
-  isRectIntersect,
-} from '../../utils/graphics';
+import { getRectCenterPoint } from '../../utils/graphics';
+import { getMergedRect, isRectIntersect } from '@suika/geo';
 import rafThrottle from '../../utils/raf_throttle';
 import { transformRotate } from '../../utils/transform';
 import { Ellipse } from './ellipse';
@@ -26,6 +22,7 @@ import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
 import { TextGraph } from './text';
 import { Line } from './line';
+import { isPointInRect } from '@suika/geo';
 
 const graphCtorMap = {
   [GraphType.Graph]: Graph,
@@ -332,7 +329,7 @@ export class SceneGraph {
     else {
       bBoxes = selectedElements.map((element) => element.getBBox());
     }
-    const composedBBox = getRectsBBox(...bBoxes);
+    const composedBBox = getMergedRect(...bBoxes);
     return isPointInRect(point, composedBBox);
   }
   getTopHitElement(x: number, y: number): Graph | null {

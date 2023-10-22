@@ -18,7 +18,8 @@
     "noImplicitOverride": true,
     "paths": {
       "@suika/icons": ["../icons/src"],
-      "@suika/components": ["../components/src"]
+      "@suika/components": ["../components/src"],
+      "@suika/geo": ["../geo/src"]
     }
   }
 }

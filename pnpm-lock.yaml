@@ -185,6 +185,9 @@ importers:
       '@suika/components':
         specifier: workspace:^
         version: link:../components
+      '@suika/geo':
+        specifier: workspace:^
+        version: link:../geo
       '@suika/icons':
         specifier: workspace:^
         version: link:../icons

@@ -4,9 +4,10 @@ import { Line } from '../scene/line';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 import { IRect } from '../../type';
-import { calcVectorRadian, normalizeRadian } from '../../utils/graphics';
+import { calcVectorRadian } from '../../utils/graphics';
 import { transformRotate } from '../../utils/transform';
 import { HALF_PI } from '../../constant';
+import { normalizeRadian } from '@suika/geo';
 
 export class DrawLineTool extends DrawGraphTool implements ITool {
   static override readonly type = 'drawLine';

@@ -2,7 +2,8 @@ import { Graph } from './scene/graph';
 import { IBox } from '../type';
 import { isSameArray } from '../utils/common';
 import EventEmitter from '../utils/event_emitter';
-import { getRectCenterPoint, getRectsBBox } from '../utils/graphics';
+import { getRectCenterPoint } from '../utils/graphics';
+import { getMergedRect } from '@suika/geo';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
 import { AlignCmd, AlignType } from './commands/align';
@@ -107,7 +108,7 @@ class SelectedElements {
       return null;
     }
     const bBoxesWithRotation = this.items.map((element) => element.getBBox());
-    return getRectsBBox(...bBoxesWithRotation);
+    return getMergedRect(...bBoxesWithRotation);
   }
   getRotation() {
     if (this.items.length === 0 || this.items.length > 1) {

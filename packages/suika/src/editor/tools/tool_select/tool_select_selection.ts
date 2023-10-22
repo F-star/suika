@@ -1,7 +1,7 @@
 import { IPoint } from '../../../type';
-import { getRectByTwoCoord } from '../../../utils/graphics';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
+import { getRectByTwoPoint } from '@suika/geo';
 
 /**
  * 绘制选区
@@ -36,7 +36,7 @@ export class DrawSelectionBox implements IBaseTool {
   drag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
 
-    const box = getRectByTwoCoord(this.lastPoint, point);
+    const box = getRectByTwoPoint(this.lastPoint, point);
     this.editor.sceneGraph.setSelection(box);
     this.editor.sceneGraph.render();
   }

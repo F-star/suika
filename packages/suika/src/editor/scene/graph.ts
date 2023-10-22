@@ -7,16 +7,13 @@ import {
   IRect,
 } from '../../type';
 import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
+import { isPointInRect, isRectIntersect } from '@suika/geo';
 import {
   getAbsoluteCoords,
   getElementRotatedXY,
   getRectCenterPoint,
-  isPointInRect,
-  isRectContain,
-  isRectIntersect,
-  normalizeRadian,
-  normalizeRect,
 } from '../../utils/graphics';
+import { normalizeRect, normalizeRadian, isRectContain } from '@suika/geo';
 import { transformRotate } from '../../utils/transform';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';

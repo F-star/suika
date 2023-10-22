@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "sideEffect": false,
+  "main": "dist/geo.es.js",
+  "module": "dist/geo.es.js",
+  "types": "dist/geo.d.ts",
   "scripts": {
     "build": "tsc && vite build"
   },

@@ -2,12 +2,8 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
 import { MutateGraphsAndRecord } from '../../../editor/service/mutate_graphs_and_record';
 import { remainDecimal } from '../../../utils/common';
-import {
-  degree2Radian,
-  getElementRotatedXY,
-  normalizeRadian,
-  radian2Degree,
-} from '../../../utils/graphics';
+import { getElementRotatedXY } from '../../../utils/graphics';
+import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
 import { BaseCard } from '../BaseCard';
 import NumberInput from '../../input/NumberInput';
 import './style.scss';
@@ -85,7 +81,7 @@ export const ElementsInfoCards: FC = () => {
           setRotation(
             newRotation === MIXED
               ? newRotation
-              : remainDecimal(radian2Degree(newRotation as number)),
+              : remainDecimal(rad2Deg(newRotation as number)),
           );
         }
       };
@@ -165,7 +161,7 @@ export const ElementsInfoCards: FC = () => {
           suffixValue="°"
           onBlur={(newRotation) => {
             if (editor) {
-              newRotation = normalizeRadian(degree2Radian(newRotation));
+              newRotation = normalizeRadian(deg2Rad(newRotation));
               const elements = editor.selectedElements.getItems();
               MutateGraphsAndRecord.setRotation(editor, elements, newRotation);
               editor.sceneGraph.render();

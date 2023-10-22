@@ -5,12 +5,8 @@ import {
   drawSquareWithCenter,
   rotateInCanvas,
 } from '../../utils/canvas';
-import {
-  getRectCenterPoint,
-  isPointInCircle,
-  isPointInRect,
-  radian2Degree,
-} from '../../utils/graphics';
+import { getRectCenterPoint } from '../../utils/graphics';
+import { isPointInCircle, isPointInRect, rad2Deg } from '@suika/geo';
 import { transformRotate } from '../../utils/transform';
 import { ICursor } from '../cursor_manager';
 
@@ -267,7 +263,7 @@ export class TransformHandle {
       return 'grab';
     }
     const degree =
-      radian2Degree(this.editor.selectedElements.getRotation()) +
+      rad2Deg(this.editor.selectedElements.getRotation()) +
       (type === 'se' || type === 'nw' ? -45 : 45);
     return { type: 'resize', degree };
   }
