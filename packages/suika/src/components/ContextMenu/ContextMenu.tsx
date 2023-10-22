@@ -198,6 +198,22 @@ export const ContextMenu: FC = () => {
         >
           <FormattedMessage id="showOrHide" />
         </ContextMenuItem>
+        {/* lock/unlock */}
+        <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+Shift+L' : '⇧⌘L'}
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              MutateGraphsAndRecord.toggleLock(
+                editor,
+                editor.selectedElements.getItems(),
+              );
+              editor.sceneGraph.render();
+            }
+          }}
+        >
+          <FormattedMessage id="lockOrUnlock" />
+        </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
           suffix={isWindows ? 'Backspace' : '⌫'}

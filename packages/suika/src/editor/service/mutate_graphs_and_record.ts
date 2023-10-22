@@ -154,7 +154,8 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    const newLock = !graphs.some((item) => item.getLock());
+    // if at least one graph is unlocked, lock all graphs; otherwise, unlock all graphs
+    const newLock = graphs.some((item) => !item.getLock());
     const prevAttrs = graphs.map((el) => ({ lock: el.lock }));
     graphs.forEach((el) => {
       el.lock = newLock;

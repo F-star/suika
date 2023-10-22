@@ -43,7 +43,7 @@ export class TransformHandle {
       this.center = null;
     }
 
-    if (handle && !this.editor.selectedElements.isLockedSingleGraph()) {
+    if (handle && !this.editor.selectedElements.isAllLocked()) {
       const ctx = this.editor.ctx;
       const setting = this.editor.setting;
 
@@ -206,7 +206,7 @@ export class TransformHandle {
   } {
     const handle = this.handle;
 
-    if (!handle || this.editor.selectedElements.isLockedSingleGraph()) {
+    if (!handle || this.editor.selectedElements.isAllLocked()) {
       return { handleName: undefined };
     }
     if (this.isInRotationHandle(hitPoint)) {

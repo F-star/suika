@@ -39,5 +39,6 @@
 
   "group": "Group selection",
 
-  "showOrHide": "Show/Hide"
+  "showOrHide": "Show/Hide",
+  "lockOrUnlock": "Lock/Unlock"
 }

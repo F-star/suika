@@ -1,9 +1,9 @@
-import { MessageIds, SupportedLocale } from './locale/types';
+import { MessageIds, SupportedLocale } from './locale';
 
 declare global {
   namespace FormatjsIntl {
     interface IntlConfig {
-      locale: SupportedLocale
+      locale: SupportedLocale;
     }
   }
 }
@@ -11,7 +11,7 @@ declare global {
 declare global {
   namespace FormatjsIntl {
     interface Message {
-      ids: MessageIds
+      ids: MessageIds;
     }
   }
 }

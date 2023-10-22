@@ -46,8 +46,8 @@ class SelectedElements {
     }
   }
 
-  isLockedSingleGraph() {
-    return this.items.length === 1 && this.items[0].getLock();
+  isAllLocked() {
+    return this.items.every((item) => item.getLock());
   }
 
   hasItem(item: Graph) {

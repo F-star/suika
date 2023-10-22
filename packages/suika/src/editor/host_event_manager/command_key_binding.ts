@@ -248,7 +248,6 @@ export class CommandKeyBinding {
     });
 
     /******* show/hide *****/
-    // show/hide
     const showOrHideAction = () => {
       MutateGraphsAndRecord.toggleVisible(
         editor,
@@ -262,6 +261,22 @@ export class CommandKeyBinding {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Show/Hide',
       action: showOrHideAction,
+    });
+
+    /******* lock/unlock *****/
+    const lockOrUnlockAction = () => {
+      MutateGraphsAndRecord.toggleLock(
+        editor,
+        editor.selectedElements.getItems(),
+      );
+      editor.sceneGraph.render();
+    };
+    editor.keybindingManager.register({
+      key: { metaKey: true, shiftKey: true, keyCode: 'KeyL' },
+      winKey: { ctrlKey: true, shiftKey: true, keyCode: 'KeyL' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'Lock/Unlock',
+      action: lockOrUnlockAction,
     });
   }
 

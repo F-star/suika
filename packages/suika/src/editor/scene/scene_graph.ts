@@ -312,7 +312,7 @@ export class SceneGraph {
     const selectedElements = this.editor.selectedElements.getItems();
     if (
       selectedElements.length === 0 ||
-      this.editor.selectedElements.isLockedSingleGraph()
+      this.editor.selectedElements.isAllLocked()
     ) {
       return false;
     }
