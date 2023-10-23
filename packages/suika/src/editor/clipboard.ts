@@ -1,5 +1,4 @@
 import { Editor } from './editor';
-import hotkeys from 'hotkeys-js';
 import { noop } from '../utils/common';
 import { arrMap } from '../utils/array_util';
 import omit from 'lodash.omit';
@@ -45,11 +44,9 @@ export class ClipboardManager {
       action: copyHandler,
     });
 
-    // TODO: paste by content menu
     window.addEventListener('paste', pasteHandler);
 
     this.unbindEvents = () => {
-      hotkeys.unbind('cmd+c, ctrl+c', copyHandler);
       window.removeEventListener('paste', pasteHandler);
     };
   }

@@ -1,4 +1,3 @@
-import hotkeys from 'hotkeys-js';
 import { IBox, IPoint } from '../../type';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
@@ -50,8 +49,7 @@ export class HostEventManager {
     this.commandKeyBinding.bindKey();
   }
   private bindModifiersRecordEvent() {
-    // record if shift, ctrl, command is pressed
-    hotkeys('*', { keydown: true, keyup: true }, (event) => {
+    const handler = (event: KeyboardEvent) => {
       const prevShift = this.isShiftPressing;
       const prevAlt = this.isAltPressing;
       const prev = this.isSpacePressing;
@@ -84,6 +82,14 @@ export class HostEventManager {
           }
         }
       }
+    };
+
+    document.addEventListener('keydown', handler);
+    document.addEventListener('keyup', handler);
+
+    this.unbindHandlers.push(() => {
+      document.removeEventListener('keydown', handler);
+      document.removeEventListener('keyup', handler);
     });
   }
   /**
@@ -232,7 +238,6 @@ export class HostEventManager {
     this.isEnableContextMenu = false;
   }
   destroy() {
-    hotkeys.unbind();
     this.unbindHandlers.forEach((fn) => fn());
     this.unbindHandlers = [];
     this.moveGraphsKeyBinding.destroy();

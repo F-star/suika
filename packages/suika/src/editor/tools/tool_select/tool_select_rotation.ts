@@ -1,4 +1,3 @@
-import hotkeys from 'hotkeys-js';
 import { IPoint } from '../../../type';
 import { getClosestTimesVal } from '../../../utils/common';
 import { calcVectorRadian, getRectCenterPoint } from '../../../utils/graphics';
@@ -27,18 +26,16 @@ export class SelectRotationTool implements IBaseTool {
   }[] = [];
 
   private shiftPressHandler = () => {
-    if (hotkeys.shift) {
-      this.rotateSelectedElements();
-    }
+    this.rotateSelectedElements();
   };
 
   constructor(private editor: Editor) {}
 
   active() {
-    hotkeys('*', { keydown: true, keyup: true }, this.shiftPressHandler);
+    this.editor.hostEventManager.on('shiftToggle', this.shiftPressHandler);
   }
   inactive() {
-    hotkeys.unbind('*', this.shiftPressHandler);
+    this.editor.hostEventManager.off('shiftToggle', this.shiftPressHandler);
   }
   start() {
     this.lastPoint = null;
