@@ -17,6 +17,7 @@
   "command.pasteHere": "粘贴到此处",
   "command.undo": "撤销",
   "command.redo": "重做",
+  "command.selectAll": "全选",
   "arrange.forward": "上移一层",
   "arrange.backward": "下移一层",
   "arrange.front": "移到顶部",

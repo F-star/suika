@@ -54,7 +54,7 @@ export const ContextMenu: FC = () => {
   }, [editor]);
 
   /**
-   * without select elements
+   * contextmenu part showed anyway
    */
   const renderNoSelectContextMenu = () => {
     return (
@@ -114,12 +114,25 @@ export const ContextMenu: FC = () => {
         >
           <FormattedMessage id="command.redo" />
         </ContextMenuItem>
+        <ContextMenuSep />
+        <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+A' : '⌘A'}
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              editor.selectedElements.selectAll();
+              editor.sceneGraph.render();
+            }
+          }}
+        >
+          <FormattedMessage id="command.selectAll" />
+        </ContextMenuItem>
       </>
     );
   };
 
   /**
-   * without select elements
+   * with select elements
    */
   const renderSelectContextMenu = () => {
     return (

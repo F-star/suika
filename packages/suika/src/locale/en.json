@@ -17,6 +17,7 @@
   "command.pasteHere": "Paste here",
   "command.undo": "Undo",
   "command.redo": "Redo",
+  "command.selectAll": "Select all",
   "arrange.forward": "Forward",
   "arrange.backward": "Backward",
   "arrange.front": "Bring to Front",
