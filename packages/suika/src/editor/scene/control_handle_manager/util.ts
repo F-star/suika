@@ -3,17 +3,24 @@ import { ITexture, TextureType } from '../../texture';
 import { Rect } from '../rect';
 import { ControlHandle } from './control_handle';
 import { ICursor } from '../../cursor_manager';
-import { rad2Deg } from '@suika/geo';
+import { normalizeDegree, rad2Deg } from '@suika/geo';
 import { ITransformHandleType } from './type';
 
 const getResizeCursor = (type: string, rotation: number): ICursor => {
-  const degree =
-    rad2Deg(rotation) + (type === 'se' || type === 'nw' ? -45 : 45);
+  const dDegree = type === 'se' || type === 'nw' ? -45 : 45;
+  const degree = rad2Deg(rotation) + dDegree;
   return { type: 'resize', degree };
 };
 
-const getRotationCursor = (): ICursor => {
-  return 'grab';
+const getRotationCursor = (type: string, rotation: number): ICursor => {
+  const dDegree = {
+    neRotation: 45,
+    seRotation: 135,
+    swRotation: 225,
+    nwRotation: 315,
+  }[type]!;
+  const degree = normalizeDegree(rad2Deg(rotation) + dDegree);
+  return { type: 'rotation', degree };
 };
 
 export const createTransformHandles = (params: {

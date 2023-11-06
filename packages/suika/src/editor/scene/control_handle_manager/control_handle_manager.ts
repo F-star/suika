@@ -107,10 +107,10 @@ export class ControlHandleManager {
     const handleHitToleration = this.editor.setting.get('handleHitToleration');
 
     for (let i = types.length - 1; i >= 0; i--) {
-      const key = types[i];
-      const handle = this.transformHandles.get(key);
+      const type = types[i];
+      const handle = this.transformHandles.get(type);
       if (!handle) {
-        console.warn(`handle ${key} not found`);
+        console.warn(`handle ${type} not found`);
         continue;
       }
 
@@ -121,7 +121,7 @@ export class ControlHandleManager {
       if (isHit) {
         return {
           handleName: handle.graph.objectName,
-          cursor: handle.getCursor(handle.graph.objectName, rotation),
+          cursor: handle.getCursor(type, rotation),
         };
       }
     }
