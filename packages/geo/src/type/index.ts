@@ -10,6 +10,12 @@ export interface IRect {
   height: number;
 }
 
+export type IBox = IRect;
+
+export interface IRectWithRotation extends IRect {
+  rotation?: number;
+}
+
 export interface ICircle {
   x: number;
   y: number;

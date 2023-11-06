@@ -22,6 +22,7 @@ import { PerfMonitor } from './perf_monitor';
 import { CursorManger, ICursor } from './cursor_manager';
 import { ImgManager } from './Img_manager';
 import { GroupManager } from './group_manager';
+import { ControlHandleManager } from './scene/control_handle_manager/control_handle_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -41,6 +42,7 @@ export class Editor {
   paperId: string;
 
   sceneGraph: SceneGraph;
+  controlHandleManager: ControlHandleManager;
   groupManager: GroupManager;
 
   setting: Setting;
@@ -84,6 +86,7 @@ export class Editor {
 
     this.sceneGraph = new SceneGraph(this);
     this.groupManager = new GroupManager(this);
+    this.controlHandleManager = new ControlHandleManager(this);
 
     this.cursorManager = new CursorManger(this);
     this.viewportManager = new ViewportManager(this);

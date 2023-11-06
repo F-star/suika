@@ -3,7 +3,6 @@ import { arrMap } from '../../../utils/array_util';
 import { noop } from '../../../utils/common';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
-import { HandleName } from '../../scene/transform_handle';
 import { IBaseTool } from '../type';
 
 /**
@@ -11,7 +10,7 @@ import { IBaseTool } from '../type';
  */
 export class SelectResizeTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
-  private handleName!: Exclude<HandleName, 'rotation'>;
+  private handleName!: string;
   private prevElements: Array<{
     x: number;
     y: number;
@@ -42,8 +41,9 @@ export class SelectResizeTool implements IBaseTool {
   }
   start(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
-    const { handleName } =
-      this.editor.sceneGraph.transformHandle.getNameByPoint(this.startPoint);
+    const handleInfo = this.editor.controlHandleManager.getHandleInfoByPoint(
+      this.startPoint,
+    );
 
     this.prevElements = arrMap(
       this.editor.selectedElements.getItems(),
@@ -55,10 +55,10 @@ export class SelectResizeTool implements IBaseTool {
         rotation: item.rotation ?? 0,
       }),
     );
-    if (!handleName || handleName === 'rotation') {
-      throw new Error(`handleName ${handleName} is invalid`);
+    if (!handleInfo) {
+      throw new Error(`handleName is invalid`);
     }
-    this.handleName = handleName;
+    this.handleName = handleInfo.handleName;
   }
   drag(e: PointerEvent) {
     this.editor.commandManager.disableRedoUndo();

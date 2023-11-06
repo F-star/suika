@@ -38,12 +38,11 @@ export class Setting {
     hoverOutlineStrokeWidth: 2,
 
     /******** transform ********/
-    handleRotationStroke: '#1592fe',
-    handleRotationFill: '#fff',
+    handleStroke: '#1592fe',
+    handleFill: '#fff',
     handleStrokeWidth: 2,
-    handleStrokePadding: 4,
+    handleHitToleration: 2,
     handleSize: 6,
-    handleRotationLineLength: 15,
 
     /********* text ********/
     defaultFontSize: 12,

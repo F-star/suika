@@ -80,11 +80,12 @@ export class SelectTool implements ITool {
       return;
     }
     const pointer = this.editor.getSceneCursorXY(e);
-    const { cursor } =
-      this.editor.sceneGraph.transformHandle.getNameByPoint(pointer);
-    this.editor.setCursor(cursor || 'default');
+    const handleInfo =
+      this.editor.controlHandleManager.getHandleInfoByPoint(pointer);
 
-    if (cursor) {
+    this.editor.setCursor(handleInfo?.cursor || 'default');
+
+    if (handleInfo) {
       this.editor.selectedElements.setHoverItem(null);
     } else {
       const topHitElement = this.editor.sceneGraph.getTopHitElement(
@@ -117,12 +118,12 @@ export class SelectTool implements ITool {
 
     this.startPoint = this.editor.getSceneCursorXY(e);
 
-    // 0. 点中 handle（旋转点）
-    const { handleName } = sceneGraph.transformHandle.getNameByPoint(
+    const handleInfo = this.editor.controlHandleManager.getHandleInfoByPoint(
       this.startPoint,
     );
-    if (handleName) {
-      if (handleName === 'rotation') {
+
+    if (handleInfo) {
+      if (handleInfo.handleName === 'rotation') {
         this.currStrategy = this.strategySelectRotation;
       } else {
         this.currStrategy = this.strategySelectResize;

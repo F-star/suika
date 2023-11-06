@@ -2,7 +2,7 @@ import { DOUBLE_PI } from '../../constant';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils/canvas';
 import { parseRGBAStr } from '../../utils/color';
-import { transformRotate } from '../../utils/transform';
+import { transformRotate } from '@suika/geo';
 import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
@@ -17,6 +17,8 @@ export class Ellipse extends Graph {
   override hitTest(x: number, y: number, padding = 0) {
     const cx = this.x + this.width / 2;
     const cy = this.y + this.height / 2;
+    const strokeWidth = (this.strokeWidth || 0) / 2;
+    padding = padding + strokeWidth;
     const w = this.width / 2 + padding;
     const h = this.height / 2 + padding;
 
@@ -33,8 +35,8 @@ export class Ellipse extends Graph {
 
   override draw(
     ctx: CanvasRenderingContext2D,
-    imgManager: ImgManager,
-    smooth: boolean,
+    imgManager?: ImgManager,
+    smooth?: boolean,
   ): void {
     const cx = this.x + this.width / 2;
     const cy = this.y + this.height / 2;
@@ -50,8 +52,12 @@ export class Ellipse extends Graph {
         ctx.fillStyle = parseRGBAStr(texture.attrs);
         ctx.fill();
       } else if (texture.type === TextureType.Image) {
-        ctx.clip();
-        this.fillImage(ctx, texture, imgManager, smooth);
+        if (imgManager) {
+          ctx.clip();
+          this.fillImage(ctx, texture, imgManager, smooth);
+        } else {
+          console.warn('ImgManager is not provided');
+        }
       }
     }
 

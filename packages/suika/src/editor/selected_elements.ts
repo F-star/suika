@@ -91,11 +91,11 @@ class SelectedElements {
     }
   }
   getCenterPoint() {
-    if (this.items.length === 1) {
-      return getRectCenterPoint(this.items[0]);
-    } else {
-      throw new Error('还没实现，敬请期待');
+    const bBox = this.getBBox();
+    if (!bBox) {
+      throw new Error('no selected elements');
     }
+    return getRectCenterPoint(bBox);
   }
   size() {
     return this.items.length;

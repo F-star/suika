@@ -3,9 +3,9 @@ import { Editor } from '../editor';
 import { Line } from '../scene/line';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
-import { IRect } from '../../type';
+import { IRect } from '@suika/geo';
 import { calcVectorRadian } from '../../utils/graphics';
-import { transformRotate } from '../../utils/transform';
+import { transformRotate } from '@suika/geo';
 import { HALF_PI } from '../../constant';
 import { normalizeRadian } from '@suika/geo';
 

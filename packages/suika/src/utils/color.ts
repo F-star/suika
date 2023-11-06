@@ -62,3 +62,16 @@ export const parseHexToRGB = (hex: string): IRGB | null => {
   const b = parseInt(hex.slice(4, 6), 16);
   return { r, g, b };
 };
+
+export const parseHexToRGBA = (hex: string): IRGBA | null => {
+  hex = normalizeHex(hex);
+  if (!hex) {
+    return null;
+  }
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const aStr = hex.slice(6, 8);
+  const a = aStr ? parseInt(aStr, 16) / 255 : 1;
+  return { r, g, b, a };
+};

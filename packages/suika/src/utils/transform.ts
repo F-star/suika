@@ -28,27 +28,6 @@ export function transform(
 }
 
 /**
- * rotate
- */
-export function transformRotate(
-  x: number,
-  y: number,
-  radian: number,
-  cx: number,
-  cy: number,
-): { x: number; y: number } {
-  if (!radian) {
-    return { x, y };
-  }
-  const cos = Math.cos(radian);
-  const sin = Math.sin(radian);
-  return {
-    x: (x - cx) * cos - (y - cy) * sin + cx,
-    y: (x - cx) * sin + (y - cy) * cos + cy,
-  };
-}
-
-/**
  * 【目前没有使用】
  * 计算旋转前的 x、y
  * transformRotate 的反推
