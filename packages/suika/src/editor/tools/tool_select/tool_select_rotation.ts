@@ -5,7 +5,7 @@ import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 import { forEach } from '../../../utils/array_util';
-import { normalizeRadian } from '@suika/geo';
+import { normalizeRadian, rad2Deg } from '@suika/geo';
 
 /**
  * select tool
@@ -93,6 +93,12 @@ export class SelectRotationTool implements IBaseTool {
         const lockRotation = this.editor.setting.get('lockRotation');
         lastRotation = getClosestTimesVal(lastRotation, lockRotation);
       }
+
+      // FIXME: 临时方案
+      this.editor.setCursor({
+        type: 'rotation',
+        degree: rad2Deg(lastRotation),
+      });
 
       this.dRotation = normalizeRadian(lastRotation - this.startRotation);
 
