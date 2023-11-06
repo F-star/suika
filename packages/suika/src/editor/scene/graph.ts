@@ -1,20 +1,14 @@
-import {
-  IBox,
-  IBox2,
-  GraphType,
-  IPoint,
-  IBox2WithRotation as IBoxWithRotation,
-  IRect,
-} from '../../type';
+import { IBox, IBox2, GraphType, IPoint, IBox2WithRotation } from '../../type';
+import { IRect } from '@suika/geo';
 import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
-import { isPointInRect, isRectIntersect } from '@suika/geo';
+import { IRectWithRotation, isPointInRect, isRectIntersect } from '@suika/geo';
 import {
   getAbsoluteCoords,
   getElementRotatedXY,
   getRectCenterPoint,
 } from '../../utils/graphics';
 import { normalizeRect, normalizeRadian, isRectContain } from '@suika/geo';
-import { transformRotate } from '../../utils/transform';
+import { transformRotate } from '@suika/geo';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';
 import { HALF_PI } from '../../constant';
@@ -125,6 +119,16 @@ export class Graph {
       const self: any = this;
       self[key] = attrs[key];
     }
+  }
+
+  getRectWithRotation(): IRectWithRotation {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      rotation: this.rotation,
+    };
   }
 
   /**
@@ -243,7 +247,8 @@ export class Graph {
       ? transformRotate(x, y, -this.rotation, cx, cy)
       : { x, y };
 
-    return isPointInRect(rotatedHitPoint, bBox, padding);
+    const strokeWidth = (this.strokeWidth ?? 0) / 2;
+    return isPointInRect(rotatedHitPoint, bBox, padding + strokeWidth);
   }
 
   /**
@@ -315,9 +320,9 @@ export class Graph {
     this.y = this.y + rotatedY - prevRotatedY;
   }
   movePoint(
-    type: 'se' | 'ne' | 'nw' | 'sw',
+    type: string, // 'se' | 'ne' | 'nw' | 'sw',
     newPos: IPoint,
-    oldBox: IBoxWithRotation,
+    oldBox: IBox2WithRotation,
     keepRatio = false,
     scaleFromCenter = false,
   ) {
@@ -454,9 +459,9 @@ export class Graph {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: CanvasRenderingContext2D,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    imgManager: ImgManager,
+    imgManager?: ImgManager,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    smooth: boolean,
+    smooth?: boolean,
   ) {
     throw new Error('Method not implemented.');
   }
@@ -474,7 +479,7 @@ export class Graph {
     ctx: CanvasRenderingContext2D,
     texture: TextureImage,
     imgManager: ImgManager,
-    smooth: boolean,
+    smooth = true,
   ) {
     const src = texture.attrs.src;
     const width = this.width;
@@ -564,7 +569,7 @@ export class Graph {
   /**
    * add dRotate to rotation
    */
-  dRotate(dRotation: number, initAttrs: IBoxWithRotation, center: IPoint) {
+  dRotate(dRotation: number, initAttrs: IBox2WithRotation, center: IPoint) {
     this.rotation = normalizeRadian(initAttrs.rotation + dRotation);
 
     const [graphCx, graphCy] = getRectCenterPoint(initAttrs);

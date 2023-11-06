@@ -3,7 +3,7 @@ import { Editor } from '../editor';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 import cloneDeep from 'lodash.clonedeep';
-import { IRect } from '../../type';
+import { IRect } from '@suika/geo';
 import { normalizeRect } from '@suika/geo';
 
 export class DrawEllipseTool extends DrawGraphTool implements ITool {

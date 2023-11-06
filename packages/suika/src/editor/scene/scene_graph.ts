@@ -1,22 +1,15 @@
 import { Editor } from '../editor';
-import {
-  GraphType,
-  IBox,
-  IEditorPaperData,
-  IObject,
-  IPoint,
-  IRect,
-} from '../../type';
+import { GraphType, IBox, IEditorPaperData, IObject, IPoint } from '../../type';
+import { IRect } from '@suika/geo';
 import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
 import { getRectCenterPoint } from '../../utils/graphics';
-import { getMergedRect, isRectIntersect } from '@suika/geo';
+import { IRectWithRotation, getMergedRect, isRectIntersect } from '@suika/geo';
 import rafThrottle from '../../utils/raf_throttle';
-import { transformRotate } from '../../utils/transform';
+import { transformRotate } from '@suika/geo';
 import { Ellipse } from './ellipse';
 import { Graph, GraphAttrs } from './graph';
 import { Rect } from './rect';
-import { TransformHandle } from './transform_handle';
 import { arrMap, forEach } from '../../utils/array_util';
 import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
@@ -49,12 +42,10 @@ export class SceneGraph {
   } | null = null;
   // private handle: { rotation: IPoint } | null = null;
   private eventEmitter = new EventEmitter<Events>();
-  transformHandle: TransformHandle;
-  grid: Grid;
+  private grid: Grid;
   showOutline = true;
 
   constructor(private editor: Editor) {
-    this.transformHandle = new TransformHandle(editor);
     this.grid = new Grid(editor);
   }
 
@@ -108,6 +99,7 @@ export class SceneGraph {
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
     const viewportBoxInScene = this.editor.viewportManager.getBbox();
+    const selectedElements = this.editor.selectedElements;
 
     const visibleGraphs = this.getVisibleItems();
     const visibleGraphsInViewport: Graph[] = [];
@@ -152,8 +144,6 @@ export class SceneGraph {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
-    const selectedElementsBBox = this.editor.selectedElements.getBBox();
-
     /** draw pixel grid */
     if (
       setting.get('enablePixelGrid') &&
@@ -164,27 +154,44 @@ export class SceneGraph {
 
     /** draw hover graph outline */
     if (setting.get('highlightLayersOnHover')) {
-      const hoverGraph = this.editor.selectedElements.getHoverItem();
+      const hoverGraph = selectedElements.getHoverItem();
       if (
         hoverGraph &&
         hoverGraph.getVisible() &&
-        !this.editor.selectedElements.hasItem(hoverGraph)
+        !selectedElements.hasItem(hoverGraph)
       ) {
         const strokeWidth = setting.get('hoverOutlineStrokeWidth');
-        this.drawGraphsBbox([hoverGraph], { strokeWidth: strokeWidth });
+        this.drawGraphsBbox([hoverGraph.getRectWithRotation()], {
+          strokeWidth: strokeWidth,
+        });
+      }
+    }
+
+    let selectedRect: IRectWithRotation | null = null;
+    const selectedSize = selectedElements.size();
+    if (selectedSize > 0) {
+      if (selectedSize === 1) {
+        const selectedGraph = selectedElements.getItems()[0];
+        selectedRect = selectedGraph.getRectWithRotation();
+      } else {
+        selectedRect = selectedElements.getBBox();
       }
     }
 
     /** draw selected elements bbox */
     if (this.showOutline) {
+      // TODO: draw outline
+      // for performance consideration, currently only draw bounding box
       this.drawGraphsBbox(
         this.editor.selectedElements
           .getItems()
-          .filter((item) => item.getVisible()),
+          .filter((item) => item.getVisible())
+          .map((item) => item.getRectWithRotation()),
       );
-      // TODO: draw outline
-      // for performance consideration, currently only draw bounding box
-      this.drawMixedSelectedBox(selectedElementsBBox);
+      // draw selected box
+      if (selectedRect) {
+        this.drawSelectedBox(selectedRect);
+      }
     }
 
     /** draw selection */
@@ -212,7 +219,15 @@ export class SceneGraph {
 
     /** draw transform handle */
     if (this.showOutline) {
-      this.transformHandle.draw(selectedElementsBBox);
+      // rect +  rotation
+      if (selectedRect) {
+        this.editor.controlHandleManager.draw({
+          ...selectedRect,
+          rotation: this.editor.selectedElements.getRotation(),
+        });
+      } else {
+        this.editor.controlHandleManager.inactive();
+      }
     }
 
     this.editor.refLine.drawRefLine(ctx);
@@ -228,17 +243,15 @@ export class SceneGraph {
   });
 
   private drawGraphsBbox(
-    graphs: Graph[],
+    bBoxes: IRectWithRotation[],
     options?: { strokeWidth?: number; stroke?: string },
   ) {
-    if (graphs.length === 0) {
+    if (bBoxes.length === 0) {
       return;
     }
 
-    const bBoxes = graphs.map((element) => element.getRect());
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
-
     ctx.save();
     ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
     if (options?.strokeWidth) {
@@ -251,12 +264,11 @@ export class SceneGraph {
     for (let i = 0, len = bBoxes.length; i < len; i++) {
       ctx.save();
       const bBox = bBoxes[i];
-      const currElement = graphs[i];
-      if (currElement.rotation) {
+      if (bBox.rotation) {
         const [cx, cy] = getRectCenterPoint(bBox);
         const { x: cxInViewport, y: cyInViewport } =
           this.editor.sceneCoordsToViewport(cx, cy);
-        rotateInCanvas(ctx, currElement.rotation, cxInViewport, cyInViewport);
+        rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
       }
       const { x: xInViewport, y: yInViewport } =
         this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
@@ -272,33 +284,30 @@ export class SceneGraph {
   }
 
   /** draw the mixed bounding box of selected elements */
-  private drawMixedSelectedBox(selectedElementsBBox: IBox | null) {
-    if (selectedElementsBBox === null) {
-      return;
-    }
-
+  private drawSelectedBox(bBox: IRectWithRotation) {
     const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
 
     const stroke = this.editor.setting.get('guideBBoxStroke');
 
     ctx.save();
-    if (this.editor.selectedElements.size() === 1) {
-      this.drawGraphsBbox(this.editor.selectedElements.getItems(), { stroke });
-    } else {
-      ctx.strokeStyle = stroke;
-      const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(
-          selectedElementsBBox.x,
-          selectedElementsBBox.y,
-        );
-      ctx.strokeRect(
-        xInViewport,
-        yInViewport,
-        selectedElementsBBox.width * zoom,
-        selectedElementsBBox.height * zoom,
-      );
+    ctx.strokeStyle = stroke;
+    const { x: xInViewport, y: yInViewport } =
+      this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
+
+    if (bBox.rotation) {
+      const [cx, cy] = getRectCenterPoint(bBox);
+      const { x: cxInViewport, y: cyInViewport } =
+        this.editor.sceneCoordsToViewport(cx, cy);
+      rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
     }
+
+    ctx.strokeRect(
+      xInViewport,
+      yInViewport,
+      bBox.width * zoom,
+      bBox.height * zoom,
+    );
 
     ctx.restore();
   }
@@ -464,17 +473,6 @@ export class SceneGraph {
   load(str: string) {
     this.children = [];
     this.addGraphsByStr(str);
-  }
-
-  // TODO: update tree by patch obj and id
-  updateElements() {
-    /**
-     * {
-     *   update: { id: '123', attrs: { width: 1 }  }
-     *   removed: new Set(['8', '9'])
-     *   create: { type: rect, }
-     * }
-     */
   }
 
   on(eventName: 'render', handler: () => void) {

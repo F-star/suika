@@ -1,5 +1,5 @@
 import { Graph } from '../scene/graph';
-import { IPoint, IRect } from '../../type';
+import { IPoint, IRect } from '@suika/geo';
 import { noop } from '../../utils/common';
 import { normalizeRect } from '@suika/geo';
 import { AddShapeCommand } from '../commands/add_shape';

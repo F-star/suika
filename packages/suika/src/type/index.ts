@@ -1,11 +1,6 @@
 import { IGroupsData } from '../editor/group_manager';
 
-export interface IRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import { IRect } from '@suika/geo';
 
 export type IBox = IRect;
 

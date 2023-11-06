@@ -14,8 +14,8 @@ export class Rect extends Graph {
 
   override draw(
     ctx: CanvasRenderingContext2D,
-    imgManager: ImgManager,
-    smooth: boolean,
+    imgManager?: ImgManager,
+    smooth?: boolean,
   ) {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
@@ -33,7 +33,11 @@ export class Rect extends Graph {
           break;
         }
         case TextureType.Image: {
-          this.fillImage(ctx, texture, imgManager, smooth);
+          if (imgManager) {
+            this.fillImage(ctx, texture, imgManager, smooth);
+          } else {
+            console.warn('ImgManager is not provided');
+          }
         }
       }
     }

@@ -1,4 +1,5 @@
-import { IPoint, IRect } from '../type';
+import { transformRotate } from '../transform';
+import { IPoint, IRect, IRectWithRotation } from '../type';
 
 export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
   return {
@@ -31,7 +32,7 @@ export const normalizeRect = ({ x, y, width, height }: IRect): IRect => {
 /**
  * get merged rect from rects
  */
-export function getMergedRect(...rects: IRect[]): IRect {
+export const getMergedRect = (...rects: IRect[]): IRect => {
   if (rects.length === 0) {
     throw new Error('the count of rect can not be 0');
   }
@@ -47,25 +48,58 @@ export function getMergedRect(...rects: IRect[]): IRect {
     width: maxX - minX,
     height: maxY - minY,
   };
-}
+};
 
-export function isRectIntersect(rect1: IRect, rect2: IRect) {
+export const isRectIntersect = (rect1: IRect, rect2: IRect) => {
   return (
     rect1.x <= rect2.x + rect2.width &&
     rect1.x + rect1.width >= rect2.x &&
     rect1.y <= rect2.y + rect2.height &&
     rect1.y + rect1.height >= rect2.y
   );
-}
+};
 
-/**
- * whether rect1 contains rect2
- */
-export function isRectContain(rect1: IRect, rect2: IRect) {
+/** whether rect1 contains rect2 */
+export const isRectContain = (rect1: IRect, rect2: IRect) => {
   return (
     rect1.x <= rect2.x &&
     rect1.y <= rect2.y &&
     rect1.x + rect1.width >= rect2.x + rect2.width &&
     rect1.y + rect1.height >= rect2.y + rect2.height
   );
-}
+};
+
+export const rectToPoints = (rect: IRectWithRotation) => {
+  const { x, y, width, height, rotation = 0 } = rect;
+  const [cx, cy] = [x + width / 2, y + height / 2];
+  let points = [
+    { x, y },
+    { x: x + width, y },
+    { x: x + width, y: y + height },
+    { x, y: y + height },
+  ];
+
+  if (rotation) {
+    points = points.map((point) =>
+      transformRotate(point.x, point.y, rotation, cx, cy),
+    );
+  }
+
+  return {
+    nw: points[0],
+    ne: points[1],
+    se: points[2],
+    sw: points[3],
+  };
+};
+
+export const offsetRect = (rect: IRectWithRotation, padding: number) => {
+  const { x, y, width, height } = rect;
+  return {
+    x: x - padding,
+    y: y - padding,
+    width: width + padding * 2,
+    height: height + padding * 2,
+    rotation: rect.rotation,
+  };
+};
