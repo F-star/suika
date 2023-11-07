@@ -12,7 +12,7 @@ const getResizeCursor = (type: string, rotation: number): ICursor => {
   return { type: 'resize', degree };
 };
 
-const getRotationCursor = (type: string, rotation: number): ICursor => {
+export const getRotationCursor = (type: string, rotation: number): ICursor => {
   const dDegree = {
     neRotation: 45,
     seRotation: 135,

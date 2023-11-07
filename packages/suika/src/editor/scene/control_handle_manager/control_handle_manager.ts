@@ -92,7 +92,7 @@ export class ControlHandleManager {
 
   getHandleInfoByPoint(hitPoint: IPoint): {
     handleName: string;
-    cursor?: ICursor;
+    cursor: ICursor;
   } | null {
     if (!this.visible) {
       return null;
@@ -120,7 +120,7 @@ export class ControlHandleManager {
 
       if (isHit) {
         return {
-          handleName: handle.graph.objectName,
+          handleName: type,
           cursor: handle.getCursor(type, rotation),
         };
       }

@@ -6,6 +6,7 @@ import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
 import { forEach } from '../../../utils/array_util';
 import { normalizeRadian, rad2Deg } from '@suika/geo';
+import { getRotationCursor } from '../../scene/control_handle_manager';
 
 /**
  * select tool
@@ -26,6 +27,7 @@ export class SelectRotationTool implements IBaseTool {
     width: number;
     height: number;
   }[] = [];
+  handleType = '';
 
   private shiftPressHandler = () => {
     this.rotateSelectedElements();
@@ -83,7 +85,7 @@ export class SelectRotationTool implements IBaseTool {
       const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] = this
         .selectedBoxCenter as [number, number];
 
-      let lastRotation = calcVectorRadian(
+      let lastMouseRotation = calcVectorRadian(
         cxInSelectedElementsBBox,
         cyInSelectedElementsBBox,
         lastPoint.x,
@@ -91,16 +93,24 @@ export class SelectRotationTool implements IBaseTool {
       );
       if (this.editor.hostEventManager.isShiftPressing) {
         const lockRotation = this.editor.setting.get('lockRotation');
-        lastRotation = getClosestTimesVal(lastRotation, lockRotation);
+        lastMouseRotation = getClosestTimesVal(lastMouseRotation, lockRotation);
       }
 
-      // FIXME: 临时方案
-      this.editor.setCursor({
-        type: 'rotation',
-        degree: rad2Deg(lastRotation),
-      });
+      if (this.editor.selectedElements.size() === 1) {
+        this.editor.setCursor(
+          getRotationCursor(
+            this.handleType,
+            this.editor.selectedElements.getRotation(),
+          ),
+        );
+      } else {
+        this.editor.setCursor({
+          type: 'rotation',
+          degree: rad2Deg(lastMouseRotation),
+        });
+      }
 
-      this.dRotation = normalizeRadian(lastRotation - this.startRotation);
+      this.dRotation = normalizeRadian(lastMouseRotation - this.startRotation);
 
       forEach(selectedElements, (graph, i) => {
         graph.dRotate(this.dRotation, this.prevGraphAttrs[i], {

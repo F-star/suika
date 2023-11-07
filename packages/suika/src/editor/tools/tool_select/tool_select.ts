@@ -7,6 +7,7 @@ import { DrawSelectionBox } from './tool_select_selection';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectResizeTool } from './tool_select_resize';
+import { isRotationCursor } from '../../cursor_manager';
 
 /**
  * Select Tool
@@ -123,7 +124,8 @@ export class SelectTool implements ITool {
     );
 
     if (handleInfo) {
-      if (handleInfo.handleName === 'rotation') {
+      if (isRotationCursor(handleInfo.cursor)) {
+        this.strategySelectRotation.handleType = handleInfo.handleName;
         this.currStrategy = this.strategySelectRotation;
       } else {
         this.currStrategy = this.strategySelectResize;

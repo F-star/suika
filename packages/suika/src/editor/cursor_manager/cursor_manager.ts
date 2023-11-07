@@ -4,10 +4,15 @@ import './cursor.scss';
 import isEqual from 'lodash.isequal';
 import { getRotationIconSvgBase64 } from './util';
 
+export interface ICursorRotation {
+  type: 'rotation';
+  degree: number;
+}
+
 export type ICursor =
   | 'default'
   | { type: 'resize'; degree: number }
-  | { type: 'rotation'; degree: number }
+  | ICursorRotation
   | 'grab'
   | 'grabbing'
   | 'move'
@@ -87,9 +92,19 @@ export class CursorManger {
   }
 
   private setRotationCursorInCanvas(degree: number) {
+    degree = Math.round(degree);
     // TODO: cache the svg base64
     this.editor.canvasElement.style.cursor = `url('${getRotationIconSvgBase64(
       degree,
     )}') 16 16, auto`;
   }
 }
+
+export const isRotationCursor = (
+  cursor: ICursor,
+): cursor is ICursorRotation => {
+  return (
+    typeof cursor === 'object' &&
+    (cursor as ICursorRotation)?.type === 'rotation'
+  );
+};
