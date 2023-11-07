@@ -9,6 +9,7 @@ import { Editor } from '../../editor';
 import { createTransformHandles } from './util';
 import { ControlHandle } from './control_handle';
 import { ITransformHandleType } from './type';
+import { nearestPixelVal } from '../../../utils/common';
 
 const types = [
   'nwRotation',
@@ -77,15 +78,17 @@ export class ControlHandleManager {
     const ctx = this.editor.ctx;
     this.transformHandles.forEach((handle) => {
       const { x, y } = this.editor.sceneCoordsToViewport(handle.x, handle.y);
-      handle.graph.x = Math.round(x - handle.graph.width / 2);
-      handle.graph.y = Math.round(y - handle.graph.height / 2);
-      handle.graph.rotation = rect.rotation;
+      const graph = handle.graph;
+      graph.x = nearestPixelVal(x - graph.width / 2);
+      graph.y = nearestPixelVal(y - graph.height / 2);
 
-      if (!handle.graph.getVisible()) {
+      graph.rotation = rect.rotation;
+
+      if (!graph.getVisible()) {
         return;
       }
       ctx.save();
-      handle.graph.draw(ctx);
+      graph.draw(ctx);
       ctx.restore();
     });
   }

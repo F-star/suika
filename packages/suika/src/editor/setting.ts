@@ -41,8 +41,8 @@ export class Setting {
     handleStroke: '#1592fe',
     handleFill: '#fff',
     handleStrokeWidth: 2,
-    handleHitToleration: 2,
-    handleSize: 6,
+    handleHitToleration: 3,
+    handleSize: 7,
 
     /********* text ********/
     defaultFontSize: 12,
