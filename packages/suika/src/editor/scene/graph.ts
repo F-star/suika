@@ -12,6 +12,7 @@ import { transformRotate } from '@suika/geo';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';
 import { HALF_PI } from '../../constant';
+import { rotateInCanvas } from '../../utils/canvas';
 
 export interface GraphAttrs {
   type?: GraphType;
@@ -463,7 +464,26 @@ export class Graph {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     smooth?: boolean,
   ) {
-    throw new Error('Method not implemented.');
+    throw new Error('draw Method not implemented.');
+  }
+
+  drawOutline(
+    ctx: CanvasRenderingContext2D,
+    stroke: string,
+    strokeWidth: number,
+  ) {
+    if (this.rotation) {
+      const cx = this.x + this.width / 2;
+      const cy = this.y + this.height / 2;
+
+      rotateInCanvas(ctx, this.rotation, cx, cy);
+    }
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = strokeWidth;
+    ctx.beginPath();
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.stroke();
+    ctx.closePath();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

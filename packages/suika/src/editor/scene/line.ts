@@ -48,4 +48,24 @@ export class Line extends Graph {
       ctx.closePath();
     }
   }
+
+  override drawOutline(
+    ctx: CanvasRenderingContext2D,
+    stroke: string,
+    strokeWidth: number,
+  ) {
+    const { x, y, width, rotation } = this;
+    if (rotation) {
+      const { x: cx, y: cy } = this.getCenter();
+
+      rotateInCanvas(ctx, rotation, cx, cy);
+    }
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + width, y);
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = stroke;
+    ctx.stroke();
+    ctx.closePath();
+  }
 }
