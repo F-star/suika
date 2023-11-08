@@ -75,4 +75,24 @@ export class Ellipse extends Graph {
 
     ctx.closePath();
   }
+
+  override drawOutline(
+    ctx: CanvasRenderingContext2D,
+    stroke: string,
+    strokeWidth: number,
+  ) {
+    const cx = this.x + this.width / 2;
+    const cy = this.y + this.height / 2;
+
+    if (this.rotation) {
+      rotateInCanvas(ctx, this.rotation, cx, cy);
+    }
+
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = strokeWidth;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, this.width / 2, this.height / 2, 0, 0, DOUBLE_PI);
+    ctx.stroke();
+    ctx.closePath();
+  }
 }

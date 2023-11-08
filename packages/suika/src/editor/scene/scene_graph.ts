@@ -160,10 +160,10 @@ export class SceneGraph {
         hoverGraph.getVisible() &&
         !selectedElements.hasItem(hoverGraph)
       ) {
-        const strokeWidth = setting.get('hoverOutlineStrokeWidth');
-        this.drawGraphsBbox([hoverGraph.getRectWithRotation()], {
-          strokeWidth: strokeWidth,
-        });
+        this.drawGraphsOutline(
+          [hoverGraph],
+          setting.get('hoverOutlineStrokeWidth'),
+        );
       }
     }
 
@@ -178,15 +178,15 @@ export class SceneGraph {
       }
     }
 
-    /** draw selected elements bbox */
+    /** draw selected elements outline */
     if (this.showOutline) {
       // TODO: draw outline
-      // for performance consideration, currently only draw bounding box
-      this.drawGraphsBbox(
+
+      this.drawGraphsOutline(
         this.editor.selectedElements
           .getItems()
-          .filter((item) => item.getVisible())
-          .map((item) => item.getRectWithRotation()),
+          .filter((item) => item.getVisible()),
+        setting.get('selectedOutlineStrokeWidth'),
       );
       // draw selected box
       if (selectedRect) {
@@ -242,46 +242,68 @@ export class SceneGraph {
     this.eventEmitter.emit('render');
   });
 
-  private drawGraphsBbox(
-    bBoxes: IRectWithRotation[],
-    options?: { strokeWidth?: number; stroke?: string },
-  ) {
-    if (bBoxes.length === 0) {
-      return;
-    }
-
-    const zoom = this.editor.zoomManager.getZoom();
+  private drawGraphsOutline(graphs: Graph[], strokeWidth: number) {
     const ctx = this.editor.ctx;
-    ctx.save();
-    ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
-    if (options?.strokeWidth) {
-      ctx.lineWidth = options.strokeWidth;
-    }
-    if (options?.stroke) {
-      ctx.strokeStyle = options.stroke;
-    }
+    const dpr = getDevicePixelRatio();
+    const viewport = this.editor.viewportManager.getViewport();
+    const zoom = this.editor.zoomManager.getZoom();
+    const dx = -viewport.x;
+    const dy = -viewport.y;
 
-    for (let i = 0, len = bBoxes.length; i < len; i++) {
+    ctx.save();
+    ctx.scale(dpr * zoom, dpr * zoom);
+    ctx.translate(dx, dy);
+
+    const stroke = this.editor.setting.get('hoverOutlineStroke');
+    strokeWidth /= zoom;
+    for (const graph of graphs) {
       ctx.save();
-      const bBox = bBoxes[i];
-      if (bBox.rotation) {
-        const [cx, cy] = getRectCenterPoint(bBox);
-        const { x: cxInViewport, y: cyInViewport } =
-          this.editor.sceneCoordsToViewport(cx, cy);
-        rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
-      }
-      const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
-      ctx.strokeRect(
-        xInViewport,
-        yInViewport,
-        bBox.width * zoom,
-        bBox.height * zoom,
-      );
+      graph.drawOutline(ctx, stroke, strokeWidth);
       ctx.restore();
     }
     ctx.restore();
   }
+
+  // private drawGraphsBbox(
+  //   bBoxes: IRectWithRotation[],
+  //   options?: { strokeWidth?: number; stroke?: string },
+  // ) {
+  //   if (bBoxes.length === 0) {
+  //     return;
+  //   }
+  //
+  //   const zoom = this.editor.zoomManager.getZoom();
+  //   const ctx = this.editor.ctx;
+  //   ctx.save();
+  //   ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
+  //   if (options?.strokeWidth) {
+  //     ctx.lineWidth = options.strokeWidth;
+  //   }
+  //   if (options?.stroke) {
+  //     ctx.strokeStyle = options.stroke;
+  //   }
+  //
+  //   for (let i = 0, len = bBoxes.length; i < len; i++) {
+  //     ctx.save();
+  //     const bBox = bBoxes[i];
+  //     if (bBox.rotation) {
+  //       const [cx, cy] = getRectCenterPoint(bBox);
+  //       const { x: cxInViewport, y: cyInViewport } =
+  //         this.editor.sceneCoordsToViewport(cx, cy);
+  //       rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
+  //     }
+  //     const { x: xInViewport, y: yInViewport } =
+  //       this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
+  //     ctx.strokeRect(
+  //       xInViewport,
+  //       yInViewport,
+  //       bBox.width * zoom,
+  //       bBox.height * zoom,
+  //     );
+  //     ctx.restore();
+  //   }
+  //   ctx.restore();
+  // }
 
   /** draw the mixed bounding box of selected elements */
   private drawSelectedBox(bBox: IRectWithRotation) {

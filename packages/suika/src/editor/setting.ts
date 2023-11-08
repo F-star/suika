@@ -36,6 +36,9 @@ export class Setting {
 
     highlightLayersOnHover: true,
     hoverOutlineStrokeWidth: 2,
+    hoverOutlineStroke: '#1592fe',
+
+    selectedOutlineStrokeWidth: 1,
 
     /******** transform ********/
     handleStroke: '#1592fe',
