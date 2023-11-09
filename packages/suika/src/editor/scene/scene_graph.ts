@@ -251,6 +251,7 @@ export class SceneGraph {
     const dy = -viewport.y;
 
     ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr * zoom, dpr * zoom);
     ctx.translate(dx, dy);
 
