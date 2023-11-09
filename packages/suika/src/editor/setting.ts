@@ -40,12 +40,13 @@ export class Setting {
 
     selectedOutlineStrokeWidth: 1,
 
-    /******** transform ********/
+    /******** transform control handle ********/
     handleStroke: '#1592fe',
     handleFill: '#fff',
     handleStrokeWidth: 2,
     handleHitToleration: 3,
     handleSize: 7,
+    neswHandleWidth: 9, // north/east/south/west handle width
 
     /********* text ********/
     defaultFontSize: 12,

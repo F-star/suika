@@ -2,6 +2,7 @@ import {
   IPoint,
   IRectWithRotation,
   offsetRect,
+  rectToMidPoints,
   rectToPoints,
 } from '@suika/geo';
 import { ICursor } from '../../cursor_manager';
@@ -12,6 +13,10 @@ import { ITransformHandleType } from './type';
 import { nearestPixelVal } from '../../../utils/common';
 
 const types = [
+  'n',
+  'e',
+  's',
+  'w',
   'nwRotation',
   'neRotation',
   'seRotation',
@@ -52,9 +57,11 @@ export class ControlHandleManager {
     const handlePoints = (() => {
       const cornerPoints = rectToPoints(rect);
       const cornerRotation = rectToPoints(offsetRect(rect, size / 2 / zoom));
+      const midPoints = rectToMidPoints(rect);
 
       return {
         ...cornerPoints,
+        ...midPoints,
         nwRotation: { ...cornerRotation.nw },
         neRotation: { ...cornerRotation.ne },
         seRotation: { ...cornerRotation.se },
@@ -63,16 +70,27 @@ export class ControlHandleManager {
     })();
 
     // update handle position
-    for (const key of types) {
-      const point = handlePoints[key];
-      const handle = this.transformHandles.get(key);
+    for (const type of types) {
+      const point = handlePoints[type];
+      const handle = this.transformHandles.get(type);
       if (!handle) {
-        console.warn(`handle ${key} not found`);
+        console.warn(`handle ${type} not found`);
         continue;
       }
       handle.x = point.x;
       handle.y = point.y;
     }
+
+    // update n/s/w/e handle graph size
+    const neswHandleWidth = this.editor.setting.get('neswHandleWidth');
+    const n = this.transformHandles.get('n')!;
+    const s = this.transformHandles.get('s')!;
+    const w = this.transformHandles.get('w')!;
+    const e = this.transformHandles.get('e')!;
+    n.graph.width = s.graph.width = rect.width * zoom;
+    n.graph.height = s.graph.height = neswHandleWidth;
+    w.graph.height = e.graph.height = rect.height * zoom;
+    w.graph.width = e.graph.width = neswHandleWidth;
 
     // 绘制缩放控制点
     const ctx = this.editor.ctx;
@@ -81,7 +99,6 @@ export class ControlHandleManager {
       const graph = handle.graph;
       graph.x = nearestPixelVal(x - graph.width / 2);
       graph.y = nearestPixelVal(y - graph.height / 2);
-
       graph.rotation = rect.rotation;
 
       if (!graph.getVisible()) {
