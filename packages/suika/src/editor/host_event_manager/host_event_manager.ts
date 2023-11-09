@@ -48,11 +48,12 @@ export class HostEventManager {
     this.moveGraphsKeyBinding.bindKey();
     this.commandKeyBinding.bindKey();
   }
+
   private bindModifiersRecordEvent() {
     const handler = (event: KeyboardEvent) => {
       const prevShift = this.isShiftPressing;
       const prevAlt = this.isAltPressing;
-      const prev = this.isSpacePressing;
+      const prevSpace = this.isSpacePressing;
 
       this.isShiftPressing = event.shiftKey;
       this.isCtrlPressing = event.ctrlKey;
@@ -66,13 +67,16 @@ export class HostEventManager {
       if (prevAlt !== this.isAltPressing) {
         this.eventEmitter.emit('altToggle', this.isAltPressing);
       }
-      if (prev !== this.isSpacePressing) {
+      if (prevSpace !== this.isSpacePressing) {
         this.eventEmitter.emit('spaceToggle', this.isSpacePressing);
       }
 
       // TODO: move to correct position
       // 按住按键会不停触发响应函数，下面这种写法则只会在按下和释放时分别执行一次
-      if (this.isEnableDragCanvasBySpace && prev !== this.isSpacePressing) {
+      if (
+        this.isEnableDragCanvasBySpace &&
+        prevSpace !== this.isSpacePressing
+      ) {
         if (this.isSpacePressing) {
           this.prevCursor = this.editor.getCursor();
           this.editor.setCursor('grab');
@@ -106,7 +110,6 @@ export class HostEventManager {
     const editor = this.editor;
     const handler = (event: WheelEvent) => {
       if (this.isCtrlPressing || this.isCommandPressing) {
-        event.preventDefault();
         const { x: cx, y: cy } = this.editor.getCursorXY(event);
         if (event.deltaY > 0) {
           editor.zoomManager.zoomOut(cx, cy);
@@ -124,10 +127,21 @@ export class HostEventManager {
         editor.sceneGraph.render();
       }
     };
-    editor.canvasElement.addEventListener('wheel', handler);
 
+    // prevent default scale page action in win
+    const preventDefaultScalePage = (event: WheelEvent) => {
+      if (this.isCtrlPressing || this.isCommandPressing) {
+        event.preventDefault();
+      }
+    };
+
+    editor.canvasElement.addEventListener('wheel', handler);
+    window.addEventListener('wheel', preventDefaultScalePage, {
+      passive: false,
+    });
     this.unbindHandlers.push(() => {
       editor.canvasElement.removeEventListener('wheel', handler);
+      window.removeEventListener('wheel', preventDefaultScalePage);
     });
   }
 
