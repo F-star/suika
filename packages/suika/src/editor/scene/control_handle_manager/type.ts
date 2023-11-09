@@ -6,4 +6,8 @@ export type ITransformHandleType =
   | 'nwRotation'
   | 'neRotation'
   | 'seRotation'
-  | 'swRotation';
+  | 'swRotation'
+  | 'n'
+  | 'e'
+  | 's'
+  | 'w';

@@ -321,7 +321,7 @@ export class Graph {
     this.y = this.y + rotatedY - prevRotatedY;
   }
   movePoint(
-    type: string, // 'se' | 'ne' | 'nw' | 'sw',
+    type: string, // 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w',
     newPos: IPoint,
     oldBox: IBox2WithRotation,
     keepRatio = false,
@@ -336,8 +336,13 @@ export class Graph {
       cx,
       cy,
     );
+
+    const x2 = oldBox.x + oldBox.width;
+    const y2 = oldBox.y + oldBox.height;
+
     let width = 0;
     let height = 0;
+
     switch (type) {
       case 'se':
         if (scaleFromCenter) {
@@ -354,7 +359,7 @@ export class Graph {
           height = (cy - poxY) * 2;
         } else {
           width = posX - oldBox.x;
-          height = oldBox.y + oldBox.height - poxY;
+          height = y2 - poxY;
         }
         break;
       case 'nw':
@@ -362,8 +367,8 @@ export class Graph {
           width = (cx - posX) * 2;
           height = (cy - poxY) * 2;
         } else {
-          width = oldBox.x + oldBox.width - posX;
-          height = oldBox.y + oldBox.height - poxY;
+          width = x2 - posX;
+          height = y2 - poxY;
         }
         break;
       case 'sw':
@@ -371,10 +376,47 @@ export class Graph {
           width = (cx - posX) * 2;
           height = (poxY - cy) * 2;
         } else {
-          width = oldBox.x + oldBox.width - posX;
+          width = x2 - posX;
           height = poxY - oldBox.y;
         }
         break;
+      case 'n':
+        if (scaleFromCenter) {
+          width = oldBox.width;
+          height = (cy - poxY) * 2;
+        } else {
+          width = oldBox.width;
+          height = y2 - poxY;
+        }
+        break;
+      case 'e':
+        if (scaleFromCenter) {
+          width = (posX - cx) * 2;
+          height = oldBox.height;
+        } else {
+          width = posX - oldBox.x;
+          height = oldBox.height;
+        }
+        break;
+      case 's':
+        if (scaleFromCenter) {
+          width = oldBox.width;
+          height = (poxY - cy) * 2;
+        } else {
+          width = oldBox.width;
+          height = poxY - oldBox.y;
+        }
+        break;
+      case 'w':
+        if (scaleFromCenter) {
+          width = (cx - posX) * 2;
+          height = oldBox.height;
+        } else {
+          width = x2 - posX;
+          height = oldBox.height;
+        }
+        break;
+
       default:
         throw new Error(`movePoint type ${type} is invalid`);
     }
@@ -402,25 +444,29 @@ export class Graph {
     } else {
       switch (type) {
         case 'se':
-          prevOriginX = oldBox.x;
+        case 's':
+        case 'e':
+          prevOriginX = oldBox.x; // origin point is left-top
           prevOriginY = oldBox.y;
           originX = oldBox.x;
           originY = oldBox.y;
           break;
         case 'ne':
-          prevOriginX = oldBox.x;
-          prevOriginY = oldBox.y + oldBox.height;
+        case 'n':
+          prevOriginX = oldBox.x; // left-bottom
+          prevOriginY = y2;
           originX = oldBox.x;
           originY = oldBox.y + height;
           break;
         case 'nw':
-          prevOriginX = oldBox.x + oldBox.width;
-          prevOriginY = oldBox.y + oldBox.height;
+          prevOriginX = x2; // right-bottom
+          prevOriginY = y2;
           originX = oldBox.x + width;
           originY = oldBox.y + height;
           break;
         case 'sw':
-          prevOriginX = oldBox.x + oldBox.width;
+        case 'w':
+          prevOriginX = x2; // right-top
           prevOriginY = oldBox.y;
           originX = oldBox.x + width;
           originY = oldBox.y;

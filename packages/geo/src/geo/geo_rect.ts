@@ -103,3 +103,30 @@ export const offsetRect = (rect: IRectWithRotation, padding: number) => {
     rotation: rect.rotation,
   };
 };
+
+/** get mid-point of each segment */
+export const rectToMidPoints = (rect: IRectWithRotation) => {
+  const { x, y, width, height, rotation = 0 } = rect;
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  const [cx, cy] = [x + halfWidth, y + halfHeight];
+  let points = [
+    { x: x + halfWidth, y },
+    { x: x + width, y: y + halfHeight },
+    { x: x + halfWidth, y: y + height },
+    { x, y: y + halfHeight },
+  ];
+
+  if (rotation) {
+    points = points.map((point) =>
+      transformRotate(point.x, point.y, rotation, cx, cy),
+    );
+  }
+
+  return {
+    n: points[0],
+    e: points[1],
+    s: points[2],
+    w: points[3],
+  };
+};

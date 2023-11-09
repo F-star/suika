@@ -7,7 +7,28 @@ import { normalizeDegree, rad2Deg } from '@suika/geo';
 import { ITransformHandleType } from './type';
 
 const getResizeCursor = (type: string, rotation: number): ICursor => {
-  const dDegree = type === 'se' || type === 'nw' ? -45 : 45;
+  let dDegree = 0;
+  switch (type) {
+    case 'se':
+    case 'nw':
+      dDegree = -45;
+      break;
+    case 'ne':
+    case 'sw':
+      dDegree = 45;
+      break;
+    case 'n':
+    case 's':
+      dDegree = 0;
+      break;
+    case 'e':
+    case 'w':
+      dDegree = 90;
+      break;
+    default:
+      console.warn('unknown type', type);
+  }
+
   const degree = rad2Deg(rotation) + dDegree;
   return { type: 'resize', degree };
 };
@@ -139,7 +160,47 @@ export const createTransformHandles = (params: {
     getCursor: getRotationCursor,
   });
 
+  /************* north/south/west/east ************/
+  const n = new ControlHandle({
+    graph: new Rect({
+      objectName: 'n',
+      ...getDefaultAttrs(),
+      visible: false,
+    }),
+    getCursor: getResizeCursor,
+  });
+  const e = new ControlHandle({
+    graph: new Rect({
+      objectName: 'e',
+      ...getDefaultAttrs(),
+      visible: false,
+    }),
+    getCursor: getResizeCursor,
+  });
+
+  const s = new ControlHandle({
+    graph: new Rect({
+      objectName: 's',
+      ...getDefaultAttrs(),
+      visible: false,
+    }),
+    getCursor: getResizeCursor,
+  });
+
+  const w = new ControlHandle({
+    graph: new Rect({
+      objectName: 'w',
+      ...getDefaultAttrs(),
+      visible: false,
+    }),
+    getCursor: getResizeCursor,
+  });
+
   return new Map<ITransformHandleType, ControlHandle>([
+    ['n', n],
+    ['e', e],
+    ['s', s],
+    ['w', w],
     ['nwRotation', nwRotation],
     ['neRotation', neRotation],
     ['seRotation', seRotation],
