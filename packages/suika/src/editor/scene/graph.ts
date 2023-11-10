@@ -320,6 +320,7 @@ export class Graph {
     const { y: prevRotatedY } = getElementRotatedXY(this);
     this.y = this.y + rotatedY - prevRotatedY;
   }
+
   movePoint(
     type: string, // 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w',
     newPos: IPoint,
@@ -424,7 +425,11 @@ export class Graph {
     if (keepRatio) {
       const ratio = oldBox.width / oldBox.height;
       const newRatio = Math.abs(width / height);
-      if (newRatio > ratio) {
+      if (
+        (['nw', 'ne', 'se', 'sw'].includes(type) && newRatio > ratio) ||
+        type === 'e' ||
+        type === 'w'
+      ) {
         height = (Math.sign(height) * Math.abs(width)) / ratio;
       } else {
         width = Math.sign(width) * Math.abs(height) * ratio;
@@ -444,15 +449,12 @@ export class Graph {
     } else {
       switch (type) {
         case 'se':
-        case 's':
-        case 'e':
           prevOriginX = oldBox.x; // origin point is left-top
           prevOriginY = oldBox.y;
           originX = oldBox.x;
           originY = oldBox.y;
           break;
         case 'ne':
-        case 'n':
           prevOriginX = oldBox.x; // left-bottom
           prevOriginY = y2;
           originX = oldBox.x;
@@ -465,11 +467,34 @@ export class Graph {
           originY = oldBox.y + height;
           break;
         case 'sw':
-        case 'w':
           prevOriginX = x2; // right-top
           prevOriginY = oldBox.y;
           originX = oldBox.x + width;
           originY = oldBox.y;
+          break;
+        case 'n':
+          prevOriginX = oldBox.x + oldBox.width / 2; // center-bottom
+          prevOriginY = y2;
+          originX = oldBox.x + width / 2;
+          originY = oldBox.y + height;
+          break;
+        case 'e':
+          prevOriginX = oldBox.x; // left-center
+          prevOriginY = oldBox.y + oldBox.height / 2;
+          originX = oldBox.x;
+          originY = oldBox.y + height / 2;
+          break;
+        case 's':
+          prevOriginX = oldBox.x + oldBox.width / 2; // center-top
+          prevOriginY = oldBox.y;
+          originX = oldBox.x + width / 2;
+          originY = oldBox.y;
+          break;
+        case 'w':
+          prevOriginX = x2; // right-center
+          prevOriginY = oldBox.y + oldBox.height / 2;
+          originX = oldBox.x + width;
+          originY = oldBox.y + height / 2;
           break;
       }
     }
