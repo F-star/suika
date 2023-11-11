@@ -134,9 +134,11 @@ export class ControlHandleManager {
         continue;
       }
 
-      const isHit = handle.hitTest
-        ? handle.hitTest(hitPointVW)
-        : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handleHitToleration);
+      const isHit = handle.graph.hitTest(
+        hitPointVW.x,
+        hitPointVW.y,
+        handleHitToleration,
+      );
 
       if (isHit) {
         return {
