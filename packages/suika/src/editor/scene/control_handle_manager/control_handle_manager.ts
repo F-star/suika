@@ -32,7 +32,7 @@ const types = [
  */
 export class ControlHandleManager {
   private visible = false;
-  transformHandles: Map<ITransformHandleType, ControlHandle>;
+  private transformHandles: Map<ITransformHandleType, ControlHandle>;
 
   constructor(private editor: Editor) {
     const setting = editor.setting;
@@ -77,8 +77,8 @@ export class ControlHandleManager {
         console.warn(`handle ${type} not found`);
         continue;
       }
-      handle.x = point.x;
-      handle.y = point.y;
+      handle.cx = point.x;
+      handle.cy = point.y;
     }
 
     // update n/s/w/e handle graph size
@@ -95,7 +95,7 @@ export class ControlHandleManager {
     // 绘制缩放控制点
     const ctx = this.editor.ctx;
     this.transformHandles.forEach((handle) => {
-      const { x, y } = this.editor.sceneCoordsToViewport(handle.x, handle.y);
+      const { x, y } = this.editor.sceneCoordsToViewport(handle.cx, handle.cy);
       const graph = handle.graph;
       graph.x = nearestPixelVal(x - graph.width / 2);
       graph.y = nearestPixelVal(y - graph.height / 2);
