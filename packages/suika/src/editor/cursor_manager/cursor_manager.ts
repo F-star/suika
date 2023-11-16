@@ -109,9 +109,7 @@ export class CursorManger {
   }
 
   private setRotationCursorInCanvas(degree: number) {
-    this.editor.canvasElement.style.cursor = `url('${getRotationIconSvgDataUrl(
-      degree,
-    )}') 16 16, auto`;
+    this.editor.canvasElement.style.cursor = getRotationIconSvgDataUrl(degree);
   }
 }
 
