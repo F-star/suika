@@ -17,6 +17,7 @@ import { getRotationCursor } from '../../scene/control_handle_manager';
 export class SelectRotationTool implements IBaseTool {
   private lastPoint: IPoint | null = null;
   private startRotation = 0;
+  private startBboxRotation = 0;
   private dRotation = 0; // 按下，然后释放的整个过程中，产生的相对角度
   /** center of selected graphs */
   private selectedBoxCenter: [x: number, y: number] | null = null;
@@ -69,6 +70,7 @@ export class SelectRotationTool implements IBaseTool {
       mousePoint.x,
       mousePoint.y,
     );
+    this.startBboxRotation = this.editor.selectedElements.getRotation();
   }
   drag(e: PointerEvent) {
     this.lastPoint = this.editor.getSceneCursorXY(e);
@@ -85,16 +87,22 @@ export class SelectRotationTool implements IBaseTool {
       const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] = this
         .selectedBoxCenter as [number, number];
 
-      let lastMouseRotation = calcVectorRadian(
+      const lastMouseRotation = calcVectorRadian(
         cxInSelectedElementsBBox,
         cyInSelectedElementsBBox,
         lastPoint.x,
         lastPoint.y,
       );
+
+      this.dRotation = lastMouseRotation - this.startRotation;
       if (this.editor.hostEventManager.isShiftPressing) {
         const lockRotation = this.editor.setting.get('lockRotation');
-        lastMouseRotation = getClosestTimesVal(lastMouseRotation, lockRotation);
+        const bboxRotation = this.startBboxRotation + this.dRotation;
+        this.dRotation =
+          getClosestTimesVal(bboxRotation, lockRotation) -
+          this.startBboxRotation;
       }
+      this.dRotation = normalizeRadian(this.dRotation);
 
       if (this.editor.selectedElements.size() === 1) {
         this.editor.setCursor(
@@ -109,8 +117,6 @@ export class SelectRotationTool implements IBaseTool {
           degree: rad2Deg(lastMouseRotation),
         });
       }
-
-      this.dRotation = normalizeRadian(lastMouseRotation - this.startRotation);
 
       forEach(selectedElements, (graph, i) => {
         graph.dRotate(this.dRotation, this.prevGraphAttrs[i], {
