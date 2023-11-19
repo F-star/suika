@@ -10,7 +10,16 @@ export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
   };
 };
 
-export const isPointInRect = (point: IPoint, rect: IRect, padding = 0) => {
+export const isPointInRect = (
+  point: IPoint,
+  rect: IRectWithRotation,
+  padding = 0,
+) => {
+  if (rect.rotation) {
+    const [cx, cy] = [rect.x + rect.width / 2, rect.y + rect.height / 2];
+    point = transformRotate(point.x, point.y, -rect.rotation, cx, cy);
+  }
+
   return (
     point.x >= rect.x - padding &&
     point.y >= rect.y - padding &&

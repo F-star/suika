@@ -13,6 +13,7 @@ import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';
 import { HALF_PI } from '../../constant';
 import { rotateInCanvas } from '../../utils/canvas';
+import { ControlHandle } from './control_handle_manager';
 
 export interface GraphAttrs {
   type?: GraphType;
@@ -242,14 +243,8 @@ export class Graph {
     this.y = y;
   }
   hitTest(x: number, y: number, padding = 0) {
-    const bBox = this.getRect();
-    const [cx, cy] = getRectCenterPoint(bBox);
-    const rotatedHitPoint = this.rotation
-      ? transformRotate(x, y, -this.rotation, cx, cy)
-      : { x, y };
-
     const strokeWidth = (this.strokeWidth ?? 0) / 2;
-    return isPointInRect(rotatedHitPoint, bBox, padding + strokeWidth);
+    return isPointInRect({ x, y }, this, padding + strokeWidth);
   }
 
   /**
@@ -675,5 +670,9 @@ export class Graph {
 
     this.x = x - initAttrs.width / 2;
     this.y = y - initAttrs.height / 2;
+  }
+
+  getControlHandles(): ControlHandle[] {
+    return [];
   }
 }

@@ -8,6 +8,7 @@ import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectResizeTool } from './tool_select_resize';
 import { isRotationCursor } from '../../cursor_manager';
+import { isTransformHandle } from '../../scene/control_handle_manager';
 
 /**
  * Select Tool
@@ -73,25 +74,27 @@ export class SelectTool implements ITool {
   }
 
   moveExcludeDrag(e: PointerEvent) {
-    this.updateCursorAndHlHoverGraph(e);
+    const point = this.editor.getSceneCursorXY(e);
+    this.updateCursorAndHlHoverGraph(point);
+
+    this.editor.selectedBox.setHoverByPoint(point);
   }
 
-  private updateCursorAndHlHoverGraph = throttle((e: PointerEvent) => {
+  private updateCursorAndHlHoverGraph = throttle((point: IPoint) => {
     if (this.editor.hostEventManager.isSpacePressing) {
       return;
     }
-    const pointer = this.editor.getSceneCursorXY(e);
-    const handleInfo =
-      this.editor.controlHandleManager.getHandleInfoByPoint(pointer);
+    const controlHandleManager = this.editor.controlHandleManager;
+    const handleInfo = controlHandleManager.getHandleInfoByPoint(point);
 
     this.editor.setCursor(handleInfo?.cursor || 'default');
 
-    if (handleInfo) {
+    if (handleInfo && isTransformHandle(handleInfo.handleName)) {
       this.editor.selectedElements.setHoverItem(null);
     } else {
       const topHitElement = this.editor.sceneGraph.getTopHitElement(
-        pointer.x,
-        pointer.y,
+        point.x,
+        point.y,
       );
       this.editor.selectedElements.setHoverItem(topHitElement);
     }
@@ -135,7 +138,7 @@ export class SelectTool implements ITool {
     // 1. 点击落在选中盒中
     else if (
       !isShiftPressing &&
-      sceneGraph.isPointInSelectedBox(this.startPoint)
+      this.editor.selectedBox.isPointInBox(this.startPoint)
     ) {
       this.currStrategy = this.strategyMove;
     } else {

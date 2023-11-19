@@ -23,6 +23,7 @@ import { CursorManger, ICursor } from './cursor_manager';
 import { ImgManager } from './Img_manager';
 import { GroupManager } from './group_manager';
 import { ControlHandleManager } from './scene/control_handle_manager';
+import { SelectedBox } from './selected_box';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -60,6 +61,7 @@ export class Editor {
   clipboard: ClipboardManager;
 
   selectedElements: SelectedElements;
+  selectedBox: SelectedBox;
   ruler: Ruler;
   refLine: RefLine;
   textEditor: TextEditor;
@@ -86,7 +88,6 @@ export class Editor {
 
     this.sceneGraph = new SceneGraph(this);
     this.groupManager = new GroupManager(this);
-    this.controlHandleManager = new ControlHandleManager(this);
 
     this.cursorManager = new CursorManger(this);
     this.viewportManager = new ViewportManager(this);
@@ -96,9 +97,13 @@ export class Editor {
     this.imgManager = new ImgManager();
 
     this.selectedElements = new SelectedElements(this);
+    this.selectedBox = new SelectedBox(this);
     this.ruler = new Ruler(this);
     this.refLine = new RefLine(this);
     this.textEditor = new TextEditor(this);
+
+    this.controlHandleManager = new ControlHandleManager(this);
+    this.controlHandleManager.bindEvents();
 
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
@@ -157,6 +162,7 @@ export class Editor {
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
     this.perfMonitor.destroy();
+    this.controlHandleManager.unbindEvents();
   }
   setCursor(cursor: ICursor) {
     this.cursorManager.setCursor(cursor);
