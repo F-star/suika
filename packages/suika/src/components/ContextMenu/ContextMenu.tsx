@@ -27,7 +27,7 @@ export const ContextMenu: FC = () => {
       const handleContextmenu = (pos: IPoint) => {
         if (!visible) {
           setShowCopy(
-            editor.sceneGraph.isPointInSelectedBox(
+            editor.selectedBox.isPointInBox(
               editor.getSceneCursorXY({
                 clientX: pos.x,
                 clientY: pos.y,

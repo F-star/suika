@@ -10,7 +10,7 @@ import { Editor } from '../../editor';
 import { createTransformHandles } from './util';
 import { ControlHandle } from './control_handle';
 import { ITransformHandleType } from './type';
-import { nearestPixelVal } from '../../../utils/common';
+import { Graph } from '../graph';
 
 const types = [
   'n',
@@ -33,6 +33,7 @@ const types = [
 export class ControlHandleManager {
   private visible = false;
   private transformHandles: Map<ITransformHandleType, ControlHandle>;
+  private handles: ControlHandle[] = [];
 
   constructor(private editor: Editor) {
     const setting = editor.setting;
@@ -42,6 +43,25 @@ export class ControlHandleManager {
       stroke: setting.get('handleStroke'),
       strokeWidth: setting.get('handleStrokeWidth'),
     });
+  }
+
+  private onHoverItemChange = (hoverItem: Graph | null) => {
+    if (
+      hoverItem &&
+      this.editor.selectedElements.size() === 1 &&
+      this.editor.selectedElements.getItems()[0] === hoverItem
+    ) {
+      this.handles = hoverItem.getControlHandles();
+    } else {
+      this.handles = [];
+    }
+  };
+  bindEvents() {
+    this.editor.selectedElements.on('hoverItemChange', this.onHoverItemChange);
+  }
+
+  unbindEvents() {
+    this.editor.selectedElements.off('hoverItemChange', this.onHoverItemChange);
   }
 
   inactive() {
@@ -88,17 +108,26 @@ export class ControlHandleManager {
     const w = this.transformHandles.get('w')!;
     const e = this.transformHandles.get('e')!;
     n.graph.width = s.graph.width = rect.width * zoom;
-    n.graph.height = s.graph.height = neswHandleWidth;
     w.graph.height = e.graph.height = rect.height * zoom;
-    w.graph.width = e.graph.width = neswHandleWidth;
+    n.graph.height =
+      s.graph.height =
+      w.graph.width =
+      e.graph.width =
+        neswHandleWidth;
 
-    // 绘制缩放控制点
+    // draw transform handles
     const ctx = this.editor.ctx;
-    this.transformHandles.forEach((handle) => {
+
+    const handles = [
+      ...this.handles,
+      ...Array.from(this.transformHandles.values()),
+    ];
+
+    handles.forEach((handle) => {
       const { x, y } = this.editor.sceneCoordsToViewport(handle.cx, handle.cy);
       const graph = handle.graph;
-      graph.x = nearestPixelVal(x - graph.width / 2);
-      graph.y = nearestPixelVal(y - graph.height / 2);
+      graph.x = x - graph.width / 2;
+      graph.y = y - graph.height / 2;
       graph.rotation = rect.rotation;
 
       if (!graph.getVisible()) {
@@ -126,9 +155,14 @@ export class ControlHandleManager {
     const rotation = this.editor.selectedElements.getRotation();
     const handleHitToleration = this.editor.setting.get('handleHitToleration');
 
-    for (let i = types.length - 1; i >= 0; i--) {
-      const type = types[i];
-      const handle = this.transformHandles.get(type);
+    const handles = [
+      ...this.handles,
+      ...Array.from(this.transformHandles.values()),
+    ];
+
+    for (let i = handles.length - 1; i >= 0; i--) {
+      const handle = handles[i];
+      const type = handle.graph.objectName;
       if (!handle) {
         console.warn(`handle ${type} not found`);
         continue;
@@ -151,3 +185,7 @@ export class ControlHandleManager {
     return null;
   }
 }
+
+export const isTransformHandle = (handleName: string) => {
+  return types.includes(handleName as any);
+};

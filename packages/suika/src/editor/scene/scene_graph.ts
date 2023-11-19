@@ -1,12 +1,9 @@
 import { Editor } from '../editor';
-import { GraphType, IBox, IEditorPaperData, IObject, IPoint } from '../../type';
+import { GraphType, IEditorPaperData, IObject } from '../../type';
 import { IRect } from '@suika/geo';
-import { rotateInCanvas } from '../../utils/canvas';
 import EventEmitter from '../../utils/event_emitter';
-import { getRectCenterPoint } from '../../utils/graphics';
-import { IRectWithRotation, getMergedRect, isRectIntersect } from '@suika/geo';
+import { isRectIntersect } from '@suika/geo';
 import rafThrottle from '../../utils/raf_throttle';
-import { transformRotate } from '@suika/geo';
 import { Ellipse } from './ellipse';
 import { Graph, GraphAttrs } from './graph';
 import { Rect } from './rect';
@@ -15,7 +12,6 @@ import Grid from '../grid';
 import { getDevicePixelRatio } from '../../utils/common';
 import { TextGraph } from './text';
 import { Line } from './line';
-import { isPointInRect } from '@suika/geo';
 
 const graphCtorMap = {
   [GraphType.Graph]: Graph,
@@ -29,9 +25,6 @@ interface Events {
   render(): void;
 }
 
-/**
- * 图形树
- */
 export class SceneGraph {
   children: Graph[] = [];
   selection: {
@@ -40,7 +33,6 @@ export class SceneGraph {
     width: number;
     height: number;
   } | null = null;
-  // private handle: { rotation: IPoint } | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private grid: Grid;
   showOutline = true;
@@ -152,7 +144,7 @@ export class SceneGraph {
       this.grid.draw();
     }
 
-    /** draw hover graph outline */
+    /** draw hover graph outline and its control handle */
     if (setting.get('highlightLayersOnHover')) {
       const hoverGraph = selectedElements.getHoverItem();
       if (
@@ -167,31 +159,17 @@ export class SceneGraph {
       }
     }
 
-    let selectedRect: IRectWithRotation | null = null;
-    const selectedSize = selectedElements.size();
-    if (selectedSize > 0) {
-      if (selectedSize === 1) {
-        const selectedGraph = selectedElements.getItems()[0];
-        selectedRect = selectedGraph.getRectWithRotation();
-      } else {
-        selectedRect = selectedElements.getBBox();
-      }
-    }
+    const selectedRect = this.editor.selectedBox.updateBbox();
 
     /** draw selected elements outline */
     if (this.showOutline) {
-      // TODO: draw outline
-
       this.drawGraphsOutline(
         this.editor.selectedElements
           .getItems()
           .filter((item) => item.getVisible()),
         setting.get('selectedOutlineStrokeWidth'),
       );
-      // draw selected box
-      if (selectedRect) {
-        this.drawSelectedBox(selectedRect);
-      }
+      this.editor.selectedBox.draw();
     }
 
     /** draw selection */
@@ -307,63 +285,34 @@ export class SceneGraph {
   // }
 
   /** draw the mixed bounding box of selected elements */
-  private drawSelectedBox(bBox: IRectWithRotation) {
-    const zoom = this.editor.zoomManager.getZoom();
-    const ctx = this.editor.ctx;
+  // private drawSelectedBox(bBox: IRectWithRotation) {
+  //   const zoom = this.editor.zoomManager.getZoom();
+  //   const ctx = this.editor.ctx;
 
-    const stroke = this.editor.setting.get('guideBBoxStroke');
+  //   const stroke = this.editor.setting.get('guideBBoxStroke');
 
-    ctx.save();
-    ctx.strokeStyle = stroke;
-    const { x: xInViewport, y: yInViewport } =
-      this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
+  //   ctx.save();
+  //   ctx.strokeStyle = stroke;
+  //   const { x: xInViewport, y: yInViewport } =
+  //     this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
 
-    if (bBox.rotation) {
-      const [cx, cy] = getRectCenterPoint(bBox);
-      const { x: cxInViewport, y: cyInViewport } =
-        this.editor.sceneCoordsToViewport(cx, cy);
-      rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
-    }
+  //   if (bBox.rotation) {
+  //     const [cx, cy] = getRectCenterPoint(bBox);
+  //     const { x: cxInViewport, y: cyInViewport } =
+  //       this.editor.sceneCoordsToViewport(cx, cy);
+  //     rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
+  //   }
 
-    ctx.strokeRect(
-      xInViewport,
-      yInViewport,
-      bBox.width * zoom,
-      bBox.height * zoom,
-    );
+  //   ctx.strokeRect(
+  //     xInViewport,
+  //     yInViewport,
+  //     bBox.width * zoom,
+  //     bBox.height * zoom,
+  //   );
 
-    ctx.restore();
-  }
-  /**
-   * 点是否在选中框（selectedBox）中
-   */
-  isPointInSelectedBox(point: IPoint) {
-    const selectedElements = this.editor.selectedElements.getItems();
-    if (
-      selectedElements.length === 0 ||
-      this.editor.selectedElements.isAllLocked()
-    ) {
-      return false;
-    }
+  //   ctx.restore();
+  // }
 
-    let bBoxes: IBox[];
-    // 【单个元素被选中】求不考虑旋转的 bBox，将其和旋转后的角度比较
-    if (selectedElements.length === 1) {
-      bBoxes = selectedElements.map((element) => element.getRect());
-      // 单个元素，要考虑旋转
-      const element = selectedElements[0];
-      const [cx, cy] = getRectCenterPoint(element);
-      if (element.rotation) {
-        point = transformRotate(point.x, point.y, -element.rotation, cx, cy);
-      }
-    }
-    // 【多个元素被选中】
-    else {
-      bBoxes = selectedElements.map((element) => element.getBBox());
-    }
-    const composedBBox = getMergedRect(...bBoxes);
-    return isPointInRect(point, composedBBox);
-  }
   getTopHitElement(x: number, y: number): Graph | null {
     const padding =
       this.editor.setting.get('selectionHitPadding') /
