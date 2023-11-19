@@ -2,7 +2,7 @@ import { normalizeDegree } from '@suika/geo';
 import { Editor } from '../editor';
 import './cursor.scss';
 import isEqual from 'lodash.isequal';
-import { getRotationIconSvgDataUrl } from './util';
+import { getIconSvgDataUrl } from './util';
 
 export interface ICursorRotation {
   type: 'rotation';
@@ -85,31 +85,12 @@ export class CursorManger {
       this.editor.canvasElement.classList.add(className);
     } else if (typeof cursor == 'string') {
       this.editor.canvasElement.style.cursor = cursor;
-    } else if (cursor.type === 'resize') {
-      this.setResizeCursorInCanvas(cursor.degree);
-    } else if (cursor.type === 'rotation') {
-      this.setRotationCursorInCanvas(cursor.degree);
+    } else if (cursor.type === 'resize' || cursor.type === 'rotation') {
+      this.editor.canvasElement.style.cursor = getIconSvgDataUrl(
+        cursor.type,
+        cursor.degree,
+      );
     }
-  }
-
-  private setResizeCursorInCanvas(degree: number) {
-    let styleCursor = '';
-    if (degree < 22.5) {
-      styleCursor = 'ns-resize';
-    } else if (degree < 67.5) {
-      styleCursor = 'nesw-resize';
-    } else if (degree < 112.5) {
-      styleCursor = 'ew-resize';
-    } else if (degree < 157.5) {
-      styleCursor = 'nwse-resize';
-    } else {
-      styleCursor = 'ns-resize';
-    }
-    this.editor.canvasElement.style.cursor = styleCursor;
-  }
-
-  private setRotationCursorInCanvas(degree: number) {
-    this.editor.canvasElement.style.cursor = getRotationIconSvgDataUrl(degree);
   }
 }
 
