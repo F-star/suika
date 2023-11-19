@@ -76,7 +76,6 @@ export class SelectTool implements ITool {
   moveExcludeDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
     this.updateCursorAndHlHoverGraph(point);
-
     this.editor.selectedBox.setHoverByPoint(point);
   }
 
@@ -216,7 +215,7 @@ export class SelectTool implements ITool {
     this.currStrategy?.afterEnd(e);
 
     this.currStrategy = null;
-    this.updateCursorAndHlHoverGraph(e);
-    this.editor.selectedElements.setHoverItem(null);
+    const point = this.editor.getSceneCursorXY(e);
+    this.updateCursorAndHlHoverGraph(point);
   }
 }
