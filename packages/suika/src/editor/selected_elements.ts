@@ -56,6 +56,9 @@ class SelectedElements {
   }
 
   clear() {
+    if (this.hoverItem && this.items.includes(this.hoverItem)) {
+      this.setHoverItem(null);
+    }
     this.items = [];
     this.eventEmitter.emit('itemsChange', this.items);
   }
