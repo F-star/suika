@@ -17,7 +17,7 @@ export interface IBox2WithMid extends IBox2 {
 }
 
 export interface IBox2WithRotation extends IBox {
-  rotation: number;
+  rotation?: number;
 }
 
 export interface ICircle {

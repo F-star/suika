@@ -4,6 +4,8 @@ import { noop } from '../../../utils/common';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';
+import { isTransformHandle } from '../../scene/control_handle_manager';
+import { GraphAttrs } from '../../scene/graph';
 
 /**
  * scale element
@@ -11,13 +13,7 @@ import { IBaseTool } from '../type';
 export class SelectResizeTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private handleName!: string;
-  private prevElements: Array<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
-  }> = [];
+  private prevGraphsAttrs: Array<GraphAttrs> = [];
   private lastPoint: IPoint | null = null;
   private unbind = noop;
 
@@ -45,18 +41,16 @@ export class SelectResizeTool implements IBaseTool {
       this.startPoint,
     );
 
-    this.prevElements = arrMap(
+    this.prevGraphsAttrs = arrMap(
       this.editor.selectedElements.getItems(),
-      (item) => ({
-        x: item.x,
-        y: item.y,
-        width: item.width,
-        height: item.height,
-        rotation: item.rotation ?? 0,
-      }),
+      (item) => item.getAttrs(),
     );
     if (!handleInfo) {
       throw new Error(`handleName is invalid`);
+    }
+
+    if (isTransformHandle(handleInfo.handleName)) {
+      this.editor.controlHandleManager.hideCustomHandles();
     }
     this.handleName = handleInfo.handleName;
   }
@@ -72,13 +66,27 @@ export class SelectResizeTool implements IBaseTool {
 
     const selectItems = this.editor.selectedElements.getItems();
     if (selectItems.length === 1) {
-      selectItems[0].movePoint(
+      selectItems[0].updateByControlHandle(
         this.handleName,
         this.lastPoint,
-        this.prevElements[0],
+        this.prevGraphsAttrs[0],
         this.editor.hostEventManager.isShiftPressing,
         this.editor.hostEventManager.isAltPressing,
       );
+
+      const controlHandleManager = this.editor.controlHandleManager;
+      // update custom control handles
+      if (
+        !isTransformHandle(this.handleName) &&
+        controlHandleManager.hasCustomHandles()
+      ) {
+        const controlHandle = selectItems[0].getControlHandles(
+          this.editor.zoomManager.getZoom(),
+        );
+        if (controlHandle) {
+          controlHandleManager.setCustomHandles(controlHandle);
+        }
+      }
     } else {
       // TODO: multi elements case
     }
@@ -86,30 +94,31 @@ export class SelectResizeTool implements IBaseTool {
     this.editor.sceneGraph.render();
   }
   end(e: PointerEvent, isDragHappened: boolean) {
-    const items = this.editor.selectedElements.getItems();
-    if (items.length === 0 || !isDragHappened) {
+    if (this.editor.selectedElements.size() === 0 || !isDragHappened) {
       return;
     }
+    const items = this.editor.selectedElements.getItems();
     this.editor.commandManager.pushCommand(
       new SetElementsAttrs(
         'scale select elements',
         items,
-        arrMap(items, (item) => ({
-          x: item.x,
-          y: item.y,
-          width: item.width,
-          height: item.height,
-          rotation: item.rotation,
-        })),
-        this.prevElements,
+        arrMap(items, (item) => item.getAttrs()),
+        this.prevGraphsAttrs,
       ),
     );
 
+    // update custom control handles
+    if (items.length === 1) {
+      this.editor.controlHandleManager.setCustomHandles(
+        items[0].getControlHandles(this.editor.zoomManager.getZoom(), true),
+      );
+      this.editor.sceneGraph.render();
+    }
     this.editor.commandManager.enableRedoUndo();
     this.editor.hostEventManager.enableDelete();
   }
   afterEnd() {
-    this.prevElements = [];
+    this.prevGraphsAttrs = [];
     this.lastPoint = null;
   }
 }

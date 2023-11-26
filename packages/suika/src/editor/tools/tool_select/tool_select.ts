@@ -8,7 +8,6 @@ import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectResizeTool } from './tool_select_resize';
 import { isRotationCursor } from '../../cursor_manager';
-import { isTransformHandle } from '../../scene/control_handle_manager';
 
 /**
  * Select Tool
@@ -23,10 +22,10 @@ export class SelectTool implements ITool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private currStrategy: IBaseTool | null = null;
   // 策略
-  private strategyMove: SelectMoveTool;
-  private strategyDrawSelectionBox: DrawSelectionBox;
-  private strategySelectRotation: SelectRotationTool;
-  private strategySelectResize: SelectResizeTool;
+  private readonly strategyMove: SelectMoveTool;
+  private readonly strategyDrawSelectionBox: DrawSelectionBox;
+  private readonly strategySelectRotation: SelectRotationTool;
+  private readonly strategySelectResize: SelectResizeTool;
 
   // 鼠标按下时选中的元素，在鼠标释放时可能会用到。shift 取消一个元素时需要使用
   private topHitElementWhenStart: Graph | null = null;
@@ -88,7 +87,7 @@ export class SelectTool implements ITool {
 
     this.editor.setCursor(handleInfo?.cursor || 'default');
 
-    if (handleInfo && isTransformHandle(handleInfo.handleName)) {
+    if (handleInfo) {
       this.editor.selectedElements.setHoverItem(null);
     } else {
       const topHitElement = this.editor.sceneGraph.getTopHitElement(
@@ -103,7 +102,6 @@ export class SelectTool implements ITool {
     this.currStrategy = null;
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
-    this.editor.selectedElements.setHoverItem(null);
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
@@ -145,7 +143,7 @@ export class SelectTool implements ITool {
         this.startPoint.x,
         this.startPoint.y,
       );
-      // 2. 点中一个元素 （FIXME: 没考虑描边的情况）
+      // 2. 点中一个元素
       if (topHitElement) {
         // 按住 shift 键的选中，添加或移除一个选中元素
         if (isShiftPressing) {
@@ -159,6 +157,7 @@ export class SelectTool implements ITool {
           selectedElements.setItems([topHitElement]);
         }
 
+        this.editor.selectedBox.setHover(true);
         sceneGraph.render();
         this.currStrategy = this.strategyMove;
       } else {
@@ -188,7 +187,7 @@ export class SelectTool implements ITool {
     }
   }
   end(e: PointerEvent, isDragHappened: boolean) {
-    const currStrategy = this.currStrategy;
+    this.editor.controlHandleManager.showCustomHandles();
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
@@ -199,6 +198,7 @@ export class SelectTool implements ITool {
       this.editor.sceneGraph.render();
     }
 
+    const currStrategy = this.currStrategy;
     if (currStrategy) {
       currStrategy.end(e, isDragHappened);
       currStrategy.inactive();
@@ -213,9 +213,10 @@ export class SelectTool implements ITool {
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
     this.currStrategy?.afterEnd(e);
-
     this.currStrategy = null;
+
     const point = this.editor.getSceneCursorXY(e);
+    this.editor.selectedBox.setHoverByPoint(point);
     this.updateCursorAndHlHoverGraph(point);
   }
 }

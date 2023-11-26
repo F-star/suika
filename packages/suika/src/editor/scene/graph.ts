@@ -12,7 +12,7 @@ import { transformRotate } from '@suika/geo';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';
 import { HALF_PI } from '../../constant';
-import { rotateInCanvas } from '../../utils/canvas';
+import { drawRoundRectPath, rotateInCanvas } from '../../utils/canvas';
 import { ControlHandle } from './control_handle_manager';
 
 export interface GraphAttrs {
@@ -316,7 +316,7 @@ export class Graph {
     this.y = this.y + rotatedY - prevRotatedY;
   }
 
-  movePoint(
+  updateByControlHandle(
     type: string, // 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w',
     newPos: IPoint,
     oldBox: IBox2WithRotation,
@@ -541,7 +541,6 @@ export class Graph {
     if (this.rotation) {
       const cx = this.x + this.width / 2;
       const cy = this.y + this.height / 2;
-
       rotateInCanvas(ctx, this.rotation, cx, cy);
     }
     ctx.strokeStyle = stroke;
@@ -566,6 +565,7 @@ export class Graph {
     texture: TextureImage,
     imgManager: ImgManager,
     smooth = true,
+    cornerRadius = 0,
   ) {
     const src = texture.attrs.src;
     const width = this.width;
@@ -593,6 +593,19 @@ export class Graph {
     const sx = img.width / 2 - width / scale / 2;
     const sy = img.height / 2 - height / scale / 2;
 
+    if (cornerRadius) {
+      ctx.save();
+      drawRoundRectPath(
+        ctx,
+        this.x,
+        this.y,
+        this.width,
+        this.height,
+        cornerRadius,
+      );
+      ctx.clip();
+    }
+
     ctx.drawImage(
       img,
       sx,
@@ -604,6 +617,10 @@ export class Graph {
       width,
       height,
     );
+
+    if (cornerRadius) {
+      ctx.restore();
+    }
   }
 
   static dMove(graphs: Graph[], dx: number, dy: number) {
@@ -656,7 +673,7 @@ export class Graph {
    * add dRotate to rotation
    */
   dRotate(dRotation: number, initAttrs: IBox2WithRotation, center: IPoint) {
-    this.rotation = normalizeRadian(initAttrs.rotation + dRotation);
+    this.rotation = normalizeRadian((initAttrs.rotation ?? 0) + dRotation);
 
     const [graphCx, graphCy] = getRectCenterPoint(initAttrs);
 
@@ -672,7 +689,8 @@ export class Graph {
     this.y = y - initAttrs.height / 2;
   }
 
-  getControlHandles(): ControlHandle[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getControlHandles(zoom: number, initial?: boolean): ControlHandle[] {
     return [];
   }
 }

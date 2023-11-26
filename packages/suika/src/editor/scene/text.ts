@@ -39,7 +39,7 @@ export class TextGraph extends Graph {
     this.content = options.content;
     this.fontSize = options.fontSize;
   }
-  override getAttrs() {
+  override getAttrs(): TextAttrs {
     return {
       ...super.getAttrs(),
       content: this.content,
