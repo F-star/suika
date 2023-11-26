@@ -7,6 +7,7 @@ import { FillCard } from '../Cards/FillCard';
 import './style.scss';
 import { FormattedMessage } from 'react-intl';
 import { StrokeCard } from '../Cards/StrokeCard';
+import { DebugPanel } from '../DebugPanel';
 
 enum PanelType {
   Global = 'Global',
@@ -16,7 +17,9 @@ enum PanelType {
 export const InfoPanel: FC = () => {
   const editor = useContext(EditorContext);
   const [type, setType] = useState(PanelType.Global);
-  // 根据是否选中元素，来决定面板类型
+  // select panel type by selected elements
+
+  const showDebugPanel = localStorage.getItem('suika-debug-panel') === 'true';
 
   useEffect(() => {
     if (editor) {
@@ -46,6 +49,8 @@ export const InfoPanel: FC = () => {
           <FormattedMessage id="noSelectedShapes" />
         </div>
       )}
+
+      {showDebugPanel && <DebugPanel />}
     </div>
   );
 };
