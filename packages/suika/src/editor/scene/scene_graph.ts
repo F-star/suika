@@ -434,7 +434,6 @@ export class SceneGraph {
       if (!Ctor) {
         throw new Error('found wrong type of graph');
       }
-
       return new Ctor(attrs as any);
     });
 

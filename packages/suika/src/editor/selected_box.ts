@@ -5,13 +5,17 @@ import { rotateInCanvas } from '../utils/canvas';
 import EventEmitter from '../utils/event_emitter';
 
 interface Events {
-  hoverChange(hover: boolean): void;
+  hoverChange(isHover: boolean): void;
 }
 
 export class SelectedBox {
   private box: IRectWithRotation | null = null;
   private eventEmitter = new EventEmitter<Events>();
-  private hover = false;
+  private _hover = false;
+
+  isHover() {
+    return this._hover;
+  }
 
   constructor(private editor: Editor) {}
 
@@ -70,17 +74,25 @@ export class SelectedBox {
     if (!this.box) {
       return false;
     }
-    return isPointInRect(point, this.box);
+    const TOL = 2;
+    return isPointInRect(
+      point,
+      this.box,
+      TOL / this.editor.zoomManager.getZoom(),
+    );
+  }
+
+  setHover(hover: boolean) {
+    if (this._hover === hover) {
+      return;
+    }
+    this._hover = hover;
+    this.eventEmitter.emit('hoverChange', hover);
   }
 
   setHoverByPoint(point: IPoint) {
     const hover = this.isPointInBox(point);
-
-    if (this.hover === hover) {
-      return;
-    }
-    this.hover = hover;
-    this.eventEmitter.emit('hoverChange', hover);
+    this.setHover(hover);
   }
 
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {

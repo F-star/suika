@@ -88,6 +88,7 @@ export const createTransformHandles = (params: {
       objectName: 'nw',
       ...getDefaultAttrs(),
     }),
+    type: 'nw',
     getCursor: getResizeCursor,
   });
 
@@ -96,6 +97,7 @@ export const createTransformHandles = (params: {
       objectName: 'ne',
       ...getDefaultAttrs(),
     }),
+    type: 'ne',
     getCursor: getResizeCursor,
   });
 
@@ -104,6 +106,7 @@ export const createTransformHandles = (params: {
       objectName: 'se',
       ...getDefaultAttrs(),
     }),
+    type: 'se',
     getCursor: getResizeCursor,
   });
 
@@ -112,6 +115,7 @@ export const createTransformHandles = (params: {
       objectName: 'sw',
       ...getDefaultAttrs(),
     }),
+    type: 'sw',
     getCursor: getResizeCursor,
   });
 
@@ -124,6 +128,7 @@ export const createTransformHandles = (params: {
       height: params.size * 2,
       visible: false,
     }),
+    type: 'nwRotation',
     getCursor: getRotationCursor,
   });
 
@@ -135,6 +140,7 @@ export const createTransformHandles = (params: {
       height: params.size * 2,
       visible: false,
     }),
+    type: 'neRotation',
     getCursor: getRotationCursor,
   });
 
@@ -146,6 +152,7 @@ export const createTransformHandles = (params: {
       height: params.size * 2,
       visible: false,
     }),
+    type: 'seRotation',
     getCursor: getRotationCursor,
   });
 
@@ -157,6 +164,7 @@ export const createTransformHandles = (params: {
       height: params.size * 2,
       visible: false,
     }),
+    type: 'swRotation',
     getCursor: getRotationCursor,
   });
 
@@ -167,6 +175,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
       visible: false,
     }),
+    type: 'n',
     getCursor: getResizeCursor,
   });
   const e = new ControlHandle({
@@ -175,6 +184,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
       visible: false,
     }),
+    type: 'e',
     getCursor: getResizeCursor,
   });
 
@@ -184,6 +194,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
       visible: false,
     }),
+    type: 's',
     getCursor: getResizeCursor,
   });
 
@@ -193,6 +204,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
       visible: false,
     }),
+    type: 'w',
     getCursor: getResizeCursor,
   });
 

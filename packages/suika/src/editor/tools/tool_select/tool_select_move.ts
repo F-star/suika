@@ -36,6 +36,8 @@ export class SelectMoveTool implements IBaseTool {
     this.unbindEvents();
   }
   start(e: PointerEvent) {
+    this.editor.controlHandleManager.hideCustomHandles();
+
     this.startPoint = this.editor.getSceneCursorXY(e);
     const selectedElements = this.editor.selectedElements.getItems({
       excludeLocked: true,
@@ -126,7 +128,6 @@ export class SelectMoveTool implements IBaseTool {
       if (!topHitElement && !this.editor.hostEventManager.isShiftPressing) {
         this.editor.selectedElements.clear();
       }
-
       return;
     }
 
@@ -139,6 +140,16 @@ export class SelectMoveTool implements IBaseTool {
           this.dy,
         ),
       );
+
+      // update custom control handles
+      if (selectedItems.length === 1) {
+        this.editor.controlHandleManager.setCustomHandles(
+          selectedItems[0].getControlHandles(
+            this.editor.zoomManager.getZoom(),
+            true,
+          ),
+        );
+      }
     }
   }
   afterEnd() {

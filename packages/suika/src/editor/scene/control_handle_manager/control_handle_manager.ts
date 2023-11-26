@@ -10,7 +10,6 @@ import { Editor } from '../../editor';
 import { createTransformHandles } from './util';
 import { ControlHandle } from './control_handle';
 import { ITransformHandleType } from './type';
-import { Graph } from '../graph';
 
 const types = [
   'n',
@@ -32,8 +31,9 @@ const types = [
  */
 export class ControlHandleManager {
   private visible = false;
+  private customHandlesVisible = true;
   private transformHandles: Map<ITransformHandleType, ControlHandle>;
-  private handles: ControlHandle[] = [];
+  private customHandles: ControlHandle[] = [];
 
   constructor(private editor: Editor) {
     const setting = editor.setting;
@@ -45,23 +45,38 @@ export class ControlHandleManager {
     });
   }
 
-  private onHoverItemChange = (hoverItem: Graph | null) => {
+  private onHoverItemChange = () => {
+    const hoverItem = this.editor.selectedElements.getHoverItem();
+    const isSingleSelectedGraph = this.editor.selectedElements.size() === 1;
+    const selectedGraph = isSingleSelectedGraph
+      ? this.editor.selectedElements.getItems()[0]
+      : null;
+    const isSelectedBoxHovered = this.editor.selectedBox.isHover();
+
     if (
-      hoverItem &&
-      this.editor.selectedElements.size() === 1 &&
-      this.editor.selectedElements.getItems()[0] === hoverItem
+      isSingleSelectedGraph &&
+      selectedGraph &&
+      (hoverItem === selectedGraph || isSelectedBoxHovered)
     ) {
-      this.handles = hoverItem.getControlHandles();
+      const zoom = this.editor.zoomManager.getZoom();
+      this.setCustomHandles(selectedGraph.getControlHandles(zoom, true));
     } else {
-      this.handles = [];
+      this.setCustomHandles([]);
     }
+    this.editor.sceneGraph.render();
   };
   bindEvents() {
     this.editor.selectedElements.on('hoverItemChange', this.onHoverItemChange);
+    this.editor.selectedBox.on('hoverChange', this.onHoverItemChange);
+    this.editor.zoomManager.on('zoomChange', this.onHoverItemChange);
+    this.editor.commandManager.on('change', this.onHoverItemChange);
   }
 
   unbindEvents() {
     this.editor.selectedElements.off('hoverItemChange', this.onHoverItemChange);
+    this.editor.selectedBox.off('hoverChange', this.onHoverItemChange);
+    this.editor.zoomManager.off('zoomChange', this.onHoverItemChange);
+    this.editor.commandManager.off('change', this.onHoverItemChange);
   }
 
   inactive() {
@@ -119,8 +134,8 @@ export class ControlHandleManager {
     const ctx = this.editor.ctx;
 
     const handles = [
-      ...this.handles,
       ...Array.from(this.transformHandles.values()),
+      ...(this.customHandlesVisible ? this.customHandles : []),
     ];
 
     handles.forEach((handle) => {
@@ -156,13 +171,13 @@ export class ControlHandleManager {
     const handleHitToleration = this.editor.setting.get('handleHitToleration');
 
     const handles = [
-      ...this.handles,
       ...Array.from(this.transformHandles.values()),
+      ...(this.customHandlesVisible ? this.customHandles : []),
     ];
 
     for (let i = handles.length - 1; i >= 0; i--) {
       const handle = handles[i];
-      const type = handle.graph.objectName;
+      const type = handle.type;
       if (!handle) {
         console.warn(`handle ${type} not found`);
         continue;
@@ -183,6 +198,28 @@ export class ControlHandleManager {
     }
 
     return null;
+  }
+
+  setCustomHandles(handles: ControlHandle[]) {
+    this.customHandles = handles;
+  }
+
+  hasCustomHandles() {
+    return this.customHandles.length > 0;
+  }
+
+  showCustomHandles() {
+    if (!this.customHandlesVisible && this.hasCustomHandles()) {
+      this.customHandlesVisible = true;
+      this.editor.sceneGraph.render();
+    }
+  }
+
+  hideCustomHandles() {
+    if (this.customHandlesVisible && this.hasCustomHandles()) {
+      this.customHandlesVisible = false;
+      this.editor.sceneGraph.render();
+    }
   }
 }
 
