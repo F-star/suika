@@ -21,7 +21,7 @@
     &:hover:not(.sk-editing),
     &.sk-hover {
       border-color: #0f8fff;
-      .sk-action-btn {
+      span.sk-action-btn {
         visibility: visible;
       }
     }

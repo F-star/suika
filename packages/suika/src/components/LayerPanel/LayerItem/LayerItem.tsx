@@ -77,7 +77,6 @@ const LayerItem: FC<IProps> = ({
   };
 
   const isHover = hoverId === id;
-  // const lock = false;
 
   return (
     <>
