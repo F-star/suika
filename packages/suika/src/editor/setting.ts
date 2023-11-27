@@ -66,7 +66,7 @@ export class Setting {
     drawGraphDefaultWidth: 100, // drawing graph default width if no drag
     drawGraphDefaultHeight: 100, // default height
 
-    /**** 标尺相关 ****/
+    /**** ruler ****/
     enableRuler: true,
     minStepInViewport: 50, // 视口区域下的最小步长
     rulerBgColor: '#fff',
@@ -75,7 +75,7 @@ export class Setting {
     rulerWidth: 20, // 宽度
     rulerMarkSize: 4, // 刻度高度
 
-    /**** 网格相关 ****/
+    /**** pixel grid ****/
     enablePixelGrid: true,
     snapToPixelGrid: true, // 是否吸附到像素网格
     minPixelGridZoom: 8, // draw pixel grid When zoom reach this value
@@ -83,10 +83,12 @@ export class Setting {
 
     dragBlockStep: 4, // drag handler will not happen if move distance less this value
 
-    offsetX: 0, // 鼠标坐标位置的修正值
+    offsetX: 0, // mouse offset
     offsetY: 0,
 
+    /**** zoom ****/
     zoomToFixPadding: 32, // base viewport coord
+    invertZoomDirection: false, // zoom in/out direction
 
     moveElementsStep: 1,
     moveElementsStepFast: 10,

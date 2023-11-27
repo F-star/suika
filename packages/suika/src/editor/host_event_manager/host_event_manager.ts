@@ -111,13 +111,16 @@ export class HostEventManager {
     const handler = (event: WheelEvent) => {
       if (this.isCtrlPressing || this.isCommandPressing) {
         const { x: cx, y: cy } = this.editor.getCursorXY(event);
-        if (event.deltaY > 0) {
-          editor.zoomManager.zoomOut(cx, cy);
-          editor.sceneGraph.render();
-        } else if (event.deltaY < 0) {
-          editor.zoomManager.zoomIn(cx, cy);
-          editor.sceneGraph.render();
+        let isZoomOut = event.deltaY > 0;
+        if (this.editor.setting.get('invertZoomDirection')) {
+          isZoomOut = !isZoomOut;
         }
+        if (isZoomOut) {
+          editor.zoomManager.zoomOut(cx, cy);
+        } else {
+          editor.zoomManager.zoomIn(cx, cy);
+        }
+        editor.sceneGraph.render();
       } else {
         const zoom = editor.zoomManager.getZoom();
         editor.viewportManager.translate(
