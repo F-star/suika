@@ -28,6 +28,69 @@ export const isPointInRect = (
   );
 };
 
+export const isPointInRoundRect = (
+  point: IPoint,
+  rect: IRectWithRotation,
+  cornerRadii: number[],
+  padding = 0,
+) => {
+  const x = rect.x - padding;
+  const y = rect.y - padding;
+  const width = rect.width + padding * 2;
+  const height = rect.height + padding * 2;
+
+  if (rect.rotation) {
+    const [cx, cy] = [x + width / 2, y + height / 2];
+    point = transformRotate(point.x, point.y, -rect.rotation, cx, cy);
+  }
+
+  if (
+    point.x >= x &&
+    point.y >= y &&
+    point.x <= x + width &&
+    point.y <= y + height
+  ) {
+    if (point.x <= x + cornerRadii[0] && point.y <= y + cornerRadii[0]) {
+      return (
+        (point.x - x - cornerRadii[0]) ** 2 +
+          (point.y - y - cornerRadii[0]) ** 2 <=
+        cornerRadii[0] ** 2
+      );
+    } else if (
+      point.x >= x + width - cornerRadii[1] &&
+      point.y <= y + cornerRadii[1]
+    ) {
+      return (
+        (point.x - x - width + cornerRadii[1]) ** 2 +
+          (point.y - y - cornerRadii[1]) ** 2 <=
+        cornerRadii[1] ** 2
+      );
+    } else if (
+      point.x >= x + width - cornerRadii[2] &&
+      point.y >= y + height - cornerRadii[2]
+    ) {
+      return (
+        (point.x - x - width + cornerRadii[2]) ** 2 +
+          (point.y - y - height + cornerRadii[2]) ** 2 <=
+        cornerRadii[2] ** 2
+      );
+    } else if (
+      point.x <= x + cornerRadii[3] &&
+      point.y >= y + height - cornerRadii[3]
+    ) {
+      return (
+        (point.x - x - cornerRadii[3]) ** 2 +
+          (point.y - y - height + cornerRadii[3]) ** 2 <=
+        cornerRadii[3] ** 2
+      );
+    } else {
+      return true;
+    }
+  } else {
+    return false;
+  }
+};
+
 /**
  * normalize rect,
  * width or height may be negative

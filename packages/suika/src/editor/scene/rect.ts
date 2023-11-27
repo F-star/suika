@@ -6,7 +6,7 @@ import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
 import { ControlHandle } from './control_handle_manager';
 import { Ellipse } from './ellipse';
-import { transformRotate } from '@suika/geo';
+import { isPointInRoundRect, transformRotate } from '@suika/geo';
 
 export interface RectAttrs extends GraphAttrs {
   cornerRadius?: number;
@@ -36,6 +36,10 @@ export class Rect extends Graph {
     };
   }
 
+  private getMaxCornerRadius() {
+    return Math.min(this.width, this.height) / 2;
+  }
+
   override draw(
     ctx: CanvasRenderingContext2D,
     imgManager?: ImgManager,
@@ -63,7 +67,7 @@ export class Rect extends Graph {
         }
         case TextureType.Image: {
           if (imgManager) {
-            const maxCornerRadius = Math.min(this.width, this.height) / 2;
+            const maxCornerRadius = this.getMaxCornerRadius();
             const cornerRadius = Math.min(
               this.cornerRadius ?? 0,
               maxCornerRadius,
@@ -126,6 +130,17 @@ export class Rect extends Graph {
       stroke: [{ type: TextureType.Solid, attrs: parseHexToRGBA('#1592fe')! }],
       strokeWidth: 1,
     });
+  }
+
+  override hitTest(x: number, y: number, padding = 0): boolean {
+    const strokeWidth = (this.strokeWidth ?? 0) / 2;
+    const maxCornerRadius = this.getMaxCornerRadius();
+    return isPointInRoundRect(
+      { x, y },
+      this,
+      new Array(4).fill(Math.min(this.cornerRadius ?? 0, maxCornerRadius)),
+      padding + strokeWidth,
+    );
   }
 
   override getControlHandles(zoom: number, initial?: boolean) {
