@@ -109,7 +109,8 @@ export class HostEventManager {
   private bindWheelEventToZoom() {
     const editor = this.editor;
     const handler = (event: WheelEvent) => {
-      if (this.isCtrlPressing || this.isCommandPressing) {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
         const { x: cx, y: cy } = this.editor.getCursorXY(event);
         if (event.deltaY > 0) {
           editor.zoomManager.zoomOut(cx, cy);
@@ -130,7 +131,7 @@ export class HostEventManager {
 
     // prevent default scale page action in win
     const preventDefaultScalePage = (event: WheelEvent) => {
-      if (this.isCtrlPressing || this.isCommandPressing) {
+      if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
       }
     };
