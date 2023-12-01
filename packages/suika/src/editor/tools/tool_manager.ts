@@ -71,24 +71,26 @@ export class ToolManager {
     let startWithLeftMouse = false;
 
     const handleDown = (e: PointerEvent) => {
-      isPressing = false;
-      this.isDragging = false;
-      startWithLeftMouse = false;
-      if (
-        e.button !== 0 || // is not left mouse
-        this.editor.textEditor.isEditing() || // is editing text mode
-        this.editor.hostEventManager.isSpacePressing // is dragging canvas mode
-      ) {
-        return;
-      }
+      setTimeout(() => {
+        isPressing = false;
+        this.isDragging = false;
+        startWithLeftMouse = false;
+        if (
+          e.button !== 0 || // is not left mouse
+          this.editor.textEditor.isEditing() || // is editing text mode
+          this.editor.hostEventManager.isSpacePressing // is dragging canvas mode
+        ) {
+          return;
+        }
 
-      isPressing = true;
-      startWithLeftMouse = true;
-      if (!this.currentTool) {
-        throw new Error('there is no active tool');
-      }
-      startPos = [e.clientX, e.clientY];
-      this.currentTool.start(e);
+        isPressing = true;
+        startWithLeftMouse = true;
+        if (!this.currentTool) {
+          throw new Error('there is no active tool');
+        }
+        startPos = [e.clientX, e.clientY];
+        this.currentTool.start(e);
+      });
     };
     const handleMove = (e: PointerEvent) => {
       if (!this.currentTool) {
