@@ -28,7 +28,9 @@ export class DrawTextTool implements ITool {
 
     // 让一个 input 元素出现在光标位置，然后输入内容回车。
     this.editor.textEditor.visible(x, y);
-    this.editor.toolManager.setActiveTool('select');
+    if (!this.editor.setting.get('keepToolSelectedAfterUse')) {
+      this.editor.toolManager.setActiveTool('select');
+    }
   }
 
   afterEnd() {

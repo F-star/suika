@@ -61,8 +61,10 @@ export class TextEditor {
     });
     this.editor.sceneGraph.addItems([text]);
 
-    this.editor.selectedElements.setItems([text]);
-    this.editor.sceneGraph.render();
+    if (!this.editor.setting.get('keepToolSelectedAfterUse')) {
+      this.editor.selectedElements.setItems([text]);
+      this.editor.sceneGraph.render();
+    }
 
     this.editor.commandManager.pushCommand(
       new AddShapeCommand('draw text', this.editor, [text]),

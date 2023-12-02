@@ -254,7 +254,10 @@ export abstract class DrawGraphTool implements ITool {
     this.isDragging = false;
     this.editor.hostEventManager.enableDelete();
     this.editor.hostEventManager.enableContextmenu();
-    if (this.drawingGraph) {
+    if (
+      this.drawingGraph &&
+      !this.editor.setting.get('keepToolSelectedAfterUse')
+    ) {
       this.editor.toolManager.setActiveTool('select');
     }
     this.startPointWhenSpaceDown = null;

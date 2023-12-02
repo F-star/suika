@@ -99,6 +99,9 @@ export class Setting {
     refLineStroke: '#f14f30ee',
     refLineStrokeWidth: 1,
     refLinePointSize: 5,
+
+    /**** tool ****/
+    keepToolSelectedAfterUse: true,
   };
 
   set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {
