@@ -8,6 +8,7 @@ export type ISetElementsAttrsType = Partial<{
   width: number;
   height: number;
   rotation: number;
+  cornerRadius: number;
   fill: ITexture[];
   stroke: ITexture[];
   strokeWidth: number;

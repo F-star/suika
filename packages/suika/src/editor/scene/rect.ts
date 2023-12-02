@@ -13,8 +13,6 @@ export interface RectAttrs extends GraphAttrs {
 }
 
 export class Rect extends Graph {
-  private cornerRadius?: number;
-
   constructor(options: RectAttrs) {
     super({ ...options, type: GraphType.Rect });
     if (options.cornerRadius !== undefined) {
@@ -269,7 +267,10 @@ export class Rect extends Graph {
         }
       }
       const dist = (a.x * b.x + a.y * b.y) / Math.sqrt(a.x * a.x + a.y * a.y);
-      this.cornerRadius = Math.round(Math.max(dist, 0) * Math.cos(Math.PI / 4));
+      this.cornerRadius = Math.min(
+        this.getMaxCornerRadius(),
+        Math.round(Math.max(dist, 0) * Math.cos(Math.PI / 4)),
+      );
     } else {
       super.updateByControlHandle(
         type,
