@@ -29,6 +29,7 @@ export interface GraphAttrs {
   strokeWidth?: number;
   // transform 相关
   rotation?: number;
+  cornerRadius?: number;
   visible?: boolean;
   lock?: boolean;
 }
@@ -47,6 +48,7 @@ export class Graph {
   strokeWidth?: number;
   // transform
   rotation?: number;
+  cornerRadius?: number;
   visible?: boolean;
   lock?: boolean;
 

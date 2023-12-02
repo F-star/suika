@@ -120,6 +120,26 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
+  setCornerRadius(editor: Editor, elements: Graph[], cornerRadius: number) {
+    if (elements.length === 0) {
+      return;
+    }
+
+    const prevAttrs = elements.map((el) => ({
+      cornerRadius: el.cornerRadius || 0,
+    }));
+    elements.forEach((el) => {
+      el.cornerRadius = cornerRadius;
+    });
+    editor.commandManager.pushCommand(
+      new SetElementsAttrs(
+        'update Corner Radius',
+        elements,
+        { cornerRadius },
+        prevAttrs,
+      ),
+    );
+  },
 
   /**
    * show graphs when at least one graph is hidden

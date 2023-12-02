@@ -8,6 +8,7 @@ import { BaseCard } from '../BaseCard';
 import NumberInput from '../../input/NumberInput';
 import './style.scss';
 import { useIntl } from 'react-intl';
+import { GraphType } from '../../../type';
 
 /**
  * 因为运算中会丢失精度
@@ -23,11 +24,16 @@ export const ElementsInfoCards: FC = () => {
   const intl = useIntl();
   const MIXED = intl.formatMessage({ id: 'mixed' });
 
+  // graph type string
+  const [graphType, setGraphType] = useState<GraphType | typeof MIXED>(MIXED);
   const [rotatedX, setRotatedX] = useState<number | typeof MIXED>(MIXED);
   const [rotatedY, setRotatedY] = useState<number | typeof MIXED>(MIXED);
   const [width, setWidth] = useState<number | typeof MIXED>(MIXED);
   const [height, setHeight] = useState<number | typeof MIXED>(MIXED);
   const [rotation, setRotation] = useState<number | typeof MIXED>(MIXED);
+  const [cornerRadius, setCornerRadius] = useState<number | typeof MIXED>(
+    MIXED,
+  );
 
   useEffect(() => {
     if (editor) {
@@ -41,12 +47,17 @@ export const ElementsInfoCards: FC = () => {
             x: number | typeof MIXED;
             y: number | typeof MIXED;
           } = getElementRotatedXY(items[0]);
+          let newGraphType: GraphType | typeof MIXED = items[0].type;
           let newWidth: number | typeof MIXED = items[0].width;
           let newHeight: number | typeof MIXED = items[0].height;
           let newRotation: number | typeof MIXED = items[0].rotation || 0;
+          let newCornerRadius: number | typeof MIXED =
+            items[0].cornerRadius || 0;
 
-          for (let i = 0, len = items.length; i < len; i++) {
-            const element = items[i];
+          for (const element of items) {
+            if (element.type !== newGraphType) {
+              newGraphType = MIXED;
+            }
             const { x: currentRotatedX, y: currentRotatedY } =
               getElementRotatedXY(element);
             if (!isEqual(newRotatedX, currentRotatedX)) {
@@ -64,8 +75,12 @@ export const ElementsInfoCards: FC = () => {
             if (!isEqual(newRotation, element.rotation || 0)) {
               newRotation = MIXED;
             }
+            if (!isEqual(newCornerRadius, element.cornerRadius || 0)) {
+              newCornerRadius = MIXED;
+            }
           }
 
+          setGraphType(newGraphType);
           setRotatedX(
             newRotatedX === MIXED
               ? newRotatedX
@@ -76,12 +91,23 @@ export const ElementsInfoCards: FC = () => {
               ? newRotatedY
               : remainDecimal(newRotatedY as number),
           );
-          setWidth(newWidth);
-          setHeight(newHeight);
+          setWidth(
+            newWidth === MIXED ? newWidth : remainDecimal(newWidth as number),
+          );
+          setHeight(
+            newHeight === MIXED
+              ? newHeight
+              : remainDecimal(newHeight as number),
+          );
           setRotation(
             newRotation === MIXED
               ? newRotation
               : remainDecimal(rad2Deg(newRotation as number)),
+          );
+          setCornerRadius(
+            newCornerRadius === MIXED
+              ? newCornerRadius
+              : remainDecimal(newCornerRadius as number),
           );
         }
       };
@@ -93,81 +119,109 @@ export const ElementsInfoCards: FC = () => {
     }
   }, [editor, MIXED]);
 
+  // attributes x, y, width, height, rotation, cornerRadius
+  const attrs = [
+    {
+      label: 'X',
+      value: rotatedX,
+      onBlur: (newRotatedX: number) => {
+        if (editor) {
+          const elements = editor.selectedElements.getItems();
+          MutateGraphsAndRecord.setRotateX(editor, elements, newRotatedX);
+          editor.sceneGraph.render();
+        }
+      },
+    },
+    {
+      label: 'Y',
+      value: rotatedY,
+      onBlur: (newRotatedY: number) => {
+        if (editor) {
+          const elements = editor.selectedElements.getItems();
+          MutateGraphsAndRecord.setRotateY(editor, elements, newRotatedY);
+          editor.sceneGraph.render();
+        }
+      },
+    },
+    {
+      label: 'W',
+      min: 1,
+      value: width,
+      onBlur: (newWidth: number) => {
+        if (editor) {
+          const elements = editor.selectedElements.getItems();
+          MutateGraphsAndRecord.setWidth(editor, elements, newWidth);
+          editor.sceneGraph.render();
+        }
+      },
+    },
+    {
+      label: 'H',
+      min: 1,
+      value: height,
+      onBlur: (newHeight: number) => {
+        if (editor) {
+          const elements = editor.selectedElements.getItems();
+          MutateGraphsAndRecord.setHeight(editor, elements, newHeight);
+          editor.sceneGraph.render();
+        }
+      },
+    },
+    {
+      label: 'R',
+      value: rotation,
+      suffixValue: '°',
+      onBlur: (newRotation: number) => {
+        if (editor) {
+          newRotation = normalizeRadian(deg2Rad(newRotation));
+          const elements = editor.selectedElements.getItems();
+          MutateGraphsAndRecord.setRotation(editor, elements, newRotation);
+          editor.sceneGraph.render();
+        }
+      },
+    },
+    {
+      label: 'C',
+      min: 0,
+      value: cornerRadius,
+      visible: () => {
+        return graphType === GraphType.Rect;
+      },
+      onBlur: (newCornerRadius: number) => {
+        if (editor) {
+          const elements = editor.selectedElements.getItems();
+          MutateGraphsAndRecord.setCornerRadius(
+            editor,
+            elements,
+            newCornerRadius,
+          );
+          editor.sceneGraph.render();
+        }
+      },
+    },
+  ];
+
   return (
     <BaseCard>
       <div className="element-info-attrs-row">
-        {[
-          {
-            label: 'X',
-            value: rotatedX,
-            onBlur: (newRotatedX: number) => {
-              if (editor) {
-                const elements = editor.selectedElements.getItems();
-                MutateGraphsAndRecord.setRotateX(editor, elements, newRotatedX);
-                editor.sceneGraph.render();
-              }
-            },
-          },
-          {
-            label: 'Y',
-            value: rotatedY,
-            onBlur: (newRotatedY: number) => {
-              if (editor) {
-                const elements = editor.selectedElements.getItems();
-                MutateGraphsAndRecord.setRotateY(editor, elements, newRotatedY);
-                editor.sceneGraph.render();
-              }
-            },
-          },
-        ].map((item) => (
+        {attrs.slice(0, 2).map((item) => (
           <AttrInput {...item} key={item.label} />
         ))}
       </div>
       <div className="element-info-attrs-row">
-        {[
-          {
-            label: 'W',
-            min: 1,
-            value: typeof width === 'number' ? remainDecimal(width, 2) : width,
-            onBlur: (newWidth: number) => {
-              if (editor) {
-                const elements = editor.selectedElements.getItems();
-                MutateGraphsAndRecord.setWidth(editor, elements, newWidth);
-                editor.sceneGraph.render();
-              }
-            },
-          },
-          {
-            label: 'H',
-            min: 1,
-            value:
-              typeof height === 'number' ? remainDecimal(height, 2) : height,
-            onBlur: (newHeight: number) => {
-              if (editor) {
-                const elements = editor.selectedElements.getItems();
-                MutateGraphsAndRecord.setHeight(editor, elements, newHeight);
-                editor.sceneGraph.render();
-              }
-            },
-          },
-        ].map((item) => (
+        {attrs.slice(2, 4).map((item) => (
           <AttrInput {...item} key={item.label} />
         ))}
       </div>
       <div className="element-info-attrs-row">
-        <AttrInput
-          label="R"
-          value={rotation}
-          suffixValue="°"
-          onBlur={(newRotation) => {
-            if (editor) {
-              newRotation = normalizeRadian(deg2Rad(newRotation));
-              const elements = editor.selectedElements.getItems();
-              MutateGraphsAndRecord.setRotation(editor, elements, newRotation);
-              editor.sceneGraph.render();
-            }
-          }}
-        />
+        {attrs
+          .slice(4, 6)
+          .filter((item) => {
+            return item.visible ? item.visible() : true;
+          })
+          .map((item) => (
+            <AttrInput {...item} key={item.label} />
+          ))}
       </div>
     </BaseCard>
   );
