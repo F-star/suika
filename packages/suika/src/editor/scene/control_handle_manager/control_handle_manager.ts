@@ -97,10 +97,10 @@ export class ControlHandleManager {
       return {
         ...cornerPoints,
         ...midPoints,
-        nwRotation: { ...cornerRotation.nw },
-        neRotation: { ...cornerRotation.ne },
-        seRotation: { ...cornerRotation.se },
-        swRotation: { ...cornerRotation.sw },
+        nwRotation: cornerRotation.nw,
+        neRotation: cornerRotation.ne,
+        seRotation: cornerRotation.se,
+        swRotation: cornerRotation.sw,
       };
     })();
 
@@ -175,6 +175,8 @@ export class ControlHandleManager {
       ...(this.customHandlesVisible ? this.customHandles : []),
     ];
 
+    const box = this.editor.selectedBox.getBox();
+
     for (let i = handles.length - 1; i >= 0; i--) {
       const handle = handles[i];
       const type = handle.type;
@@ -183,11 +185,9 @@ export class ControlHandleManager {
         continue;
       }
 
-      const isHit = handle.graph.hitTest(
-        hitPointVW.x,
-        hitPointVW.y,
-        handleHitToleration,
-      );
+      const isHit = handle.hitTest
+        ? handle.hitTest(hitPointVW.x, hitPointVW.y, handleHitToleration, box!)
+        : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handleHitToleration);
 
       if (isHit) {
         return {

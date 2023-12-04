@@ -169,6 +169,19 @@ export const createTransformHandles = (params: {
   });
 
   /************* north/south/west/east ************/
+  const hitTest = function (
+    this: ControlHandle,
+    x: number,
+    y: number,
+    tol: number,
+    rect: { x: number; y: number; width: number; height: number },
+  ) {
+    if (rect.width === 0 || rect.height === 0) {
+      return false;
+    }
+    return this.graph.hitTest(x, y, tol);
+  };
+
   const n = new ControlHandle({
     graph: new Rect({
       objectName: 'n',
@@ -176,6 +189,7 @@ export const createTransformHandles = (params: {
       visible: false,
     }),
     type: 'n',
+    hitTest,
     getCursor: getResizeCursor,
   });
   const e = new ControlHandle({
@@ -185,6 +199,7 @@ export const createTransformHandles = (params: {
       visible: false,
     }),
     type: 'e',
+    hitTest,
     getCursor: getResizeCursor,
   });
 
@@ -195,6 +210,7 @@ export const createTransformHandles = (params: {
       visible: false,
     }),
     type: 's',
+    hitTest,
     getCursor: getResizeCursor,
   });
 
@@ -205,6 +221,7 @@ export const createTransformHandles = (params: {
       visible: false,
     }),
     type: 'w',
+    hitTest,
     getCursor: getResizeCursor,
   });
 
