@@ -13,11 +13,15 @@ export class SelectedBox {
   private eventEmitter = new EventEmitter<Events>();
   private _hover = false;
 
+  constructor(private editor: Editor) {}
+
   isHover() {
     return this._hover;
   }
 
-  constructor(private editor: Editor) {}
+  getBox(): IRectWithRotation | null {
+    return this.box ? { ...this.box } : null;
+  }
 
   updateBbox() {
     const selectedElements = this.editor.selectedElements;
