@@ -101,7 +101,7 @@ export class Setting {
     refLinePointSize: 5,
 
     /**** tool ****/
-    keepToolSelectedAfterUse: true,
+    keepToolSelectedAfterUse: false,
   };
 
   set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {
