@@ -16,6 +16,7 @@ export class ControlHandle {
   cy: number;
   type: string;
   graph: Graph;
+  padding: number;
   hitTest?: HitTest;
   getCursor: GetCursor;
 
@@ -23,6 +24,7 @@ export class ControlHandle {
     cx?: number;
     cy?: number;
     type: string;
+    padding?: number;
     graph: Graph;
     hitTest?: HitTest;
     getCursor: GetCursor;
@@ -30,6 +32,7 @@ export class ControlHandle {
     this.cx = attrs.cx ?? 0;
     this.cy = attrs.cy ?? 0;
     this.type = attrs.type;
+    this.padding = attrs.padding ?? 0;
     this.graph = attrs.graph;
     this.getCursor = attrs.getCursor;
     if (attrs.hitTest) {

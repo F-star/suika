@@ -89,6 +89,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
     }),
     type: 'nw',
+    padding: 3,
     getCursor: getResizeCursor,
   });
 
@@ -98,6 +99,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
     }),
     type: 'ne',
+    padding: 3,
     getCursor: getResizeCursor,
   });
 
@@ -107,6 +109,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
     }),
     type: 'se',
+    padding: 3,
     getCursor: getResizeCursor,
   });
 
@@ -116,6 +119,7 @@ export const createTransformHandles = (params: {
       ...getDefaultAttrs(),
     }),
     type: 'sw',
+    padding: 3,
     getCursor: getResizeCursor,
   });
 

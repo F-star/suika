@@ -86,13 +86,28 @@ export class ControlHandleManager {
   draw(rect: IRectWithRotation) {
     this.visible = true;
     const zoom = this.editor.zoomManager.getZoom();
-    const size = this.editor.setting.get('handleSize');
+    const handleSize = this.editor.setting.get('handleSize');
+    const handleStrokeWidth = this.editor.setting.get('handleStrokeWidth');
+    const neswHandleWidth = this.editor.setting.get('neswHandleWidth');
 
     // calculate handle position
     const handlePoints = (() => {
       const cornerPoints = rectToPoints(rect);
-      const cornerRotation = rectToPoints(offsetRect(rect, size / 2 / zoom));
-      const midPoints = rectToMidPoints(rect);
+
+      const offset = handleSize / 2 / zoom;
+      const cornerRotation = rectToPoints(offsetRect(rect, offset));
+
+      // when rect size < 40（viewport）, nwse handle should outside the selectedBox
+      const MIN_SIZE = 40;
+      const offsets: number[] = new Array(4).fill(0);
+      if (rect.width * zoom < MIN_SIZE) {
+        offsets[1] = offsets[3] = neswHandleWidth / 2 / zoom;
+      }
+      if (rect.height * zoom < MIN_SIZE) {
+        offsets[0] = offsets[2] = neswHandleWidth / 2 / zoom;
+      }
+      const neswRect = offsetRect(rect, offsets);
+      const midPoints = rectToMidPoints(neswRect);
 
       return {
         ...cornerPoints,
@@ -117,13 +132,14 @@ export class ControlHandleManager {
     }
 
     // update n/s/w/e handle graph size
-    const neswHandleWidth = this.editor.setting.get('neswHandleWidth');
     const n = this.transformHandles.get('n')!;
     const s = this.transformHandles.get('s')!;
     const w = this.transformHandles.get('w')!;
     const e = this.transformHandles.get('e')!;
-    n.graph.width = s.graph.width = rect.width * zoom;
-    w.graph.height = e.graph.height = rect.height * zoom;
+    n.graph.width = s.graph.width =
+      rect.width * zoom - handleSize - handleStrokeWidth;
+    w.graph.height = e.graph.height =
+      rect.height * zoom - handleSize - handleStrokeWidth;
     n.graph.height =
       s.graph.height =
       w.graph.width =
@@ -168,7 +184,6 @@ export class ControlHandleManager {
     );
 
     const rotation = this.editor.selectedElements.getRotation();
-    const handleHitToleration = this.editor.setting.get('handleHitToleration');
 
     const handles = [
       ...Array.from(this.transformHandles.values()),
@@ -186,8 +201,8 @@ export class ControlHandleManager {
       }
 
       const isHit = handle.hitTest
-        ? handle.hitTest(hitPointVW.x, hitPointVW.y, handleHitToleration, box!)
-        : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handleHitToleration);
+        ? handle.hitTest(hitPointVW.x, hitPointVW.y, handle.padding, box!)
+        : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
 
       if (isHit) {
         return {

@@ -165,13 +165,20 @@ export const rectToPoints = (rect: IRectWithRotation) => {
   };
 };
 
-export const offsetRect = (rect: IRectWithRotation, padding: number) => {
+export const offsetRect = (
+  rect: IRectWithRotation,
+  padding: number | number[],
+) => {
+  if (typeof padding === 'number') {
+    padding = [padding, padding, padding, padding];
+  }
   const { x, y, width, height } = rect;
+
   return {
-    x: x - padding,
-    y: y - padding,
-    width: width + padding * 2,
-    height: height + padding * 2,
+    x: x - padding[3],
+    y: y - padding[0],
+    width: width + padding[1] + padding[3],
+    height: height + padding[0] + padding[2],
     rotation: rect.rotation,
   };
 };
