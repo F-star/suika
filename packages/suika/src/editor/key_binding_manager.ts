@@ -55,7 +55,9 @@ export class KeyBindingManager {
   private handleAction = (e: KeyboardEvent) => {
     // There are some default behaviors to prevent editor action
     // e.g. Windows press ALT will focus on browser menu bar, which make key press no effect
-    e.preventDefault();
+    if (e.altKey) {
+      e.preventDefault();
+    }
 
     if (
       e.target instanceof HTMLInputElement ||
