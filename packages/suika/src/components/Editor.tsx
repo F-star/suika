@@ -36,7 +36,7 @@ const Editor: FC = () => {
           });
           editor.sceneGraph.render();
         },
-        150,
+        10,
         { leading: false },
       );
       window.addEventListener('resize', changeViewport);
