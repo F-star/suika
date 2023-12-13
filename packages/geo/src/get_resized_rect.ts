@@ -164,7 +164,7 @@ const ne: IResizeOperation = {
     }
     return { width, height };
   },
-  getOrigin: (rect: IRectWithRotation, newWidth, newHeight) => [
+  getOrigin: (rect: IRectWithRotation, _newWidth, newHeight) => [
     // left-bottom
     rect.x,
     rect.y + rect.height,
@@ -234,9 +234,9 @@ const sw: IResizeOperation = {
 const n: IResizeOperation = {
   getSize: (
     rect: IRectWithRotation,
-    posX: number,
+    _posX: number,
     posY: number,
-    cx: number,
+    _cx: number,
     cy: number,
     scaleFromCenter: boolean,
   ) => {
@@ -264,9 +264,9 @@ const e: IResizeOperation = {
   getSize: (
     rect: IRectWithRotation,
     posX: number,
-    posY: number,
+    _posY: number,
     cx: number,
-    cy: number,
+    _cy: number,
     scaleFromCenter: boolean,
   ) => {
     let width = 0;
@@ -280,7 +280,7 @@ const e: IResizeOperation = {
     }
     return { width, height };
   },
-  getOrigin: (rect: IRectWithRotation, newWidth, newHeight) => [
+  getOrigin: (rect: IRectWithRotation, _newWidth, newHeight) => [
     // left-center
     rect.x,
     rect.y + rect.height / 2,
@@ -292,9 +292,9 @@ const e: IResizeOperation = {
 const s: IResizeOperation = {
   getSize: (
     rect: IRectWithRotation,
-    posX: number,
+    _posX: number,
     posY: number,
-    cx: number,
+    _cx: number,
     cy: number,
     scaleFromCenter: boolean,
   ) => {
@@ -322,9 +322,9 @@ const w: IResizeOperation = {
   getSize: (
     rect: IRectWithRotation,
     posX: number,
-    posY: number,
+    _posY: number,
     cx: number,
-    cy: number,
+    _cy: number,
     scaleFromCenter: boolean,
   ) => {
     let width = 0;
