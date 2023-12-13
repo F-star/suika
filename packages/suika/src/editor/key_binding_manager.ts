@@ -87,6 +87,7 @@ export class KeyBindingManager {
       }
 
       if (isMatch) {
+        e.preventDefault();
         console.log(`[${getKeyStr(e)}] => ${keyBinding.actionName}`);
         keyBinding.action(e);
         break;
