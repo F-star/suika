@@ -89,8 +89,8 @@ export class Setting {
     zoomToFixPadding: 32, // base viewport coord
     invertZoomDirection: false, // zoom in/out direction
 
-    moveElementsStep: 1,
-    moveElementsStepFast: 10,
+    smallNudge: 1,
+    bigNudge: 10,
     moveElementsDelay: 500,
 
     // reference line

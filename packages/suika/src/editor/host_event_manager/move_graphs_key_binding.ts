@@ -72,20 +72,20 @@ export class MoveGraphsKeyBinding {
         isEnableUpdateStartPoints = false;
       }
 
-      let step = editor.setting.get('moveElementsStep');
-      if (event.shiftKey) step = editor.setting.get('moveElementsStepFast');
+      let nudge = editor.setting.get('smallNudge');
+      if (event.shiftKey) nudge = editor.setting.get('bigNudge');
 
       if (pressed.ArrowLeft) {
-        editor.moveElements(movedEls, -step, 0);
+        editor.moveElements(movedEls, -nudge, 0);
       }
       if (pressed.ArrowRight) {
-        editor.moveElements(movedEls, step, 0);
+        editor.moveElements(movedEls, nudge, 0);
       }
       if (pressed.ArrowUp) {
-        editor.moveElements(movedEls, 0, -step);
+        editor.moveElements(movedEls, 0, -nudge);
       }
       if (pressed.ArrowDown) {
-        editor.moveElements(movedEls, 0, step);
+        editor.moveElements(movedEls, 0, nudge);
       }
 
       this.editor.commandManager.disableRedoUndo();
