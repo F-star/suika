@@ -133,10 +133,7 @@ export class SelectTool implements ITool {
     }
 
     // 1. 点击落在选中盒中
-    else if (
-      !isShiftPressing &&
-      this.editor.selectedBox.isPointInBox(this.startPoint)
-    ) {
+    else if (this.editor.selectedBox.isPointInBox(this.startPoint)) {
       this.currStrategy = this.strategyMove;
     } else {
       const topHitElement = sceneGraph.getTopHitElement(
