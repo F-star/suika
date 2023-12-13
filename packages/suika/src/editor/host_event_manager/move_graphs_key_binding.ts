@@ -29,6 +29,7 @@ export class MoveGraphsKeyBinding {
     let isEnableUpdateStartPoints = true;
 
     const recordDebounce = debounce((moveEls: Graph[]) => {
+      this.editor.controlHandleManager.showCustomHandles();
       isEnableUpdateStartPoints = true;
       this.editor.commandManager.enableRedoUndo();
       editor.commandManager.pushCommand(
@@ -89,6 +90,7 @@ export class MoveGraphsKeyBinding {
       }
 
       this.editor.commandManager.disableRedoUndo();
+      this.editor.controlHandleManager.hideCustomHandles();
       recordDebounce(movedEls);
       editor.sceneGraph.render();
     };
