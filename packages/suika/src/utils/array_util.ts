@@ -1,4 +1,4 @@
-// Array method with call this, so it will faster.
+// Array method without call this, so it will faster.
 
 /**
  * forEach
@@ -35,4 +35,16 @@ export const arrMapRevert = <T, U>(
     ret.push(cb(array[i], i));
   }
   return ret;
+};
+
+export const arrEvery = <T>(
+  array: T[],
+  cb: (item: T, index: number) => unknown,
+): boolean => {
+  for (let i = 0, len = array.length; i < len; i++) {
+    if (!cb(array[i], i)) {
+      return false;
+    }
+  }
+  return true;
 };
