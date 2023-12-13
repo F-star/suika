@@ -1,27 +1,30 @@
 import { IPoint } from '../../../type';
 import { Editor } from '../../editor';
+import { Graph } from '../../scene/graph';
 import { IBaseTool } from '../type';
 import { getRectByTwoPoint } from '@suika/geo';
 
 /**
- * 绘制选区
+ * draw selection box
  */
 export class DrawSelectionBox implements IBaseTool {
   private lastPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
+  private startSelectedGraphs: Graph[] = [];
 
   constructor(private editor: Editor) {}
   active() {
-    // do nothing
+    // noop
   }
   inactive() {
-    // do nothing
+    // noop
   }
   start(e: PointerEvent) {
     this.isShiftPressingWhenStart = false;
 
     if (this.editor.hostEventManager.isShiftPressing) {
       this.isShiftPressingWhenStart = true;
+      this.startSelectedGraphs = this.editor.selectedElements.getItems();
     } else {
       this.editor.selectedElements.clear();
     }
@@ -30,7 +33,6 @@ export class DrawSelectionBox implements IBaseTool {
     this.lastPoint = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     this.editor.sceneGraph.render();
-    // 设置选区
     this.editor.sceneGraph.setSelection(this.lastPoint);
   }
   drag(e: PointerEvent) {
@@ -38,19 +40,24 @@ export class DrawSelectionBox implements IBaseTool {
 
     const box = getRectByTwoPoint(this.lastPoint, point);
     this.editor.sceneGraph.setSelection(box);
+
+    const graphsInSelection = this.editor.sceneGraph.getElementsInSelection();
+
+    if (this.isShiftPressingWhenStart) {
+      this.editor.selectedElements.setItems(this.startSelectedGraphs);
+      this.editor.selectedElements.toggleItems(graphsInSelection);
+    } else {
+      this.editor.selectedElements.setItems(graphsInSelection);
+    }
+
     this.editor.sceneGraph.render();
   }
   end() {
-    const elements = this.editor.sceneGraph.getElementsInSelection();
-
-    if (this.isShiftPressingWhenStart) {
-      this.editor.selectedElements.toggleItems(elements);
-    } else {
-      this.editor.selectedElements.setItems(elements);
-    }
+    // noop
   }
   afterEnd() {
     this.isShiftPressingWhenStart = false;
+    this.startSelectedGraphs = [];
     this.editor.sceneGraph.selection = null;
     this.editor.sceneGraph.render();
   }
