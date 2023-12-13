@@ -53,6 +53,10 @@ export class KeyBindingManager {
   constructor(private editor: Editor) {}
 
   private handleAction = (e: KeyboardEvent) => {
+    // There are some default behaviors to prevent editor action
+    // e.g. Windows press ALT will focus on browser menu bar, which make key press no effect
+    e.preventDefault();
+
     if (
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLTextAreaElement
@@ -81,7 +85,6 @@ export class KeyBindingManager {
       }
 
       if (isMatch) {
-        e.preventDefault();
         console.log(`[${getKeyStr(e)}] => ${keyBinding.actionName}`);
         keyBinding.action(e);
         break;
