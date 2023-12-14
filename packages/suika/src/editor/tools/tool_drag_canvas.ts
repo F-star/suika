@@ -1,4 +1,5 @@
 import { IBox, IPoint } from '../../type';
+import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
@@ -7,6 +8,7 @@ import { ITool } from './type';
  */
 export class DragCanvasTool implements ITool {
   static type = 'dragCanvas';
+  cursor: ICursor = 'grab';
   readonly type = 'dragCanvas';
   readonly hotkey = 'h';
   private startPoint: IPoint = { x: -1, y: -1 };
@@ -14,36 +16,27 @@ export class DragCanvasTool implements ITool {
 
   constructor(private editor: Editor) {}
   active() {
-    this.editor.setCursor('grab');
+    this.editor.canvasDragger.disableDragBySpace();
+    this.editor.canvasDragger.active();
   }
   inactive() {
-    this.editor.setCursor('default');
+    this.editor.canvasDragger.inactive();
+    this.editor.canvasDragger.enableDragBySpace();
   }
   moveExcludeDrag() {
-    // do nothing;
+    // noop
   }
-  start(e: PointerEvent) {
-    this.editor.canvasElement.style.cursor = 'grabbing';
-    this.startPoint = this.editor.getCursorXY(e);
-    this.prevViewport = this.editor.viewportManager.getViewport();
+  start() {
+    // noop
   }
-  drag(e: PointerEvent) {
-    const point: IPoint = this.editor.getCursorXY(e);
-    const startPoint = this.startPoint;
-    const dx = point.x - startPoint.x;
-    const dy = point.y - startPoint.y;
-    const zoom = this.editor.zoomManager.getZoom();
-    // 类似苹果笔记本触控板的 “自然滚动”，所以他要反向，即加上 "-dx"
-    const viewportX = this.prevViewport.x - dx / zoom;
-    const viewportY = this.prevViewport.y - dy / zoom;
-
-    this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
-    this.editor.sceneGraph.render();
+  drag() {
+    // noop
   }
   end() {
-    // do nothing
+    // noop
   }
   afterEnd() {
-    this.editor.canvasElement.style.cursor = 'grab';
+    // ToolManager will exec enableDragBySpace() when tool end
+    this.editor.canvasDragger.disableDragBySpace();
   }
 }

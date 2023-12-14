@@ -7,7 +7,7 @@ import { DrawSelectionBox } from './tool_select_selection';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectRotationTool } from './tool_select_rotation';
 import { SelectResizeTool } from './tool_select_resize';
-import { isRotationCursor } from '../../cursor_manager';
+import { ICursor, isRotationCursor } from '../../cursor_manager';
 
 /**
  * Select Tool
@@ -16,6 +16,7 @@ import { isRotationCursor } from '../../cursor_manager';
  */
 export class SelectTool implements ITool {
   static type = 'select';
+  cursor: ICursor = 'default';
   type = 'select';
   hotkey = 'v';
 
@@ -51,8 +52,6 @@ export class SelectTool implements ITool {
     this.strategySelectResize = new SelectResizeTool(editor);
   }
   active() {
-    this.editor.setCursor('default');
-
     this.editor.selectedElements.on(
       'hoverItemChange',
       this.handleHoverItemChange,
@@ -60,8 +59,6 @@ export class SelectTool implements ITool {
     this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
   }
   inactive() {
-    this.editor.setCursor('default');
-
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
@@ -79,7 +76,7 @@ export class SelectTool implements ITool {
   }
 
   private updateCursorAndHlHoverGraph = throttle((point: IPoint) => {
-    if (this.editor.hostEventManager.isSpacePressing) {
+    if (this.editor.canvasDragger.isActive()) {
       return;
     }
     const controlHandleManager = this.editor.controlHandleManager;

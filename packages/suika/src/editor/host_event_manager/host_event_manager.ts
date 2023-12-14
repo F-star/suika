@@ -1,4 +1,4 @@
-import { IBox, IPoint } from '../../type';
+import { IPoint } from '../../type';
 import EventEmitter from '../../utils/event_emitter';
 import { Editor } from '../editor';
 import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
@@ -23,7 +23,6 @@ export class HostEventManager {
   isSpacePressing = false;
 
   isDraggingCanvasBySpace = false;
-  isEnableDragCanvasBySpace = true;
   isEnableDelete = true;
   isEnableContextMenu = true;
   // isEnableMoveSelectedElementByKey = true; // no use now
@@ -42,7 +41,6 @@ export class HostEventManager {
   bindHotkeys() {
     this.bindModifiersRecordEvent(); // 记录 isShiftPressing 等值
     this.bindWheelEventToZoom(); // 滚轮移动画布
-    this.bindDragCanvasEvent(); // 空格和拖拽移动画布
     this.bindContextMenu();
 
     this.moveGraphsKeyBinding.bindKey();
@@ -69,22 +67,6 @@ export class HostEventManager {
       }
       if (prevSpace !== this.isSpacePressing) {
         this.eventEmitter.emit('spaceToggle', this.isSpacePressing);
-      }
-
-      // TODO: move to correct position
-      // 按住按键会不停触发响应函数，下面这种写法则只会在按下和释放时分别执行一次
-      if (
-        this.isEnableDragCanvasBySpace &&
-        prevSpace !== this.isSpacePressing
-      ) {
-        if (this.isSpacePressing) {
-          this.prevCursor = this.editor.getCursor();
-          this.editor.setCursor('grab');
-        } else {
-          if (!this.isDraggingCanvasBySpace) {
-            this.editor.setCursor(this.prevCursor);
-          }
-        }
       }
     };
 
@@ -149,81 +131,6 @@ export class HostEventManager {
     });
   }
 
-  private bindDragCanvasEvent() {
-    let isEnableDrag = false;
-    let startPointer: IPoint | null = null;
-    let prevViewport: IBox;
-
-    // 鼠标按下
-    const pointerdownHandler = (event: PointerEvent) => {
-      isEnableDrag = false;
-      startPointer = null;
-      this.isDraggingCanvasBySpace = false;
-
-      if (this.isEnableDragCanvasBySpace && this.isSpacePressing) {
-        this.editor.setCursor('grabbing');
-        this.isDraggingCanvasBySpace = true;
-        startPointer = this.editor.getCursorXY(event);
-        prevViewport = this.editor.viewportManager.getViewport();
-      }
-    };
-    this.editor.canvasElement.addEventListener(
-      'pointerdown',
-      pointerdownHandler,
-    );
-
-    // drag canvas when mouse move
-    const pointermoveHandler = (event: PointerEvent) => {
-      if (startPointer) {
-        const viewportPos = this.editor.getCursorXY(event);
-        const dx = viewportPos.x - startPointer.x;
-        const dy = viewportPos.y - startPointer.y;
-        const dragBlockStep = this.editor.setting.get('dragBlockStep');
-        if (
-          (!isEnableDrag && Math.abs(dx) > dragBlockStep) ||
-          Math.abs(dy) > dragBlockStep
-        ) {
-          isEnableDrag = true;
-        }
-        if (isEnableDrag) {
-          const zoom = this.editor.zoomManager.getZoom();
-          const viewportX = prevViewport.x - dx / zoom;
-          const viewportY = prevViewport.y - dy / zoom;
-
-          this.editor.viewportManager.setViewport({
-            x: viewportX,
-            y: viewportY,
-          });
-          this.editor.sceneGraph.render();
-        }
-      }
-    };
-    window.addEventListener('pointermove', pointermoveHandler);
-
-    // 鼠标释放
-    const pointerupHandler = () => {
-      if (this.isDraggingCanvasBySpace) {
-        this.editor.setCursor(this.isSpacePressing ? 'grab' : this.prevCursor);
-      }
-      isEnableDrag = false;
-      startPointer = null;
-      // we hope reset isDraggingCanvasBySpace after exec tool.end()
-      setTimeout(() => {
-        this.isDraggingCanvasBySpace = false;
-      });
-    };
-    window.addEventListener('pointerup', pointerupHandler);
-
-    this.unbindHandlers.push(() => {
-      this.editor.canvasElement.removeEventListener(
-        'pointerdown',
-        pointerdownHandler,
-      );
-      window.removeEventListener('pointermove', pointermoveHandler);
-      window.removeEventListener('pointerup', pointerupHandler);
-    });
-  }
-
   private bindContextMenu() {
     const handler = (e: MouseEvent) => {
       e.preventDefault();
@@ -237,12 +144,6 @@ export class HostEventManager {
     });
   }
 
-  enableDragBySpace() {
-    this.isEnableDragCanvasBySpace = true;
-  }
-  disableDragBySpace() {
-    this.isEnableDragCanvasBySpace = false;
-  }
   enableDelete() {
     this.isEnableDelete = true;
   }

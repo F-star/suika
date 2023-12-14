@@ -24,6 +24,7 @@ import { ImgManager } from './Img_manager';
 import { GroupManager } from './group_manager';
 import { ControlHandleManager } from './scene/control_handle_manager';
 import { SelectedBox } from './selected_box';
+import { CanvasDragger } from './canvas_dragger';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -50,6 +51,7 @@ export class Editor {
 
   viewportManager: ViewportManager;
 
+  canvasDragger: CanvasDragger;
   toolManager: ToolManager;
   commandManager: CommandManager;
   zoomManager: ZoomManager;
@@ -108,6 +110,7 @@ export class Editor {
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
 
+    this.canvasDragger = new CanvasDragger(this);
     this.toolManager = new ToolManager(this);
 
     this.clipboard = new ClipboardManager(this);
@@ -159,6 +162,7 @@ export class Editor {
     this.keybindingManager.destroy();
     this.hostEventManager.destroy();
     this.clipboard.destroy();
+    this.canvasDragger.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
     this.perfMonitor.destroy();

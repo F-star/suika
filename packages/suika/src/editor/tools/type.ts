@@ -1,6 +1,9 @@
+import { ICursor } from '../cursor_manager';
+
 export interface ITool extends IBaseTool {
   hotkey: string;
   type: string;
+  cursor: ICursor;
   moveExcludeDrag: (event: PointerEvent) => void;
 }
 
