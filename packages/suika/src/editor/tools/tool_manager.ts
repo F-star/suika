@@ -111,7 +111,7 @@ export class ToolManager {
         }
         if (this.isDragging) {
           this.enableSwitchTool = false;
-          this.editor.hostEventManager.disableDragBySpace();
+          this.editor.canvasDragger.disableDragBySpace();
           this.currentTool.drag(e);
         }
       } else {
@@ -129,7 +129,7 @@ export class ToolManager {
       }
 
       if (isPressing) {
-        this.editor.hostEventManager.enableDragBySpace();
+        this.editor.canvasDragger.enableDragBySpace();
         isPressing = false;
         this.currentTool.end(e, this.isDragging);
         this.currentTool.afterEnd(e);
@@ -175,6 +175,7 @@ export class ToolManager {
       throw new Error(`没有 ${toolName} 对应的工具对象`);
     }
     prevTool && prevTool.inactive();
+    this.setCursorWhenActive();
     currentTool.active();
     this.eventEmitter.emit('change', currentTool.type);
   }
@@ -186,5 +187,10 @@ export class ToolManager {
   }
   destroy() {
     this.currentTool?.inactive();
+  }
+  setCursorWhenActive() {
+    if (this.currentTool) {
+      this.editor.cursorManager.setCursor(this.currentTool.cursor);
+    }
   }
 }

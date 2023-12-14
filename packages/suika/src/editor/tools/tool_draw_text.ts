@@ -1,17 +1,19 @@
+import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
 export class DrawTextTool implements ITool {
   static readonly type = 'drawText';
+  cursor: ICursor = 'crosshair';
   readonly type = 'drawText';
   readonly hotkey = 't';
 
   constructor(private editor: Editor) {}
   active() {
-    this.editor.setCursor('crosshair');
+    // noop
   }
   inactive() {
-    this.editor.setCursor('default');
+    // noop
   }
   moveExcludeDrag() {
     // do nothing

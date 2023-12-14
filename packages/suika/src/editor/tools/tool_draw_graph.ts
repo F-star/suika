@@ -5,6 +5,7 @@ import { normalizeRect } from '@suika/geo';
 import { AddShapeCommand } from '../commands/add_shape';
 import { Editor } from '../editor';
 import { ITool } from './type';
+import { ICursor } from '../cursor_manager';
 
 /**
  * Draw Graph Tool
@@ -13,6 +14,7 @@ import { ITool } from './type';
  */
 export abstract class DrawGraphTool implements ITool {
   static type = 'drawGraph';
+  cursor: ICursor = 'crosshair';
   type = 'drawGraph';
   commandDesc = 'Add Graph';
   hotkey = '';
@@ -36,8 +38,6 @@ export abstract class DrawGraphTool implements ITool {
   constructor(protected editor: Editor) {}
   active() {
     const editor = this.editor;
-    editor.setCursor('crosshair');
-
     const hotkeysManager = editor.hostEventManager;
     const updateRect = () => {
       if (this.isDragging) {
@@ -83,7 +83,6 @@ export abstract class DrawGraphTool implements ITool {
     };
   }
   inactive() {
-    this.editor.setCursor('default');
     this.unbindEvent();
   }
   moveExcludeDrag() {
