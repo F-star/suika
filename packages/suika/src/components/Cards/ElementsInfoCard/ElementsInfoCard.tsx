@@ -37,7 +37,7 @@ export const ElementsInfoCards: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      const handler = () => {
+      const updateInfo = () => {
         const items = editor.selectedElements.getItems();
         if (items.length > 0) {
           let {
@@ -111,10 +111,13 @@ export const ElementsInfoCards: FC = () => {
           );
         }
       };
-      editor.sceneGraph.on('render', handler);
+
+      updateInfo(); // init
+
+      editor.sceneGraph.on('render', updateInfo);
 
       return () => {
-        editor.sceneGraph.off('render', handler);
+        editor.sceneGraph.off('render', updateInfo);
       };
     }
   }, [editor, MIXED]);

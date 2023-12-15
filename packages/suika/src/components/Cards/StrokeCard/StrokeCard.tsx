@@ -29,7 +29,7 @@ export const StrokeCard: FC = () => {
         .getItems()
         .map((el) => cloneDeep(el.stroke));
 
-      const handler = () => {
+      const updateInfo = () => {
         const selectedElements = editor.selectedElements.getItems();
         if (selectedElements.length > 0) {
           /**
@@ -60,9 +60,11 @@ export const StrokeCard: FC = () => {
         }
       };
 
-      editor.sceneGraph.on('render', handler);
+      updateInfo(); // init
+
+      editor.sceneGraph.on('render', updateInfo);
       return () => {
-        editor.sceneGraph.off('render', handler);
+        editor.sceneGraph.off('render', updateInfo);
       };
     }
   }, [editor]);
