@@ -15,10 +15,19 @@ export class CanvasDragger {
   private startPoint: IPoint = { x: 0, y: 0 };
   private startViewportPos: IPoint = { x: 0, y: 0 };
 
-  private handleSpaceToggle = (isPressing: boolean) => {
+  private handleSpaceToggle = (isSpacePressing: boolean) => {
+    if (!this.isEnableDragCanvasBySpace || this.isPressing) return;
+    if (isSpacePressing) {
+      this.active();
+    } else {
+      this.inactive();
+    }
+  };
+
+  private handleWheelBtnToggle = (isPressing: boolean, event: PointerEvent) => {
     if (!this.isEnableDragCanvasBySpace) return;
     if (isPressing) {
-      this.active();
+      this.active(event);
     } else {
       this.inactive();
     }
@@ -26,13 +35,21 @@ export class CanvasDragger {
 
   constructor(private editor: Editor) {
     this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
+    this.editor.hostEventManager.on(
+      'wheelBtnToggle',
+      this.handleWheelBtnToggle,
+    );
   }
 
   isActive() {
     return this._active;
   }
 
-  active() {
+  /**
+   * active canvas dragger
+   * if event is not undefined, will active and start dragging immediately
+   */
+  active(event?: PointerEvent) {
     if (this._active) {
       console.warn('CanvasDragger already active');
       return;
@@ -40,6 +57,10 @@ export class CanvasDragger {
     this._active = true;
     this.editor.setCursor('grab');
     this.bindEvent();
+    if (event) {
+      this.editor.setCursor('grabbing');
+      this.handlePointerDown(event);
+    }
   }
 
   private bindEvent() {
@@ -121,6 +142,10 @@ export class CanvasDragger {
 
   destroy() {
     this.editor.hostEventManager.off('spaceToggle', this.handleSpaceToggle);
+    this.editor.hostEventManager.off(
+      'wheelBtnToggle',
+      this.handleWheelBtnToggle,
+    );
     this.unbindEvent();
   }
 }

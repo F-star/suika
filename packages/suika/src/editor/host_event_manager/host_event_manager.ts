@@ -9,6 +9,7 @@ interface Events {
   shiftToggle(press: boolean): void;
   altToggle(press: boolean): void;
   spaceToggle(press: boolean): void;
+  wheelBtnToggle(press: boolean, event: PointerEvent): void;
   contextmenu(point: IPoint): void;
 }
 
@@ -21,6 +22,7 @@ export class HostEventManager {
   isAltPressing = false;
   isCommandPressing = false;
   isSpacePressing = false;
+  isWheelBtnPressing = false;
 
   isDraggingCanvasBySpace = false;
   isEnableDelete = true;
@@ -41,6 +43,7 @@ export class HostEventManager {
   bindHotkeys() {
     this.bindModifiersRecordEvent(); // 记录 isShiftPressing 等值
     this.bindWheelEventToZoom(); // 滚轮移动画布
+    this.bindMouseRecordEvent();
     this.bindContextMenu();
 
     this.moveGraphsKeyBinding.bindKey();
@@ -78,6 +81,31 @@ export class HostEventManager {
       document.removeEventListener('keyup', handler);
     });
   }
+
+  private bindMouseRecordEvent() {
+    const handler = (event: PointerEvent) => {
+      if (event.button !== 1) return;
+
+      const prevWheelBtnPressing = this.isWheelBtnPressing;
+      this.isWheelBtnPressing = event.type === 'pointerdown';
+      if (prevWheelBtnPressing !== this.isWheelBtnPressing) {
+        this.eventEmitter.emit(
+          'wheelBtnToggle',
+          this.isWheelBtnPressing,
+          event,
+        );
+      }
+    };
+
+    document.addEventListener('pointerdown', handler);
+    document.addEventListener('pointerup', handler);
+
+    this.unbindHandlers.push(() => {
+      document.removeEventListener('pointerdown', handler);
+      document.removeEventListener('pointerup', handler);
+    });
+  }
+
   /**
    * shiftToggle 会在切换时触发。按住 shift 不放，只会触发一次
    */
