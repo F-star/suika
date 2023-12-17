@@ -42,7 +42,7 @@ export class HostEventManager {
   }
   bindHotkeys() {
     this.bindModifiersRecordEvent(); // 记录 isShiftPressing 等值
-    this.bindWheelEventToZoom(); // 滚轮移动画布
+    this.bindWheelEvent();
     this.bindMouseRecordEvent();
     this.bindContextMenu();
 
@@ -116,7 +116,10 @@ export class HostEventManager {
     this.eventEmitter.off(eventName, handler);
   }
 
-  private bindWheelEventToZoom() {
+  /**
+   * bind wheel event, to zoom or move canvas
+   */
+  private bindWheelEvent() {
     const editor = this.editor;
     const handler = (event: WheelEvent) => {
       if (event.ctrlKey || event.metaKey) {
@@ -133,6 +136,9 @@ export class HostEventManager {
         }
         editor.sceneGraph.render();
       } else {
+        if (this.editor.canvasDragger.isActive()) {
+          return;
+        }
         const zoom = editor.zoomManager.getZoom();
         editor.viewportManager.translate(
           event.deltaX / zoom,
