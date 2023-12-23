@@ -1,6 +1,6 @@
 import { IPoint, IRectWithRotation, isPointInRect } from '@suika/geo';
 import { Editor } from './editor';
-import { getRectCenterPoint } from '../utils/graphics';
+import { getRectCenterPoint } from '../utils/geo';
 import { rotateInCanvas } from '../utils/canvas';
 import EventEmitter from '../utils/event_emitter';
 

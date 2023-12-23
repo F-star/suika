@@ -6,7 +6,7 @@ import {
   isRectIntersect2,
   pointsToHLines,
   pointsToVLines,
-} from '../utils/graphics';
+} from '../utils/geo';
 import { getClosestValInSortedArr } from '../utils/common';
 import { drawLine, drawXShape } from '../utils/canvas';
 import { arrMap, forEach } from '../utils/array_util';

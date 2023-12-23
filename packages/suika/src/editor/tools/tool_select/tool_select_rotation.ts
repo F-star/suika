@@ -1,6 +1,6 @@
 import { IPoint } from '../../../type';
 import { getClosestTimesVal } from '../../../utils/common';
-import { calcVectorRadian } from '../../../utils/graphics';
+import { calcVectorRadian } from '../../../utils/geo';
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
 import { Editor } from '../../editor';
 import { IBaseTool } from '../type';

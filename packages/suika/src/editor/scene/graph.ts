@@ -4,16 +4,17 @@ import { calcCoverScale, genId, objectNameGenerator } from '../../utils/common';
 import { IRectWithRotation, isPointInRect, isRectIntersect } from '@suika/geo';
 import {
   getAbsoluteCoords,
-  getElementRotatedXY,
+  getRectRotatedXY,
   getRectCenterPoint,
-} from '../../utils/graphics';
-import { normalizeRect, normalizeRadian, isRectContain } from '@suika/geo';
+} from '../../utils/geo';
+import { normalizeRadian, isRectContain } from '@suika/geo';
 import { transformRotate } from '@suika/geo';
 import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
 import { ImgManager } from '../Img_manager';
 import { HALF_PI } from '../../constant';
 import { drawRoundRectPath, rotateInCanvas } from '../../utils/canvas';
 import { ControlHandle } from './control_handle_manager';
+import { getResizedLine } from './utils';
 
 export interface GraphAttrs {
   type?: GraphType;
@@ -310,11 +311,11 @@ export class Graph {
   }
 
   setRotatedX(rotatedX: number) {
-    const { x: prevRotatedX } = getElementRotatedXY(this);
+    const { x: prevRotatedX } = getRectRotatedXY(this);
     this.x = this.x + rotatedX - prevRotatedX;
   }
   setRotatedY(rotatedY: number) {
-    const { y: prevRotatedY } = getElementRotatedXY(this);
+    const { y: prevRotatedY } = getRectRotatedXY(this);
     this.y = this.y + rotatedY - prevRotatedY;
   }
 
@@ -322,17 +323,14 @@ export class Graph {
     type: string, // 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w',
     newPos: IPoint,
     oldBox: IBox2WithRotation,
-    keepRatio = false,
-    scaleFromCenter = false,
+    isShiftPressing = false,
+    isAltPressing = false,
   ) {
-    const rect = getResizedRect(
-      type,
-      newPos,
-      oldBox,
-      keepRatio,
-      scaleFromCenter,
-    );
-    this.setAttrs(normalizeRect(rect));
+    const rect =
+      this.height === 0
+        ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
+        : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
+    this.setAttrs(rect);
   }
   draw(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

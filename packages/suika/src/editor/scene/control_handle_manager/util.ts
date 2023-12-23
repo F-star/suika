@@ -3,10 +3,19 @@ import { ITexture, TextureType } from '../../texture';
 import { Rect } from '../rect';
 import { ControlHandle } from './control_handle';
 import { ICursor } from '../../cursor_manager';
-import { normalizeDegree, rad2Deg } from '@suika/geo';
+import { IRectWithRotation, normalizeDegree, rad2Deg } from '@suika/geo';
 import { ITransformHandleType } from './type';
 
-const getResizeCursor = (type: string, rotation: number): ICursor => {
+const getResizeCursor = (
+  type: string,
+  rotation: number,
+  selectedBox: IRectWithRotation,
+): ICursor => {
+  if (selectedBox.height === 0) {
+    // be considered as a line
+    return 'move';
+  }
+
   let dDegree = 0;
   switch (type) {
     case 'se':

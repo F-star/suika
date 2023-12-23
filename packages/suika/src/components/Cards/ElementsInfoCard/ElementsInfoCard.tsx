@@ -2,7 +2,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
 import { MutateGraphsAndRecord } from '../../../editor/service/mutate_graphs_and_record';
 import { remainDecimal } from '../../../utils/common';
-import { getElementRotatedXY } from '../../../utils/graphics';
+import { getRectRotatedXY } from '../../../utils/geo';
 import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
 import { BaseCard } from '../BaseCard';
 import NumberInput from '../../input/NumberInput';
@@ -46,7 +46,7 @@ export const ElementsInfoCards: FC = () => {
           }: {
             x: number | typeof MIXED;
             y: number | typeof MIXED;
-          } = getElementRotatedXY(items[0]);
+          } = getRectRotatedXY(items[0]);
           let newGraphType: GraphType | typeof MIXED = items[0].type;
           let newWidth: number | typeof MIXED = items[0].width;
           let newHeight: number | typeof MIXED = items[0].height;
@@ -59,7 +59,7 @@ export const ElementsInfoCards: FC = () => {
               newGraphType = MIXED;
             }
             const { x: currentRotatedX, y: currentRotatedY } =
-              getElementRotatedXY(element);
+              getRectRotatedXY(element);
             if (!isEqual(newRotatedX, currentRotatedX)) {
               newRotatedX = MIXED;
             }

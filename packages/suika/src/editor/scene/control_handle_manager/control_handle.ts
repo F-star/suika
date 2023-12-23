@@ -9,7 +9,11 @@ type HitTest = (
   rect: IRectWithRotation,
 ) => boolean;
 
-type GetCursor = (type: string, rotation: number) => ICursor;
+type GetCursor = (
+  type: string,
+  rotation: number,
+  selectedBox: IRectWithRotation,
+) => ICursor;
 
 export class ControlHandle {
   cx: number;
