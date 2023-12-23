@@ -16,7 +16,7 @@ export class CanvasDragger {
   private startViewportPos: IPoint = { x: 0, y: 0 };
 
   private handleSpaceToggle = (isSpacePressing: boolean) => {
-    if (!this.isEnableDragCanvasBySpace || this.isPressing) return;
+    if (!this.isEnableDragCanvasBySpace) return;
     if (isSpacePressing) {
       this.active();
     } else {
