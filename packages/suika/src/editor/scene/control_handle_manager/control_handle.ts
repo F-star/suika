@@ -9,11 +9,7 @@ type HitTest = (
   rect: IRectWithRotation,
 ) => boolean;
 
-type GetCursor = (
-  type: string,
-  rotation: number,
-  selectedBox: IRectWithRotation,
-) => ICursor;
+type GetCursorFn = (type: string, selectedBox: IRectWithRotation) => ICursor;
 
 export class ControlHandle {
   cx: number;
@@ -22,7 +18,7 @@ export class ControlHandle {
   graph: Graph;
   padding: number;
   hitTest?: HitTest;
-  getCursor: GetCursor;
+  getCursor: GetCursorFn;
 
   constructor(attrs: {
     cx?: number;
@@ -31,7 +27,7 @@ export class ControlHandle {
     padding?: number;
     graph: Graph;
     hitTest?: HitTest;
-    getCursor: GetCursor;
+    getCursor: GetCursorFn;
   }) {
     this.cx = attrs.cx ?? 0;
     this.cy = attrs.cy ?? 0;

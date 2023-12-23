@@ -183,8 +183,6 @@ export class ControlHandleManager {
       hitPoint.y,
     );
 
-    const rotation = this.editor.selectedElements.getRotation();
-
     const handles = [
       ...Array.from(this.transformHandles.values()),
       ...(this.customHandlesVisible ? this.customHandles : []),
@@ -212,7 +210,7 @@ export class ControlHandleManager {
       if (isHit) {
         return {
           handleName: type,
-          cursor: handle.getCursor(type, rotation, selectedBox),
+          cursor: handle.getCursor(type, selectedBox),
         };
       }
     }

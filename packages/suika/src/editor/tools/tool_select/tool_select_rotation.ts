@@ -106,10 +106,7 @@ export class SelectRotationTool implements IBaseTool {
 
       if (this.editor.selectedElements.size() === 1) {
         this.editor.setCursor(
-          getRotationCursor(
-            this.handleType,
-            this.editor.selectedElements.getRotation(),
-          ),
+          getRotationCursor(this.handleType, this.editor.selectedBox.getBox()!),
         );
       } else {
         this.editor.setCursor({

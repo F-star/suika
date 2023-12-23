@@ -8,14 +8,13 @@ import { ITransformHandleType } from './type';
 
 const getResizeCursor = (
   type: string,
-  rotation: number,
   selectedBox: IRectWithRotation,
 ): ICursor => {
   if (selectedBox.height === 0) {
     // be considered as a line
     return 'move';
   }
-
+  const rotation = selectedBox.rotation ?? 0;
   let dDegree = 0;
   switch (type) {
     case 'se':
@@ -42,13 +41,29 @@ const getResizeCursor = (
   return { type: 'resize', degree };
 };
 
-export const getRotationCursor = (type: string, rotation: number): ICursor => {
-  const dDegree = {
-    neRotation: 45,
-    seRotation: 135,
-    swRotation: 225,
-    nwRotation: 315,
-  }[type]!;
+export const getRotationCursor = (
+  type: string,
+  selectedBox: IRectWithRotation,
+): ICursor => {
+  const rotation = selectedBox.rotation ?? 0;
+  let dDegree = 0;
+
+  if (selectedBox.height === 0) {
+    // be considered as a line
+    dDegree = {
+      neRotation: 90,
+      seRotation: 90,
+      swRotation: 270,
+      nwRotation: 270,
+    }[type]!;
+  } else {
+    dDegree = {
+      neRotation: 45,
+      seRotation: 135,
+      swRotation: 225,
+      nwRotation: 315,
+    }[type]!;
+  }
   const degree = normalizeDegree(rad2Deg(rotation) + dDegree);
   return { type: 'rotation', degree };
 };
