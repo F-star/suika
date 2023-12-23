@@ -1,4 +1,4 @@
-import { getElementRotatedXY } from '../../utils/graphics';
+import { getRectRotatedXY } from '../../utils/geo';
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
 import { Graph } from '../scene/graph';
@@ -57,9 +57,9 @@ export const MutateGraphsAndRecord = {
       width: el.width,
     }));
     elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(el);
+      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el);
       el.width = width;
-      const { x: rotatedX, y: rotatedY } = getElementRotatedXY(el);
+      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el);
       const dx = rotatedX - preRotatedX;
       const dy = rotatedY - preRotatedY;
       el.x -= dx;
@@ -85,9 +85,9 @@ export const MutateGraphsAndRecord = {
       height: el.height,
     }));
     elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getElementRotatedXY(el);
+      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el);
       el.height = height;
-      const { x: rotatedX, y: rotatedY } = getElementRotatedXY(el);
+      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el);
       const dx = rotatedX - preRotatedX;
       const dy = rotatedY - preRotatedY;
       el.x -= dx;

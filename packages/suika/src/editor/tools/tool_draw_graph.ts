@@ -126,6 +126,7 @@ export abstract class DrawGraphTool implements ITool {
     const size = Math.max(Math.abs(width), Math.abs(height));
     rect.height = (Math.sign(height) || 1) * size;
     rect.width = (Math.sign(width) || 1) * size;
+    return rect;
   }
 
   /**
@@ -190,7 +191,7 @@ export abstract class DrawGraphTool implements ITool {
     }
 
     if (keepSquare) {
-      this.adjustSizeWhenShiftPressing(rect);
+      rect = this.adjustSizeWhenShiftPressing(rect);
     }
 
     if (isStartPtAsCenter) {

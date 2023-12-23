@@ -1,6 +1,6 @@
-import { DOUBLE_PI } from '../constant';
+import { DOUBLE_PI, HALF_PI } from '../constant';
 import { IBox, IBox2, IBox2WithMid, IPoint } from '../type';
-import { IRect } from '@suika/geo';
+import { IRect, IRectWithRotation } from '@suika/geo';
 import { transformRotate } from '@suika/geo';
 
 export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
@@ -71,15 +71,9 @@ export function getAbsoluteCoords(
 /**
  * 计算一个形状左上角的坐标，考虑旋转
  */
-export function getElementRotatedXY(element: {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation?: number;
-}) {
-  const [cx, cy] = getRectCenterPoint(element);
-  return transformRotate(element.x, element.y, element.rotation || 0, cx, cy);
+export function getRectRotatedXY(rect: IRectWithRotation) {
+  const [cx, cy] = getRectCenterPoint(rect);
+  return transformRotate(rect.x, rect.y, rect.rotation || 0, cx, cy);
 }
 
 export const bboxToBbox2 = (bbox: IBox): IBox2 => {
@@ -121,4 +115,31 @@ export const pointsToHLines = (points: IPoint[]): Map<number, number[]> => {
     map.get(y)!.push(x);
   }
   return map;
+};
+
+export const adjustSizeToKeepPolarSnap = (rect: IRect): IRect => {
+  const radian = calcVectorRadian(
+    rect.x,
+    rect.y,
+    rect.x + rect.width,
+    rect.y + rect.height,
+  );
+
+  const { width, height } = rect;
+  const remainder = radian % HALF_PI;
+  if (remainder < Math.PI / 8 || remainder > (Math.PI * 3) / 8) {
+    if (Math.abs(width) > Math.abs(height)) {
+      rect.height = 0;
+    } else {
+      rect.width = 0;
+    }
+  } else {
+    const min = Math.min(Math.abs(width), Math.abs(height));
+    const max = Math.max(Math.abs(width), Math.abs(height));
+    const size = min + (max - min) / 2;
+
+    rect.height = (Math.sign(height) || 1) * size;
+    rect.width = (Math.sign(width) || 1) * size;
+  }
+  return rect;
 };

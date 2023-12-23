@@ -4,9 +4,8 @@ import { Line } from '../scene/line';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 import { IRect } from '@suika/geo';
-import { calcVectorRadian } from '../../utils/graphics';
+import { adjustSizeToKeepPolarSnap } from '../../utils/geo';
 import { transformRotate } from '@suika/geo';
-import { HALF_PI } from '../../constant';
 import { normalizeRadian } from '@suika/geo';
 
 export class DrawLineTool extends DrawGraphTool implements ITool {
@@ -34,29 +33,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
   }
 
   protected override adjustSizeWhenShiftPressing(rect: IRect) {
-    const radian = calcVectorRadian(
-      rect.x,
-      rect.y,
-      rect.x + rect.width,
-      rect.y + rect.height,
-    );
-
-    const { width, height } = rect;
-    const remainder = radian % HALF_PI;
-    if (remainder < Math.PI / 8 || remainder > (Math.PI * 3) / 8) {
-      if (Math.abs(width) > Math.abs(height)) {
-        rect.height = 0;
-      } else {
-        rect.width = 0;
-      }
-    } else {
-      const min = Math.min(Math.abs(width), Math.abs(height));
-      const max = Math.max(Math.abs(width), Math.abs(height));
-      const size = min + (max - min) / 2;
-
-      rect.height = (Math.sign(height) || 1) * size;
-      rect.width = (Math.sign(width) || 1) * size;
-    }
+    return adjustSizeToKeepPolarSnap(rect);
   }
 
   protected override updateGraph(rect: IRect) {

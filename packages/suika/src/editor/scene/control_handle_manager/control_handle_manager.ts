@@ -190,7 +190,7 @@ export class ControlHandleManager {
       ...(this.customHandlesVisible ? this.customHandles : []),
     ];
 
-    const box = this.editor.selectedBox.getBox();
+    const selectedBox = this.editor.selectedBox.getBox()!;
 
     for (let i = handles.length - 1; i >= 0; i--) {
       const handle = handles[i];
@@ -201,13 +201,18 @@ export class ControlHandleManager {
       }
 
       const isHit = handle.hitTest
-        ? handle.hitTest(hitPointVW.x, hitPointVW.y, handle.padding, box!)
+        ? handle.hitTest(
+            hitPointVW.x,
+            hitPointVW.y,
+            handle.padding,
+            selectedBox,
+          )
         : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
 
       if (isHit) {
         return {
           handleName: type,
-          cursor: handle.getCursor(type, rotation),
+          cursor: handle.getCursor(type, rotation, selectedBox),
         };
       }
     }
