@@ -42,7 +42,7 @@ export class Setting {
 
     /******** transform control handle ********/
     handleStroke: '#1592fe',
-    handleFill: '#fff',
+    handleFill: '#fcfcfc',
     handleStrokeWidth: 2,
     handleSize: 7,
     neswHandleWidth: 10, // north/east/south/west handle width

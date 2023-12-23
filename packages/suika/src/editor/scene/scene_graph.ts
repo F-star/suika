@@ -172,6 +172,19 @@ export class SceneGraph {
       this.editor.selectedBox.draw();
     }
 
+    /** draw transform handle */
+    if (this.showOutline) {
+      // rect +  rotation
+      if (selectedRect) {
+        this.editor.controlHandleManager.draw({
+          ...selectedRect,
+          rotation: this.editor.selectedElements.getRotation(),
+        });
+      } else {
+        this.editor.controlHandleManager.inactive();
+      }
+    }
+
     /** draw selection */
     if (this.selection) {
       ctx.save();
@@ -193,19 +206,6 @@ export class SceneGraph {
         heightInViewport,
       );
       ctx.restore();
-    }
-
-    /** draw transform handle */
-    if (this.showOutline) {
-      // rect +  rotation
-      if (selectedRect) {
-        this.editor.controlHandleManager.draw({
-          ...selectedRect,
-          rotation: this.editor.selectedElements.getRotation(),
-        });
-      } else {
-        this.editor.controlHandleManager.inactive();
-      }
     }
 
     this.editor.refLine.drawRefLine(ctx);
