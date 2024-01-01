@@ -6,8 +6,6 @@ import { getRectCenterPoint } from '../utils/geo';
 import { getMergedRect } from '@suika/geo';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
-import { AlignCmd, AlignType } from './commands/align';
-import { ArrangeCmd, ArrangeType } from './commands/arrange';
 import { GroupElements } from './commands/group';
 
 interface Events {
@@ -135,42 +133,6 @@ class SelectedElements {
     this.editor.commandManager.pushCommand(
       new RemoveElement('Remove Elements', this.editor, this.items),
     );
-    this.editor.sceneGraph.render();
-  }
-  setRotateXY(rotatedX: number, rotatedY: number) {
-    const items = this.items;
-    for (let i = 0, len = items.length; i < len; i++) {
-      const element = items[i];
-      element.setRotateXY(rotatedX, rotatedY);
-    }
-  }
-  align(type: AlignType) {
-    if (this.size() < 2) {
-      console.warn('can align zero or two elements, fail silently');
-      return;
-    }
-    this.editor.commandManager.pushCommand(
-      new AlignCmd('Align ' + type, this.editor, this.items, type),
-    );
-    this.editor.sceneGraph.render();
-  }
-
-  arrange(type: ArrangeType) {
-    if (this.size() === 0) {
-      console.warn("can't arrange, no element");
-    }
-
-    if (
-      ArrangeCmd.shouldExecCmd(
-        type,
-        this.editor.sceneGraph.children,
-        new Set(this.items),
-      )
-    ) {
-      this.editor.commandManager.pushCommand(
-        new ArrangeCmd('Arrange ' + type, this.editor, this.items, type),
-      );
-    }
     this.editor.sceneGraph.render();
   }
 

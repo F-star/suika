@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
-import { MutateGraphsAndRecord } from '../../../editor/service/mutate_graphs_and_record';
+import { MutateGraphsAndRecord } from '../../../editor/service';
 import { remainDecimal } from '../../../utils/common';
 import { getRectRotatedXY } from '../../../utils/geo';
 import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';

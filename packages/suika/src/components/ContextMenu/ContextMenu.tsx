@@ -8,7 +8,7 @@ import './ContextMenu.scss';
 import { FormattedMessage } from 'react-intl';
 import { IHistoryStatus } from '../../editor/commands/command_manager';
 import { isWindows } from '../../utils/common';
-import { MutateGraphsAndRecord } from '../../editor/service/mutate_graphs_and_record';
+import { MutateGraphsAndRecord, arrangeAndRecord } from '../../editor/service';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;
@@ -154,9 +154,7 @@ export const ContextMenu: FC = () => {
           suffix={isWindows ? 'Ctrl+]' : '⌘]'}
           onClick={() => {
             setVisible(false);
-            if (editor) {
-              editor.selectedElements.arrange(ArrangeType.Forward);
-            }
+            editor && arrangeAndRecord(editor, ArrangeType.Forward);
           }}
         >
           <FormattedMessage id="arrange.forward" />
@@ -165,9 +163,7 @@ export const ContextMenu: FC = () => {
           suffix={isWindows ? 'Ctrl+[' : '⌘['}
           onClick={() => {
             setVisible(false);
-            if (editor) {
-              editor.selectedElements.arrange(ArrangeType.Backward);
-            }
+            editor && arrangeAndRecord(editor, ArrangeType.Backward);
           }}
         >
           <FormattedMessage id="arrange.backward" />
@@ -176,9 +172,7 @@ export const ContextMenu: FC = () => {
           suffix="]"
           onClick={() => {
             setVisible(false);
-            if (editor) {
-              editor.selectedElements.arrange(ArrangeType.Front);
-            }
+            editor && arrangeAndRecord(editor, ArrangeType.Front);
           }}
         >
           <FormattedMessage id="arrange.front" />
@@ -187,9 +181,7 @@ export const ContextMenu: FC = () => {
           suffix="["
           onClick={() => {
             setVisible(false);
-            if (editor) {
-              editor.selectedElements.arrange(ArrangeType.Back);
-            }
+            editor && arrangeAndRecord(editor, ArrangeType.Back);
           }}
         >
           <FormattedMessage id="arrange.back" />

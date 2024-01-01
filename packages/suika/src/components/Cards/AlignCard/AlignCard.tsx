@@ -5,7 +5,15 @@ import { AlignType } from '../../../editor/commands/align';
 import { Graph } from '../../../editor/scene/graph';
 import { BaseCard } from '../BaseCard';
 import './AlignCard.scss';
-import { AlignHCenter, AlignLeft, AlignRight, AlignTop, AlignVCenter, IconAlignBottom } from '@suika/icons';
+import {
+  AlignHCenter,
+  AlignLeft,
+  AlignRight,
+  AlignTop,
+  AlignVCenter,
+  IconAlignBottom,
+} from '@suika/icons';
+import { alignAndRecord } from '../../../editor/service';
 
 export const AlignCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -33,7 +41,7 @@ export const AlignCard: FC = () => {
         <div
           className="align-item"
           onClick={() => {
-            editor?.selectedElements.align(AlignType.Left);
+            editor && alignAndRecord(editor, AlignType.Left);
           }}
         >
           <AlignLeft />
@@ -41,7 +49,7 @@ export const AlignCard: FC = () => {
         <div
           className="align-item"
           onClick={() => {
-            editor?.selectedElements.align(AlignType.HCenter);
+            editor && alignAndRecord(editor, AlignType.HCenter);
           }}
         >
           <AlignHCenter />
@@ -49,28 +57,31 @@ export const AlignCard: FC = () => {
         <div
           className="align-item"
           onClick={() => {
-            editor?.selectedElements.align(AlignType.Right);
+            editor && alignAndRecord(editor, AlignType.Right);
           }}
         >
           <AlignRight />
         </div>
-        <div className="align-item"
+        <div
+          className="align-item"
           onClick={() => {
-            editor?.selectedElements.align(AlignType.Top);
+            editor && alignAndRecord(editor, AlignType.Top);
           }}
         >
           <AlignTop />
         </div>
-        <div className="align-item"
+        <div
+          className="align-item"
           onClick={() => {
-            editor?.selectedElements.align(AlignType.VCenter);
+            editor && alignAndRecord(editor, AlignType.VCenter);
           }}
         >
           <AlignVCenter />
         </div>
-        <div className="align-item"
+        <div
+          className="align-item"
           onClick={() => {
-            editor?.selectedElements.align(AlignType.Bottom);
+            editor && alignAndRecord(editor, AlignType.Bottom);
           }}
         >
           <IconAlignBottom />

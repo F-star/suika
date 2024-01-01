@@ -3,7 +3,7 @@ import { EditorContext } from '../../context';
 import { IObject } from '../../type';
 import './LayerPanel.scss';
 import { Tree } from './LayerItem/tree';
-import { MutateGraphsAndRecord } from '../../editor/service/mutate_graphs_and_record';
+import { MutateGraphsAndRecord } from '../../editor/service';
 
 export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);

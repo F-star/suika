@@ -1,6 +1,6 @@
 import { ArrangeType } from '../commands/arrange';
 import { Editor } from '../editor';
-import { MutateGraphsAndRecord } from '../service/mutate_graphs_and_record';
+import { MutateGraphsAndRecord, arrangeAndRecord } from '../service';
 
 export class CommandKeyBinding {
   private isBound = false;
@@ -185,7 +185,7 @@ export class CommandKeyBinding {
     /********** Arrange *******/
     // front
     const frontAction = () => {
-      editor.selectedElements.arrange(ArrangeType.Front);
+      arrangeAndRecord(editor, ArrangeType.Front);
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
@@ -197,7 +197,7 @@ export class CommandKeyBinding {
 
     // back
     const backAction = () => {
-      editor.selectedElements.arrange(ArrangeType.Back);
+      arrangeAndRecord(editor, ArrangeType.Back);
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
@@ -209,7 +209,7 @@ export class CommandKeyBinding {
 
     // forward
     const forwardAction = () => {
-      editor.selectedElements.arrange(ArrangeType.Forward);
+      arrangeAndRecord(editor, ArrangeType.Forward);
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
@@ -222,7 +222,7 @@ export class CommandKeyBinding {
 
     // backward
     const backwardAction = () => {
-      editor.selectedElements.arrange(ArrangeType.Backward);
+      arrangeAndRecord(editor, ArrangeType.Backward);
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
