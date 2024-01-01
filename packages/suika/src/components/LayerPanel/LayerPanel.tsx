@@ -9,7 +9,7 @@ export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);
   const [objects, setObjects] = useState<IObject[]>([]);
   const [selectedIds, setSelectedIds] = useState(new Set<string>());
-  const [hoverId, setHoverId] = useState('');
+  const [hlId, setHlId] = useState('');
 
   useEffect(() => {
     if (editor) {
@@ -19,10 +19,10 @@ export const LayerPanel: FC = () => {
         setSelectedIds(editor.selectedElements.getIdSet());
       });
 
-      setHoverId(editor.selectedElements.getHoverItem()?.id || '');
-      editor.selectedElements.on('hoverItemChange', (item) => {
-        const hoverId = item ? item.id : '';
-        setHoverId(hoverId);
+      setHlId(editor.selectedElements.getHighlightedItem()?.id || '');
+      editor.selectedElements.on('highlightedItemChange', (item) => {
+        const id = item ? item.id : '';
+        setHlId(id);
       });
     }
   }, [editor]);
@@ -40,13 +40,12 @@ export const LayerPanel: FC = () => {
     editor.sceneGraph.render();
   };
 
-  const setEditorHoverId = (id: string) => {
+  const setEditorHlId = (id: string) => {
     if (editor) {
-      const graph = editor.sceneGraph.getElementById(id);
-      if (graph) {
-        editor.selectedElements.setHoverItem(graph);
-        editor.sceneGraph.render();
-      }
+      const graph = editor.sceneGraph.getElementById(id) ?? null;
+
+      editor.selectedElements.setHighlightedItem(graph);
+      editor.sceneGraph.render();
     }
   };
 
@@ -85,10 +84,10 @@ export const LayerPanel: FC = () => {
       <Tree
         treeData={objects}
         activeIds={Array.from(selectedIds)}
-        hoverId={hoverId}
+        hlId={hlId}
         toggleVisible={toggleVisible}
         toggleLock={toggleLock}
-        setHoverId={setEditorHoverId}
+        setHlId={setEditorHlId}
         setName={setName}
         setSelectedGraph={setSelectedGraph}
       />

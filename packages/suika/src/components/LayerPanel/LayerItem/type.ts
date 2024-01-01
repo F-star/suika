@@ -1,7 +1,8 @@
 export interface IBaseEvents {
   toggleVisible: (id: string) => void;
   toggleLock: (id: string) => void;
-  setHoverId: (id: string) => void;
+  /** set highlight id */
+  setHlId: (id: string) => void;
   setName: (id: string, newName: string) => void;
   setSelectedGraph: (
     objId: string,

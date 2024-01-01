@@ -11,11 +11,14 @@ import { GroupElements } from './commands/group';
 interface Events {
   itemsChange(items: Graph[]): void;
   hoverItemChange(item: Graph | null, prevItem: Graph | null): void;
+  highlightedItemChange(item: Graph | null, prevItem: Graph | null): void;
 }
 
 class SelectedElements {
   private items: Graph[] = [];
   private hoverItem: Graph | null = null;
+  private highlightedItem: Graph | null = null;
+
   private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
@@ -155,6 +158,7 @@ class SelectedElements {
   setHoverItem(graph: Graph | null) {
     const prevHoverItem = this.hoverItem;
     this.hoverItem = graph;
+    this.setHighlightedItem(graph);
     if (prevHoverItem !== graph) {
       this.eventEmitter.emit('hoverItemChange', graph, this.hoverItem);
     }
@@ -162,6 +166,22 @@ class SelectedElements {
 
   getHoverItem(): Graph | null {
     return this.hoverItem;
+  }
+
+  setHighlightedItem(graph: Graph | null) {
+    const prevHighlightItem = this.highlightedItem;
+    this.highlightedItem = graph;
+    if (prevHighlightItem !== graph) {
+      this.eventEmitter.emit(
+        'highlightedItemChange',
+        graph,
+        this.highlightedItem,
+      );
+    }
+  }
+
+  getHighlightedItem(): Graph | null {
+    return this.highlightedItem;
   }
 }
 

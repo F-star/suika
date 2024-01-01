@@ -6,16 +6,16 @@ import { IBaseEvents } from './type';
 interface IProps extends IBaseEvents {
   treeData: IObject[];
   activeIds: string[];
-  hoverId: string;
+  hlId: string;
 }
 
 export const Tree: FC<IProps> = ({
   treeData,
   activeIds = [],
-  hoverId,
+  hlId: hoverId,
   toggleVisible,
   toggleLock,
-  setHoverId,
+  setHlId: setHoverId,
   setName,
   setSelectedGraph,
 }) => {
@@ -29,12 +29,12 @@ export const Tree: FC<IProps> = ({
           name={item.name}
           children={item.children}
           activeIds={activeIds}
-          hoverId={hoverId}
+          hlId={hoverId}
           visible={item.visible}
           lock={item.lock}
           toggleVisible={toggleVisible}
           toggleLock={toggleLock}
-          setHoverId={setHoverId}
+          setHlId={setHoverId}
           setName={setName}
           setSelectedGraph={setSelectedGraph}
         />

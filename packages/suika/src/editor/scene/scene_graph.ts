@@ -146,14 +146,10 @@ export class SceneGraph {
 
     /** draw hover graph outline and its control handle */
     if (setting.get('highlightLayersOnHover')) {
-      const hoverGraph = selectedElements.getHoverItem();
-      if (
-        hoverGraph &&
-        hoverGraph.getVisible() &&
-        !selectedElements.hasItem(hoverGraph)
-      ) {
+      const hlItem = selectedElements.getHighlightedItem();
+      if (hlItem && !selectedElements.hasItem(hlItem)) {
         this.drawGraphsOutline(
-          [hoverGraph],
+          [hlItem],
           setting.get('hoverOutlineStrokeWidth'),
         );
       }

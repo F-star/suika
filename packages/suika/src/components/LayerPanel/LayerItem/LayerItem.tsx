@@ -17,7 +17,7 @@ interface IProps extends IBaseEvents {
   active?: boolean;
   level?: number;
   activeIds?: string[];
-  hoverId?: string;
+  hlId?: string;
   visible: boolean;
   lock: boolean;
 }
@@ -29,12 +29,12 @@ const LayerItem: FC<IProps> = ({
   id,
   activeIds = [],
   level = 0,
-  hoverId,
+  hlId,
   visible,
   lock,
   toggleVisible,
   toggleLock,
-  setHoverId,
+  setHlId,
   setName,
   setSelectedGraph,
 }) => {
@@ -76,7 +76,7 @@ const LayerItem: FC<IProps> = ({
     setIsEditing(false);
   };
 
-  const isHover = hoverId === id;
+  const isHl = hlId === id;
 
   return (
     <>
@@ -84,15 +84,18 @@ const LayerItem: FC<IProps> = ({
         className={classNames('sk-layer-item', {
           'sk-active': active,
           'sk-hidden': !visible,
-          'sk-hover': isHover,
+          'sk-hover': isHl,
           'sk-editing': isEditing,
         })}
         onMouseDown={(e) => {
           setSelectedGraph && setSelectedGraph(id, e);
         }}
         onMouseEnter={() => {
-          // TODO: setHoverId when mouse enter
-          // setHoverId && setHoverId(id);
+          setHlId && setHlId(id);
+        }}
+        onMouseLeave={() => {
+          console.log('mouse leave');
+          setHlId && setHlId('');
         }}
         onDoubleClick={handleDbClick}
       >
@@ -159,13 +162,13 @@ const LayerItem: FC<IProps> = ({
               level={level + 1}
               children={item.children}
               activeIds={activeIds}
-              hoverId={hoverId}
+              hlId={hlId}
               visible={item.visible}
               lock={item.lock}
               setName={setName}
               toggleVisible={toggleVisible}
               toggleLock={toggleLock}
-              setHoverId={setHoverId}
+              setHlId={setHlId}
               setSelectedGraph={setSelectedGraph}
             />
           ))}
