@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import './popover.scss';
 
 import {
@@ -19,22 +19,25 @@ interface PopoverProps {
   children: React.ReactElement;
   offset?: number;
 
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const Popover: FC<PopoverProps> = ({
-  placement = 'bottom',
-  content,
-  children,
-  offset = 5,
+export const Popover: FC<PopoverProps> = (props) => {
+  const { placement = 'bottom', content, children, offset = 5 } = props;
 
-  open,
-  onOpenChange,
-}) => {
+  const [open, setOpen] = useState(false);
+
+  const onOpenChange = (visible: boolean) => {
+    setOpen(visible);
+    props.onOpenChange?.(visible);
+  };
+
+  const mixedOpen = props.open === undefined ? open : props.open;
+
   const { x, y, strategy, refs, context } = useFloating({
     placement: placement,
-    open,
+    open: mixedOpen,
     onOpenChange,
     whileElementsMounted: autoUpdate,
     middleware: [
@@ -60,7 +63,7 @@ export const Popover: FC<PopoverProps> = ({
         {children}
       </span>
       <FloatingPortal>
-        {open && (
+        {mixedOpen && (
           <div
             ref={refs.setFloating}
             className="sk-popover-content"
