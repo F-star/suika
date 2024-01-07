@@ -115,7 +115,8 @@ export class ToolManager {
           this.currentTool.drag(e);
         }
       } else {
-        this.currentTool.moveExcludeDrag(e);
+        const isOutsideCanvas = this.editor.canvasElement !== e.target;
+        this.currentTool.moveExcludeDrag(e, isOutsideCanvas);
       }
     };
     const handleUp = (e: PointerEvent) => {

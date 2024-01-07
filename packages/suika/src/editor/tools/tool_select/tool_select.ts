@@ -69,7 +69,9 @@ export class SelectTool implements ITool {
     this.editor.sceneGraph.render();
   }
 
-  moveExcludeDrag(e: PointerEvent) {
+  moveExcludeDrag(e: PointerEvent, isOutsideCanvas: boolean) {
+    if (isOutsideCanvas) return;
+
     const point = this.editor.getSceneCursorXY(e);
     this.updateCursorAndHlHoverGraph(point);
     this.editor.selectedBox.setHoverByPoint(point);
