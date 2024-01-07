@@ -1,0 +1,27 @@
+.sk-dropdown-item-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 16px 0 8px;
+  height: 24px;
+  line-height: 24px;
+  font-size: 12px;
+
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+    background-color: #0f8fff;
+  }
+
+  .sk-dropdown-item {
+    display: flex;
+    align-items: center;
+
+    .sk-dropdown-item-icon-box {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
