@@ -58,10 +58,10 @@ export const Popover: FC<PopoverProps> = (props) => {
 
   return (
     <>
-      {/* TODO: remove span container el */}
-      <span ref={refs.setReference} {...getReferenceProps()}>
-        {children}
-      </span>
+      {React.cloneElement(children as React.ReactElement, {
+        ...getReferenceProps(),
+        ref: refs.setReference,
+      })}
       <FloatingPortal>
         {mixedOpen && (
           <div

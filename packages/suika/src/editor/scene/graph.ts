@@ -440,7 +440,7 @@ export class Graph {
     }
   }
 
-  toJSON() {
+  toJSON(): GraphAttrs {
     return {
       type: this.type,
       id: this.id,

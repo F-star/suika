@@ -1,0 +1,13 @@
+.sk-ed-menu-btn {
+  margin-right: 8px;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    background-color: #eee;
+  }
+}

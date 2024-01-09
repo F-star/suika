@@ -40,5 +40,8 @@
 
   "group": "创建编组",
   "showOrHide": "显示/隐藏",
-  "lockOrUnlock": "锁定/解锁"
+  "lockOrUnlock": "锁定/解锁",
+
+  "import.originFile": "从本地导入",
+  "export.originFile": "导出到本地"
 }

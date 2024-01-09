@@ -12,6 +12,7 @@ import {
   SelectOutlined,
   TextFilled,
 } from '@suika/icons';
+import { Menu } from './menu';
 
 export const ToolBar = () => {
   const editor = useContext(EditorContext);
@@ -29,6 +30,7 @@ export const ToolBar = () => {
 
   return (
     <div className="suika-tool-bar">
+      <Menu />
       {(
         [
           {

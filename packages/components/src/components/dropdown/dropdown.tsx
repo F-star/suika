@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Popover } from '../popover';
 import { DropdownItem } from './dropdown-item';
 import './dropdown.scss';
@@ -32,37 +32,35 @@ export const Dropdown: FC<IProps> = (props) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="sk-dropdown">
-      <Popover
-        open={open}
-        onOpenChange={(val) => {
-          setOpen(val);
-        }}
-        content={
-          <div className="sk-dropdown-content">
-            {items.map((item, index) => {
-              return isDivider(item) ? (
-                <div key={index} className="sk-dropdown-item-separator" />
-              ) : (
-                <DropdownItem
-                  key={item.key}
-                  suffix={item.suffix}
-                  check={item.check}
-                  onClick={() => {
-                    setOpen(false);
-                    props.onClick?.({ key: item.key });
-                  }}
-                >
-                  {item.label}
-                </DropdownItem>
-              );
-            })}
-          </div>
-        }
-        placement="bottom-start"
-      >
-        <span>{children}</span>
-      </Popover>
-    </div>
+    <Popover
+      open={open}
+      onOpenChange={(val) => {
+        setOpen(val);
+      }}
+      content={
+        <div className="sk-dropdown-content">
+          {items.map((item, index) => {
+            return isDivider(item) ? (
+              <div key={index} className="sk-dropdown-item-separator" />
+            ) : (
+              <DropdownItem
+                key={item.key}
+                suffix={item.suffix}
+                check={item.check}
+                onClick={() => {
+                  setOpen(false);
+                  props.onClick?.({ key: item.key });
+                }}
+              >
+                {item.label}
+              </DropdownItem>
+            );
+          })}
+        </div>
+      }
+      placement="bottom-start"
+    >
+      {React.cloneElement(children as React.ReactElement)}
+    </Popover>
   );
 };

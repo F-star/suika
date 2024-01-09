@@ -90,4 +90,9 @@ export class CommandManager {
   off<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.off(eventName, listener);
   }
+  clearRecords() {
+    this.redoStack = [];
+    this.undoStack = [];
+    this.emitStatusChange();
+  }
 }

@@ -4,3 +4,4 @@ export * from './select-outlined';
 export * from './hand-outlined';
 export * from './text-filled';
 export * from './line-outlined';
+export * from './menu-outlined';
