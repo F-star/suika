@@ -94,7 +94,6 @@ const LayerItem: FC<IProps> = ({
           setHlId && setHlId(id);
         }}
         onMouseLeave={() => {
-          console.log('mouse leave');
           setHlId && setHlId('');
         }}
         onDoubleClick={handleDbClick}
