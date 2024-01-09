@@ -41,5 +41,9 @@
   "group": "Group selection",
 
   "showOrHide": "Show/Hide",
-  "lockOrUnlock": "Lock/Unlock"
+  "lockOrUnlock": "Lock/Unlock",
+
+  "import.originFile": "Import local file",
+
+  "export.originFile": "Save local copy"
 }

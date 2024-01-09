@@ -25,6 +25,7 @@ import { GroupManager } from './group_manager';
 import { ControlHandleManager } from './scene/control_handle_manager';
 import { SelectedBox } from './selected_box';
 import { CanvasDragger } from './canvas_dragger';
+import { IEditorPaperData } from '../type';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -124,11 +125,7 @@ export class Editor {
 
     const data = this.autoSaveGraphs.load();
     if (data) {
-      if (data.groups) {
-        this.groupManager.load(data.groups);
-      }
-      this.sceneGraph.load(data.data);
-      this.paperId = data.paperId;
+      this.loadData(data);
     }
     this.paperId ??= genId();
     this.autoSaveGraphs.autoSave();
@@ -155,6 +152,15 @@ export class Editor {
     Promise.resolve().then(() => {
       this.sceneGraph.render();
     });
+  }
+  loadData(data: IEditorPaperData) {
+    if (data.groups) {
+      this.groupManager.load(data.groups);
+    }
+    this.sceneGraph.load(data.data);
+    this.commandManager.clearRecords();
+    this.paperId = data.paperId;
+    this.paperId ??= genId();
   }
   destroy() {
     this.containerElement.removeChild(this.canvasElement);

@@ -98,87 +98,89 @@ export const TextureCard: FC<IProps> = ({
       placement="left-start"
       offset={2}
     >
-      <BaseCard
-        title={title}
-        headerAction={
-          <IconButton onClick={onAdd}>
-            <AddOutlined />
-          </IconButton>
-        }
-      >
-        {arrMapRevert(textures, (texture, index) => {
-          /** SOLID **/
-          if (texture.type === TextureType.Solid) {
-            return (
-              <div className="fill-item" key={index}>
-                <ColorHexInput
-                  prefix={
-                    <div
-                      className="color-block"
-                      style={{
-                        backgroundColor: parseRGBAStr(texture.attrs),
-                        boxShadow: isNearWhite(texture.attrs)
-                          ? '0 0 0 1px rgba(0,0,0,0.1) inset'
-                          : undefined,
-                      }}
-                      onMouseDown={() => {
-                        setActiveIndex(index);
-                      }}
-                    />
-                  }
-                  value={parseRGBToHex(texture.attrs)}
-                  onBlur={(newHex) => {
-                    const rgb = parseHexToRGB(newHex);
-
-                    if (rgb) {
-                      const newSolidTexture: TextureSolid = {
-                        type: TextureType.Solid,
-                        attrs: {
-                          ...rgb,
-                          a: texture.attrs.a,
-                        },
-                      };
-                      onChangeComplete(newSolidTexture, index);
+      <div>
+        <BaseCard
+          title={title}
+          headerAction={
+            <IconButton onClick={onAdd}>
+              <AddOutlined />
+            </IconButton>
+          }
+        >
+          {arrMapRevert(textures, (texture, index) => {
+            /** SOLID **/
+            if (texture.type === TextureType.Solid) {
+              return (
+                <div className="fill-item" key={index}>
+                  <ColorHexInput
+                    prefix={
+                      <div
+                        className="color-block"
+                        style={{
+                          backgroundColor: parseRGBAStr(texture.attrs),
+                          boxShadow: isNearWhite(texture.attrs)
+                            ? '0 0 0 1px rgba(0,0,0,0.1) inset'
+                            : undefined,
+                        }}
+                        onMouseDown={() => {
+                          setActiveIndex(index);
+                        }}
+                      />
                     }
-                  }}
-                />
-                <IconButton onClick={() => onDelete(index)}>
-                  <RemoveOutlined />
-                </IconButton>
-              </div>
-            );
-          }
+                    value={parseRGBToHex(texture.attrs)}
+                    onBlur={(newHex) => {
+                      const rgb = parseHexToRGB(newHex);
 
-          /** IMAGE */
-          if (texture.type === TextureType.Image) {
-            return (
-              <div className="fill-item" key={index}>
-                <div
-                  className="img-block"
-                  onClick={() => {
-                    setActiveIndex(index);
-                  }}
-                >
-                  <img
-                    style={{
-                      backgroundImage: `url(${texture.attrs.src})`,
-                      objectFit: 'contain',
-                      width: '100%',
-                      height: '100%',
+                      if (rgb) {
+                        const newSolidTexture: TextureSolid = {
+                          type: TextureType.Solid,
+                          attrs: {
+                            ...rgb,
+                            a: texture.attrs.a,
+                          },
+                        };
+                        onChangeComplete(newSolidTexture, index);
+                      }
                     }}
-                    alt="img"
-                    src={texture.attrs.src || DEFAULT_IMAGE_SRC}
                   />
+                  <IconButton onClick={() => onDelete(index)}>
+                    <RemoveOutlined />
+                  </IconButton>
                 </div>
-                <IconButton onClick={() => onDelete(index)}>
-                  <RemoveOutlined />
-                </IconButton>
-              </div>
-            );
-          }
-        })}
-        {appendedContent}
-      </BaseCard>
+              );
+            }
+
+            /** IMAGE */
+            if (texture.type === TextureType.Image) {
+              return (
+                <div className="fill-item" key={index}>
+                  <div
+                    className="img-block"
+                    onClick={() => {
+                      setActiveIndex(index);
+                    }}
+                  >
+                    <img
+                      style={{
+                        backgroundImage: `url(${texture.attrs.src})`,
+                        objectFit: 'contain',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                      alt="img"
+                      src={texture.attrs.src || DEFAULT_IMAGE_SRC}
+                    />
+                  </div>
+                  <IconButton onClick={() => onDelete(index)}>
+                    <RemoveOutlined />
+                  </IconButton>
+                </div>
+              );
+            }
+          })}
+          {appendedContent}
+        </BaseCard>
+      </div>
     </Popover>
   );
 };

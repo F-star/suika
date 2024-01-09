@@ -412,17 +412,19 @@ export class SceneGraph {
   }
 
   toJSON() {
+    const data = arrMap(this.children, (item) => item.toJSON());
     const paperData: IEditorPaperData = {
       appVersion: 'suika-editor_0.0.1',
       paperId: this.editor.paperId,
       groups: this.editor.groupManager.export(),
-      data: JSON.stringify(arrMap(this.children, (item) => item.toJSON())),
+      data: data,
     };
     return JSON.stringify(paperData);
   }
 
-  addGraphsByStr(str: string) {
-    const data: GraphAttrs[] = JSON.parse(str);
+  addGraphsByStr(info: string | GraphAttrs[]) {
+    const data: GraphAttrs[] =
+      typeof info === 'string' ? JSON.parse(info) : info;
     const newChildren = data.map((attrs) => {
       const type = attrs.type;
       const Ctor = graphCtorMap[type!];
@@ -437,9 +439,9 @@ export class SceneGraph {
     return newChildren;
   }
 
-  load(str: string) {
+  load(info: string | GraphAttrs[]) {
     this.children = [];
-    this.addGraphsByStr(str);
+    this.addGraphsByStr(info);
   }
 
   on(eventName: 'render', handler: () => void) {

@@ -13,7 +13,7 @@ import {
   AlignVCenter,
   IconAlignBottom,
 } from '@suika/icons';
-import { alignAndRecord } from '../../../editor/service';
+import { alignAndRecord } from '../../../editor';
 
 export const AlignCard: FC = () => {
   const editor = useContext(EditorContext);

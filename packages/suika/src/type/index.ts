@@ -1,6 +1,7 @@
 import { IGroupsData } from '../editor/group_manager';
 
 import { IRect } from '@suika/geo';
+import { GraphAttrs } from '../editor/scene/graph';
 
 export type IBox = IRect;
 
@@ -68,7 +69,7 @@ export interface IEditorPaperData {
   appVersion: string;
   paperId: string;
   groups: IGroupsData;
-  data: string;
+  data: GraphAttrs[];
 }
 
 export interface IVerticalLine {
