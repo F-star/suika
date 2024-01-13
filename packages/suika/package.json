@@ -12,6 +12,7 @@
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
     "@suika/components": "workspace:^",
+    "@suika/common": "workspace:^",
     "@suika/icons": "workspace:^",
     "@suika/geo": "workspace:^",
     "@testing-library/jest-dom": "^5.14.1",

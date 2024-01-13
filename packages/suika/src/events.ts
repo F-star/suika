@@ -1,5 +1,5 @@
 import { SupportedLocale } from './locale';
-import EventEmitter from './utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 
 interface Events {
   localeChange: (locale: SupportedLocale) => void;

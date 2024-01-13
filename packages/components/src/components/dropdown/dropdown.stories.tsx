@@ -17,6 +17,7 @@ export const Default: Story = {
       {
         label: 'item one',
         check: true,
+        suffix: 'Ctrl+1',
         key: 'aa',
       },
       {
@@ -24,8 +25,31 @@ export const Default: Story = {
       },
       {
         label: 'item two',
-        suffix: 'Ctrl+1',
         key: 'bb',
+        children: [
+          {
+            label: 'item two one',
+            key: 'bb-1',
+          },
+          {
+            label: 'item two two',
+            key: 'bb-2',
+          },
+        ],
+      },
+      {
+        label: 'item three',
+        key: 'cc',
+        children: [
+          {
+            label: 'item three one',
+            key: 'cc-1',
+          },
+          {
+            label: 'item three two',
+            key: 'cc-2',
+          },
+        ],
       },
     ],
     onClick: (params) => {

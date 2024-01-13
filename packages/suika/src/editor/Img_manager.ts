@@ -1,4 +1,4 @@
-import EventEmitter from '../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 
 export class ImgManager {
   eventEmitter = new EventEmitter<{

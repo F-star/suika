@@ -1,6 +1,6 @@
 import { IBox, IBox2 } from '../type';
 import { getDevicePixelRatio } from '../utils/common';
-import EventEmitter from '../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 import { Editor } from './editor';
 
 interface Events {

@@ -1,7 +1,7 @@
 import { Editor } from '../editor';
 import { GraphType, IEditorPaperData, IObject } from '../../type';
 import { IRect } from '@suika/geo';
-import EventEmitter from '../../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 import { isRectIntersect } from '@suika/geo';
 import rafThrottle from '../../utils/raf_throttle';
 import { Ellipse } from './ellipse';

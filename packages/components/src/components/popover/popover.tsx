@@ -3,6 +3,7 @@ import './popover.scss';
 
 import {
   FloatingPortal,
+  OffsetOptions,
   Placement,
   autoUpdate,
   flip,
@@ -10,21 +11,30 @@ import {
   useClick,
   useDismiss,
   useFloating,
+  useHover,
   useInteractions,
 } from '@floating-ui/react';
 
 interface PopoverProps {
-  placement?: Placement;
   content: React.ReactNode;
   children: React.ReactElement;
-  offset?: number;
 
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+
+  placement?: Placement;
+  trigger?: 'click' | 'hover';
+  offset?: OffsetOptions;
 }
 
 export const Popover: FC<PopoverProps> = (props) => {
-  const { placement = 'bottom', content, children, offset = 5 } = props;
+  const {
+    content,
+    children,
+    placement = 'bottom-start',
+    trigger = 'click',
+    offset = 5,
+  } = props;
 
   const [open, setOpen] = useState(false);
 
@@ -48,11 +58,19 @@ export const Popover: FC<PopoverProps> = (props) => {
     ],
   });
 
-  const click = useClick(context, { event: 'mousedown' });
+  const click = useClick(context, {
+    event: 'mousedown',
+    enabled: trigger === 'click',
+  });
   const dismiss = useDismiss(context);
+
+  const hover = useHover(context, {
+    enabled: trigger === 'hover',
+  });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     click,
+    hover,
     dismiss,
   ]);
 

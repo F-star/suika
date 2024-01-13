@@ -1,7 +1,7 @@
 import { Graph } from './scene/graph';
 import { IBox } from '../type';
 import { isSameArray } from '../utils/common';
-import EventEmitter from '../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 import { getRectCenterPoint } from '../utils/geo';
 import { getMergedRect } from '@suika/geo';
 import { RemoveElement } from './commands/remove_element';

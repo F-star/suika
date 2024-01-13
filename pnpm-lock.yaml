@@ -61,11 +61,20 @@ importers:
         specifier: ^4.9.3
         version: 4.9.5
 
+  packages/common:
+    devDependencies:
+      vite:
+        specifier: ^4.2.0
+        version: 4.3.1(@types/node@18.15.13)(sass@1.62.0)
+
   packages/components:
     dependencies:
       '@floating-ui/react':
         specifier: ^0.22.3
         version: 0.22.3(react-dom@18.2.0)(react@18.2.0)
+      '@suika/common':
+        specifier: workspace:^
+        version: link:../common
       '@suika/icons':
         specifier: workspace:^
         version: link:../icons
@@ -147,7 +156,7 @@ importers:
     devDependencies:
       vite:
         specifier: ^4.2.0
-        version: 4.3.1(@types/node@18.15.13)
+        version: 4.3.1(@types/node@18.15.13)(sass@1.62.0)
 
   packages/icons:
     dependencies:
@@ -175,13 +184,16 @@ importers:
         version: 2.5.0
       vite:
         specifier: ^4.2.0
-        version: 4.3.1(@types/node@18.15.13)
+        version: 4.3.1(@types/node@18.15.13)(sass@1.62.0)
 
   packages/suika:
     dependencies:
       '@floating-ui/react':
         specifier: ^0.22.3
         version: 0.22.3(react-dom@18.2.0)(react@18.2.0)
+      '@suika/common':
+        specifier: workspace:^
+        version: link:../common
       '@suika/components':
         specifier: workspace:^
         version: link:../components
@@ -11267,6 +11279,7 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: false
 
   /postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
@@ -12115,14 +12128,6 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
     dev: false
-
-  /rollup@3.20.7:
-    resolution: {integrity: sha512-P7E2zezKSLhWnTz46XxjSmInrbOCiul1yf+kJccMxT56vxjHwCbDfoLbiqFgu+WQoo9ij2PkraYaBstgB2prBA==}
-    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
-    hasBin: true
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
 
   /rollup@3.29.4:
     resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
@@ -13547,7 +13552,7 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  /vite@4.3.1(@types/node@18.15.13):
+  /vite@4.3.1(@types/node@18.15.13)(sass@1.62.0):
     resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -13576,39 +13581,6 @@ packages:
       esbuild: 0.17.18
       postcss: 8.4.31
       rollup: 3.29.4
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-  /vite@4.3.1(@types/node@18.15.13)(sass@1.62.0):
-    resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      '@types/node': 18.15.13
-      esbuild: 0.17.18
-      postcss: 8.4.23
-      rollup: 3.20.7
       sass: 1.62.0
     optionalDependencies:
       fsevents: 2.3.2

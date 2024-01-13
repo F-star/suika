@@ -4,7 +4,7 @@
  * Publish-Subscribe Design Pattern
  */
 
-class EventEmitter<T extends Record<string | symbol, any>> {
+export class EventEmitter<T extends Record<string | symbol, any>> {
   private eventMap: Record<keyof T, Array<(...args: any[]) => void>> =
     {} as any;
 
