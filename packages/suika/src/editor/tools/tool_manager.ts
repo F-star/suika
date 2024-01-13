@@ -1,5 +1,5 @@
 import { noop } from '../../utils/common';
-import EventEmitter from '../../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 import { Editor } from '../editor';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';

@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
+    "@suika/common": "workspace:^",
     "@suika/icons": "workspace:^",
     "classnames": "^2.3.2"
   },

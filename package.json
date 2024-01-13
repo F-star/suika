@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "run-p \"watch icons\" \"watch components\" \"watch geo\" app:dev",
+    "dev": "run-p \"watch common\" \"watch icons\" \"watch components\" \"watch geo\" app:dev",
     "watch": "node scripts/dev.js",
     "app:dev": "pnpm --filter @suika/suika dev",
     "app:build": "pnpm --filter @suika/suika build",

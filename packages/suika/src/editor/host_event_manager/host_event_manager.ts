@@ -1,5 +1,5 @@
 import { IPoint } from '../../type';
-import EventEmitter from '../../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 import { Editor } from '../editor';
 import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
 import { CommandKeyBinding } from './command_key_binding';

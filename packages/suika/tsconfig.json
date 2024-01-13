@@ -17,6 +17,7 @@
     "jsx": "react-jsx",
     "noImplicitOverride": true,
     "paths": {
+      "@suika/common": ["../common/src"],
       "@suika/icons": ["../icons/src"],
       "@suika/components": ["../components/src"],
       "@suika/geo": ["../geo/src"]

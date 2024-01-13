@@ -1,6 +1,6 @@
 import { IBox } from '../type';
 import { remainDecimal, viewportCoordsToSceneUtil } from '../utils/common';
-import EventEmitter from '../utils/event_emitter';
+import { EventEmitter } from '@suika/common';
 import { getMergedRect } from '@suika/geo';
 import { Editor } from './editor';
 
