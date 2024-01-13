@@ -44,6 +44,10 @@
   "lockOrUnlock": "Lock/Unlock",
 
   "import.originFile": "Import local file",
+  "export.originFile": "Save local copy",
 
-  "export.originFile": "Save local copy"
+  "preference": "Preference",
+  "keepToolSelectedAfterUse": "Keep tool selected after use",
+  "invertZoomDirection": "Invert zoom direction",
+  "highlightLayersOnHover": "Highlight layers on hover"
 }

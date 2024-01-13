@@ -81,3 +81,13 @@ export interface IHorizontalLine {
   y: number;
   xs: number[];
 }
+
+/**
+ * get all boolean keys of T
+ * e.g.
+ * type A = { a: string; b: boolean; c: boolean };
+ * type B = BooleanKeys<A>; // 'b' | 'c'
+ */
+export type BooleanKeys<T> = {
+  [K in keyof T]: T[K] extends boolean ? K : never;
+}[keyof T];

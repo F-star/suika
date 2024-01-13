@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import './dropdown-item.scss';
-import { CheckOutlined } from '@suika/icons';
+import { CheckOutlined, RightOutlined } from '@suika/icons';
 import { Dropdown } from '../dropdown';
 import { DropdownEvents, Item } from '../type';
 import { EventEmitter } from '@suika/common';
@@ -41,6 +41,7 @@ export const DropdownItem: FC<IProps> = (props) => {
         {label}
       </div>
       {suffix && <span>{suffix}</span>}
+      {subItems && <RightOutlined />}
     </>
   );
 
