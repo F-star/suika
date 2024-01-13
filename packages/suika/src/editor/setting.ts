@@ -1,5 +1,6 @@
 import { EventEmitter } from '@suika/common';
 import { ITexture, TextureType } from './texture';
+import { BooleanKeys } from '../type';
 
 interface Events {
   update(attrs: SettingValue): void;
@@ -102,7 +103,14 @@ export class Setting {
     /**** tool ****/
     keepToolSelectedAfterUse: false,
   };
-
+  toggle<K extends BooleanKeys<Setting['value']>>(key: K) {
+    const value = this.value[key];
+    if (typeof value === 'boolean') {
+      this.set(key, !value);
+    } else {
+      console.warn(`toggle ${key} failed, value is not boolean`);
+    }
+  }
   set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {
     this.value[key] = value;
     this.eventEmitter.emit('update', this.getAttrs());

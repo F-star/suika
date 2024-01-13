@@ -7,9 +7,9 @@ import { OffsetOptions, Placement } from '@floating-ui/react';
 
 import { EventEmitter } from '@suika/common';
 
-interface IProps {
+export interface IDropdownProps {
   items: Item[];
-  onClick?: (params: { key: string }) => void;
+  onClick?: (params: { key: string }) => boolean | void;
   children: React.ReactNode;
 
   placement?: Placement;
@@ -24,7 +24,7 @@ const isDivider = (item: Item): item is DropdownDivider => {
   return (item as DropdownDivider).type === 'divider';
 };
 
-export const Dropdown: FC<IProps> = (props) => {
+export const Dropdown: FC<IDropdownProps> = (props) => {
   const { items, children, placement = 'bottom-start' } = props;
   const [open, setOpen] = useState(false);
 
@@ -59,8 +59,10 @@ export const Dropdown: FC<IProps> = (props) => {
                 subItems={item.children}
                 emitter={emitter.current}
                 onClick={(params) => {
-                  setOpen(false);
-                  props.onClick?.(params);
+                  const preventClose = props.onClick?.(params);
+                  if (!preventClose) {
+                    onOpenChange(false);
+                  }
                 }}
               />
             );

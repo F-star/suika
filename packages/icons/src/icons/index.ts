@@ -1,5 +1,6 @@
 export * from './add-outlined';
 export * from './arrow-down-outlined';
+export * from './right-outlined';
 export * from './align';
 export * from './i18n-outlined';
 export * from './close-outlined';
