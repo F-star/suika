@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "sideEffect": false,
+  "sideEffects": false,
   "main": "dist/common.es.js",
   "module": "dist/common.es.js",
   "types": "dist/common.d.ts",
