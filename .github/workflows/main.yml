@@ -35,7 +35,7 @@ jobs:
       - name: build static files
         # Treating warnings as errors because process.env.CI = true.
         # 暂时不处理 eslint 的 warn，改成 false
-        run: PUBLIC_URL=/app/suika pnpm run all:build
+        run: pnpm run all:build
 
       # 部署到自己的服务器
       - name: deploy file to server
