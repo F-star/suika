@@ -18,6 +18,7 @@ import { IconButton, Popover } from '@suika/components';
 import { ColorHexInput } from '../../input/ColorHexInput';
 import { AddOutlined, RemoveOutlined } from '@suika/icons';
 import { arrMapRevert } from '../../../utils/array_util';
+import { FormattedMessage } from 'react-intl';
 
 const isNearWhite = (rgba: IRGBA, threshold = 85) => {
   const { r, g, b } = rgba;
@@ -79,9 +80,7 @@ export const TextureCard: FC<IProps> = ({
         }
       >
         {/* TODO: different types with empty and different types with filled */}
-        {/* <div style={{ marginLeft: 16 }}>
-          <FormattedMessage id="mixed" />
-        </div> */}
+        <></>
       </BaseCard>
     );
   }

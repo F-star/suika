@@ -22,5 +22,7 @@
       "@suika/components": ["../components/src"],
       "@suika/geo": ["../geo/src"]
     }
-  }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

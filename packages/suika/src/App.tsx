@@ -6,11 +6,6 @@ import { useEffect, useState } from 'react';
 import { appEventEmitter } from './events';
 import { SupportedLocale } from './locale';
 
-// FIXME: terrible code
-if (process.env.NODE_ENV !== 'development') {
-  require('@suika/components/dist/style.css');
-}
-
 const messageMap = {
   zh,
   en,
