@@ -209,3 +209,12 @@ export const rectToMidPoints = (rect: IRectWithRotation) => {
     w: points[3],
   };
 };
+
+/**
+ * Calculate the coordinates of the upper left corner of a shape, considering rotation
+ */
+export function getRectRotatedXY(rect: IRectWithRotation) {
+  const cx = rect.x + rect.width / 2;
+  const cy = rect.y + rect.height / 2;
+  return transformRotate(rect.x, rect.y, rect.rotation || 0, cx, cy);
+}

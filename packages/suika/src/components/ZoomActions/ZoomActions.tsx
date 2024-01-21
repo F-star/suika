@@ -2,13 +2,13 @@ import { useClickAway } from 'ahooks';
 import classNames from 'classnames';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../context';
-import { SettingValue } from '../../editor/setting';
+import { SettingValue } from '@suika/core';
 import { ActionItem } from './components/ActionItem';
 import { FormattedMessage } from 'react-intl';
 import { ArrowDownOutlined } from '@suika/icons';
 import './ZoomActions.scss';
 import { ZoomInput } from './components/ZoomInput';
-import { isWindows } from '../../utils/common';
+import { isWindows } from '@suika/common';
 import { MessageIds } from '../../locale';
 
 export const ZoomActions: FC = () => {

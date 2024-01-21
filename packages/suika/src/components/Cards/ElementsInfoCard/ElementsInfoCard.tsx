@@ -1,8 +1,8 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
-import { MutateGraphsAndRecord } from '../../../editor/service';
-import { remainDecimal } from '../../../utils/common';
-import { getRectRotatedXY } from '../../../utils/geo';
+import { MutateGraphsAndRecord } from '@suika/core';
+import { remainDecimal } from '@suika/common';
+import { getRectRotatedXY } from '@suika/geo';
 import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
 import { BaseCard } from '../BaseCard';
 import NumberInput from '../../input/NumberInput';

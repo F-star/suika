@@ -1,5 +1,5 @@
 import { FC, useRef, useState } from 'react';
-import { remainDecimal } from '../../../../utils/common';
+import { remainDecimal } from '@suika/common';
 import { useMount } from 'ahooks';
 import './style.scss';
 

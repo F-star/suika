@@ -20,7 +20,8 @@
       "@suika/common": ["../common/src"],
       "@suika/icons": ["../icons/src"],
       "@suika/components": ["../components/src"],
-      "@suika/geo": ["../geo/src"]
+      "@suika/geo": ["../geo/src"],
+      "@suika/core": ["../core/src"]
     }
   },
   "include": ["src"],

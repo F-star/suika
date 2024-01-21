@@ -1,7 +1,5 @@
-import { IGroupsData } from '../editor/group_manager';
-
 import { IRect } from '@suika/geo';
-import { GraphAttrs } from '../editor/scene/graph';
+import { GraphAttrs, IGroupsData } from '@suika/core';
 
 export type IBox = IRect;
 

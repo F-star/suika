@@ -62,7 +62,44 @@ importers:
         version: 5.2.2
 
   packages/common:
+    dependencies:
+      lodash.clonedeep:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
+      lodash.isequal:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.omit:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.throttle:
+        specifier: ^4.1.1
+        version: 4.1.1
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
     devDependencies:
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.7
+        version: 4.5.7
+      '@types/lodash.debounce':
+        specifier: ^4.0.7
+        version: 4.0.7
+      '@types/lodash.isequal':
+        specifier: ^4.5.6
+        version: 4.5.6
+      '@types/lodash.omit':
+        specifier: ^4.5.7
+        version: 4.5.7
+      '@types/lodash.throttle':
+        specifier: ^4.1.7
+        version: 4.1.7
+      '@types/uuid':
+        specifier: ^9.0.2
+        version: 9.0.2
       vite:
         specifier: ^4.2.0
         version: 4.3.1(@types/node@18.15.13)(sass@1.62.0)
@@ -152,6 +189,25 @@ importers:
         specifier: ^4.2.0
         version: 4.3.1(@types/node@18.15.13)(sass@1.62.0)
 
+  packages/core:
+    dependencies:
+      stats.js:
+        specifier: ^0.17.0
+        version: 0.17.0
+    devDependencies:
+      '@suika/common':
+        specifier: workspace:^
+        version: link:../common
+      '@suika/geo':
+        specifier: workspace:^
+        version: link:../geo
+      '@types/stats.js':
+        specifier: ^0.17.3
+        version: 0.17.3
+      vite:
+        specifier: ^4.2.0
+        version: 4.3.1(@types/node@18.15.13)(sass@1.62.0)
+
   packages/geo:
     devDependencies:
       vite:
@@ -197,6 +253,9 @@ importers:
       '@suika/components':
         specifier: workspace:^
         version: link:../components
+      '@suika/core':
+        specifier: workspace:^
+        version: link:../core
       '@suika/geo':
         specifier: workspace:^
         version: link:../geo
@@ -209,21 +268,6 @@ importers:
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
-      lodash.clonedeep:
-        specifier: ^4.5.0
-        version: 4.5.0
-      lodash.debounce:
-        specifier: ^4.0.8
-        version: 4.0.8
-      lodash.isequal:
-        specifier: ^4.5.0
-        version: 4.5.0
-      lodash.omit:
-        specifier: ^4.5.0
-        version: 4.5.0
-      lodash.throttle:
-        specifier: ^4.1.1
-        version: 4.1.1
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -245,25 +289,7 @@ importers:
       stats.js:
         specifier: ^0.17.0
         version: 0.17.0
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.0
     devDependencies:
-      '@types/lodash.clonedeep':
-        specifier: ^4.5.7
-        version: 4.5.7
-      '@types/lodash.debounce':
-        specifier: ^4.0.7
-        version: 4.0.7
-      '@types/lodash.isequal':
-        specifier: ^4.5.6
-        version: 4.5.6
-      '@types/lodash.omit':
-        specifier: ^4.5.7
-        version: 4.5.7
-      '@types/lodash.throttle':
-        specifier: ^4.1.7
-        version: 4.1.7
       '@types/react':
         specifier: ^18.2.25
         version: 18.2.48
@@ -276,9 +302,6 @@ importers:
       '@types/stats.js':
         specifier: ^0.17.3
         version: 0.17.3
-      '@types/uuid':
-        specifier: ^9.0.2
-        version: 9.0.2
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.14.0
         version: 6.14.0(@typescript-eslint/parser@6.14.0)(eslint@8.55.0)(typescript@5.3.3)
@@ -13347,15 +13370,6 @@ packages:
       source-map: 0.6.1
     dev: false
 
-  /postcss@8.4.31:
-    resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
-    engines: {node: ^10 || ^12 || >=14}
-    dependencies:
-      nanoid: 3.3.6
-      picocolors: 1.0.0
-      source-map-js: 1.0.2
-    dev: true
-
   /postcss@8.4.33:
     resolution: {integrity: sha512-Kkpbhhdjw2qQs2O2DGX+8m5OVqEcbB9HRBvuYM9pgrjEFUg30A9LmXNlTAUj4S9kgtGyrMbTzVjH7E+s5Re2yg==}
     engines: {node: ^10 || ^12 || >=14}
@@ -15715,7 +15729,7 @@ packages:
     dependencies:
       '@types/node': 18.15.13
       esbuild: 0.17.18
-      postcss: 8.4.31
+      postcss: 8.4.33
       rollup: 3.29.4
       sass: 1.62.0
     optionalDependencies:

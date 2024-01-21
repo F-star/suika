@@ -1,12 +1,11 @@
 import { Dropdown, IDropdownProps } from '@suika/components';
 import { FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { exportService, importService } from '../../../../../editor';
+import { exportService, importService, SettingValue } from '@suika/core';
 import { EditorContext } from '../../../../../context';
 import { MenuOutlined } from '@suika/icons';
 import './menu.scss';
 import { MessageIds } from '../../../../../locale';
-import { SettingValue } from '../../../../../editor/setting';
 
 export const Menu: FC = () => {
   const intl = useIntl();
