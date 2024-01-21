@@ -1,7 +1,7 @@
-import throttle from 'lodash.throttle';
+import { throttle } from '@suika/common';
 import { FC, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../context';
-import { Editor as GraphEditor } from '../editor/editor';
+import { Editor as GraphEditor } from '@suika/core';
 import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
 import { LayerPanel } from './LayerPanel';

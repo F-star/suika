@@ -1,18 +1,16 @@
-import isEqual from 'lodash.isequal';
+import { isEqual, cloneDeep } from '@suika/common';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../../context';
-
 import { useIntl } from 'react-intl';
-import { ITexture } from '../../../editor/texture';
-import cloneDeep from 'lodash.clonedeep';
 import {
+  ITexture,
   ISetElementsAttrsType,
   SetElementsAttrs,
-} from '../../../editor/commands/set_elements_attrs';
+  Graph,
+} from '@suika/core';
 import { TextureCard } from '../TextureCard';
-import { Graph } from '../../../editor/scene/graph';
 import NumberInput from '../../input/NumberInput';
-import { arrMap, forEach } from '../../../utils/array_util';
+import { arrMap, forEach } from '@suika/common';
 import { LineWidthOutlined } from '@suika/icons';
 
 export const StrokeCard: FC = () => {

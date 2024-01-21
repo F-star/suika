@@ -1,7 +1,10 @@
 import { FC, useEffect, useRef } from 'react';
-import { parseToNumber } from '../../utils/common';
+import { parseToNumber } from '@suika/common';
 import CustomRuleInput from './CustomRuleInput';
-import { isNumberStr } from '../../utils/valid';
+
+const isNumberStr = (str: string) => {
+  return !Number.isNaN(Number(str));
+};
 
 interface INumberInputProps {
   value: string | number;

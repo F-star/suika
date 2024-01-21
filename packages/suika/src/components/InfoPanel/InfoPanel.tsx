@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../context';
-import { GraphAttrs } from '../../editor/scene/graph';
+import { GraphAttrs } from '@suika/core';
 import { AlignCard } from '../Cards/AlignCard';
 import { ElementsInfoCards } from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';

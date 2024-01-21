@@ -1,8 +1,7 @@
 import classNames from 'classnames';
 import { FC, useContext, useEffect, useState } from 'react';
 import { EditorContext } from '../../../context';
-import { AlignType } from '../../../editor/commands/align';
-import { Graph } from '../../../editor/scene/graph';
+import { AlignType, Graph, alignAndRecord } from '@suika/core';
 import { BaseCard } from '../BaseCard';
 import './AlignCard.scss';
 import {
@@ -13,7 +12,6 @@ import {
   AlignVCenter,
   IconAlignBottom,
 } from '@suika/icons';
-import { alignAndRecord } from '../../../editor';
 
 export const AlignCard: FC = () => {
   const editor = useContext(EditorContext);

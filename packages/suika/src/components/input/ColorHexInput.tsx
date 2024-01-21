@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef } from 'react';
 import CustomRuleInput from './CustomRuleInput';
-import { normalizeHex } from '../../utils/color';
+import { normalizeHex } from '@suika/common';
 
 interface IProps {
   value: string;

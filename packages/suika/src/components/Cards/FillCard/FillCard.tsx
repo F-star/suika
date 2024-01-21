@@ -1,13 +1,13 @@
-import isEqual from 'lodash.isequal';
+import { isEqual, cloneDeep } from '@suika/common';
+
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { EditorContext } from '../../../context';
 
 import { useIntl } from 'react-intl';
-import { ITexture } from '../../../editor/texture';
-import cloneDeep from 'lodash.clonedeep';
-import { SetElementsAttrs } from '../../../editor/commands/set_elements_attrs';
+import { ITexture } from '@suika/core';
+import { SetElementsAttrs } from '@suika/core';
 import { TextureCard } from '../TextureCard';
-import { Graph } from '../../../editor/scene/graph';
+import { Graph } from '@suika/core';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);

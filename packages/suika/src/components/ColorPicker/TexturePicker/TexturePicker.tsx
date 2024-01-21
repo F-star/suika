@@ -1,10 +1,6 @@
 import { FC } from 'react';
 import { SolidPicker } from '../SolidPicker';
-import {
-  ITexture,
-  TextureType,
-  DEFAULT_TEXTURES,
-} from '../../../editor/texture';
+import { ITexture, TextureType, DEFAULT_TEXTURES } from '@suika/core';
 import './TexturePicker.scss';
 import { CloseOutlined } from '@suika/icons';
 import { Select } from '@suika/components';

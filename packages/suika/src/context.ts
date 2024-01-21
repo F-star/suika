@@ -1,9 +1,6 @@
 import { createContext } from 'react';
-import { Editor } from './editor/editor';
-
+import { Editor } from '@suika/core';
 
 const EditorContext = createContext<Editor | null>(null);
 
-export {
-  EditorContext,
-};
+export { EditorContext };

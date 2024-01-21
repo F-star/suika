@@ -1,0 +1,21 @@
+{
+  "name": "@suika/core",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/core.es.js",
+  "module": "dist/core.es.js",
+  "types": "dist/core.d.ts",
+  "scripts": {
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {
+    "@suika/common": "workspace:^",
+    "@suika/geo": "workspace:^",
+    "@types/stats.js": "^0.17.3",
+    "vite": "^4.2.0"
+  },
+  "dependencies": {
+    "stats.js": "^0.17.0"
+  }
+}

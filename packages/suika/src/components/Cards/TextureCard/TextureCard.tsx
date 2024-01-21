@@ -1,9 +1,5 @@
 import { FC, useState } from 'react';
-import {
-  parseHexToRGB,
-  parseRGBAStr,
-  parseRGBToHex,
-} from '../../../utils/color';
+import { parseHexToRGB, parseRGBAStr, parseRGBToHex } from '@suika/common';
 import { BaseCard } from '../BaseCard';
 import './TextureCard.scss';
 import {
@@ -12,13 +8,12 @@ import {
   ITexture,
   TextureSolid,
   TextureType,
-} from '../../../editor/texture';
+} from '@suika/core';
 import { TexturePicker } from '../../ColorPicker/TexturePicker';
 import { IconButton, Popover } from '@suika/components';
 import { ColorHexInput } from '../../input/ColorHexInput';
 import { AddOutlined, RemoveOutlined } from '@suika/icons';
-import { arrMapRevert } from '../../../utils/array_util';
-import { FormattedMessage } from 'react-intl';
+import { arrMapRevert } from '@suika/common';
 
 const isNearWhite = (rgba: IRGBA, threshold = 85) => {
   const { r, g, b } = rgba;

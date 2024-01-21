@@ -1,7 +1,7 @@
 import { useMount } from 'ahooks';
 import { FC, useRef } from 'react';
 import './ImagePicker.scss';
-import { DEFAULT_IMAGE_SRC } from '../../../editor/texture';
+import { DEFAULT_IMAGE_SRC } from '@suika/core';
 import { FormattedMessage } from 'react-intl';
 
 interface IProps {
