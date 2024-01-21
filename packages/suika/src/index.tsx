@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+// vite does not automatically import styles when referencing other packages, you need to manually import them
+import '@suika/core/dist/style.css';
+import '@suika/components/dist/style.css';
 
 // vite does not automatically import styles when referencing other packages, you need to manually import them
 // TODO: FIXME: find a better way to do this
