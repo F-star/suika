@@ -4,7 +4,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'geo',
+      name: 'common',
       fileName: (format) => `common.${format}.js`,
     },
   },
