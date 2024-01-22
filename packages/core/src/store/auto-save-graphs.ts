@@ -1,4 +1,5 @@
 import { debounce } from '@suika/common';
+
 import { Editor } from '../editor';
 import { IEditorPaperData } from '../type';
 

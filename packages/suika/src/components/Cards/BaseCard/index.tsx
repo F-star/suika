@@ -1,5 +1,6 @@
-import React, { FC } from 'react';
 import './style.scss';
+
+import React, { FC } from 'react';
 
 interface IBaseCardProps {
   title?: string;

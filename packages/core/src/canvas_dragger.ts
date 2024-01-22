@@ -1,4 +1,5 @@
 import { IPoint } from '@suika/geo';
+
 import { Editor } from './editor';
 
 /**

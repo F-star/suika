@@ -1,10 +1,10 @@
-import { Ellipse } from '../scene/ellipse';
+import { cloneDeep } from '@suika/common';
+import { IRect, normalizeRect } from '@suika/geo';
+
 import { Editor } from '../editor';
+import { Ellipse } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
-import { cloneDeep } from '@suika/common';
-import { IRect } from '@suika/geo';
-import { normalizeRect } from '@suika/geo';
 
 export class DrawEllipseTool extends DrawGraphTool implements ITool {
   static override readonly type = 'drawEllipse';

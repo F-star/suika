@@ -1,6 +1,7 @@
-import { FC, useContext, useEffect, useState } from 'react';
-import { EditorContext } from '../../context';
 import { Graph } from '@suika/core';
+import { FC, useContext, useEffect, useState } from 'react';
+
+import { EditorContext } from '../../context';
 
 export const DebugPanel: FC = () => {
   const editor = useContext(EditorContext);

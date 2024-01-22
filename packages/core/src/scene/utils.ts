@@ -1,12 +1,13 @@
 import {
+  getRectRotatedXY,
   IPoint,
   IRect,
-  getRectRotatedXY,
   normalizeRadian,
   transformRotate,
 } from '@suika/geo';
-import { adjustSizeToKeepPolarSnap, getRectCenterPoint } from '../utils';
+
 import { IBox2WithRotation } from '../type';
+import { adjustSizeToKeepPolarSnap, getRectCenterPoint } from '../utils';
 
 /**
  * Get the new position of the line when resizing

@@ -1,5 +1,5 @@
 import { Editor } from '../../editor';
-import { Graph } from '../../scene/graph';
+import { Graph } from '../../graphs';
 import { ICommand } from '../type';
 import { firstInfoOfUnmovedGraphs, lastInfoOfUnmovedGraphs } from './util';
 

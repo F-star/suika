@@ -1,6 +1,6 @@
+import { IRGBA } from '@suika/core';
 import { FC } from 'react';
 import { SketchPicker } from 'react-color';
-import { IRGBA } from '@suika/core';
 
 interface IProps {
   color: IRGBA;

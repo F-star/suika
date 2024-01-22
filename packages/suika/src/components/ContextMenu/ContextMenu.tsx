@@ -1,17 +1,19 @@
+import './ContextMenu.scss';
+
+import { isWindows } from '@suika/common';
+import {
+  arrangeAndRecord,
+  ArrangeType,
+  IHistoryStatus,
+  MutateGraphsAndRecord,
+} from '@suika/core';
 import { FC, useContext, useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+
 import { EditorContext } from '../../context';
 import { IPoint } from '../../type';
 import ContextMenuItem from './components/ContextMenuItem';
 import ContextMenuSep from './components/ContextMenuSep';
-import './ContextMenu.scss';
-import { FormattedMessage } from 'react-intl';
-import {
-  ArrangeType,
-  IHistoryStatus,
-  MutateGraphsAndRecord,
-  arrangeAndRecord,
-} from '@suika/core';
-import { isWindows } from '@suika/common';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;

@@ -1,13 +1,13 @@
-import { noop } from '@suika/common';
-import { EventEmitter } from '@suika/common';
+import { EventEmitter, noop } from '@suika/common';
+
 import { Editor } from '../editor';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
+import { DrawLineTool } from './tool_draw_line';
 import { DrawRectTool } from './tool_draw_rect';
+import { DrawTextTool } from './tool_draw_text';
 import { SelectTool } from './tool_select';
 import { ITool } from './type';
-import { DrawTextTool } from './tool_draw_text';
-import { DrawLineTool } from './tool_draw_line';
 
 interface Events {
   change(type: string): void;

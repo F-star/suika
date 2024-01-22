@@ -1,6 +1,7 @@
+import './ToolBtn.scss';
+
 import classNames from 'classnames';
 import React, { FC } from 'react';
-import './ToolBtn.scss';
 
 interface IToolBtn {
   className?: string;

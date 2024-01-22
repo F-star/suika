@@ -1,14 +1,16 @@
+import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
+
 import { Editor } from './editor';
-import { IPoint, IVerticalLine, IHorizontalLine } from './type';
+import { IHorizontalLine, IPoint, IVerticalLine } from './type';
 import {
   bboxToBbox2,
   bboxToBboxWithMid,
+  drawLine,
+  drawXShape,
   isRectIntersect2,
   pointsToHLines,
   pointsToVLines,
 } from './utils';
-import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
-import { drawLine, drawXShape } from './utils';
 
 /**
  * reference line

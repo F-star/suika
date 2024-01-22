@@ -1,8 +1,9 @@
-import { IPoint } from '../type';
 import { EventEmitter } from '@suika/common';
+
 import { Editor } from '../editor';
-import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
+import { IPoint } from '../type';
 import { CommandKeyBinding } from './command_key_binding';
+import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
 
 interface Events {
   shiftToggle(press: boolean): void;

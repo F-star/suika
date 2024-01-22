@@ -1,9 +1,11 @@
+import './LayerPanel.scss';
+
+import { MutateGraphsAndRecord } from '@suika/core';
 import { FC, useContext, useEffect, useState } from 'react';
+
 import { EditorContext } from '../../context';
 import { IObject } from '../../type';
-import './LayerPanel.scss';
 import { Tree } from './LayerItem/tree';
-import { MutateGraphsAndRecord } from '@suika/core';
 
 export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);

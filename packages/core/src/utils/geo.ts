@@ -1,6 +1,7 @@
+import { IRect } from '@suika/geo';
+
 import { DOUBLE_PI, HALF_PI } from '../constant';
 import { IBox, IBox2, IBox2WithMid, IPoint } from '../type';
-import { IRect } from '@suika/geo';
 
 export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
   return (

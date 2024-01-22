@@ -1,10 +1,10 @@
-import { Rect } from '../scene/rect';
+import { cloneDeep } from '@suika/common';
+import { IRect, normalizeRect } from '@suika/geo';
+
 import { Editor } from '../editor';
+import { Rect } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
-import { cloneDeep } from '@suika/common';
-import { IRect } from '@suika/geo';
-import { normalizeRect } from '@suika/geo';
 
 export class DrawRectTool extends DrawGraphTool implements ITool {
   static override readonly type = 'drawRect';

@@ -1,4 +1,5 @@
 import { EventEmitter } from '@suika/common';
+
 import { ITexture, TextureType } from './texture';
 import { BooleanKeys } from './type';
 

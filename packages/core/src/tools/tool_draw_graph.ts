@@ -1,11 +1,11 @@
-import { Graph } from '../scene/graph';
-import { IPoint, IRect } from '@suika/geo';
 import { noop } from '@suika/common';
-import { normalizeRect } from '@suika/geo';
+import { IPoint, IRect, normalizeRect } from '@suika/geo';
+
 import { AddShapeCommand } from '../commands/add_shape';
-import { Editor } from '../editor';
-import { ITool } from './type';
 import { ICursor } from '../cursor_manager';
+import { Editor } from '../editor';
+import { Graph } from '../graphs';
+import { ITool } from './type';
 
 /**
  * Draw Graph Tool

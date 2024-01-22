@@ -1,4 +1,4 @@
-import { Graph } from '../../scene/graph';
+import { Graph } from '../../graphs';
 
 /**
  * return

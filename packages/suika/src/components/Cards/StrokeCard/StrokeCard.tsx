@@ -1,17 +1,17 @@
-import { isEqual, cloneDeep } from '@suika/common';
-import { FC, useContext, useEffect, useRef, useState } from 'react';
-import { EditorContext } from '../../../context';
-import { useIntl } from 'react-intl';
+import { arrMap, cloneDeep, forEach, isEqual } from '@suika/common';
 import {
-  ITexture,
-  ISetElementsAttrsType,
-  SetElementsAttrs,
   Graph,
+  ISetElementsAttrsType,
+  ITexture,
+  SetElementsAttrs,
 } from '@suika/core';
-import { TextureCard } from '../TextureCard';
-import NumberInput from '../../input/NumberInput';
-import { arrMap, forEach } from '@suika/common';
 import { LineWidthOutlined } from '@suika/icons';
+import { FC, useContext, useEffect, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+
+import { EditorContext } from '../../../context';
+import NumberInput from '../../input/NumberInput';
+import { TextureCard } from '../TextureCard';
 
 export const StrokeCard: FC = () => {
   const editor = useContext(EditorContext);

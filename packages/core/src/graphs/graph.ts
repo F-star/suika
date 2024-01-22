@@ -1,20 +1,28 @@
-import { IBox, IBox2, GraphType, IPoint, IBox2WithRotation } from '../type';
-import { IRect, getRectRotatedXY, getResizedRect } from '@suika/geo';
 import { calcCoverScale, genId, objectNameGenerator } from '@suika/common';
-import { IRectWithRotation, isPointInRect, isRectIntersect } from '@suika/geo';
 import {
+  getRectRotatedXY,
+  getResizedRect,
+  IRect,
+  IRectWithRotation,
+  isPointInRect,
+  isRectContain,
+  isRectIntersect,
+  normalizeRadian,
+  transformRotate,
+} from '@suika/geo';
+
+import { HALF_PI } from '../constant';
+import { ControlHandle } from '../control_handle_manager';
+import { ImgManager } from '../Img_manager';
+import { getResizedLine } from '../scene/utils';
+import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
+import { GraphType, IBox, IBox2, IBox2WithRotation, IPoint } from '../type';
+import {
+  drawRoundRectPath,
   getAbsoluteCoords,
   getRectCenterPoint,
-  drawRoundRectPath,
   rotateInCanvas,
 } from '../utils';
-import { normalizeRadian, isRectContain } from '@suika/geo';
-import { transformRotate } from '@suika/geo';
-import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
-import { ImgManager } from '../Img_manager';
-import { HALF_PI } from '../constant';
-import { ControlHandle } from './control_handle_manager';
-import { getResizedLine } from './utils';
 
 export interface GraphAttrs {
   type?: GraphType;

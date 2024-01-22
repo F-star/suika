@@ -1,6 +1,7 @@
 import { FC } from 'react';
-import LayerItem from './LayerItem';
+
 import { IObject } from '../../../type';
+import LayerItem from './LayerItem';
 import { IBaseEvents } from './type';
 
 interface IProps extends IBaseEvents {

@@ -1,12 +1,12 @@
-import { Graph } from './scene/graph';
-import { IBox } from './type';
-import { isSameArray } from '@suika/common';
-import { EventEmitter } from '@suika/common';
-import { getRectCenterPoint } from './utils';
+import { EventEmitter, isSameArray } from '@suika/common';
 import { getMergedRect } from '@suika/geo';
+
+import { GroupElements } from './commands/group';
 import { RemoveElement } from './commands/remove_element';
 import { Editor } from './editor';
-import { GroupElements } from './commands/group';
+import { Graph } from './graphs';
+import { IBox } from './type';
+import { getRectCenterPoint } from './utils';
 
 interface Events {
   itemsChange(items: Graph[]): void;

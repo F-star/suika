@@ -1,9 +1,5 @@
-import classNames from 'classnames';
-import { useEffect, useContext, useState } from 'react';
-import { EditorContext } from '../../../../context';
-import { ToolBtn } from './components/ToolBtn';
 import './Toolbar.scss';
-import { useIntl } from 'react-intl';
+
 import {
   EllipseOutlined,
   HandOutlined,
@@ -12,6 +8,12 @@ import {
   SelectOutlined,
   TextFilled,
 } from '@suika/icons';
+import classNames from 'classnames';
+import { useContext, useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+
+import { EditorContext } from '../../../../context';
+import { ToolBtn } from './components/ToolBtn';
 import { Menu } from './menu';
 
 export const ToolBar = () => {

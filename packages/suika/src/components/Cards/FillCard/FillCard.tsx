@@ -1,13 +1,10 @@
-import { isEqual, cloneDeep } from '@suika/common';
-
+import { cloneDeep, isEqual } from '@suika/common';
+import { Graph, ITexture, SetElementsAttrs } from '@suika/core';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
-import { EditorContext } from '../../../context';
-
 import { useIntl } from 'react-intl';
-import { ITexture } from '@suika/core';
-import { SetElementsAttrs } from '@suika/core';
+
+import { EditorContext } from '../../../context';
 import { TextureCard } from '../TextureCard';
-import { Graph } from '@suika/core';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);

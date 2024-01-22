@@ -1,5 +1,5 @@
+import { Graph } from '../graphs';
 import { ICommand } from './type';
-import { Graph } from '../scene/graph';
 
 /**
  * move elements

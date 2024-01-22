@@ -1,10 +1,11 @@
 import { cloneDeep } from '@suika/common';
+import { IRect, normalizeRadian, transformRotate } from '@suika/geo';
+
 import { Editor } from '../editor';
-import { Line } from '../scene/line';
+import { Line } from '../graphs';
+import { adjustSizeToKeepPolarSnap } from '../utils';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
-import { adjustSizeToKeepPolarSnap } from '../utils';
-import { IRect, transformRotate, normalizeRadian } from '@suika/geo';
 
 export class DrawLineTool extends DrawGraphTool implements ITool {
   static override readonly type = 'drawLine';

@@ -1,14 +1,20 @@
-import { FC, useContext, useEffect, useState } from 'react';
-import { EditorContext } from '../../../context';
-import { MutateGraphsAndRecord } from '@suika/core';
-import { remainDecimal } from '@suika/common';
-import { getRectRotatedXY } from '@suika/geo';
-import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
-import { BaseCard } from '../BaseCard';
-import NumberInput from '../../input/NumberInput';
 import './style.scss';
+
+import { remainDecimal } from '@suika/common';
+import { MutateGraphsAndRecord } from '@suika/core';
+import {
+  deg2Rad,
+  getRectRotatedXY,
+  normalizeRadian,
+  rad2Deg,
+} from '@suika/geo';
+import { FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+
+import { EditorContext } from '../../../context';
 import { GraphType } from '../../../type';
+import NumberInput from '../../input/NumberInput';
+import { BaseCard } from '../BaseCard';
 
 /**
  * 因为运算中会丢失精度

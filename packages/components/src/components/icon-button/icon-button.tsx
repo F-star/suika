@@ -1,5 +1,6 @@
-import { FC, PropsWithChildren } from 'react';
 import './icon-button.scss';
+
+import { FC, PropsWithChildren } from 'react';
 
 interface IProps extends PropsWithChildren {
   onClick: () => void;

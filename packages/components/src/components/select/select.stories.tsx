@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Select } from './select';
 import { useState } from 'react';
+
+import { Select } from './select';
 
 const meta = {
   title: 'Select',

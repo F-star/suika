@@ -1,7 +1,8 @@
 import { getRectRotatedXY } from '@suika/geo';
+
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { Graph } from '../scene/graph';
+import { Graph } from '../graphs';
 
 /**
  * mutate elements and record to history

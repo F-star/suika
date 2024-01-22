@@ -1,4 +1,4 @@
-import { Graph } from '../scene/graph';
+import { Graph } from '../graphs';
 import { ICommand } from './type';
 
 export enum AlignType {

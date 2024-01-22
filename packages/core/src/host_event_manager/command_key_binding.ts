@@ -1,6 +1,6 @@
 import { ArrangeType } from '../commands/arrange';
 import { Editor } from '../editor';
-import { MutateGraphsAndRecord, arrangeAndRecord } from '../service';
+import { arrangeAndRecord, MutateGraphsAndRecord } from '../service';
 
 export class CommandKeyBinding {
   private isBound = false;

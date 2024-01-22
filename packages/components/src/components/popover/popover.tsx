@@ -1,19 +1,19 @@
-import React, { FC, useState } from 'react';
 import './popover.scss';
 
 import {
-  FloatingPortal,
-  OffsetOptions,
-  Placement,
   autoUpdate,
   flip,
+  FloatingPortal,
   offset as floatUiOffset,
+  OffsetOptions,
+  Placement,
   useClick,
   useDismiss,
   useFloating,
   useHover,
   useInteractions,
 } from '@floating-ui/react';
+import React, { FC, useState } from 'react';
 
 interface PopoverProps {
   content: React.ReactNode;
