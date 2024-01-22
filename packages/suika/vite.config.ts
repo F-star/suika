@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: './',
+  server: {
+    port: 6167,
+  },
   build: {
     outDir: 'build',
     cssCodeSplit: false,
