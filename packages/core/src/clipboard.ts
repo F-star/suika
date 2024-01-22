@@ -1,9 +1,9 @@
-import { Editor } from './editor';
-import { noop, arrMap } from '@suika/common';
-import { omit } from '@suika/common';
+import { arrMap, noop, omit } from '@suika/common';
+
 import { AddShapeCommand } from './commands/add_shape';
+import { Editor } from './editor';
+import { Graph } from './graphs';
 import { IEditorPaperData } from './type';
-import { Graph } from './scene/graph';
 
 /**
  * Clipboard Manager

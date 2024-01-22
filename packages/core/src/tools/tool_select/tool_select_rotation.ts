@@ -1,11 +1,12 @@
-import { IPoint } from '../../type';
 import { forEach, getClosestTimesVal } from '@suika/common';
-import { calcVectorRadian } from '../../utils';
-import { SetElementsAttrs } from '../../commands/set_elements_attrs';
-import { Editor } from '../../editor';
-import { IBaseTool } from '../type';
 import { normalizeRadian, rad2Deg } from '@suika/geo';
-import { getRotationCursor } from '../../scene/control_handle_manager';
+
+import { SetElementsAttrs } from '../../commands/set_elements_attrs';
+import { getRotationCursor } from '../../control_handle_manager';
+import { Editor } from '../../editor';
+import { IPoint } from '../../type';
+import { calcVectorRadian } from '../../utils';
+import { IBaseTool } from '../type';
 
 /**
  * select tool

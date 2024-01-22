@@ -1,7 +1,8 @@
 import { cloneDeep } from '@suika/common';
-import { Editor } from '../editor';
-import { TextGraph } from '../scene/text';
+
 import { AddShapeCommand } from '../commands/add_shape';
+import { Editor } from '../editor';
+import { TextGraph } from '../graphs';
 
 export class TextEditor {
   textarea: HTMLInputElement;

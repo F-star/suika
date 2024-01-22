@@ -1,13 +1,14 @@
 import { throttle } from '@suika/common';
-import { Graph } from '../../scene/graph';
-import { IPoint } from '../../type';
-import { Editor } from '../../editor';
-import { IBaseTool, ITool } from '../type';
-import { DrawSelectionBox } from './tool_select_selection';
-import { SelectMoveTool } from './tool_select_move';
-import { SelectRotationTool } from './tool_select_rotation';
-import { SelectResizeTool } from './tool_select_resize';
+
 import { ICursor, isRotationCursor } from '../../cursor_manager';
+import { Editor } from '../../editor';
+import { Graph } from '../../graphs';
+import { IPoint } from '../../type';
+import { IBaseTool, ITool } from '../type';
+import { SelectMoveTool } from './tool_select_move';
+import { SelectResizeTool } from './tool_select_resize';
+import { SelectRotationTool } from './tool_select_rotation';
+import { DrawSelectionBox } from './tool_select_selection';
 
 /**
  * Select Tool

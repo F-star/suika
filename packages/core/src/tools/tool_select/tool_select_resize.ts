@@ -1,12 +1,12 @@
-import { IPoint } from '../../type';
-import { arrEvery, arrMap } from '@suika/common';
-import { noop } from '@suika/common';
+import { arrEvery, arrMap, noop } from '@suika/common';
+import { getResizedRect, IRect } from '@suika/geo';
+
 import { SetElementsAttrs } from '../../commands/set_elements_attrs';
+import { isTransformHandle } from '../../control_handle_manager';
 import { Editor } from '../../editor';
+import { GraphAttrs } from '../../graphs';
+import { IPoint } from '../../type';
 import { IBaseTool } from '../type';
-import { isTransformHandle } from '../../scene/control_handle_manager';
-import { GraphAttrs } from '../../scene/graph';
-import { IRect, getResizedRect } from '@suika/geo';
 
 /**
  * scale element

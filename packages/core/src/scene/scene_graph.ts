@@ -1,17 +1,16 @@
+import {
+  arrMap,
+  EventEmitter,
+  forEach,
+  getDevicePixelRatio,
+} from '@suika/common';
+import { IRect, isRectIntersect } from '@suika/geo';
+
 import { Editor } from '../editor';
-import { GraphType, IEditorPaperData, IObject } from '../type';
-import { IRect } from '@suika/geo';
-import { EventEmitter } from '@suika/common';
-import { isRectIntersect } from '@suika/geo';
-import { rafThrottle } from '../utils';
-import { arrMap, forEach } from '@suika/common';
-import { Ellipse } from './ellipse';
-import { Graph, GraphAttrs } from './graph';
-import { Rect } from './rect';
+import { Ellipse, Graph, GraphAttrs, Line, Rect, TextGraph } from '../graphs';
 import Grid from '../grid';
-import { getDevicePixelRatio } from '@suika/common';
-import { TextGraph } from './text';
-import { Line } from './line';
+import { GraphType, IEditorPaperData, IObject } from '../type';
+import { rafThrottle } from '../utils';
 
 const graphCtorMap = {
   [GraphType.Graph]: Graph,

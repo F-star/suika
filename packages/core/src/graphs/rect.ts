@@ -1,12 +1,13 @@
-import { GraphType, IBox2WithRotation, IPoint } from '../type';
-import { rotateInCanvas } from '../utils';
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import { isPointInRoundRect, transformRotate } from '@suika/geo';
+
+import { ControlHandle } from '../control_handle_manager';
 import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
-import { Graph, GraphAttrs } from './graph';
-import { ControlHandle } from './control_handle_manager';
+import { GraphType, IBox2WithRotation, IPoint } from '../type';
+import { rotateInCanvas } from '../utils';
 import { Ellipse } from './ellipse';
-import { isPointInRoundRect, transformRotate } from '@suika/geo';
+import { Graph, GraphAttrs } from './graph';
 
 export interface RectAttrs extends GraphAttrs {
   cornerRadius?: number;

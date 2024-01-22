@@ -1,11 +1,12 @@
-import { DOUBLE_PI } from '../constant';
-import { GraphType } from '../type';
-import { rotateInCanvas } from '../utils';
+import { parseRGBAStr } from '@suika/common';
 import { transformRotate } from '@suika/geo';
+
+import { DOUBLE_PI } from '../constant';
 import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
+import { GraphType } from '../type';
+import { rotateInCanvas } from '../utils';
 import { Graph, GraphAttrs } from './graph';
-import { parseRGBAStr } from '@suika/common';
 
 export type EllipseAttrs = GraphAttrs;
 

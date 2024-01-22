@@ -1,4 +1,5 @@
 import { isWindows } from '@suika/common';
+
 import { Editor } from './editor';
 
 interface IKey {

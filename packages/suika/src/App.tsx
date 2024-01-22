@@ -1,10 +1,11 @@
-import { IntlProvider } from 'react-intl';
 import './App.css';
-import Editor from './components/Editor';
-import { zh, en } from './locale';
+
 import { useEffect, useState } from 'react';
+import { IntlProvider } from 'react-intl';
+
+import Editor from './components/Editor';
 import { appEventEmitter } from './events';
-import { SupportedLocale } from './locale';
+import { en, SupportedLocale, zh } from './locale';
 
 const messageMap = {
   zh,

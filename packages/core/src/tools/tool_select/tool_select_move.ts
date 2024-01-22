@@ -1,7 +1,8 @@
-import { IPoint } from '../../type';
 import { noop } from '@suika/common';
+
 import { MoveElementsCommand } from '../../commands/move_elements';
 import { Editor } from '../../editor';
+import { IPoint } from '../../type';
 import { IBaseTool } from '../type';
 
 /**

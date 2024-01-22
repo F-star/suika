@@ -1,8 +1,12 @@
-import { IBox } from './type';
-import { remainDecimal, viewportCoordsToSceneUtil } from '@suika/common';
-import { EventEmitter } from '@suika/common';
+import {
+  EventEmitter,
+  remainDecimal,
+  viewportCoordsToSceneUtil,
+} from '@suika/common';
 import { getMergedRect } from '@suika/geo';
+
 import { Editor } from './editor';
+import { IBox } from './type';
 
 interface Events {
   zoomChange(zoom: number, prevZoom: number): void;

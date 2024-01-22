@@ -1,5 +1,5 @@
-import { createContext } from 'react';
 import { Editor } from '@suika/core';
+import { createContext } from 'react';
 
 const EditorContext = createContext<Editor | null>(null);
 

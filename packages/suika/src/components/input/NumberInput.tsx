@@ -1,5 +1,6 @@
-import { FC, useEffect, useRef } from 'react';
 import { parseToNumber } from '@suika/common';
+import { FC, useEffect, useRef } from 'react';
+
 import CustomRuleInput from './CustomRuleInput';
 
 const isNumberStr = (str: string) => {

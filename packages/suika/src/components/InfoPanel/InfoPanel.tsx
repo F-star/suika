@@ -1,11 +1,13 @@
-import { FC, useContext, useEffect, useState } from 'react';
-import { EditorContext } from '../../context';
+import './style.scss';
+
 import { GraphAttrs } from '@suika/core';
+import { FC, useContext, useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+
+import { EditorContext } from '../../context';
 import { AlignCard } from '../Cards/AlignCard';
 import { ElementsInfoCards } from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
-import './style.scss';
-import { FormattedMessage } from 'react-intl';
 import { StrokeCard } from '../Cards/StrokeCard';
 import { DebugPanel } from '../DebugPanel';
 

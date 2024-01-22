@@ -1,14 +1,15 @@
+import './select.scss';
+
 import {
-  FloatingPortal,
   autoUpdate,
+  FloatingPortal,
   useDismiss,
   useFloating,
   useInteractions,
 } from '@floating-ui/react';
-import React, { FC, useState } from 'react';
-import './select.scss';
-import classNames from 'classnames';
 import { ArrowDownOutlined, CheckOutlined } from '@suika/icons';
+import classNames from 'classnames';
+import React, { FC, useState } from 'react';
 
 type ValueType = string;
 

@@ -1,8 +1,9 @@
-import { IPoint } from '../../type';
-import { Editor } from '../../editor';
-import { Graph } from '../../scene/graph';
-import { IBaseTool } from '../type';
 import { getRectByTwoPoint } from '@suika/geo';
+
+import { Editor } from '../../editor';
+import { Graph } from '../../graphs';
+import { IPoint } from '../../type';
+import { IBaseTool } from '../type';
 
 /**
  * draw selection box

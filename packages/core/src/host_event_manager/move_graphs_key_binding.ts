@@ -1,9 +1,9 @@
-import { debounce } from '@suika/common';
+import { arrMap, debounce, noop } from '@suika/common';
+
 import { SetElementsAttrs } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
-import { Graph } from '../scene/graph';
+import { Graph } from '../graphs';
 import { IPoint } from '../type';
-import { noop, arrMap } from '@suika/common';
 
 /**
  * move graphs by arrow key binding

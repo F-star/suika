@@ -1,15 +1,17 @@
+import './ZoomActions.scss';
+
+import { isWindows } from '@suika/common';
+import { SettingValue } from '@suika/core';
+import { ArrowDownOutlined } from '@suika/icons';
 import { useClickAway } from 'ahooks';
 import classNames from 'classnames';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
-import { EditorContext } from '../../context';
-import { SettingValue } from '@suika/core';
-import { ActionItem } from './components/ActionItem';
 import { FormattedMessage } from 'react-intl';
-import { ArrowDownOutlined } from '@suika/icons';
-import './ZoomActions.scss';
-import { ZoomInput } from './components/ZoomInput';
-import { isWindows } from '@suika/common';
+
+import { EditorContext } from '../../context';
 import { MessageIds } from '../../locale';
+import { ActionItem } from './components/ActionItem';
+import { ZoomInput } from './components/ZoomInput';
 
 export const ZoomActions: FC = () => {
   const editor = useContext(EditorContext);

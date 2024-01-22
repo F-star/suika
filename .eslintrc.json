@@ -6,9 +6,18 @@
     "plugin:react-hooks/recommended",
     "prettier"
   ],
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "simple-import-sort"
+  ],
   "parser": "@typescript-eslint/parser",
   "rules": {
+    /******* import / export sort*********/
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "no-duplicate-imports": "error",
     // 缩进
     // "indent": ["error", 2, { "SwitchCase": 1 }],
     // // 必须使用分号

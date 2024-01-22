@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
 import './LocaleSelector.scss';
+
 import {
   autoUpdate,
   offset,
@@ -7,10 +7,12 @@ import {
   useFloating,
   useInteractions,
 } from '@floating-ui/react';
-import classNames from 'classnames';
-import { useClickAway } from 'ahooks';
-import { appEventEmitter } from '../../events';
 import { I18nOutlined } from '@suika/icons';
+import { useClickAway } from 'ahooks';
+import classNames from 'classnames';
+import { FC, useState } from 'react';
+
+import { appEventEmitter } from '../../events';
 
 export const LocaleSelector: FC = () => {
   const [isOpen, setIsOpen] = useState(false);

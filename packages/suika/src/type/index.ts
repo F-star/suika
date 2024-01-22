@@ -1,5 +1,5 @@
-import { IRect } from '@suika/geo';
 import { GraphAttrs, IGroupsData } from '@suika/core';
+import { IRect } from '@suika/geo';
 
 export type IBox = IRect;
 

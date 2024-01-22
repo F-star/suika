@@ -1,7 +1,8 @@
+import { parseRGBAStr } from '@suika/common';
+
+import { TextureType } from '../texture';
 import { GraphType } from '../type';
 import { rotateInCanvas } from '../utils';
-import { parseRGBAStr } from '@suika/common';
-import { TextureType } from '../texture';
 import { Graph, GraphAttrs } from './graph';
 
 export type LineAttrs = GraphAttrs;

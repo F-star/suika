@@ -5,11 +5,12 @@ import {
   rectToMidPoints,
   rectToPoints,
 } from '@suika/geo';
-import { ICursor } from '../../cursor_manager';
-import { Editor } from '../../editor';
-import { createTransformHandles } from './util';
+
+import { ICursor } from '../cursor_manager';
+import { Editor } from '../editor';
 import { ControlHandle } from './control_handle';
 import { ITransformHandleType } from './type';
+import { createTransformHandles } from './util';
 
 const types = [
   'n',

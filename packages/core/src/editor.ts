@@ -1,31 +1,32 @@
-import { SceneGraph } from './scene/scene_graph';
 import {
   genId,
   sceneCoordsToViewportUtil,
   viewportCoordsToSceneUtil,
 } from '@suika/common';
-import { CommandManager } from './commands/command_manager';
-import { HostEventManager } from './host_event_manager';
-import Ruler from './ruler';
-import SelectedElements from './selected_elements';
-import { Setting } from './setting';
-import { ToolManager } from './tools/tool_manager';
-import { ViewportManager } from './viewport_manager';
-import { ZoomManager } from './zoom_manager';
-import { AutoSaveGraphs } from './store/auto-save-graphs';
-import { GraphAttrs } from './scene/graph';
-import { TextEditor } from './text/text_editor';
-import { RefLine } from './ref_line';
+
+import { CanvasDragger } from './canvas_dragger';
 import { ClipboardManager } from './clipboard';
+import { CommandManager } from './commands/command_manager';
+import { ControlHandleManager } from './control_handle_manager';
+import { CursorManger, ICursor } from './cursor_manager';
+import { GraphAttrs } from './graphs';
+import { GroupManager } from './group_manager';
+import { HostEventManager } from './host_event_manager';
+import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
 import { PerfMonitor } from './perf_monitor';
-import { CursorManger, ICursor } from './cursor_manager';
-import { ImgManager } from './Img_manager';
-import { GroupManager } from './group_manager';
-import { ControlHandleManager } from './scene/control_handle_manager';
+import { RefLine } from './ref_line';
+import Ruler from './ruler';
+import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
-import { CanvasDragger } from './canvas_dragger';
+import SelectedElements from './selected_elements';
+import { Setting } from './setting';
+import { AutoSaveGraphs } from './store/auto-save-graphs';
+import { TextEditor } from './text/text_editor';
+import { ToolManager } from './tools/tool_manager';
 import { IEditorPaperData } from './type';
+import { ViewportManager } from './viewport_manager';
+import { ZoomManager } from './zoom_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;

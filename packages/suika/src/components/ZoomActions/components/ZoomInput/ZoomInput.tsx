@@ -1,7 +1,8 @@
-import { FC, useRef, useState } from 'react';
+import './style.scss';
+
 import { remainDecimal } from '@suika/common';
 import { useMount } from 'ahooks';
-import './style.scss';
+import { FC, useRef, useState } from 'react';
 
 interface IProps {
   defaultValue?: number;

@@ -1,8 +1,7 @@
-import react from '@vitejs/plugin-react-swc';
-import { defineConfig } from 'vite';
 import typescript from '@rollup/plugin-typescript';
-
+import react from '@vitejs/plugin-react-swc';
 import path from 'path';
+import { defineConfig } from 'vite';
 
 const resolvePath = (str: string) => path.resolve(__dirname, str);
 

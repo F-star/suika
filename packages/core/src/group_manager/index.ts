@@ -1,3 +1,3 @@
-export * from './type';
 export * from './group';
 export * from './group_manager';
+export * from './type';
