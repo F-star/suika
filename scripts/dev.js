@@ -60,10 +60,7 @@ const setup = async () => {
                 let newPath;
                 if (output.endsWith('.css')) {
                   // <target>.es.css ---> style.css
-                  newPath = oldPath.replace(
-                    `dist/${target}.es.css`,
-                    'dist/style.css',
-                  );
+                  newPath = oldPath.replace(`${target}.es.css`, 'style.css');
                 }
                 if (newPath && oldPath !== newPath) {
                   fs.renameSync(oldPath, newPath);
