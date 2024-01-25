@@ -149,12 +149,13 @@ export const createTransformHandles = (params: {
   });
 
   /************************* rotation handle  **********************/
+  const rotationHandleSize = params.size * 2.5;
   const nwRotation = new ControlHandle({
     graph: new Rect({
       objectName: 'nwRotation',
       ...getDefaultAttrs(),
-      width: params.size * 2,
-      height: params.size * 2,
+      width: rotationHandleSize,
+      height: rotationHandleSize,
       visible: false,
     }),
     type: 'nwRotation',
@@ -165,8 +166,8 @@ export const createTransformHandles = (params: {
     graph: new Rect({
       objectName: 'neRotation',
       ...getDefaultAttrs(),
-      width: params.size * 2,
-      height: params.size * 2,
+      width: rotationHandleSize,
+      height: rotationHandleSize,
       visible: false,
     }),
     type: 'neRotation',
@@ -177,8 +178,8 @@ export const createTransformHandles = (params: {
     graph: new Rect({
       objectName: 'seRotation',
       ...getDefaultAttrs(),
-      width: params.size * 2,
-      height: params.size * 2,
+      width: rotationHandleSize,
+      height: rotationHandleSize,
       visible: false,
     }),
     type: 'seRotation',
@@ -189,8 +190,8 @@ export const createTransformHandles = (params: {
     graph: new Rect({
       objectName: 'swRotation',
       ...getDefaultAttrs(),
-      width: params.size * 2,
-      height: params.size * 2,
+      width: rotationHandleSize,
+      height: rotationHandleSize,
       visible: false,
     }),
     type: 'swRotation',
