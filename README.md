@@ -11,7 +11,7 @@ Suika, an open-source vector graphics editor based on Canvas, similar to Figma.
 ## Feature
 
 - Graphics editing
-- Tools: select, rectangle, ellipse, line, hand, text, hand...
+- Tools: select, rectangle, ellipse, line, text, hand...
 - Zoom, arrange, align, fill, stroke...
 - KeyBinding, copy / paste
 - Pixel grid, Snap to pixiel grid, ruler
@@ -25,6 +25,14 @@ pnpm install
 pnpm run dev
 ```
 
+## Build
+
+```sh
+pnpm all:build
+```
+
+The target output folder is `packages/suika/build`.
+
 ## Editor core design
 
 编辑器内核的类结构设计：
@@ -33,7 +41,7 @@ https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap
 
 ## Chat
 
-建了个图形编辑器交流的 **微信群**，很多都是业内人士。
+建了个图形编辑器交流的 **微信群**。
 
 如果你是做图形编辑器开发或是感兴趣的，可以加我微信 frstars，备注 “图形编辑器群”，我拉你进群。
 

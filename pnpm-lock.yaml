@@ -21,6 +21,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^17.6.1
         version: 17.6.1
+      '@jgoz/esbuild-plugin-typecheck':
+        specifier: ^3.1.0
+        version: 3.1.0(esbuild@0.17.18)(typescript@5.2.2)
       '@typescript-eslint/parser':
         specifier: ^5.59.0
         version: 5.59.0(eslint@8.39.0)(typescript@5.2.2)
@@ -57,6 +60,9 @@ importers:
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
+      picocolors:
+        specifier: ^1.0.0
+        version: 1.0.0
       prettier:
         specifier: 2.8.7
         version: 2.8.7
@@ -194,16 +200,16 @@ importers:
 
   packages/core:
     dependencies:
-      stats.js:
-        specifier: ^0.17.0
-        version: 0.17.0
-    devDependencies:
       '@suika/common':
         specifier: workspace:^
         version: link:../common
       '@suika/geo':
         specifier: workspace:^
         version: link:../geo
+      stats.js:
+        specifier: ^0.17.0
+        version: 0.17.0
+    devDependencies:
       '@types/stats.js':
         specifier: ^0.17.3
         version: 0.17.3
@@ -4085,6 +4091,20 @@ packages:
       '@types/node': 18.15.13
       '@types/yargs': 17.0.24
       chalk: 4.1.2
+    dev: true
+
+  /@jgoz/esbuild-plugin-typecheck@3.1.0(esbuild@0.17.18)(typescript@5.2.2):
+    resolution: {integrity: sha512-4kXVwi3Sl5d8oIeSeiLzszzH6/AJVrqq7Q2Iw4IswGXqmN8QPgk4FYhfmBE3KlblZORmGr4/QfXaUHg1pHyaLA==}
+    peerDependencies:
+      '@jgoz/esbuild-plugin-livereload': '>=2.0.3'
+      esbuild: 0.17.x || 0.18.x || 0.19.x
+      typescript: '>= 3.5'
+    peerDependenciesMeta:
+      '@jgoz/esbuild-plugin-livereload':
+        optional: true
+    dependencies:
+      esbuild: 0.17.18
+      typescript: 5.2.2
     dev: true
 
   /@joshwooding/vite-plugin-react-docgen-typescript@0.2.1(typescript@5.3.3)(vite@4.3.1):

@@ -8,6 +8,7 @@
   "module": "dist/geo.es.js",
   "types": "dist/geo.d.ts",
   "scripts": {
+    "dev": "node ../../scripts/dev.js geo",
     "build": "tsc && vite build"
   },
   "devDependencies": {

@@ -9,14 +9,17 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "run-p \"watch common\" \"watch icons\" \"watch components\" \"watch geo\" \"watch core\" app:dev",
-    "watch": "node scripts/dev.js",
+    "dev": "run-p common:dev icons:dev components:dev geo:dev core:dev app:dev",
+    "all:build": "pnpm -r build",
     "app:dev": "pnpm --filter @suika/suika dev",
     "app:build": "pnpm --filter @suika/suika build",
     "storybook": "pnpm --filter @suika/components storybook",
     "components:build": "pnpm --filter @suika/components build",
-    "icons:dev": "pnpm --filter @suika/icons dev",
-    "all:build": "pnpm -r exec pnpm run build",
+    "common:dev": "pnpm -F @suika/common dev",
+    "geo:dev": "pnpm -F @suika/geo dev",
+    "core:dev": "pnpm -F @suika/core dev",
+    "icons:dev": "pnpm -F @suika/icons dev",
+    "components:dev": "pnpm -F @suika/components dev",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install",
@@ -25,6 +28,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.6.1",
     "@commitlint/config-conventional": "^17.6.1",
+    "@jgoz/esbuild-plugin-typecheck": "^3.1.0",
     "@typescript-eslint/parser": "^5.59.0",
     "esbuild": "^0.17.17",
     "esbuild-sass-plugin": "^2.9.0",
@@ -37,6 +41,7 @@
     "lint-staged": "^13.2.1",
     "minimist": "^1.2.8",
     "npm-run-all": "^4.1.5",
+    "picocolors": "^1.0.0",
     "prettier": "2.8.7",
     "typescript": "^5.2.2"
   },

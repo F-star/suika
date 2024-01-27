@@ -8,6 +8,7 @@
   "module": "dist/common.es.js",
   "types": "dist/common.d.ts",
   "scripts": {
+    "dev": "node ../../scripts/dev.js common",
     "build": "tsc && vite build"
   },
   "devDependencies": {

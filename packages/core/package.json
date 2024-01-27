@@ -7,15 +7,16 @@
   "module": "dist/core.es.js",
   "types": "dist/core.d.ts",
   "scripts": {
+    "dev": "node ../../scripts/dev.js core",
     "build": "tsc && vite build"
   },
-  "devDependencies": {
+  "dependencies": {
     "@suika/common": "workspace:^",
     "@suika/geo": "workspace:^",
+    "stats.js": "^0.17.0"
+  },
+  "devDependencies": {
     "@types/stats.js": "^0.17.3",
     "vite": "^4.2.0"
-  },
-  "dependencies": {
-    "stats.js": "^0.17.0"
   }
 }

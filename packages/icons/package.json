@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "node ../../scripts/dev.js icons",
     "build": "vite build",
     "preview": "vite preview"
   },
