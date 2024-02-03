@@ -424,15 +424,17 @@ export class SceneGraph {
   addGraphsByStr(info: string | GraphAttrs[]) {
     const data: GraphAttrs[] =
       typeof info === 'string' ? JSON.parse(info) : info;
-    const newChildren = data.map((attrs) => {
+
+    const newChildren: Graph[] = [];
+    for (const attrs of data) {
       const type = attrs.type;
       const Ctor = graphCtorMap[type!];
-
       if (!Ctor) {
-        throw new Error('found wrong type of graph');
+        console.error(`Unsupported graph type "${attrs.type}", ignore it`);
+        continue;
       }
-      return new Ctor(attrs as any);
-    });
+      newChildren.push(new Ctor(attrs as any));
+    }
 
     this.children.push(...newChildren);
     return newChildren;
