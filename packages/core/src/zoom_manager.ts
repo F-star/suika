@@ -68,7 +68,7 @@ export class ZoomManager {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
     const zoom = Math.max(
-      remainDecimal(prevZoom * (1 - zoomStep)),
+      remainDecimal(prevZoom / (1 + zoomStep)),
       this.editor.setting.get('zoomMin'),
     );
 
