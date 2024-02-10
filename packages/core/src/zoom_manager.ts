@@ -1,9 +1,5 @@
-import {
-  EventEmitter,
-  remainDecimal,
-  viewportCoordsToSceneUtil,
-} from '@suika/common';
-import { getMergedRect } from '@suika/geo';
+import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
+import { getMergedRect, IPoint } from '@suika/geo';
 
 import { Editor } from './editor';
 import { IBox } from './type';
@@ -42,38 +38,56 @@ export class ZoomManager {
   setZoomAndUpdateViewport(zoom: number) {
     const prevZoom = this.zoom;
     this.setZoom(zoom);
-    this.adjustScroll(undefined, undefined, prevZoom);
+    this.adjustScroll(prevZoom);
   }
   /**
    * zoom in
-   *
    * reference: https://mp.weixin.qq.com/s/UDnIxjYEsTop51gW7fwxMw
+   * @param center zoom center
+   * @param enableLevel zoom by level
    */
-  zoomIn(): void;
-  zoomIn(cx: number, cy: number): void;
-  zoomIn(cx?: number, cy?: number) {
+  zoomIn(center?: IPoint, enableLevel?: boolean) {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
-    const zoom = Math.min(
-      remainDecimal(prevZoom * (1 + zoomStep)),
-      this.editor.setting.get('zoomMax'),
-    );
+
+    let zoom: number;
+    if (enableLevel) {
+      const levels = this.editor.setting.get('zoomLevels');
+      const [, right] = getNearestVals(levels, prevZoom);
+      zoom = right;
+    } else {
+      zoom = Math.min(
+        prevZoom * (1 + zoomStep),
+        this.editor.setting.get('zoomMax'),
+      );
+    }
 
     this.setZoom(zoom);
-    this.adjustScroll(cx, cy, prevZoom);
+    this.adjustScroll(prevZoom, center);
   }
-  zoomOut(): void;
-  zoomOut(cx: number, cy: number): void;
-  zoomOut(cx?: number, cy?: number) {
+  /**
+   * zoom out
+   * reference: https://mp.weixin.qq.com/s/UDnIxjYEsTop51gW7fwxMw
+   * @param center zoom center
+   * @param enableLevel zoom by level
+   */
+  zoomOut(center?: IPoint, enableLevel?: boolean) {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
-    const zoom = Math.max(
-      remainDecimal(prevZoom / (1 + zoomStep)),
-      this.editor.setting.get('zoomMin'),
-    );
+    let zoom: number;
+    if (enableLevel) {
+      const levels = this.editor.setting.get('zoomLevels');
+      const [left] = getNearestVals(levels, prevZoom);
+      zoom = left;
+    } else {
+      zoom = Math.max(
+        prevZoom / (1 + zoomStep),
+        this.editor.setting.get('zoomMin'),
+      );
+    }
 
     this.setZoom(zoom);
-    this.adjustScroll(cx, cy, prevZoom);
+    this.adjustScroll(prevZoom, center);
   }
   /**
    * make origin in viewport center
@@ -165,37 +179,25 @@ export class ZoomManager {
    * adjust scroll value
    * if no set (cx, cy), scale by canvas center
    */
-  adjustScroll(
-    cx: number | undefined,
-    cy: number | undefined,
-    prevZoom: number,
-  ) {
+  adjustScroll(prevZoom: number, center?: IPoint) {
     const viewportManager = this.editor.viewportManager;
     const zoom = this.editor.zoomManager.getZoom();
 
     const { x: scrollX, y: scrollY } = viewportManager.getViewport();
 
-    let _cx: number;
-    let _cy: number;
-
-    if (cx === undefined || cy === undefined) {
-      const center = this.getCanvasCenter();
-      _cx = center.x;
-      _cy = center.y;
-    } else {
-      _cx = cx;
-      _cy = cy;
+    if (!center) {
+      center = this.getCanvasCenter();
     }
 
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneUtil(
-      _cx,
-      _cy,
+      center.x,
+      center.y,
       prevZoom,
       scrollX,
       scrollY,
     );
-    const newScrollX = sceneX - _cx / zoom;
-    const newScrollY = sceneY - _cy / zoom;
+    const newScrollX = sceneX - center.x / zoom;
+    const newScrollY = sceneY - center.y / zoom;
 
     viewportManager.setViewport({
       x: newScrollX,
@@ -215,3 +217,25 @@ export class ZoomManager {
     this.eventEmitter.off(eventName, handler);
   }
 }
+
+/**
+ * binary search to find
+ * the left and right index of the target value
+ */
+const getNearestVals = <T>(arr: T[], target: T): [T, T] => {
+  let left = 0;
+  let right = arr.length - 1;
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) {
+      right = mid === 0 ? 0 : mid - 1;
+      left = mid === arr.length - 1 ? arr.length - 1 : mid + 1;
+      break;
+    } else if (arr[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  return [arr[right], arr[left]];
+};

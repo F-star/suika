@@ -60,9 +60,13 @@ export class Setting {
 
     lockRotation: Math.PI / 12, // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
 
-    zoomStep: 0.27, // 缩放比例步长
+    /*********** zoom *************/
+    zoomStep: 0.2325,
     zoomMax: 256,
     zoomMin: 0.02,
+    zoomLevels: [
+      0.02, 0.03, 0.06, 0.13, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256,
+    ],
 
     drawGraphDefaultWidth: 100, // drawing graph default width if no drag
     drawGraphDefaultHeight: 100, // default height

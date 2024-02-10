@@ -111,7 +111,7 @@ export class CommandKeyBinding {
 
     // zoom in
     const zoomInAction = () => {
-      editor.zoomManager.zoomIn();
+      editor.zoomManager.zoomIn(undefined, true);
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
@@ -123,7 +123,7 @@ export class CommandKeyBinding {
 
     // zoom out
     const zoomOutAction = () => {
-      editor.zoomManager.zoomOut();
+      editor.zoomManager.zoomOut(undefined, true);
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({

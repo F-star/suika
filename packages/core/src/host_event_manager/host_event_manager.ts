@@ -123,15 +123,15 @@ export class HostEventManager {
     const handler = (event: WheelEvent) => {
       if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
-        const { x: cx, y: cy } = this.editor.getCursorXY(event);
+        const point = this.editor.getCursorXY(event);
         let isZoomOut = event.deltaY > 0;
         if (this.editor.setting.get('invertZoomDirection')) {
           isZoomOut = !isZoomOut;
         }
         if (isZoomOut) {
-          editor.zoomManager.zoomOut(cx, cy);
+          editor.zoomManager.zoomOut(point);
         } else {
-          editor.zoomManager.zoomIn(cx, cy);
+          editor.zoomManager.zoomIn(point);
         }
         editor.sceneGraph.render();
       } else {
