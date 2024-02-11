@@ -129,9 +129,13 @@ export class HostEventManager {
           isZoomOut = !isZoomOut;
         }
         if (isZoomOut) {
-          editor.zoomManager.zoomOut(point);
+          editor.zoomManager.zoomOut({
+            center: point,
+          });
         } else {
-          editor.zoomManager.zoomIn(point);
+          editor.zoomManager.zoomIn({
+            center: point,
+          });
         }
         editor.sceneGraph.render();
       } else {

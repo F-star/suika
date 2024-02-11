@@ -46,12 +46,12 @@ export class ZoomManager {
    * @param center zoom center
    * @param enableLevel zoom by level
    */
-  zoomIn(center?: IPoint, enableLevel?: boolean) {
+  zoomIn(opts?: { center?: IPoint; enableLevel?: boolean }) {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
 
     let zoom: number;
-    if (enableLevel) {
+    if (opts?.enableLevel) {
       const levels = this.editor.setting.get('zoomLevels');
       const [, right] = getNearestVals(levels, prevZoom);
       zoom = right;
@@ -63,7 +63,7 @@ export class ZoomManager {
     }
 
     this.setZoom(zoom);
-    this.adjustScroll(prevZoom, center);
+    this.adjustScroll(prevZoom, opts?.center);
   }
   /**
    * zoom out
@@ -71,11 +71,11 @@ export class ZoomManager {
    * @param center zoom center
    * @param enableLevel zoom by level
    */
-  zoomOut(center?: IPoint, enableLevel?: boolean) {
+  zoomOut(opts?: { center?: IPoint; enableLevel?: boolean }) {
     const zoomStep = this.editor.setting.get('zoomStep');
     const prevZoom = this.zoom;
     let zoom: number;
-    if (enableLevel) {
+    if (opts?.enableLevel) {
       const levels = this.editor.setting.get('zoomLevels');
       const [left] = getNearestVals(levels, prevZoom);
       zoom = left;
@@ -87,7 +87,7 @@ export class ZoomManager {
     }
 
     this.setZoom(zoom);
-    this.adjustScroll(prevZoom, center);
+    this.adjustScroll(prevZoom, opts?.center);
   }
   /**
    * make origin in viewport center
