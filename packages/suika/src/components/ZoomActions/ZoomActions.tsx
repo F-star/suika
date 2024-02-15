@@ -71,14 +71,14 @@ export const ZoomActions: FC = () => {
                 id: 'zoom.zoomIn',
                 suffix: isWindows ? 'Ctrl++' : '⌘+',
                 action: () => {
-                  editor?.zoomManager.zoomIn();
+                  editor?.zoomManager.zoomIn({ enableLevel: true });
                 },
               },
               {
                 id: 'zoom.zoomOut',
                 suffix: isWindows ? 'Ctrl+-' : '⌘-',
                 action: () => {
-                  editor?.zoomManager.zoomOut();
+                  editor?.zoomManager.zoomOut({ enableLevel: true });
                 },
               },
               {
