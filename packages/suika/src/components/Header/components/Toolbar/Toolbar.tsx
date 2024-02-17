@@ -4,6 +4,7 @@ import {
   EllipseOutlined,
   HandOutlined,
   LineOutlined,
+  PenOutlined,
   RectOutlined,
   SelectOutlined,
   TextFilled,
@@ -54,6 +55,12 @@ export const ToolBar = () => {
             icon: <EllipseOutlined />,
           },
           {
+            name: 'drawPath',
+            hotkey: 'P',
+            intlId: 'tool.pen',
+            icon: <PenOutlined />,
+          },
+          {
             name: 'drawLine',
             hotkey: 'L',
             intlId: 'tool.line',
@@ -78,7 +85,7 @@ export const ToolBar = () => {
           className={classNames({ active: currTool === tool.name })}
           tooltipContent={intl.formatMessage({ id: tool.intlId })}
           hotkey={tool.hotkey}
-          onClick={() => {
+          onMouseDown={() => {
             editor?.toolManager.setActiveTool(tool.name);
           }}
         >

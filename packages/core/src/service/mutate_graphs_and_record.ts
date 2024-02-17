@@ -1,6 +1,6 @@
 import { getRectRotatedXY } from '@suika/geo';
 
-import { SetElementsAttrs } from '../commands/set_elements_attrs';
+import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
 import { Graph } from '../graphs';
 
@@ -20,7 +20,7 @@ export const MutateGraphsAndRecord = {
       element.setRotatedX(rotatedX);
     }
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'Update X of Elements',
         elements,
         elements.map((el) => ({ x: el.x })),
@@ -39,7 +39,7 @@ export const MutateGraphsAndRecord = {
       element.setRotatedY(rotatedY);
     }
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'Update Y of Elements',
         elements,
         elements.map((el) => ({ y: el.y })),
@@ -67,7 +67,7 @@ export const MutateGraphsAndRecord = {
       el.y -= dy;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'Update Width of Elements',
         elements,
         elements.map((el) => ({ width: el.width, x: el.x, y: el.y })),
@@ -95,7 +95,7 @@ export const MutateGraphsAndRecord = {
       el.y -= dy;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update Height of Elements',
         elements,
         elements.map((el) => ({ height: el.height, x: el.x, y: el.y })),
@@ -113,7 +113,7 @@ export const MutateGraphsAndRecord = {
       el.rotation = rotation;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update Rotation',
         elements,
         { rotation },
@@ -133,7 +133,7 @@ export const MutateGraphsAndRecord = {
       el.cornerRadius = cornerRadius;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update Corner Radius',
         elements,
         { cornerRadius },
@@ -159,7 +159,7 @@ export const MutateGraphsAndRecord = {
       el.visible = newVisible;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update visible of graphs',
         graphs,
         { visible: newVisible },
@@ -182,7 +182,7 @@ export const MutateGraphsAndRecord = {
       el.lock = newLock;
     });
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update lock of graphs',
         graphs,
         { lock: newLock },
@@ -196,7 +196,7 @@ export const MutateGraphsAndRecord = {
     const prevAttrs = [{ objectName: graph.objectName }];
     graph.objectName = objectName;
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update name of graph',
         [graph],
         { objectName },

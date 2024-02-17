@@ -7,10 +7,14 @@ import { adjustSizeToKeepPolarSnap } from '../utils';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 
+const TYPE = 'drawLine';
+const HOTKEY = 'l';
+
 export class DrawLineTool extends DrawGraphTool implements ITool {
-  static override readonly type = 'drawLine';
-  override readonly type = 'drawLine';
-  override readonly hotkey = 'l';
+  static override readonly type = TYPE;
+  static override readonly hotkey = HOTKEY;
+  override readonly type = TYPE;
+  override readonly hotkey = HOTKEY;
 
   constructor(editor: Editor) {
     super(editor);
@@ -37,7 +41,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
 
   protected override updateGraph(rect: IRect) {
     const attrs = this.calcAttrs(rect);
-    Object.assign(this.drawingGraph!, attrs);
+    this.drawingGraph!.updateAttrs(attrs);
   }
 
   private calcAttrs({ x, y, width, height }: IRect) {

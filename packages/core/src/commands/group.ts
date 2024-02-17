@@ -3,7 +3,7 @@ import { Graph } from '../graphs';
 import { Group } from '../group_manager';
 import { ICommand } from './type';
 
-export class GroupElements implements ICommand {
+export class GroupCmd implements ICommand {
   private groupedElSet = new Set<Graph>();
   /** prevGraphId -> groupInfo */
   private prevGroupedElInfoMap = new Map<

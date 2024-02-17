@@ -6,10 +6,14 @@ import { Rect } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
 import { ITool } from './type';
 
+const TYPE = 'drawRect';
+const HOTKEY = 'r';
+
 export class DrawRectTool extends DrawGraphTool implements ITool {
-  static override readonly type = 'drawRect';
-  override readonly type = 'drawRect';
-  override readonly hotkey = 'r';
+  static override readonly type = TYPE;
+  static override readonly hotkey = HOTKEY;
+  override readonly type = TYPE;
+  override readonly hotkey = HOTKEY;
 
   constructor(editor: Editor) {
     super(editor);

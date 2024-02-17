@@ -7,6 +7,7 @@ export * from './hide-outlined';
 export * from './i18n-outlined';
 export * from './line-width-outlined';
 export * from './lock-filled';
+export * from './pen-outlined';
 export * from './remove-outlined';
 export * from './right-outlined';
 export * from './show-outlined';

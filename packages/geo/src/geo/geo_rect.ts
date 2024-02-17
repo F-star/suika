@@ -1,5 +1,6 @@
 import { transformRotate } from '../transform';
 import { IPoint, IRect, IRectWithRotation } from '../type';
+import { normalizeRadian } from './geo_angle';
 
 export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
   return {
@@ -8,6 +9,16 @@ export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
     width: Math.abs(point1.x - point2.x),
     height: Math.abs(point1.y - point2.y),
   };
+};
+
+export const getRectByPoints = (points: IPoint[]): IRect => {
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  const width = Math.max(...xs) - x;
+  const height = Math.max(...ys) - y;
+  return { x, y, width, height };
 };
 
 export const isPointInRect = (
@@ -213,8 +224,29 @@ export const rectToMidPoints = (rect: IRectWithRotation) => {
 /**
  * Calculate the coordinates of the upper left corner of a shape, considering rotation
  */
-export function getRectRotatedXY(rect: IRectWithRotation) {
+export const getRectRotatedXY = (rect: IRectWithRotation) => {
   const cx = rect.x + rect.width / 2;
   const cy = rect.y + rect.height / 2;
   return transformRotate(rect.x, rect.y, rect.rotation || 0, cx, cy);
-}
+};
+
+export const getRotatedRectByTwoPoint = (
+  point1: IPoint,
+  point2: IPoint,
+): IRectWithRotation => {
+  const { x, y } = point1;
+  const width = point2.x - point1.x;
+  const height = point2.y - point1.y;
+  const rotation = normalizeRadian(Math.atan2(height, width));
+  const cx = x + width / 2;
+  const cy = y + height / 2;
+  const p = transformRotate(x, y, -rotation, cx, cy);
+
+  return {
+    x: p.x,
+    y: p.y,
+    width: Math.sqrt(width * width + height * height),
+    height: 0,
+    rotation,
+  };
+};

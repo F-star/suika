@@ -8,6 +8,7 @@ import {
 
 import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
+import { GraphType } from '../type';
 import { ControlHandle } from './control_handle';
 import { ITransformHandleType } from './type';
 import { createTransformHandles } from './util';
@@ -31,9 +32,10 @@ const types = [
  * Control Point Handle
  */
 export class ControlHandleManager {
-  private visible = false;
-  private customHandlesVisible = true;
+  private transformHandlesVisible = false;
   private transformHandles: Map<ITransformHandleType, ControlHandle>;
+
+  private customHandlesVisible = false;
   private customHandles: ControlHandle[] = [];
 
   constructor(private editor: Editor) {
@@ -47,22 +49,24 @@ export class ControlHandleManager {
   }
 
   private onHoverItemChange = () => {
-    const hoverItem = this.editor.selectedElements.getHoverItem();
-    const isSingleSelectedGraph = this.editor.selectedElements.size() === 1;
-    const selectedGraph = isSingleSelectedGraph
-      ? this.editor.selectedElements.getItems()[0]
-      : null;
-    const isSelectedBoxHovered = this.editor.selectedBox.isHover();
+    if (!this.editor.pathEditor.getActive()) {
+      const hoverItem = this.editor.selectedElements.getHoverItem();
+      const isSingleSelectedGraph = this.editor.selectedElements.size() === 1;
+      const selectedGraph = isSingleSelectedGraph
+        ? this.editor.selectedElements.getItems()[0]
+        : null;
+      const isSelectedBoxHovered = this.editor.selectedBox.isHover();
 
-    if (
-      isSingleSelectedGraph &&
-      selectedGraph &&
-      (hoverItem === selectedGraph || isSelectedBoxHovered)
-    ) {
-      const zoom = this.editor.zoomManager.getZoom();
-      this.setCustomHandles(selectedGraph.getControlHandles(zoom, true));
-    } else {
-      this.setCustomHandles([]);
+      if (
+        isSingleSelectedGraph &&
+        selectedGraph &&
+        (hoverItem === selectedGraph || isSelectedBoxHovered)
+      ) {
+        const zoom = this.editor.zoomManager.getZoom();
+        this.setCustomHandles(selectedGraph.getControlHandles(zoom, true));
+      } else {
+        this.setCustomHandles([]);
+      }
     }
     this.editor.sceneGraph.render();
   };
@@ -80,12 +84,13 @@ export class ControlHandleManager {
     this.editor.commandManager.off('change', this.onHoverItemChange);
   }
 
-  inactive() {
-    this.visible = false;
-  }
+  private updateTransformHandles(rect: IRectWithRotation | null) {
+    if (!rect || this.editor.pathEditor.getActive()) {
+      this.transformHandlesVisible = false;
+      return;
+    }
+    this.transformHandlesVisible = true;
 
-  draw(rect: IRectWithRotation) {
-    this.visible = true;
     const zoom = this.editor.zoomManager.getZoom();
     const handleSize = this.editor.setting.get('handleSize');
     const handleStrokeWidth = this.editor.setting.get('handleStrokeWidth');
@@ -146,21 +151,36 @@ export class ControlHandleManager {
       w.graph.width =
       e.graph.width =
         neswHandleWidth;
+  }
 
-    // draw transform handles
+  draw(rect: IRectWithRotation | null) {
+    this.updateTransformHandles(rect);
+    const handles: ControlHandle[] = [];
+    if (this.transformHandlesVisible) {
+      handles.push(...Array.from(this.transformHandles.values()));
+    }
+    if (this.customHandlesVisible) {
+      handles.push(...this.customHandles);
+    }
+
     const ctx = this.editor.ctx;
-
-    const handles = [
-      ...Array.from(this.transformHandles.values()),
-      ...(this.customHandlesVisible ? this.customHandles : []),
-    ];
-
     handles.forEach((handle) => {
-      const { x, y } = this.editor.sceneCoordsToViewport(handle.cx, handle.cy);
       const graph = handle.graph;
-      graph.x = x - graph.width / 2;
-      graph.y = y - graph.height / 2;
-      graph.rotation = rect.rotation;
+      if (graph.type === GraphType.Path) {
+        // TODO:
+      } else {
+        const { x, y } = this.editor.sceneCoordsToViewport(
+          handle.cx,
+          handle.cy,
+        );
+        graph.updateAttrs({ x: x - graph.width / 2, y: y - graph.height / 2 });
+      }
+      if (rect) {
+        graph.rotation = rect.rotation;
+      }
+      if (handle.rotation !== undefined) {
+        graph.rotation = handle.rotation;
+      }
 
       if (!graph.getVisible()) {
         return;
@@ -175,7 +195,15 @@ export class ControlHandleManager {
     handleName: string;
     cursor: ICursor;
   } | null {
-    if (!this.visible) {
+    const handles: ControlHandle[] = [];
+    if (this.transformHandlesVisible) {
+      handles.push(...Array.from(this.transformHandles.values()));
+    }
+    if (this.customHandlesVisible) {
+      handles.push(...this.customHandles);
+    }
+
+    if (handles.length === 0) {
       return null;
     }
 
@@ -184,12 +212,7 @@ export class ControlHandleManager {
       hitPoint.y,
     );
 
-    const handles = [
-      ...Array.from(this.transformHandles.values()),
-      ...(this.customHandlesVisible ? this.customHandles : []),
-    ];
-
-    const selectedBox = this.editor.selectedBox.getBox()!;
+    const selectedBox = this.editor.selectedBox.getBox();
 
     for (let i = handles.length - 1; i >= 0; i--) {
       const handle = handles[i];
@@ -222,20 +245,21 @@ export class ControlHandleManager {
   setCustomHandles(handles: ControlHandle[]) {
     this.customHandles = handles;
   }
-
+  clearCustomHandles() {
+    this.customHandles = [];
+  }
   hasCustomHandles() {
     return this.customHandles.length > 0;
   }
 
   showCustomHandles() {
-    if (!this.customHandlesVisible && this.hasCustomHandles()) {
+    if (!this.customHandlesVisible) {
       this.customHandlesVisible = true;
       this.editor.sceneGraph.render();
     }
   }
-
   hideCustomHandles() {
-    if (this.customHandlesVisible && this.hasCustomHandles()) {
+    if (this.customHandlesVisible) {
       this.customHandlesVisible = false;
       this.editor.sceneGraph.render();
     }

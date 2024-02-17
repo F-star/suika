@@ -1,6 +1,6 @@
 import { noop } from '@suika/common';
 
-import { MoveElementsCommand } from '../../commands/move_elements';
+import { MoveGraphsCommand } from '../../commands/move_graphs';
 import { Editor } from '../../editor';
 import { IPoint } from '../../type';
 import { IBaseTool } from '../type';
@@ -43,10 +43,13 @@ export class SelectMoveTool implements IBaseTool {
     const selectedElements = this.editor.selectedElements.getItems({
       excludeLocked: true,
     });
-    this.startPoints = selectedElements.map((element) => ({
-      x: element.x,
-      y: element.y,
-    }));
+    this.startPoints = selectedElements.map((graph) => {
+      const rect = graph.getRect();
+      return {
+        x: rect.x,
+        y: rect.y,
+      };
+    });
     const bBox = this.editor.selectedElements.getBBox();
     if (!bBox) {
       console.error(
@@ -63,7 +66,9 @@ export class SelectMoveTool implements IBaseTool {
     this.move();
   }
   private move() {
-    this.editor.sceneGraph.showOutline = false;
+    this.editor.sceneGraph.showBoxAndHandleWhenSelected = false;
+    this.editor.sceneGraph.showSelectedGraphsOutline = false;
+
     const { x, y } = this.editor.viewportCoordsToScene(
       this.dragPoint!.x,
       this.dragPoint!.y,
@@ -95,8 +100,10 @@ export class SelectMoveTool implements IBaseTool {
     });
     const startPoints = this.startPoints;
     for (let i = 0, len = selectedElements.length; i < len; i++) {
-      selectedElements[i].x = startPoints[i].x + dx;
-      selectedElements[i].y = startPoints[i].y + dy;
+      selectedElements[i].updateAttrs({
+        x: startPoints[i].x + dx,
+        y: startPoints[i].y + dy,
+      });
     }
 
     // 参照线处理（目前不处理 “吸附到像素网格的情况” 的特殊情况）
@@ -104,8 +111,10 @@ export class SelectMoveTool implements IBaseTool {
     const { offsetX, offsetY } = this.editor.refLine.updateRefLine();
 
     for (let i = 0, len = selectedElements.length; i < len; i++) {
-      selectedElements[i].x = startPoints[i].x + dx + offsetX;
-      selectedElements[i].y = startPoints[i].y + dy + offsetY;
+      selectedElements[i].updateAttrs({
+        x: startPoints[i].x + dx + offsetX,
+        y: startPoints[i].y + dy + offsetY,
+      });
     }
 
     this.editor.sceneGraph.render();
@@ -134,12 +143,7 @@ export class SelectMoveTool implements IBaseTool {
 
     if (this.dx !== 0 || this.dy !== 0) {
       this.editor.commandManager.pushCommand(
-        new MoveElementsCommand(
-          'Move Elements',
-          selectedItems,
-          this.dx,
-          this.dy,
-        ),
+        new MoveGraphsCommand('Move Elements', selectedItems, this.dx, this.dy),
       );
 
       // update custom control handles
@@ -156,7 +160,8 @@ export class SelectMoveTool implements IBaseTool {
   afterEnd() {
     this.dragPoint = null;
 
-    this.editor.sceneGraph.showOutline = true;
+    this.editor.sceneGraph.showBoxAndHandleWhenSelected = true;
+    this.editor.sceneGraph.showSelectedGraphsOutline = true;
     this.editor.refLine.clear();
     this.editor.sceneGraph.render();
   }

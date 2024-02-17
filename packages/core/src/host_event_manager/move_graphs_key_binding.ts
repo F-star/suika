@@ -1,6 +1,6 @@
 import { arrMap, debounce, noop } from '@suika/common';
 
-import { SetElementsAttrs } from '../commands/set_elements_attrs';
+import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { Editor } from '../editor';
 import { Graph } from '../graphs';
 import { IPoint } from '../type';
@@ -32,7 +32,7 @@ export class MoveGraphsKeyBinding {
       isEnableUpdateStartPoints = true;
       this.editor.commandManager.enableRedoUndo();
       editor.commandManager.pushCommand(
-        new SetElementsAttrs(
+        new SetGraphsAttrsCmd(
           'Move elements',
           moveEls,
           arrMap(moveEls, ({ x, y }) => ({ x, y })),

@@ -11,9 +11,14 @@ export interface ICursorRotation {
   degree: number;
 }
 
+interface ICursorResize {
+  type: 'resize';
+  degree: number;
+}
+
 export type ICursor =
   | 'default'
-  | { type: 'resize'; degree: number }
+  | ICursorResize
   | ICursorRotation
   | 'grab'
   | 'grabbing'

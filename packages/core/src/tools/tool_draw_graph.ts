@@ -1,7 +1,7 @@
 import { noop } from '@suika/common';
 import { IPoint, IRect, normalizeRect } from '@suika/geo';
 
-import { AddShapeCommand } from '../commands/add_shape';
+import { AddGraphCmd } from '../commands/add_graphs';
 import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
 import { Graph } from '../graphs';
@@ -9,15 +9,15 @@ import { ITool } from './type';
 
 /**
  * Draw Graph Tool
- *
  * reference: https://mp.weixin.qq.com/s/lD1qlGus3pRvT5ZfdH0_lg
  */
 export abstract class DrawGraphTool implements ITool {
-  static type = 'drawGraph';
+  static readonly type: string = '';
+  static readonly hotkey: string = '';
+  readonly type: string = '';
+  readonly hotkey: string = '';
   cursor: ICursor = 'crosshair';
-  type = 'drawGraph';
   commandDesc = 'Add Graph';
-  hotkey = '';
 
   protected drawingGraph: Graph | null = null;
 
@@ -135,10 +135,13 @@ export abstract class DrawGraphTool implements ITool {
   protected updateGraph(rect: IRect) {
     rect = normalizeRect(rect);
     const drawingShape = this.drawingGraph!;
-    drawingShape.x = rect.x;
-    drawingShape.y = rect.y;
-    drawingShape.width = rect.width;
-    drawingShape.height = rect.height;
+
+    drawingShape.updateAttrs({
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    });
   }
 
   /** update drawing rect object */
@@ -245,7 +248,7 @@ export abstract class DrawGraphTool implements ITool {
 
     if (this.drawingGraph) {
       this.editor.commandManager.pushCommand(
-        new AddShapeCommand(this.commandDesc, this.editor, [this.drawingGraph]),
+        new AddGraphCmd(this.commandDesc, this.editor, [this.drawingGraph]),
       );
     }
   }

@@ -14,6 +14,7 @@ import { GroupManager } from './group_manager';
 import { HostEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
+import { PathEditor } from './path_editor/path_editor';
 import { PerfMonitor } from './perf_monitor';
 import { RefLine } from './ref_line';
 import Ruler from './ruler';
@@ -23,7 +24,7 @@ import SelectedElements from './selected_elements';
 import { Setting } from './setting';
 import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { TextEditor } from './text/text_editor';
-import { ToolManager } from './tools/tool_manager';
+import { ToolManager } from './tools';
 import { IEditorPaperData } from './type';
 import { ViewportManager } from './viewport_manager';
 import { ZoomManager } from './zoom_manager';
@@ -69,6 +70,7 @@ export class Editor {
   ruler: Ruler;
   refLine: RefLine;
   textEditor: TextEditor;
+  pathEditor: PathEditor;
 
   autoSaveGraphs: AutoSaveGraphs;
   perfMonitor: PerfMonitor;
@@ -105,6 +107,7 @@ export class Editor {
     this.ruler = new Ruler(this);
     this.refLine = new RefLine(this);
     this.textEditor = new TextEditor(this);
+    this.pathEditor = new PathEditor(this);
 
     this.controlHandleManager = new ControlHandleManager(this);
     this.controlHandleManager.bindEvents();
@@ -196,6 +199,14 @@ export class Editor {
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
     return sceneCoordsToViewportUtil(x, y, zoom, scrollX, scrollY);
   }
+  viewportSizeToScene(size: number) {
+    const zoom = this.zoomManager.getZoom();
+    return size / zoom;
+  }
+  sceneSizeToViewport(size: number) {
+    const zoom = this.zoomManager.getZoom();
+    return size * zoom;
+  }
   /** get cursor viewport xy */
   getCursorXY(event: { clientX: number; clientY: number }) {
     return {
@@ -213,5 +224,8 @@ export class Editor {
       element.x += dx;
       element.y += dy;
     }
+  }
+  render() {
+    this.sceneGraph.render();
   }
 }

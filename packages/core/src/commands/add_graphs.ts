@@ -2,10 +2,7 @@ import { Editor } from '../editor';
 import { Graph } from '../graphs';
 import { ICommand } from './type';
 
-/**
- * add elements
- */
-export class AddShapeCommand implements ICommand {
+export class AddGraphCmd implements ICommand {
   constructor(
     public desc: string,
     private editor: Editor,

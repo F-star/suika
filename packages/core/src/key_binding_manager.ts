@@ -69,7 +69,7 @@ export class KeyBindingManager {
 
     let isMatch = false;
     const ctx: IWhenCtx = {
-      isToolDragging: this.editor.toolManager.isDragging,
+      isToolDragging: this.editor.toolManager.isDragging(),
     };
 
     for (const keyBinding of this.keyBindingMap.values()) {

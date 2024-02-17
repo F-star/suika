@@ -1,4 +1,4 @@
-import { Graph } from '../graphs';
+import { Graph, ISegment } from '../graphs';
 import { ITexture } from '../texture';
 import { ICommand } from './type';
 
@@ -15,12 +15,10 @@ export type ISetElementsAttrsType = Partial<{
   objectName: string;
   visible: boolean;
   lock: boolean;
+  pathData: ISegment[][];
 }>;
 
-/**
- * 创建矩形
- */
-export class SetElementsAttrs implements ICommand {
+export class SetGraphsAttrsCmd implements ICommand {
   static readonly type = 'SetElementsAttrs';
   constructor(
     public desc: string,
@@ -38,16 +36,16 @@ export class SetElementsAttrs implements ICommand {
     const { elements, attrs } = this;
     for (let i = 0, len = this.elements.length; i < len; i++) {
       if (Array.isArray(attrs)) {
-        elements[i].setAttrs(attrs[i]);
+        elements[i].updateAttrs(attrs[i]);
       } else {
-        elements[i].setAttrs(attrs);
+        elements[i].updateAttrs(attrs);
       }
     }
   }
   undo() {
     const { elements, prevAttrs } = this;
     for (let i = 0, len = this.elements.length; i < len; i++) {
-      elements[i].setAttrs(prevAttrs[i]);
+      elements[i].updateAttrs(prevAttrs[i]);
     }
   }
 }

@@ -10,6 +10,7 @@
   "tool.select": "Select",
   "tool.rectangle": "Rectangle",
   "tool.ellipse": "Ellipse",
+  "tool.pen": "Pen",
   "tool.line": "Line",
   "tool.text": "Text",
   "tool.hand": "Hand",

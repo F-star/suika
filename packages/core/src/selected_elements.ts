@@ -1,8 +1,8 @@
 import { EventEmitter, isSameArray } from '@suika/common';
 import { getMergedRect } from '@suika/geo';
 
-import { GroupElements } from './commands/group';
-import { RemoveElement } from './commands/remove_element';
+import { GroupCmd } from './commands/group';
+import { RemoveGraphsCmd } from './commands/remove_graphs';
 import { Editor } from './editor';
 import { Graph } from './graphs';
 import { IBox } from './type';
@@ -25,9 +25,7 @@ class SelectedElements {
   setItems(items: Graph[]) {
     const prevItems = this.items;
     this.items = items;
-    if (!isSameArray(prevItems, items)) {
-      this.eventEmitter.emit('itemsChange', items);
-    }
+    this.emitItemsChangeIfChanged(prevItems, items);
   }
   getItems({ excludeLocked = false } = {}): Graph[] {
     if (excludeLocked) {
@@ -60,8 +58,7 @@ class SelectedElements {
     if (this.hoverItem && this.items.includes(this.hoverItem)) {
       this.setHoverItem(null);
     }
-    this.items = [];
-    this.eventEmitter.emit('itemsChange', this.items);
+    this.setItems([]);
   }
   /**
    * “追加” 多个元素
@@ -82,8 +79,11 @@ class SelectedElements {
     retItems.push(...toggledElements);
     this.items = retItems;
 
-    if (!isSameArray(prevItems, retItems)) {
-      this.eventEmitter.emit('itemsChange', this.items);
+    this.emitItemsChangeIfChanged(prevItems, retItems);
+  }
+  private emitItemsChangeIfChanged(prevItems: Graph[], items: Graph[]) {
+    if (!isSameArray(prevItems, items)) {
+      this.eventEmitter.emit('itemsChange', items);
     }
   }
   toggleItemById(id: string) {
@@ -134,7 +134,7 @@ class SelectedElements {
       return;
     }
     this.editor.commandManager.pushCommand(
-      new RemoveElement('Remove Elements', this.editor, this.items),
+      new RemoveGraphsCmd('Remove Elements', this.editor, this.items),
     );
     this.editor.sceneGraph.render();
   }
@@ -151,7 +151,7 @@ class SelectedElements {
       return;
     }
     this.editor.commandManager.pushCommand(
-      new GroupElements('Group Elements', this.editor, this.items),
+      new GroupCmd('Group Elements', this.editor, this.items),
     );
   }
 

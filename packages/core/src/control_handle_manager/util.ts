@@ -9,8 +9,11 @@ import { ITransformHandleType } from './type';
 
 const getResizeCursor = (
   type: string,
-  selectedBox: IRectWithRotation,
+  selectedBox: IRectWithRotation | null,
 ): ICursor => {
+  if (!selectedBox) {
+    return 'default';
+  }
   if (selectedBox.height === 0) {
     // be considered as a line
     return 'move';
@@ -44,8 +47,11 @@ const getResizeCursor = (
 
 export const getRotationCursor = (
   type: string,
-  selectedBox: IRectWithRotation,
+  selectedBox: IRectWithRotation | null,
 ): ICursor => {
+  if (!selectedBox) {
+    return 'default';
+  }
   const rotation = selectedBox.rotation ?? 0;
   let dDegree = 0;
 
@@ -204,9 +210,9 @@ export const createTransformHandles = (params: {
     x: number,
     y: number,
     tol: number,
-    rect: { x: number; y: number; width: number; height: number },
+    rect: { x: number; y: number; width: number; height: number } | null,
   ) {
-    if (rect.width === 0 || rect.height === 0) {
+    if (!rect || rect.width === 0 || rect.height === 0) {
       return false;
     }
     return this.graph.hitTest(x, y, tol);

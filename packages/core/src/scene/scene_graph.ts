@@ -7,7 +7,15 @@ import {
 import { IRect, isRectIntersect } from '@suika/geo';
 
 import { Editor } from '../editor';
-import { Ellipse, Graph, GraphAttrs, Line, Rect, TextGraph } from '../graphs';
+import {
+  Ellipse,
+  Graph,
+  GraphAttrs,
+  Line,
+  Path,
+  Rect,
+  TextGraph,
+} from '../graphs';
 import Grid from '../grid';
 import { GraphType, IEditorPaperData, IObject } from '../type';
 import { rafThrottle } from '../utils';
@@ -18,6 +26,7 @@ const graphCtorMap = {
   [GraphType.Ellipse]: Ellipse,
   [GraphType.Line]: Line,
   [GraphType.Text]: TextGraph,
+  [GraphType.Path]: Path,
 };
 
 interface Events {
@@ -34,7 +43,9 @@ export class SceneGraph {
   } | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private grid: Grid;
-  showOutline = true;
+  showBoxAndHandleWhenSelected = true;
+  showSelectedGraphsOutline = true;
+  highlightLayersOnHover = true;
 
   constructor(private editor: Editor) {
     this.grid = new Grid(editor);
@@ -144,7 +155,7 @@ export class SceneGraph {
     }
 
     /** draw hover graph outline and its control handle */
-    if (setting.get('highlightLayersOnHover')) {
+    if (this.highlightLayersOnHover && setting.get('highlightLayersOnHover')) {
       const hlItem = selectedElements.getHighlightedItem();
       if (hlItem && !selectedElements.hasItem(hlItem)) {
         this.drawGraphsOutline(
@@ -157,7 +168,7 @@ export class SceneGraph {
     const selectedRect = this.editor.selectedBox.updateBbox();
 
     /** draw selected elements outline */
-    if (this.showOutline) {
+    if (this.showSelectedGraphsOutline) {
       this.drawGraphsOutline(
         this.editor.selectedElements
           .getItems()
@@ -168,16 +179,16 @@ export class SceneGraph {
     }
 
     /** draw transform handle */
-    if (this.showOutline) {
+    if (this.showBoxAndHandleWhenSelected) {
       // rect +  rotation
-      if (selectedRect) {
-        this.editor.controlHandleManager.draw({
-          ...selectedRect,
-          rotation: this.editor.selectedElements.getRotation(),
-        });
-      } else {
-        this.editor.controlHandleManager.inactive();
-      }
+      this.editor.controlHandleManager.draw(
+        selectedRect
+          ? {
+              ...selectedRect,
+              rotation: this.editor.selectedElements.getRotation(),
+            }
+          : null,
+      );
     }
 
     /** draw selection */
