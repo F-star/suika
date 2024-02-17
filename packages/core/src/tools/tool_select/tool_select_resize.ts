@@ -1,7 +1,7 @@
 import { arrEvery, arrMap, noop } from '@suika/common';
 import { getResizedRect, IRect } from '@suika/geo';
 
-import { SetElementsAttrs } from '../../commands/set_elements_attrs';
+import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { isTransformHandle } from '../../control_handle_manager';
 import { Editor } from '../../editor';
 import { GraphAttrs } from '../../graphs';
@@ -132,7 +132,7 @@ export class SelectResizeTool implements IBaseTool {
         const graph = selectItems[i];
         const x = newSelectBbox.x + this.graphOffsets[i].x * widthRatio;
         const y = newSelectBbox.y + this.graphOffsets[i].y * heightRatio;
-        graph.setAttrs({
+        graph.updateAttrs({
           x,
           y,
           width: this.prevGraphsAttrs[i].width * widthRatio,
@@ -149,7 +149,7 @@ export class SelectResizeTool implements IBaseTool {
     }
     const items = this.editor.selectedElements.getItems();
     this.editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'scale select elements',
         items,
         arrMap(items, (item) => item.getAttrs()),

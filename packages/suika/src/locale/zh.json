@@ -10,6 +10,7 @@
   "tool.select": "选择",
   "tool.rectangle": "矩形",
   "tool.ellipse": "圆",
+  "tool.pen": "钢笔",
   "tool.line": "直线",
   "tool.text": "文字",
   "tool.hand": "拖拽画布",

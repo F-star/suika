@@ -1,5 +1,5 @@
 import { cloneDeep, isEqual } from '@suika/common';
-import { Graph, ITexture, SetElementsAttrs } from '@suika/core';
+import { Graph, ITexture, SetGraphsAttrsCmd } from '@suika/core';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -72,7 +72,7 @@ export const FillCard: FC = () => {
     if (!editor) return;
 
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         cmdDesc,
         selectedElements,
         { fill: newStroke },

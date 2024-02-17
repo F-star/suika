@@ -10,16 +10,19 @@ import { SelectResizeTool } from './tool_select_resize';
 import { SelectRotationTool } from './tool_select_rotation';
 import { DrawSelectionBox } from './tool_select_selection';
 
+const TYPE = 'select';
+const HOTKEY = 'v';
+
 /**
  * Select Tool
- *
  * reference: https://mp.weixin.qq.com/s/lXv5_bisMHVHqtv2DwflwA
  */
 export class SelectTool implements ITool {
-  static type = 'select';
+  static readonly type = TYPE;
+  static readonly hotkey = HOTKEY;
+  readonly type = TYPE;
+  readonly hotkey = HOTKEY;
   cursor: ICursor = 'default';
-  type = 'select';
-  hotkey = 'v';
 
   private startPoint: IPoint = { x: -1, y: -1 };
   private currStrategy: IBaseTool | null = null;
@@ -33,8 +36,15 @@ export class SelectTool implements ITool {
   private topHitElementWhenStart: Graph | null = null;
   private isDragHappened = false; // 发生过拖拽
 
+  constructor(private editor: Editor) {
+    this.strategyMove = new SelectMoveTool(editor);
+    this.strategyDrawSelectionBox = new DrawSelectionBox(editor);
+    this.strategySelectRotation = new SelectRotationTool(editor);
+    this.strategySelectResize = new SelectResizeTool(editor);
+  }
+
   private handleHoverItemChange = () => {
-    if (!this.editor.toolManager.isDragging) {
+    if (!this.editor.toolManager.isDragging()) {
       this.editor.sceneGraph.render();
     }
   };
@@ -46,12 +56,6 @@ export class SelectTool implements ITool {
     // TODO: resetHoverItem after drag canvas end
   };
 
-  constructor(private editor: Editor) {
-    this.strategyMove = new SelectMoveTool(editor);
-    this.strategyDrawSelectionBox = new DrawSelectionBox(editor);
-    this.strategySelectRotation = new SelectRotationTool(editor);
-    this.strategySelectResize = new SelectResizeTool(editor);
-  }
   active() {
     this.editor.selectedElements.on(
       'hoverItemChange',

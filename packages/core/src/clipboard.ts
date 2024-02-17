@@ -1,6 +1,6 @@
 import { arrMap, noop, omit } from '@suika/common';
 
-import { AddShapeCommand } from './commands/add_shape';
+import { AddGraphCmd } from './commands/add_graphs';
 import { Editor } from './editor';
 import { Graph } from './graphs';
 import { IEditorPaperData } from './type';
@@ -120,7 +120,7 @@ export class ClipboardManager {
 
     // TODO: duplicated objectName should be renamed
     editor.commandManager.pushCommand(
-      new AddShapeCommand('pasted graphs', editor, pastedGraphs),
+      new AddGraphCmd('pasted graphs', editor, pastedGraphs),
     );
     editor.selectedElements.setItems(pastedGraphs);
 

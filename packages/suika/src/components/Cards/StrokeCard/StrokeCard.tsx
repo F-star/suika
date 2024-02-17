@@ -3,7 +3,7 @@ import {
   Graph,
   ISetElementsAttrsType,
   ITexture,
-  SetElementsAttrs,
+  SetGraphsAttrsCmd,
 } from '@suika/core';
 import { LineWidthOutlined } from '@suika/icons';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
@@ -157,7 +157,7 @@ export const StrokeCard: FC = () => {
     }
 
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(cmdDesc, selectedElements, attrs, prevAttrs),
+      new SetGraphsAttrsCmd(cmdDesc, selectedElements, attrs, prevAttrs),
     );
 
     prevStrokes.current = selectedElements.map((el) => cloneDeep(el.fill));
@@ -168,7 +168,7 @@ export const StrokeCard: FC = () => {
 
     const selectedElements = editor.selectedElements.getItems();
     editor.commandManager.pushCommand(
-      new SetElementsAttrs(
+      new SetGraphsAttrsCmd(
         'update strokeWidth',
         selectedElements,
         { strokeWidth: newStrokeWidth },

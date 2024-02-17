@@ -2,7 +2,7 @@ import { Editor } from '../editor';
 import { Graph } from '../graphs';
 import { ICommand } from './type';
 
-export class RemoveElement implements ICommand {
+export class RemoveGraphsCmd implements ICommand {
   private removedIndexes: number[] = [];
 
   constructor(

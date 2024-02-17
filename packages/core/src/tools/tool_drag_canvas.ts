@@ -2,14 +2,15 @@ import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
-/**
- * drag canvas
- */
+const TYPE = 'dragCanvas';
+const HOTKEY = 'h';
+
 export class DragCanvasTool implements ITool {
-  static type = 'dragCanvas';
+  static readonly type = TYPE;
+  static readonly hotkey = HOTKEY;
+  readonly type = TYPE;
+  readonly hotkey = HOTKEY;
   cursor: ICursor = 'grab';
-  readonly type = 'dragCanvas';
-  readonly hotkey = 'h';
 
   constructor(private editor: Editor) {}
   active() {

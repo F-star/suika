@@ -13,16 +13,25 @@ interface Events {
   beforeExecCmd(): void;
 }
 
+interface ICommandItem {
+  command: ICommand;
+  /**
+   * consider the continue commands marked "isBatched" as one macro command
+   */
+  isBatched?: boolean;
+}
+
 /**
  * Command Manager
  *
  * reference: https://mp.weixin.qq.com/s/JBhXeFPTw8O34vOtk05cQg
  */
 export class CommandManager {
-  redoStack: ICommand[] = [];
-  undoStack: ICommand[] = [];
+  redoStack: ICommandItem[] = [];
+  undoStack: ICommandItem[] = [];
   private isEnableRedoUndo = true;
   private emitter = new EventEmitter<Events>();
+  private isBatching = false;
 
   constructor(private editor: Editor) {}
 
@@ -31,14 +40,33 @@ export class CommandManager {
       return;
     }
     if (this.redoStack.length > 0) {
-      const command = this.redoStack.pop()!;
-      console.log(
-        `%c Redo %c ${command.desc}`,
-        'background: #f04; color: #ee0',
-        '',
-      );
-      this.undoStack.push(command);
-      command.redo();
+      const topCmdItem = this.redoStack.pop()!;
+      const isBatched = topCmdItem.isBatched;
+      const cmdItems: ICommandItem[] = [topCmdItem];
+
+      if (isBatched) {
+        // if the command is batched, redo all the commands marked "isBatched"
+        while (this.redoStack.length > 0 && this.redoStack.at(-1)!.isBatched) {
+          const currCmdItem = this.redoStack.pop()!;
+          cmdItems.push(currCmdItem);
+        }
+        console.log('------- [redo] batched start -----');
+      }
+
+      for (const cmdItem of cmdItems) {
+        const command = cmdItem.command;
+        console.log(
+          `%c Redo %c ${command.desc}`,
+          'background: #f04; color: #ee0',
+          '',
+        );
+        this.undoStack.push(cmdItem);
+        command.redo();
+      }
+
+      if (isBatched) {
+        console.log('------- [redo] batched end -----');
+      }
 
       this.editor.sceneGraph.render();
       this.emitStatusChange();
@@ -49,14 +77,33 @@ export class CommandManager {
       return;
     }
     if (this.undoStack.length > 0) {
-      const command = this.undoStack.pop()!;
-      console.log(
-        `%c Undo %c ${command.desc}`,
-        'background: #40f; color: #eee',
-        '',
-      );
-      this.redoStack.push(command);
-      command.undo();
+      const topCmdItem = this.undoStack.pop()!;
+      const isBatched = topCmdItem.isBatched;
+      const cmdItems: ICommandItem[] = [topCmdItem];
+
+      if (isBatched) {
+        // if the command is batched, undo all the commands marked "isBatched"
+        while (this.undoStack.length > 0 && this.undoStack.at(-1)!.isBatched) {
+          const currCmdItem = this.undoStack.pop()!;
+          cmdItems.push(currCmdItem);
+        }
+        console.log('------- [undo] batched start -----');
+      }
+
+      for (const cmdItem of cmdItems) {
+        const command = cmdItem.command;
+        console.log(
+          `%c Undo %c ${command.desc}`,
+          'background: #40f; color: #eee',
+          '',
+        );
+        this.redoStack.push(cmdItem);
+        command.undo();
+      }
+
+      if (isBatched) {
+        console.log('------- [undo] batched end -----');
+      }
 
       this.editor.sceneGraph.render();
       this.emitStatusChange();
@@ -68,6 +115,12 @@ export class CommandManager {
   disableRedoUndo() {
     this.isEnableRedoUndo = false;
   }
+  batchCommandStart() {
+    this.isBatching = true;
+  }
+  batchCommandEnd() {
+    this.isBatching = false;
+  }
   pushCommand(command: ICommand) {
     this.emitter.emit('beforeExecCmd');
     console.log(
@@ -75,7 +128,11 @@ export class CommandManager {
       'background: #222; color: #bada55',
       '',
     );
-    this.undoStack.push(command);
+    const commandItem: ICommandItem = { command };
+    if (this.isBatching) {
+      commandItem.isBatched = true;
+    }
+    this.undoStack.push(commandItem);
     this.redoStack = [];
     this.emitStatusChange();
   }

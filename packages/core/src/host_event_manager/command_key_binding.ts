@@ -62,16 +62,21 @@ export class CommandKeyBinding {
       action: selectAllAction,
     });
 
-    // cancel select
-    const cancelSelectAction = () => {
-      editor.selectedElements.clear();
+    // switch to default select tool
+    // or cancel select(when in select tool)
+    const setDefaultToolOrCancelSelectAction = () => {
+      if (this.editor.toolManager.getActiveToolName() === 'select') {
+        editor.selectedElements.clear();
+      } else {
+        this.editor.toolManager.setActiveTool('select');
+      }
       editor.sceneGraph.render();
     };
     editor.keybindingManager.register({
       key: { keyCode: 'Escape' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Cancel Select',
-      action: cancelSelectAction,
+      action: setDefaultToolOrCancelSelectAction,
     });
 
     /********** Ruler **********/

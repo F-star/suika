@@ -47,8 +47,8 @@ export class Graph {
   type = GraphType.Graph;
   id: string;
   objectName: string;
-  protected _x: number;
-  protected _y: number;
+  x: number;
+  y: number;
   width: number;
   height: number;
   // color
@@ -60,19 +60,7 @@ export class Graph {
   cornerRadius?: number;
   visible?: boolean;
   lock?: boolean;
-
-  get x() {
-    return this._x;
-  }
-  set x(val: number) {
-    this._x = val;
-  }
-  get y() {
-    return this._y;
-  }
-  set y(val: number) {
-    this._y = val;
-  }
+  private _cacheBbox: Readonly<IBox> | null = null;
 
   constructor(options: GraphAttrs) {
     this.type = options.type ?? this.type;
@@ -85,8 +73,8 @@ export class Graph {
       this.objectName = objectNameGenerator.gen(options.type ?? this.type);
     }
 
-    this._x = options.x;
-    this._y = options.y;
+    this.x = options.x;
+    this.y = options.y;
     this.width = options.width;
     this.height = options.height;
 
@@ -125,8 +113,20 @@ export class Graph {
       visible: this.visible,
     };
   }
-  setAttrs(attrs: Partial<GraphAttrs>) {
+  private shouldUpdateBbox(attrs: Partial<GraphAttrs>) {
+    // TODO: if x, y, width, height value no change, bbox should not be updated
+    return (
+      attrs.x !== undefined ||
+      attrs.y !== undefined ||
+      attrs.width !== undefined ||
+      attrs.height !== undefined
+    );
+  }
+  updateAttrs(attrs: Partial<GraphAttrs>) {
     let key: keyof Partial<GraphAttrs>;
+    if (this.shouldUpdateBbox(attrs)) {
+      this._cacheBbox = null;
+    }
     for (key in attrs) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       const self: any = this;
@@ -145,10 +145,14 @@ export class Graph {
   }
 
   /**
-   * 计算包围盒（不考虑 strokeWidth）
-   * 考虑旋转 (旋转后的正交包围盒)
+   * AABB (axis-aligned bounding box), without considering strokeWidth)
+   * Consider rotation (orthogonal bounding box after rotation)
    */
-  getBBox(): IBox {
+  getBBox(): Readonly<IBox> {
+    if (this._cacheBbox) {
+      return this._cacheBbox;
+    }
+
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
     const rotation = this.rotation;
     if (!rotation) {
@@ -164,47 +168,29 @@ export class Graph {
     const minY = Math.min(nwY, neY, seY, swY);
     const maxX = Math.max(nwX, neX, seX, swX);
     const maxY = Math.max(nwY, neY, seY, swY);
-    return {
+    this._cacheBbox = {
       x: minX,
       y: minY,
       width: maxX - minX,
       height: maxY - minY,
     };
+    return this._cacheBbox;
   }
   /**
-   * AABB (axis-aligned bounding box)
+   * other getBBox with
+   * minX, minY, maxX, maxY style
    */
-  getBBox2(): IBox2 {
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
-    const rotation = this.rotation;
-    if (!rotation) {
-      const box = this.getRect();
-      return {
-        minX: box.x,
-        minY: box.y,
-        maxX: box.x + box.width,
-        maxY: box.y + box.height,
-      };
-    }
-
-    const { x: tlX, y: tlY } = transformRotate(x, y, rotation, cx, cy); // 左上
-    const { x: trX, y: trY } = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const { x: brX, y: brY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const { x: blX, y: blY } = transformRotate(x, y2, rotation, cx, cy); // 右下
-
-    const minX = Math.min(tlX, trX, brX, blX);
-    const minY = Math.min(tlY, trY, brY, blY);
-    const maxX = Math.max(tlX, trX, brX, blX);
-    const maxY = Math.max(tlY, trY, brY, blY);
+  getBBox2(): Readonly<IBox2> {
+    const bbox = this.getBBox();
     return {
-      minX,
-      minY,
-      maxX,
-      maxY,
+      minX: bbox.x,
+      minY: bbox.y,
+      maxX: bbox.x + bbox.width,
+      maxY: bbox.y + bbox.height,
     };
   }
   getBboxVerts(): [IPoint, IPoint, IPoint, IPoint] {
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
+    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.getRect());
 
     const rotation = this.rotation;
     if (!rotation) {
@@ -225,7 +211,7 @@ export class Graph {
   }
 
   /**
-   * get bbox before rotation
+   * get rect before rotation
    */
   getRect() {
     return {
@@ -236,9 +222,10 @@ export class Graph {
     };
   }
   getCenter() {
+    const rect = this.getRect();
     return {
-      x: this.x + this.width / 2,
-      y: this.y + this.height / 2,
+      x: rect.x + rect.width / 2,
+      y: rect.y + rect.height / 2,
     };
   }
   setRotateXY(rotatedX: number, rotatedY: number) {
@@ -250,12 +237,15 @@ export class Graph {
       cx,
       cy,
     );
-    this.x = x;
-    this.y = y;
+    this.updateAttrs({ x, y });
   }
   hitTest(x: number, y: number, padding = 0) {
     const strokeWidth = (this.strokeWidth ?? 0) / 2;
-    return isPointInRect({ x, y }, this, padding + strokeWidth);
+    return isPointInRect(
+      { x, y },
+      this.getRectWithRotation(),
+      padding + strokeWidth,
+    );
   }
 
   /**
@@ -271,7 +261,8 @@ export class Graph {
       } else {
         // OBB intersect
         // use SAT algorithm to check intersect
-        const { x: cx, y: cy } = this.getCenter();
+        const bbox = this.getRectWithRotation();
+        const [cx, cy] = getRectCenterPoint(bbox);
         const r = -this.rotation;
         const s1 = transformRotate(rect.x, rect.y, r, cx, cy);
         const s2 = transformRotate(
@@ -298,12 +289,7 @@ export class Graph {
           height: rotatedSelectionHeight,
         };
 
-        isIntersected = isRectIntersect(rotatedSelection, {
-          x: this.x,
-          y: this.y,
-          width: this.width,
-          height: this.height,
-        });
+        isIntersected = isRectIntersect(rotatedSelection, bbox);
       }
     }
 
@@ -320,11 +306,11 @@ export class Graph {
 
   setRotatedX(rotatedX: number) {
     const { x: prevRotatedX } = getRectRotatedXY(this);
-    this.x = this.x + rotatedX - prevRotatedX;
+    this.updateAttrs({ x: this.x + rotatedX - prevRotatedX });
   }
   setRotatedY(rotatedY: number) {
     const { y: prevRotatedY } = getRectRotatedXY(this);
-    this.y = this.y + rotatedY - prevRotatedY;
+    this.updateAttrs({ y: this.y + rotatedY - prevRotatedY });
   }
 
   updateByControlHandle(
@@ -338,7 +324,7 @@ export class Graph {
       this.height === 0
         ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
         : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
-    this.setAttrs(rect);
+    this.updateAttrs(rect);
   }
   draw(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -356,15 +342,16 @@ export class Graph {
     stroke: string,
     strokeWidth: number,
   ) {
+    const { x, y, width, height } = this.getRect();
     if (this.rotation) {
-      const cx = this.x + this.width / 2;
-      const cy = this.y + this.height / 2;
+      const cx = x + width / 2;
+      const cy = y + height / 2;
       rotateInCanvas(ctx, this.rotation, cx, cy);
     }
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
     ctx.beginPath();
-    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.rect(x, y, width, height);
     ctx.stroke();
     ctx.closePath();
   }
@@ -386,8 +373,7 @@ export class Graph {
     cornerRadius = 0,
   ) {
     const src = texture.attrs.src;
-    const width = this.width;
-    const height = this.height;
+    const { x, y, width, height } = this.getRect();
     let img: CanvasImageSource | undefined = undefined;
 
     // anti-aliasing
@@ -413,14 +399,7 @@ export class Graph {
 
     if (cornerRadius) {
       ctx.save();
-      drawRoundRectPath(
-        ctx,
-        this.x,
-        this.y,
-        this.width,
-        this.height,
-        cornerRadius,
-      );
+      drawRoundRectPath(ctx, x, y, width, height, cornerRadius);
       ctx.clip();
     }
 
@@ -430,8 +409,8 @@ export class Graph {
       sy,
       width / scale,
       height / scale,
-      this.x,
-      this.y,
+      x,
+      y,
       width,
       height,
     );
@@ -503,8 +482,10 @@ export class Graph {
       center.y,
     );
 
-    this.x = x - initAttrs.width / 2;
-    this.y = y - initAttrs.height / 2;
+    this.updateAttrs({
+      x: x - initAttrs.width / 2,
+      y: y - initAttrs.height / 2,
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

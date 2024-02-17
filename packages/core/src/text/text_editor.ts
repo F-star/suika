@@ -1,6 +1,6 @@
 import { cloneDeep } from '@suika/common';
 
-import { AddShapeCommand } from '../commands/add_shape';
+import { AddGraphCmd } from '../commands/add_graphs';
 import { Editor } from '../editor';
 import { TextGraph } from '../graphs';
 
@@ -68,7 +68,7 @@ export class TextEditor {
     }
 
     this.editor.commandManager.pushCommand(
-      new AddShapeCommand('draw text', this.editor, [text]),
+      new AddGraphCmd('draw text', this.editor, [text]),
     );
   }
   visible(x: number, y: number) {

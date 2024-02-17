@@ -46,6 +46,9 @@ const setup = async () => {
       typecheckPlugin({
         watch: true,
         omitStartLog: true,
+        // compilerOptions: {
+        //   noUnusedLocals: false,
+        // },
         logger: {
           info(message) {
             // don't log info
@@ -70,7 +73,7 @@ const setup = async () => {
         setup(build) {
           build.onEnd((result) => {
             if (result.errors.length) {
-              console.error('build failed:', result.errors);
+              console.error('build failed...' /*, result.errors */);
               return;
             }
             console.log('watch build succeeded:', relativeOutputFile);

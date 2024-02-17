@@ -2,11 +2,15 @@ import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
 import { ITool } from './type';
 
+const TYPE = 'drawText';
+const HOTKEY = 't';
+
 export class DrawTextTool implements ITool {
-  static readonly type = 'drawText';
+  static readonly type = TYPE;
+  static readonly hotkey = HOTKEY;
+  readonly type = TYPE;
+  readonly hotkey = HOTKEY;
   cursor: ICursor = 'crosshair';
-  readonly type = 'drawText';
-  readonly hotkey = 't';
 
   constructor(private editor: Editor) {}
   active() {

@@ -52,6 +52,7 @@ export enum GraphType {
   Ellipse = 'Ellipse',
   Text = 'Text',
   Line = 'Line',
+  Path = 'Path',
   // Group = 'Group',
 }
 

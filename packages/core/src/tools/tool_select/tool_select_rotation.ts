@@ -1,7 +1,7 @@
 import { forEach, getClosestTimesVal } from '@suika/common';
 import { normalizeRadian, rad2Deg } from '@suika/geo';
 
-import { SetElementsAttrs } from '../../commands/set_elements_attrs';
+import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { getRotationCursor } from '../../control_handle_manager';
 import { Editor } from '../../editor';
 import { IPoint } from '../../type';
@@ -53,11 +53,8 @@ export class SelectRotationTool implements IBaseTool {
     for (let i = 0, len = selectedElements.length; i < len; i++) {
       const el = selectedElements[i];
       this.prevGraphAttrs[i] = {
+        ...el.getRect(),
         rotation: el.rotation ?? 0,
-        x: el.x,
-        y: el.y,
-        width: el.width,
-        height: el.height,
       };
     }
 
@@ -131,7 +128,7 @@ export class SelectRotationTool implements IBaseTool {
     const commandDesc = 'Rotate Elements';
     if (this.dRotation !== 0) {
       this.editor.commandManager.pushCommand(
-        new SetElementsAttrs(
+        new SetGraphsAttrsCmd(
           commandDesc,
           selectedElements,
           selectedElements.map((el) => ({
