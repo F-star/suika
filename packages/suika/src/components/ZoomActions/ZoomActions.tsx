@@ -50,7 +50,7 @@ export const ZoomActions: FC = () => {
           setPopoverVisible(!popoverVisible);
         }}
       >
-        {Math.floor(zoom * 100)}%
+        {Math.round(zoom * 100)}%
         <ArrowDownOutlined />
       </div>
       {popoverVisible && (
