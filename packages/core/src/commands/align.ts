@@ -45,7 +45,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dx[i] = mixedBBox.minX - bBoxes[i].minX;
-          el.x += this.dx[i];
+          el.updateAttrs({ x: el.x + this.dx[i] });
         }
         break;
       }
@@ -54,7 +54,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dx[i] = centerX - (bBoxes[i].minX / 2 + bBoxes[i].maxX / 2);
-          el.x += this.dx[i];
+          el.updateAttrs({ x: el.x + this.dx[i] });
         }
         break;
       }
@@ -62,7 +62,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dx[i] = mixedBBox.maxX - bBoxes[i].maxX;
-          el.x += this.dx[i];
+          el.updateAttrs({ x: el.x + this.dx[i] });
         }
         break;
       }
@@ -70,7 +70,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dy[i] = mixedBBox.minY - bBoxes[i].minY;
-          el.y += this.dy[i];
+          el.updateAttrs({ y: el.y + this.dy[i] });
         }
         break;
       }
@@ -79,7 +79,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dy[i] = centerY - (bBoxes[i].minY / 2 + bBoxes[i].maxY / 2);
-          el.y += this.dy[i];
+          el.updateAttrs({ y: el.y + this.dy[i] });
         }
         break;
       }
@@ -87,7 +87,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dy[i] = mixedBBox.maxY - bBoxes[i].maxY;
-          el.y += this.dy[i];
+          el.updateAttrs({ y: el.y + this.dy[i] });
         }
         break;
       }
@@ -99,15 +99,19 @@ export class AlignCmd implements ICommand {
   redo() {
     for (let i = 0; i < this.elements.length; i++) {
       const el = this.elements[i];
-      el.x += this.dx[i] ?? 0;
-      el.y += this.dy[i] ?? 0;
+      el.updateAttrs({
+        x: el.x + (this.dx[i] ?? 0),
+        y: el.y + (this.dy[i] ?? 0),
+      });
     }
   }
   undo() {
     for (let i = 0; i < this.elements.length; i++) {
       const el = this.elements[i];
-      el.x -= this.dx[i] ?? 0;
-      el.y -= this.dy[i] ?? 0;
+      el.updateAttrs({
+        x: el.x - (this.dx[i] ?? 0),
+        y: el.y - (this.dy[i] ?? 0),
+      });
     }
   }
 }
