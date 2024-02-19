@@ -115,7 +115,7 @@ export class CanvasDragger {
     const dy = point.y - this.startPoint.y;
 
     const zoom = this.editor.zoomManager.getZoom();
-    const dragBlockStep = this.editor.setting.get('dragBlockStep') * zoom;
+    const dragBlockStep = this.editor.setting.get('dragBlockStep');
     if (
       !this.isDragging &&
       (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep)
