@@ -14,7 +14,7 @@ export class PathEditor {
   constructor(private editor: Editor) {}
 
   private onSelectedChange = (items: Graph[]) => {
-    if (items.length === 0 && items[0] === this.path) {
+    if (items.length === 0 || items[0] === this.path) {
       return;
     }
     // end path edit
