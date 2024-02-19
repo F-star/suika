@@ -228,8 +228,8 @@ const getNearestVals = <T>(arr: T[], target: T): [T, T] => {
   while (left <= right) {
     const mid = Math.floor((left + right) / 2);
     if (arr[mid] === target) {
-      right = mid === 0 ? 0 : mid - 1;
-      left = mid === arr.length - 1 ? arr.length - 1 : mid + 1;
+      right = mid - 1;
+      left = mid + 1;
       break;
     } else if (arr[mid] < target) {
       left = mid + 1;
@@ -237,5 +237,7 @@ const getNearestVals = <T>(arr: T[], target: T): [T, T] => {
       right = mid - 1;
     }
   }
+  if (right < 0) right = 0;
+  if (left >= arr.length) left = arr.length - 1;
   return [arr[right], arr[left]];
 };
