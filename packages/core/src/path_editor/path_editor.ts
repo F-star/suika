@@ -1,6 +1,7 @@
 import { parseHexToRGBA } from '@suika/common';
 import { getRotatedRectByTwoPoint, IPoint, isPointEqual } from '@suika/geo';
 
+import { RemoveGraphsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { Editor } from '../editor';
 import { Ellipse, Graph, Line, Path, Rect } from '../graphs';
@@ -31,12 +32,18 @@ export class PathEditor {
     this.editor.sceneGraph.showSelectedGraphsOutline = false;
     this.editor.sceneGraph.highlightLayersOnHover = false;
 
+    this.unbindHotkeys();
     this.bindHotkeys();
     this.editor.selectedElements.on('itemsChange', this.onSelectedChange);
-    // 监听
   }
   inactive() {
+    if (!this._active) {
+      return;
+    }
+
     this._active = false;
+    this.removePathIfEmpty();
+
     this.path = null;
     this.editor.sceneGraph.showSelectedGraphsOutline = true;
     this.editor.sceneGraph.highlightLayersOnHover = true;
@@ -45,10 +52,21 @@ export class PathEditor {
     this.unbindHotkeys();
     this.editor.selectedElements.off('itemsChange', this.onSelectedChange);
   }
-
+  private removePathIfEmpty() {
+    if (
+      this.path &&
+      (this.path.pathData.length === 0 ||
+        this.path.pathData.every((item) => item.length <= 1))
+    ) {
+      this.editor.commandManager.pushCommand(
+        new RemoveGraphsCmd('remove empty path', this.editor, [this.path]),
+      );
+    }
+  }
   private bindHotkeys() {
     const editor = this.editor;
 
+    this.eventTokens = [];
     // delete / backspace: delete selected segments
     const token = editor.keybindingManager.registerWithHighPrior({
       key: [{ keyCode: 'Backspace' }, { keyCode: 'Delete' }],
@@ -69,6 +87,7 @@ export class PathEditor {
     for (const token of this.eventTokens) {
       this.editor.keybindingManager.unregister(token);
     }
+    this.eventTokens = [];
   }
 
   /**
