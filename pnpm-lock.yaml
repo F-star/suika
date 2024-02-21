@@ -206,10 +206,16 @@ importers:
       '@suika/geo':
         specifier: workspace:^
         version: link:../geo
+      bezier-js:
+        specifier: ^6.1.4
+        version: 6.1.4
       stats.js:
         specifier: ^0.17.0
         version: 0.17.0
     devDependencies:
+      '@types/bezier-js':
+        specifier: ^4.1.3
+        version: 4.1.3
       '@types/stats.js':
         specifier: ^0.17.3
         version: 0.17.3
@@ -5666,6 +5672,10 @@ packages:
     dependencies:
       '@babel/types': 7.21.4
 
+  /@types/bezier-js@4.1.3:
+    resolution: {integrity: sha512-FNVVCu5mx/rJCWBxLTcL7oOajmGtWtBTDjq6DSUWUI12GeePivrZZXz+UgE0D6VYsLEjvExRO03z4hVtu3pTEQ==}
+    dev: true
+
   /@types/body-parser@1.19.2:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
@@ -7315,6 +7325,10 @@ packages:
     dependencies:
       open: 7.4.2
     dev: true
+
+  /bezier-js@6.1.4:
+    resolution: {integrity: sha512-PA0FW9ZpcHbojUCMu28z9Vg/fNkwTj5YhusSAjHHDfHDGLxJ6YUKrAN2vk1fP2MMOxVw4Oko16FMlRGVBGqLKg==}
+    dev: false
 
   /bfj@7.0.2:
     resolution: {integrity: sha512-+e/UqUzwmzJamNF50tBV6tZPTORow7gQ96iFow+8b562OdMpEK0BcJEq2OSPEDmAbSMBQ7PKZ87ubFkgxpYWgw==}

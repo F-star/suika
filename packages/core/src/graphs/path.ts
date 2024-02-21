@@ -1,11 +1,6 @@
 import { parseRGBAStr } from '@suika/common';
-import {
-  addPoint,
-  getRectByPoints,
-  IPoint,
-  IRect,
-  IRectWithRotation,
-} from '@suika/geo';
+import { addPoint, IPoint, IRect, IRectWithRotation } from '@suika/geo';
+import { Bezier } from 'bezier-js';
 
 import { ImgManager } from '../Img_manager';
 import { TextureType } from '../texture';
@@ -34,15 +29,37 @@ export class Path extends Graph {
   }
 
   override getBBox(): IRect {
-    const points: IPoint[] = [];
+    // TODO: cache
     const pathData = this.pathData;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
     for (const path of pathData) {
-      for (const seg of path) {
-        points.push(seg.point, Path.getHandleIn(seg), Path.getHandleOut(seg));
+      for (let i = 1; i < path.length; i++) {
+        const seg = path[i];
+        const prevSeg = path[i - 1];
+        const bbox = new Bezier(
+          prevSeg.point,
+          Path.getHandleOut(prevSeg),
+          Path.getHandleIn(seg),
+          seg.point,
+        ).bbox();
+        minX = Math.min(minX, bbox.x.min);
+        minY = Math.min(minY, bbox.y.min);
+        maxX = Math.max(maxX, bbox.x.max);
+        maxY = Math.max(maxY, bbox.y.max);
       }
     }
-    const rect = getRectByPoints(points);
-    return rect;
+    if (minX === Infinity) {
+      return { x: 0, y: 0, width: 100, height: 100 };
+    }
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
   }
 
   override getRectWithRotation(): IRectWithRotation {
