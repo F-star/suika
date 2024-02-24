@@ -70,7 +70,6 @@ export class SelectTool implements ITool {
     );
     this.editor.hostEventManager.off('spaceToggle', this.handleSpaceToggle);
 
-    this.editor.selectedElements.clear();
     this.editor.sceneGraph.render();
   }
 
