@@ -14,7 +14,7 @@ import { GroupManager } from './group_manager';
 import { HostEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
-import { PathEditor } from './path_editor/path_editor';
+import { PathEditor } from './path_editor';
 import { PerfMonitor } from './perf_monitor';
 import { RefLine } from './ref_line';
 import Ruler from './ruler';

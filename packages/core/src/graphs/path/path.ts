@@ -2,11 +2,11 @@ import { parseRGBAStr } from '@suika/common';
 import { addPoint, IPoint, IRect, IRectWithRotation } from '@suika/geo';
 import { Bezier } from 'bezier-js';
 
-import { ImgManager } from '../Img_manager';
-import { TextureType } from '../texture';
-import { GraphType } from '../type';
-import { rotateInCanvas } from '../utils';
-import { Graph, GraphAttrs } from './graph';
+import { ImgManager } from '../../Img_manager';
+import { TextureType } from '../../texture';
+import { GraphType } from '../../type';
+import { rotateInCanvas } from '../../utils';
+import { Graph, GraphAttrs } from './../graph';
 
 export interface ISegment {
   point: IPoint;
@@ -189,5 +189,28 @@ export class Path extends Graph {
   }
   static getHandleOut(seg: ISegment) {
     return addPoint(seg.point, seg.handleOut);
+  }
+
+  getSeg(pathIdx: number, segIdx: number) {
+    return Path.getSeg(this.pathData, pathIdx, segIdx);
+  }
+  static getSeg(pathData: ISegment[][], pathIdx: number, segIdx: number) {
+    const pathDataItem = pathData[pathIdx];
+    if (!pathDataItem) {
+      return null;
+    }
+    return pathDataItem[segIdx] ?? null;
+  }
+  setSeg(pathIdx: number, segIdx: number, seg: ISegment) {
+    const pathData = this.pathData;
+    const pathDataItem = pathData[pathIdx];
+    if (!pathDataItem) {
+      throw new Error(`pathIdx ${pathIdx} is out of range`);
+    }
+    if (segIdx >= pathDataItem.length) {
+      throw new Error(`segIdx ${segIdx} is out of range`);
+    }
+    pathDataItem[segIdx] = seg;
+    this.updateAttrs({ pathData });
   }
 }

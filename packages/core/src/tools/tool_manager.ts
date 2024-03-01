@@ -8,11 +8,13 @@ import { DrawLineTool } from './tool_draw_line';
 import { DrawPathTool } from './tool_draw_path';
 import { DrawRectTool } from './tool_draw_rect';
 import { DrawTextTool } from './tool_draw_text';
+import { PathSelectTool } from './tool_path_select/tool_path_select';
 import { SelectTool } from './tool_select';
 import { ITool, IToolClassConstructor } from './type';
 
 interface Events {
-  change(type: string): void;
+  switchTool(type: string): void;
+  changeEnableTools(toolTypes: string[]): void;
 }
 
 /**
@@ -23,12 +25,14 @@ export class ToolManager {
   /** tool type(string) => tool class constructor */
   private toolCtorMap = new Map<string, IToolClassConstructor>();
   /** hotkey => tool type */
-  private hotkeyMap = new Map<string, string>();
+  private hotkeySet = new Set<string>();
   private currentTool: ITool | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private enableSwitchTool = true;
   private keyBindingToken: number[] = [];
   private _isDragging = false;
+  private enableToolTypes: string[] = [];
+
   _unbindEvent: () => void;
 
   isDragging() {
@@ -36,17 +40,14 @@ export class ToolManager {
   }
 
   constructor(private editor: Editor) {
-    this.registerToolCtorAndHotKey(SelectTool);
-    this.registerToolCtorAndHotKey(DrawRectTool);
-    this.registerToolCtorAndHotKey(DrawEllipseTool);
-    this.registerToolCtorAndHotKey(DrawPathTool);
-    this.registerToolCtorAndHotKey(DrawLineTool);
-    this.registerToolCtorAndHotKey(DrawTextTool);
-    this.registerToolCtorAndHotKey(DragCanvasTool);
-
-    this.setActiveTool(SelectTool.type);
-
-    this._unbindEvent = this.bindEvent();
+    this.registerToolCtor(SelectTool);
+    this.registerToolCtor(DrawRectTool);
+    this.registerToolCtor(DrawEllipseTool);
+    this.registerToolCtor(DrawLineTool);
+    this.registerToolCtor(DrawTextTool);
+    this.registerToolCtor(DragCanvasTool);
+    this.registerToolCtor(PathSelectTool);
+    this.registerToolCtor(DrawPathTool);
 
     this.setEnableHotKeyTools([
       SelectTool.type,
@@ -57,46 +58,50 @@ export class ToolManager {
       DrawTextTool.type,
       DragCanvasTool.type,
     ]);
+
+    this.setActiveTool(SelectTool.type);
+    this._unbindEvent = this.bindEvent();
   }
   private unbindHotkey() {
     this.keyBindingToken.forEach((token) => {
       this.editor.keybindingManager.unregister(token);
     });
-  }
-  private setEnableHotKeyTools(toolType: string[]) {
-    this.unbindHotkey();
-    for (const type of toolType) {
-      const toolCtor = this.toolCtorMap.get(type);
-
-      if (!toolCtor) {
-        console.warn(
-          `tool "${type}" not found, please register it before use it`,
-        );
-        continue;
-      }
-
-      const key = `Key${toolCtor.hotkey.toUpperCase()}`;
-      const token = this.editor.keybindingManager.register({
-        key: { keyCode: key },
-        actionName: type,
-        action: () => {
-          this.setActiveTool(type);
-        },
-      });
-      this.keyBindingToken.push(token);
-    }
+    this.keyBindingToken = [];
   }
 
-  private registerToolCtorAndHotKey(toolCtor: IToolClassConstructor) {
-    if (this.toolCtorMap.has(toolCtor.type)) {
-      console.warn(`tool "${toolCtor.type}" had exit, replace it!`);
-    }
-    this.toolCtorMap.set(toolCtor.type, toolCtor);
+  public setEnableHotKeyTools(toolTypes: string[]) {
+    this.enableToolTypes = toolTypes;
+    this.eventEmitter.emit('changeEnableTools', [...toolTypes]);
+  }
+  public getEnableTools() {
+    return [...this.enableToolTypes];
+  }
 
-    if (this.hotkeyMap.has(toolCtor.hotkey)) {
-      console.warn(`hotkey "${toolCtor.type}" had exit, replace it!`);
+  private registerToolCtor(toolCtor: IToolClassConstructor) {
+    const type = toolCtor.type;
+    const hotkey = toolCtor.hotkey;
+    if (this.toolCtorMap.has(type)) {
+      console.warn(`tool "${type}" had exit, replace it!`);
     }
-    this.hotkeyMap.set(toolCtor.hotkey, toolCtor.type);
+
+    this.toolCtorMap.set(type, toolCtor);
+
+    // select and pathSelect tool has same hotkey
+    if (this.hotkeySet.has(hotkey)) {
+      console.log(`register same hotkey: "${hotkey}"`);
+    }
+    this.hotkeySet.add(hotkey);
+
+    const keyCode = `Key${toolCtor.hotkey.toUpperCase()}`;
+    const token = this.editor.keybindingManager.register({
+      key: { keyCode: keyCode },
+      actionName: type,
+      when: () => this.enableToolTypes.includes(type),
+      action: () => {
+        this.setActiveTool(type);
+      },
+    });
+    this.keyBindingToken.push(token);
   }
   getActiveToolName() {
     return this.currentTool?.type;
@@ -214,17 +219,22 @@ export class ToolManager {
       return;
     }
 
+    if (!this.enableToolTypes.includes(toolName)) {
+      console.warn(`target tool "${toolName}" is not enable`);
+      return;
+    }
+
     const prevTool = this.currentTool;
     const currentToolCtor = this.toolCtorMap.get(toolName) || null;
     if (!currentToolCtor) {
-      throw new Error(`没有 ${toolName} 对应的工具对象`);
+      throw new Error(`tool "${toolName}" is not registered`);
     }
     const currentTool = (this.currentTool = new currentToolCtor(this.editor));
 
     prevTool && prevTool.inactive();
     this.setCursorWhenActive();
     currentTool.active();
-    this.eventEmitter.emit('change', currentTool.type);
+    this.eventEmitter.emit('switchTool', currentTool.type);
   }
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
