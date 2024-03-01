@@ -124,7 +124,7 @@ export class Editor {
     this.autoSaveGraphs = new AutoSaveGraphs(this);
 
     this.imgManager.eventEmitter.on('added', () => {
-      this.sceneGraph.render();
+      this.render();
     });
 
     const data = this.autoSaveGraphs.load();
@@ -154,7 +154,7 @@ export class Editor {
      * 所以下面的 render 要异步执行
      */
     Promise.resolve().then(() => {
-      this.sceneGraph.render();
+      this.render();
     });
   }
   loadData(data: IEditorPaperData) {

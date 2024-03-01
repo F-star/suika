@@ -53,7 +53,7 @@ export class CommandKeyBinding {
     // select all
     const selectAllAction = () => {
       editor.selectedElements.selectAll();
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'KeyA' },
@@ -70,7 +70,7 @@ export class CommandKeyBinding {
       } else {
         this.editor.toolManager.setActiveTool('select');
       }
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { keyCode: 'Escape' },
@@ -83,7 +83,7 @@ export class CommandKeyBinding {
     // toggle ruler
     const toggleRulersAction = () => {
       editor.setting.set('enableRuler', !editor.setting.get('enableRuler'));
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { shiftKey: true, keyCode: 'KeyR' },
@@ -95,7 +95,7 @@ export class CommandKeyBinding {
     // zoom to fix
     const zoomToFitAction = () => {
       editor.zoomManager.zoomToFit();
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { shiftKey: true, keyCode: 'Digit1' },
@@ -106,7 +106,7 @@ export class CommandKeyBinding {
     // zoom to selection
     const zoomToSelectionAction = () => {
       editor.zoomManager.zoomToSelection();
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { shiftKey: true, keyCode: 'Digit2' },
@@ -117,7 +117,7 @@ export class CommandKeyBinding {
     // zoom in
     const zoomInAction = () => {
       editor.zoomManager.zoomIn({ enableLevel: true });
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'Equal' },
@@ -129,7 +129,7 @@ export class CommandKeyBinding {
     // zoom out
     const zoomOutAction = () => {
       editor.zoomManager.zoomOut({ enableLevel: true });
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'Minus' },
@@ -141,7 +141,7 @@ export class CommandKeyBinding {
     // zoom to 100%
     const zoomTo100 = () => {
       editor.zoomManager.setZoomAndUpdateViewport(1);
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: [
@@ -163,7 +163,7 @@ export class CommandKeyBinding {
         'enablePixelGrid',
         !editor.setting.get('enablePixelGrid'),
       );
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'Quote' },
@@ -178,7 +178,7 @@ export class CommandKeyBinding {
         'snapToPixelGrid',
         !editor.setting.get('snapToPixelGrid'),
       );
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { shiftKey: true, metaKey: true, keyCode: 'Quote' },
@@ -191,7 +191,7 @@ export class CommandKeyBinding {
     // front
     const frontAction = () => {
       arrangeAndRecord(editor, ArrangeType.Front);
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { keyCode: 'BracketRight' },
@@ -203,7 +203,7 @@ export class CommandKeyBinding {
     // back
     const backAction = () => {
       arrangeAndRecord(editor, ArrangeType.Back);
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { keyCode: 'BracketLeft' },
@@ -215,7 +215,7 @@ export class CommandKeyBinding {
     // forward
     const forwardAction = () => {
       arrangeAndRecord(editor, ArrangeType.Forward);
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'BracketRight' },
@@ -228,7 +228,7 @@ export class CommandKeyBinding {
     // backward
     const backwardAction = () => {
       arrangeAndRecord(editor, ArrangeType.Backward);
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'BracketLeft' },
@@ -242,7 +242,7 @@ export class CommandKeyBinding {
     // group
     const groupAction = () => {
       editor.selectedElements.group();
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, keyCode: 'KeyG' },
@@ -258,7 +258,7 @@ export class CommandKeyBinding {
         editor,
         editor.selectedElements.getItems(),
       );
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, shiftKey: true, keyCode: 'KeyH' },
@@ -274,7 +274,7 @@ export class CommandKeyBinding {
         editor,
         editor.selectedElements.getItems(),
       );
-      editor.sceneGraph.render();
+      editor.render();
     };
     editor.keybindingManager.register({
       key: { metaKey: true, shiftKey: true, keyCode: 'KeyL' },

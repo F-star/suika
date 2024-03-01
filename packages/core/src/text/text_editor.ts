@@ -64,7 +64,7 @@ export class TextEditor {
 
     if (!this.editor.setting.get('keepToolSelectedAfterUse')) {
       this.editor.selectedElements.setItems([text]);
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
 
     this.editor.commandManager.pushCommand(

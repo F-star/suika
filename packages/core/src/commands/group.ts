@@ -61,7 +61,7 @@ export class GroupCmd implements ICommand {
     }
 
     this.editor.sceneGraph.children = newGraphs;
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
 
   redo() {

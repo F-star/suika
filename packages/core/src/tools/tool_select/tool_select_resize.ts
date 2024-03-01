@@ -141,7 +141,7 @@ export class SelectResizeTool implements IBaseTool {
       }
     }
 
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
   onEnd(_e: PointerEvent, isDragHappened: boolean) {
     if (this.editor.selectedElements.size() === 0 || !isDragHappened) {
@@ -162,7 +162,7 @@ export class SelectResizeTool implements IBaseTool {
       this.editor.controlHandleManager.setCustomHandles(
         items[0].getControlHandles(this.editor.zoomManager.getZoom(), true),
       );
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
     this.editor.commandManager.enableRedoUndo();
     this.editor.hostEventManager.enableDelete();

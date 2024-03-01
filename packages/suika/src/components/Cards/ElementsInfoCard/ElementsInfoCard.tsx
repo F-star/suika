@@ -137,7 +137,7 @@ export const ElementsInfoCards: FC = () => {
         if (editor) {
           const elements = editor.selectedElements.getItems();
           MutateGraphsAndRecord.setRotateX(editor, elements, newRotatedX);
-          editor.sceneGraph.render();
+          editor.render();
         }
       },
     },
@@ -148,7 +148,7 @@ export const ElementsInfoCards: FC = () => {
         if (editor) {
           const elements = editor.selectedElements.getItems();
           MutateGraphsAndRecord.setRotateY(editor, elements, newRotatedY);
-          editor.sceneGraph.render();
+          editor.render();
         }
       },
     },
@@ -160,7 +160,7 @@ export const ElementsInfoCards: FC = () => {
         if (editor) {
           const elements = editor.selectedElements.getItems();
           MutateGraphsAndRecord.setWidth(editor, elements, newWidth);
-          editor.sceneGraph.render();
+          editor.render();
         }
       },
     },
@@ -172,7 +172,7 @@ export const ElementsInfoCards: FC = () => {
         if (editor) {
           const elements = editor.selectedElements.getItems();
           MutateGraphsAndRecord.setHeight(editor, elements, newHeight);
-          editor.sceneGraph.render();
+          editor.render();
         }
       },
     },
@@ -185,7 +185,7 @@ export const ElementsInfoCards: FC = () => {
           newRotation = normalizeRadian(deg2Rad(newRotation));
           const elements = editor.selectedElements.getItems();
           MutateGraphsAndRecord.setRotation(editor, elements, newRotation);
-          editor.sceneGraph.render();
+          editor.render();
         }
       },
     },
@@ -204,7 +204,7 @@ export const ElementsInfoCards: FC = () => {
             elements,
             newCornerRadius,
           );
-          editor.sceneGraph.render();
+          editor.render();
         }
       },
     },

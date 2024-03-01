@@ -121,7 +121,7 @@ export class SelectRotationTool implements IBaseTool {
     } else {
       throw new Error('no selected elements, please report issue');
     }
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
   onEnd() {
     const selectedElements = this.editor.selectedElements.getItems();

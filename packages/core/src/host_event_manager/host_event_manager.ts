@@ -137,7 +137,7 @@ export class HostEventManager {
             center: point,
           });
         }
-        editor.sceneGraph.render();
+        editor.render();
       } else {
         if (
           this.editor.canvasDragger.isActive() &&
@@ -150,7 +150,7 @@ export class HostEventManager {
           event.deltaX / zoom,
           event.deltaY / zoom,
         );
-        editor.sceneGraph.render();
+        editor.render();
       }
     };
 

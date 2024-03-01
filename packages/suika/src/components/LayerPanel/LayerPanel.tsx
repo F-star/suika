@@ -39,7 +39,7 @@ export const LayerPanel: FC = () => {
     } else {
       editor.selectedElements.setItemsById(new Set([objId]));
     }
-    editor.sceneGraph.render();
+    editor.render();
   };
 
   const setEditorHlId = (id: string) => {
@@ -47,7 +47,7 @@ export const LayerPanel: FC = () => {
       const graph = editor.sceneGraph.getElementById(id) ?? null;
 
       editor.selectedElements.setHighlightedItem(graph);
-      editor.sceneGraph.render();
+      editor.render();
     }
   };
 
@@ -56,7 +56,7 @@ export const LayerPanel: FC = () => {
       const graph = editor.sceneGraph.getElementById(id);
       if (graph && graph.objectName !== newName) {
         MutateGraphsAndRecord.setGraphName(editor, graph, newName);
-        editor.sceneGraph.render();
+        editor.render();
       }
     }
   };
@@ -66,7 +66,7 @@ export const LayerPanel: FC = () => {
       const graph = editor.sceneGraph.getElementById(id);
       if (graph) {
         MutateGraphsAndRecord.toggleVisible(editor, [graph]);
-        editor.sceneGraph.render();
+        editor.render();
       }
     }
   };
@@ -76,7 +76,7 @@ export const LayerPanel: FC = () => {
       const graph = editor.sceneGraph.getElementById(id);
       if (graph) {
         MutateGraphsAndRecord.toggleLock(editor, [graph]);
-        editor.sceneGraph.render();
+        editor.render();
       }
     }
   };

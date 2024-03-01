@@ -47,7 +47,7 @@ export const FillCard: FC = () => {
       item.fill = cloneDeep(newFills);
     });
     pushToHistory('Add Fill', selectItems, newFills);
-    editor?.sceneGraph.render();
+    editor?.render();
   };
 
   const deleteFill = (index: number) => {
@@ -61,7 +61,7 @@ export const FillCard: FC = () => {
       item.fill = cloneDeep(newFills);
     });
     pushToHistory('Update Fill', selectItems, newFills);
-    editor.sceneGraph.render();
+    editor.render();
   };
 
   const pushToHistory = (
@@ -129,7 +129,7 @@ export const FillCard: FC = () => {
       onChange={(newTexture, i) => {
         if (!editor) return;
         updateSelectedFill(newTexture, i);
-        editor.sceneGraph.render();
+        editor.render();
       }}
       onChangeComplete={(newTexture, i) => {
         if (!editor) return;
@@ -141,7 +141,7 @@ export const FillCard: FC = () => {
           newFill!,
         );
 
-        editor.sceneGraph.render();
+        editor.render();
       }}
       onAdd={addFill}
       onDelete={deleteFill}

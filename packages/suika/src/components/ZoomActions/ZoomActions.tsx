@@ -60,7 +60,7 @@ export const ZoomActions: FC = () => {
               defaultValue={zoom}
               onChange={(newZoom) => {
                 editor?.zoomManager.setZoomAndUpdateViewport(newZoom);
-                editor?.sceneGraph.render();
+                editor?.render();
               }}
             />
           </div>
@@ -122,7 +122,7 @@ export const ZoomActions: FC = () => {
                 key={item.id}
                 onClick={() => {
                   item.action();
-                  editor?.sceneGraph.render();
+                  editor?.render();
                   setPopoverVisible(false);
                 }}
               >
@@ -138,7 +138,7 @@ export const ZoomActions: FC = () => {
               if (editor) {
                 const enablePixelGrid = editor.setting.get('enablePixelGrid');
                 editor.setting.set('enablePixelGrid', !enablePixelGrid);
-                editor.sceneGraph.render();
+                editor.render();
                 setPopoverVisible(false);
               }
             }}
@@ -152,7 +152,7 @@ export const ZoomActions: FC = () => {
               if (editor) {
                 const snapToPixelGrid = editor.setting.get('snapToPixelGrid');
                 editor.setting.set('snapToPixelGrid', !snapToPixelGrid);
-                editor.sceneGraph.render();
+                editor.render();
                 setPopoverVisible(false);
               }
             }}
@@ -166,7 +166,7 @@ export const ZoomActions: FC = () => {
               if (editor) {
                 const enableRuler = editor.setting.get('enableRuler');
                 editor.setting.set('enableRuler', !enableRuler);
-                editor.sceneGraph.render();
+                editor.render();
                 setPopoverVisible(false);
               }
             }}

@@ -36,7 +36,7 @@ const Editor: FC = () => {
             width: document.body.clientWidth - leftRightMargin,
             height: document.body.clientHeight - topMargin,
           });
-          editor.sceneGraph.render();
+          editor.render();
         },
         10,
         { leading: false },

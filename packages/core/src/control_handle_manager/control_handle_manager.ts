@@ -68,7 +68,7 @@ export class ControlHandleManager {
         this.setCustomHandles([]);
       }
     }
-    this.editor.sceneGraph.render();
+    this.editor.render();
   };
   bindEvents() {
     this.editor.selectedElements.on('hoverItemChange', this.onHoverItemChange);
@@ -255,13 +255,13 @@ export class ControlHandleManager {
   showCustomHandles() {
     if (!this.customHandlesVisible) {
       this.customHandlesVisible = true;
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
   }
   hideCustomHandles() {
     if (this.customHandlesVisible) {
       this.customHandlesVisible = false;
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
   }
 }

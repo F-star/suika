@@ -242,7 +242,7 @@ export abstract class DrawGraphTool implements ITool {
         this.editor.sceneGraph.addItems([this.drawingGraph]);
 
         this.editor.selectedElements.setItems([this.drawingGraph]);
-        this.editor.sceneGraph.render();
+        this.editor.render();
       }
     }
 

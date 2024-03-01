@@ -14,5 +14,5 @@ export const arrangeAndRecord = (editor: Editor, type: ArrangeType) => {
       new ArrangeCmd('Arrange ' + type, editor, items, type),
     );
   }
-  editor.sceneGraph.render();
+  editor.render();
 };

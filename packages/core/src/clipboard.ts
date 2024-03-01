@@ -141,7 +141,7 @@ export class ClipboardManager {
         Graph.dMove(pastedGraphs, dx, dy);
       }
     }
-    editor.sceneGraph.render();
+    editor.render();
   }
 
   destroy() {

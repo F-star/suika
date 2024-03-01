@@ -136,7 +136,7 @@ class SelectedElements {
     this.editor.commandManager.pushCommand(
       new RemoveGraphsCmd('Remove Elements', this.editor, this.items),
     );
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
 
   selectAll() {

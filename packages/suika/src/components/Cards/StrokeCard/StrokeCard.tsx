@@ -101,7 +101,7 @@ export const StrokeCard: FC = () => {
       item.stroke = cloneDeep(newStrokes);
     });
     pushToHistory('Add Stroke', selectItems, newStrokes, true);
-    editor?.sceneGraph.render();
+    editor?.render();
   };
 
   const deleteStroke = (index: number) => {
@@ -115,7 +115,7 @@ export const StrokeCard: FC = () => {
       item.stroke = cloneDeep(newStrokes);
     });
     pushToHistory('Update Stroke', selectItems, newStrokes);
-    editor.sceneGraph.render();
+    editor.render();
   };
 
   const pushToHistory = (
@@ -181,7 +181,7 @@ export const StrokeCard: FC = () => {
     });
     setStrokeWidth(newStrokeWidth);
 
-    editor.sceneGraph.render();
+    editor.render();
   };
 
   return (
@@ -211,7 +211,7 @@ export const StrokeCard: FC = () => {
       onChange={(newTexture, i) => {
         if (!editor) return;
         updateStrokeWithoutRecord(newTexture, i);
-        editor.sceneGraph.render();
+        editor.render();
       }}
       onChangeComplete={(newTexture, i) => {
         if (!editor) return;
@@ -222,7 +222,7 @@ export const StrokeCard: FC = () => {
           editor.selectedElements.getItems(),
           newStrokes!,
         );
-        editor.sceneGraph.render();
+        editor.render();
       }}
       onAdd={addStroke}
       onDelete={deleteStroke}

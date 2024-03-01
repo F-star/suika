@@ -45,7 +45,7 @@ export class SelectTool implements ITool {
 
   private handleHoverItemChange = () => {
     if (!this.editor.toolManager.isDragging()) {
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
   };
 
@@ -70,7 +70,7 @@ export class SelectTool implements ITool {
     );
     this.editor.hostEventManager.off('spaceToggle', this.handleSpaceToggle);
 
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
 
   onMoveExcludeDrag(e: PointerEvent, isOutsideCanvas: boolean) {
@@ -195,7 +195,7 @@ export class SelectTool implements ITool {
 
     if (this.topHitElementWhenStart && !this.isDragHappened) {
       this.editor.selectedElements.toggleItems([this.topHitElementWhenStart]);
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
 
     const currStrategy = this.currStrategy;

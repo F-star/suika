@@ -126,7 +126,7 @@ export const ContextMenu: FC = () => {
             setVisible(false);
             if (editor) {
               editor.selectedElements.selectAll();
-              editor.sceneGraph.render();
+              editor.render();
             }
           }}
         >
@@ -202,7 +202,7 @@ export const ContextMenu: FC = () => {
                 editor,
                 editor.selectedElements.getItems(),
               );
-              editor.sceneGraph.render();
+              editor.render();
             }
           }}
         >
@@ -218,7 +218,7 @@ export const ContextMenu: FC = () => {
                 editor,
                 editor.selectedElements.getItems(),
               );
-              editor.sceneGraph.render();
+              editor.render();
             }
           }}
         >

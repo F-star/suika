@@ -9,5 +9,5 @@ export const alignAndRecord = (editor: Editor, type: AlignType) => {
   editor.commandManager.pushCommand(
     new AlignCmd('Align ' + type, editor.selectedElements.getItems(), type),
   );
-  editor.sceneGraph.render();
+  editor.render();
 };

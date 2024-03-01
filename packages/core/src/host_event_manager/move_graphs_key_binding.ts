@@ -91,7 +91,7 @@ export class MoveGraphsKeyBinding {
       this.editor.commandManager.disableRedoUndo();
       this.editor.controlHandleManager.hideCustomHandles();
       recordDebounce(movedEls);
-      editor.sceneGraph.render();
+      editor.render();
     };
 
     const handleKeyup = (e: KeyboardEvent) => {

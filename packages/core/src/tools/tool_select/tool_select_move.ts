@@ -117,7 +117,7 @@ export class SelectMoveTool implements IBaseTool {
       });
     }
 
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
   onEnd(e: PointerEvent, isDragHappened: boolean) {
     const selectedItems = this.editor.selectedElements.getItems({
@@ -163,6 +163,6 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = true;
     this.editor.sceneGraph.showSelectedGraphsOutline = true;
     this.editor.refLine.clear();
-    this.editor.sceneGraph.render();
+    this.editor.render();
   }
 }

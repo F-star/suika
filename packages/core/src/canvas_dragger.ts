@@ -131,7 +131,7 @@ export class CanvasDragger {
       const viewportX = this.startViewportPos.x - dx / zoom;
       const viewportY = this.startViewportPos.y - dy / zoom;
       this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
-      this.editor.sceneGraph.render();
+      this.editor.render();
     }
   };
 

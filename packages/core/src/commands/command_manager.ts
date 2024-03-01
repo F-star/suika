@@ -71,7 +71,7 @@ export class CommandManager {
         console.log('------- [redo] batched end -----');
       }
 
-      this.editor.sceneGraph.render();
+      this.editor.render();
       this.emitStatusChange();
     }
   }
@@ -109,7 +109,7 @@ export class CommandManager {
         console.log('------- [undo] batched end -----');
       }
 
-      this.editor.sceneGraph.render();
+      this.editor.render();
       this.emitStatusChange();
     }
   }
