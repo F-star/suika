@@ -81,7 +81,7 @@ export class PathSelectTool implements ITool {
     this.editor.commandManager.batchCommandEnd();
   }
 
-  moveExcludeDrag() {
+  onMoveExcludeDrag() {
     // noop
   }
   afterEnd() {

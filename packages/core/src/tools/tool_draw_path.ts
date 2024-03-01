@@ -40,7 +40,7 @@ export class DrawPathTool implements ITool {
     this.editor.render();
   }
 
-  moveExcludeDrag(e: PointerEvent, isOutsideCanvas: boolean) {
+  onMoveExcludeDrag(e: PointerEvent, isOutsideCanvas: boolean) {
     if (isOutsideCanvas) {
       return;
     }

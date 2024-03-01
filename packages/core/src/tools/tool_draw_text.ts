@@ -19,7 +19,7 @@ export class DrawTextTool implements ITool {
   onInactive() {
     // noop
   }
-  moveExcludeDrag() {
+  onMoveExcludeDrag() {
     // do nothing
   }
   onStart() {

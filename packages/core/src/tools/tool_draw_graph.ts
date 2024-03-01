@@ -85,7 +85,7 @@ export abstract class DrawGraphTool implements ITool {
   onInactive() {
     this.unbindEvent();
   }
-  moveExcludeDrag() {
+  onMoveExcludeDrag() {
     // do nothing;
   }
 

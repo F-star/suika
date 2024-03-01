@@ -5,7 +5,7 @@ export interface ITool extends IBaseTool {
   hotkey: string;
   type: string;
   cursor: ICursor;
-  moveExcludeDrag: (event: PointerEvent, isOutsideCanvas: boolean) => void;
+  onMoveExcludeDrag: (event: PointerEvent, isOutsideCanvas: boolean) => void;
 }
 
 export interface IBaseTool {

@@ -21,7 +21,7 @@ export class DragCanvasTool implements ITool {
     this.editor.canvasDragger.inactive();
     this.editor.canvasDragger.enableDragBySpace();
   }
-  moveExcludeDrag() {
+  onMoveExcludeDrag() {
     // noop
   }
   onStart() {
