@@ -50,5 +50,7 @@
   "preference": "Preference",
   "keepToolSelectedAfterUse": "Keep tool selected after use",
   "invertZoomDirection": "Invert zoom direction",
-  "highlightLayersOnHover": "Highlight layers on hover"
+  "highlightLayersOnHover": "Highlight layers on hover",
+
+  "done": "Done"
 }

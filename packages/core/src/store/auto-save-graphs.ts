@@ -10,7 +10,7 @@ export class AutoSaveGraphs {
   constructor(private editor: Editor) {
     this.listener = debounce(() => {
       this.save();
-    }, 300);
+    }, 10);
   }
 
   autoSave() {

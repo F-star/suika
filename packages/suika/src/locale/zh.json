@@ -49,5 +49,7 @@
   "preference": "偏好设置",
   "keepToolSelectedAfterUse": "使用工具后保持选中状态",
   "invertZoomDirection": "反转缩放方向",
-  "highlightLayersOnHover": "鼠标悬停时高亮图层"
+  "highlightLayersOnHover": "鼠标悬停时高亮图层",
+
+  "done": "完成"
 }

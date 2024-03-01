@@ -15,10 +15,12 @@ interface Events {
 
 interface ICommandItem {
   command: ICommand;
-  /**
-   * consider the continue commands marked "isBatched" as one macro command
-   */
+  /** consider the continue commands marked "isBatched" as one macro command */
   isBatched?: boolean;
+  hooks?: {
+    beforeRedo?: () => void;
+    beforeUndo?: () => void;
+  };
 }
 
 /**
@@ -61,6 +63,7 @@ export class CommandManager {
           '',
         );
         this.undoStack.push(cmdItem);
+        cmdItem.hooks?.beforeRedo?.();
         command.redo();
       }
 
@@ -98,6 +101,7 @@ export class CommandManager {
           '',
         );
         this.redoStack.push(cmdItem);
+        cmdItem.hooks?.beforeUndo?.();
         command.undo();
       }
 
@@ -121,7 +125,13 @@ export class CommandManager {
   batchCommandEnd() {
     this.isBatching = false;
   }
-  pushCommand(command: ICommand) {
+  pushCommand(
+    command: ICommand,
+    hooks?: {
+      beforeRedo?: () => void;
+      beforeUndo?: () => void;
+    },
+  ) {
     this.emitter.emit('beforeExecCmd');
     console.log(
       `%c Exec %c ${command.desc}`,
@@ -131,6 +141,9 @@ export class CommandManager {
     const commandItem: ICommandItem = { command };
     if (this.isBatching) {
       commandItem.isBatched = true;
+    }
+    if (hooks) {
+      commandItem.hooks = hooks;
     }
     this.undoStack.push(commandItem);
     this.redoStack = [];

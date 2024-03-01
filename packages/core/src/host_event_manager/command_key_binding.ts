@@ -75,7 +75,7 @@ export class CommandKeyBinding {
     editor.keybindingManager.register({
       key: { keyCode: 'Escape' },
       when: (ctx) => !ctx.isToolDragging,
-      actionName: 'Cancel Select',
+      actionName: 'Back to Select Tool or Cancel Select',
       action: setDefaultToolOrCancelSelectAction,
     });
 
