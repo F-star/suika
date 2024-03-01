@@ -11,10 +11,14 @@ export class CanvasDragger {
   private inactiveAfterPointerUp = false;
   private isEnableDragCanvasBySpace = true;
 
-  private isPressing = false;
+  private _isPressing = false;
   private isDragging = false;
   private startPoint: IPoint = { x: 0, y: 0 };
   private startViewportPos: IPoint = { x: 0, y: 0 };
+
+  isPressing() {
+    return this._isPressing;
+  }
 
   private handleSpaceToggle = (isSpacePressing: boolean) => {
     if (!this.isEnableDragCanvasBySpace) return;
@@ -72,7 +76,7 @@ export class CanvasDragger {
   }
 
   inactive() {
-    if (this.isPressing) {
+    if (this._isPressing) {
       this.inactiveAfterPointerUp = true;
     } else {
       if (!this._active) {
@@ -103,13 +107,13 @@ export class CanvasDragger {
     if (!(e.button === 0 || e.button === 1)) return;
     this.editor.cursorManager.setCursor('grabbing');
 
-    this.isPressing = true;
+    this._isPressing = true;
     this.startPoint = this.editor.getCursorXY(e);
     this.startViewportPos = this.editor.viewportManager.getViewport();
   };
 
   private handlePointerMove = (e: PointerEvent) => {
-    if (!this.isPressing) return;
+    if (!this._isPressing) return;
     const point: IPoint = this.editor.getCursorXY(e);
     const dx = point.x - this.startPoint.x;
     const dy = point.y - this.startPoint.y;
@@ -134,7 +138,7 @@ export class CanvasDragger {
   private handlePointerUp = () => {
     this.editor.cursorManager.setCursor('grab');
     this.isDragging = false;
-    this.isPressing = false;
+    this._isPressing = false;
     if (this.inactiveAfterPointerUp) {
       this.inactiveAfterPointerUp = false;
       this.inactive();

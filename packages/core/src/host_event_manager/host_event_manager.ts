@@ -120,7 +120,7 @@ export class HostEventManager {
    */
   private bindWheelEvent() {
     const editor = this.editor;
-    const handler = (event: WheelEvent) => {
+    const onWheel = (event: WheelEvent) => {
       if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
         const point = this.editor.getCursorXY(event);
@@ -139,7 +139,10 @@ export class HostEventManager {
         }
         editor.sceneGraph.render();
       } else {
-        if (this.editor.canvasDragger.isActive()) {
+        if (
+          this.editor.canvasDragger.isActive() &&
+          this.editor.canvasDragger.isPressing()
+        ) {
           return;
         }
         const zoom = editor.zoomManager.getZoom();
@@ -158,12 +161,12 @@ export class HostEventManager {
       }
     };
 
-    editor.canvasElement.addEventListener('wheel', handler);
+    editor.canvasElement.addEventListener('wheel', onWheel);
     window.addEventListener('wheel', preventDefaultScalePage, {
       passive: false,
     });
     this.unbindHandlers.push(() => {
-      editor.canvasElement.removeEventListener('wheel', handler);
+      editor.canvasElement.removeEventListener('wheel', onWheel);
       window.removeEventListener('wheel', preventDefaultScalePage);
     });
   }
