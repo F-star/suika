@@ -135,7 +135,7 @@ export class ToolManager {
           throw new Error('there is no active tool');
         }
         startPos = { x: e.clientX, y: e.clientY };
-        this.currentTool.start(e);
+        this.currentTool.onStart(e);
       });
     };
     const handleMove = (e: PointerEvent) => {
@@ -158,7 +158,7 @@ export class ToolManager {
         if (this._isDragging) {
           this.enableSwitchTool = false;
           this.editor.canvasDragger.disableDragBySpace();
-          this.currentTool.drag(e);
+          this.currentTool.onDrag(e);
         }
       } else {
         const isOutsideCanvas = this.editor.canvasElement !== e.target;
@@ -178,7 +178,7 @@ export class ToolManager {
       if (isPressing) {
         this.editor.canvasDragger.enableDragBySpace();
         isPressing = false;
-        this.currentTool.end(e, this._isDragging);
+        this.currentTool.onEnd(e, this._isDragging);
         this.currentTool.afterEnd(e);
       }
 
@@ -231,9 +231,9 @@ export class ToolManager {
     }
     const currentTool = (this.currentTool = new currentToolCtor(this.editor));
 
-    prevTool && prevTool.inactive();
+    prevTool && prevTool.onInactive();
     this.setCursorWhenActive();
-    currentTool.active();
+    currentTool.onActive();
     this.eventEmitter.emit('switchTool', currentTool.type);
   }
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {
@@ -243,7 +243,7 @@ export class ToolManager {
     this.eventEmitter.off(eventName, handler);
   }
   destroy() {
-    this.currentTool?.inactive();
+    this.currentTool?.onInactive();
   }
   setCursorWhenActive() {
     if (this.currentTool) {

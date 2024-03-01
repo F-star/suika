@@ -36,7 +36,7 @@ export abstract class DrawGraphTool implements ITool {
   private unbindEvent: () => void = noop;
 
   constructor(protected editor: Editor) {}
-  active() {
+  onActive() {
     const editor = this.editor;
     const hotkeysManager = editor.hostEventManager;
     const updateRect = () => {
@@ -82,14 +82,14 @@ export abstract class DrawGraphTool implements ITool {
       hotkeysManager.off('spaceToggle', handleSpaceToggle);
     };
   }
-  inactive() {
+  onInactive() {
     this.unbindEvent();
   }
   moveExcludeDrag() {
     // do nothing;
   }
 
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(
       e,
       this.editor.setting.get('snapToPixelGrid'),
@@ -100,7 +100,7 @@ export abstract class DrawGraphTool implements ITool {
     this.lastDragPointWhenSpaceDown = null;
   }
 
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     this.editor.hostEventManager.disableDelete();
     this.editor.hostEventManager.disableContextmenu();
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -214,7 +214,7 @@ export abstract class DrawGraphTool implements ITool {
     sceneGraph.render();
   }
 
-  end(e: PointerEvent) {
+  onEnd(e: PointerEvent) {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }

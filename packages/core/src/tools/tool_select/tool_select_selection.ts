@@ -14,13 +14,13 @@ export class DrawSelectionBox implements IBaseTool {
   private startSelectedGraphs: Graph[] = [];
 
   constructor(private editor: Editor) {}
-  active() {
+  onActive() {
     // noop
   }
-  inactive() {
+  onInactive() {
     // noop
   }
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     this.isShiftPressingWhenStart = false;
 
     if (this.editor.hostEventManager.isShiftPressing) {
@@ -36,7 +36,7 @@ export class DrawSelectionBox implements IBaseTool {
     this.editor.sceneGraph.render();
     this.editor.sceneGraph.setSelection(this.lastPoint);
   }
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
 
     const box = getRectByTwoPoint(this.lastPoint, point);
@@ -53,7 +53,7 @@ export class DrawSelectionBox implements IBaseTool {
 
     this.editor.sceneGraph.render();
   }
-  end() {
+  onEnd() {
     // noop
   }
   afterEnd() {

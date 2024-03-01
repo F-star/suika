@@ -13,23 +13,23 @@ export class DrawTextTool implements ITool {
   cursor: ICursor = 'crosshair';
 
   constructor(private editor: Editor) {}
-  active() {
+  onActive() {
     // noop
   }
-  inactive() {
+  onInactive() {
     // noop
   }
   moveExcludeDrag() {
     // do nothing
   }
-  start() {
+  onStart() {
     // do nothing
   }
-  drag() {
+  onDrag() {
     // do nothing
   }
 
-  end(e: PointerEvent) {
+  onEnd(e: PointerEvent) {
     const { x, y } = this.editor.getCursorXY(e);
 
     // 让一个 input 元素出现在光标位置，然后输入内容回车。

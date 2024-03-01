@@ -13,24 +13,24 @@ export class DragCanvasTool implements ITool {
   cursor: ICursor = 'grab';
 
   constructor(private editor: Editor) {}
-  active() {
+  onActive() {
     this.editor.canvasDragger.disableDragBySpace();
     this.editor.canvasDragger.active();
   }
-  inactive() {
+  onInactive() {
     this.editor.canvasDragger.inactive();
     this.editor.canvasDragger.enableDragBySpace();
   }
   moveExcludeDrag() {
     // noop
   }
-  start() {
+  onStart() {
     // noop
   }
-  drag() {
+  onDrag() {
     // noop
   }
-  end() {
+  onEnd() {
     // noop
   }
   afterEnd() {

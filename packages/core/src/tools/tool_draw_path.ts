@@ -27,13 +27,13 @@ export class DrawPathTool implements ITool {
   private currCursorScenePoint: IPoint | null = null;
 
   constructor(private editor: Editor) {}
-  active() {
+  onActive() {
     if (this.editor.pathEditor.getActive()) {
       this.path = this.editor.pathEditor.getPath()!;
       this.pathIdx = this.path.pathData.length;
     }
   }
-  inactive() {
+  onInactive() {
     this.editor.commandManager.batchCommandEnd();
 
     this.editor.pathEditor.updateControlHandles();
@@ -58,7 +58,7 @@ export class DrawPathTool implements ITool {
     }
   }
 
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
     const pathEditor = this.editor.pathEditor;
     if (this.editor.setting.get('snapToPixelGrid')) {
@@ -147,7 +147,7 @@ export class DrawPathTool implements ITool {
     this.editor.render();
   }
 
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     if (!this.startPoint) {
       console.warn('startPoint is null, check start()');
       return;
@@ -174,7 +174,7 @@ export class DrawPathTool implements ITool {
     this.editor.render();
   }
 
-  end() {
+  onEnd() {
     this.editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Path Data',

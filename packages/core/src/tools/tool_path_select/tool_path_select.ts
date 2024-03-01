@@ -22,13 +22,13 @@ export class PathSelectTool implements ITool {
   private indexInfo: Readonly<ISelectedIdxInfo> | null = null;
 
   constructor(private editor: Editor) {}
-  active() {
+  onActive() {
     console.log('路径选择工具');
   }
-  inactive() {
+  onInactive() {
     // noop
   }
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     const startPoint = this.editor.getSceneCursorXY(e);
 
     const control =
@@ -54,7 +54,7 @@ export class PathSelectTool implements ITool {
       }
     }
   }
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
     if (this.startPoint) {
       const path = this.editor.pathEditor.getPath()!;
@@ -68,7 +68,7 @@ export class PathSelectTool implements ITool {
       }
     }
   }
-  end() {
+  onEnd() {
     const path = this.editor.pathEditor.getPath()!;
     this.editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(

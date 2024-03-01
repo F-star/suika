@@ -24,7 +24,7 @@ export class SelectResizeTool implements IBaseTool {
 
   constructor(private editor: Editor) {}
 
-  active() {
+  onActive() {
     const handler = () => {
       this.resize();
     };
@@ -36,11 +36,11 @@ export class SelectResizeTool implements IBaseTool {
       this.editor.hostEventManager.off('altToggle', handler);
     };
   }
-  inactive() {
+  onInactive() {
     this.unbind();
     this.unbind = noop;
   }
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     this.startPoint = this.editor.getSceneCursorXY(e);
     const handleInfo = this.editor.controlHandleManager.getHandleInfoByPoint(
       this.startPoint,
@@ -71,7 +71,7 @@ export class SelectResizeTool implements IBaseTool {
     }
     this.handleName = handleInfo.handleName;
   }
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     this.editor.commandManager.disableRedoUndo();
     this.editor.hostEventManager.disableDelete();
 
@@ -143,7 +143,7 @@ export class SelectResizeTool implements IBaseTool {
 
     this.editor.sceneGraph.render();
   }
-  end(_e: PointerEvent, isDragHappened: boolean) {
+  onEnd(_e: PointerEvent, isDragHappened: boolean) {
     if (this.editor.selectedElements.size() === 0 || !isDragHappened) {
       return;
     }

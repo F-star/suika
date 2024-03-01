@@ -9,18 +9,18 @@ export interface ITool extends IBaseTool {
 }
 
 export interface IBaseTool {
-  active: () => void;
-  inactive: () => void;
+  onActive: () => void;
+  onInactive: () => void;
   // moveExcludeDrag: (event: PointerEvent) => void;
-  start: (event: PointerEvent) => void;
-  drag: (event: PointerEvent) => void;
+  onStart: (event: PointerEvent) => void;
+  onDrag: (event: PointerEvent) => void;
   /**
    * end (after drag)
    * @param event
    * @param isDragHappened is drag happened
    * @returns
    */
-  end: (event: PointerEvent, isDragHappened: boolean) => void;
+  onEnd: (event: PointerEvent, isDragHappened: boolean) => void;
   /** init state when finish a drag loop */
   afterEnd: (event: PointerEvent) => void;
   onCommandChange?: () => void;

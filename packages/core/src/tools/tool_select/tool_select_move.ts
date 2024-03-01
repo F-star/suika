@@ -21,7 +21,7 @@ export class SelectMoveTool implements IBaseTool {
   unbindEvents = noop;
 
   constructor(private editor: Editor) {}
-  active() {
+  onActive() {
     const hotkeysManager = this.editor.hostEventManager;
     const moveWhenToggleShift = () => {
       if (this.dragPoint) {
@@ -33,10 +33,10 @@ export class SelectMoveTool implements IBaseTool {
       hotkeysManager.off('shiftToggle', moveWhenToggleShift);
     };
   }
-  inactive() {
+  onInactive() {
     this.unbindEvents();
   }
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     this.editor.controlHandleManager.hideCustomHandles();
 
     this.startPoint = this.editor.getSceneCursorXY(e);
@@ -61,7 +61,7 @@ export class SelectMoveTool implements IBaseTool {
 
     this.editor.refLine.cacheXYToBbox();
   }
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     this.dragPoint = this.editor.getCursorXY(e);
     this.move();
   }
@@ -119,7 +119,7 @@ export class SelectMoveTool implements IBaseTool {
 
     this.editor.sceneGraph.render();
   }
-  end(e: PointerEvent, isDragHappened: boolean) {
+  onEnd(e: PointerEvent, isDragHappened: boolean) {
     const selectedItems = this.editor.selectedElements.getItems({
       excludeLocked: true,
     });

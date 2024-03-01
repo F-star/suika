@@ -56,14 +56,14 @@ export class SelectTool implements ITool {
     // TODO: resetHoverItem after drag canvas end
   };
 
-  active() {
+  onActive() {
     this.editor.selectedElements.on(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
     this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
   }
-  inactive() {
+  onInactive() {
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
@@ -101,7 +101,7 @@ export class SelectTool implements ITool {
     }
   }, 20);
 
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     this.currStrategy = null;
     this.topHitElementWhenStart = null;
     this.isDragHappened = false;
@@ -167,13 +167,13 @@ export class SelectTool implements ITool {
     }
 
     if (this.currStrategy) {
-      this.currStrategy.active();
-      this.currStrategy.start(e);
+      this.currStrategy.onActive();
+      this.currStrategy.onStart(e);
     } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
   }
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     this.isDragHappened = true;
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -181,12 +181,12 @@ export class SelectTool implements ITool {
     }
 
     if (this.currStrategy) {
-      this.currStrategy.drag(e);
+      this.currStrategy.onDrag(e);
     } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
   }
-  end(e: PointerEvent, isDragHappened: boolean) {
+  onEnd(e: PointerEvent, isDragHappened: boolean) {
     this.editor.controlHandleManager.showCustomHandles();
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -200,8 +200,8 @@ export class SelectTool implements ITool {
 
     const currStrategy = this.currStrategy;
     if (currStrategy) {
-      currStrategy.end(e, isDragHappened);
-      currStrategy.inactive();
+      currStrategy.onEnd(e, isDragHappened);
+      currStrategy.onInactive();
     } else {
       throw new Error('没有根据判断选择策略，代码有问题');
     }

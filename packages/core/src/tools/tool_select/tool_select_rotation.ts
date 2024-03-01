@@ -36,13 +36,13 @@ export class SelectRotationTool implements IBaseTool {
 
   constructor(private editor: Editor) {}
 
-  active() {
+  onActive() {
     this.editor.hostEventManager.on('shiftToggle', this.shiftPressHandler);
   }
-  inactive() {
+  onInactive() {
     this.editor.hostEventManager.off('shiftToggle', this.shiftPressHandler);
   }
-  start(e: PointerEvent) {
+  onStart(e: PointerEvent) {
     this.lastPoint = null;
     this.dRotation = 0;
     this.selectedBoxCenter = null;
@@ -69,7 +69,7 @@ export class SelectRotationTool implements IBaseTool {
     );
     this.startBboxRotation = this.editor.selectedElements.getRotation();
   }
-  drag(e: PointerEvent) {
+  onDrag(e: PointerEvent) {
     this.lastPoint = this.editor.getSceneCursorXY(e);
     this.rotateSelectedElements();
   }
@@ -123,7 +123,7 @@ export class SelectRotationTool implements IBaseTool {
     }
     this.editor.sceneGraph.render();
   }
-  end() {
+  onEnd() {
     const selectedElements = this.editor.selectedElements.getItems();
     const commandDesc = 'Rotate Elements';
     if (this.dRotation !== 0) {
