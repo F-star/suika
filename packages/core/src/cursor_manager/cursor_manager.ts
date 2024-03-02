@@ -26,16 +26,12 @@ export type ICursor =
   | 'pointer'
   | 'crosshair'
   | 'text'
-  | 'wait'
-  | 'help'
-  | 'not-allowed'
-  | 'zoom-in'
-  | 'zoom-out';
+  | 'pen';
 
 export class CursorManger {
   private cursor!: ICursor;
   // the cursors with custom style, need to add class to canvas element
-  private customClassCursor = new Set<ICursor>(['default', 'move']);
+  private customClassCursor = new Set<ICursor>(['default', 'move', 'pen']);
 
   constructor(private editor: Editor) {
     this.setCursor('default');

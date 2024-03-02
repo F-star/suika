@@ -18,7 +18,7 @@ export class DrawPathTool implements ITool {
   static readonly hotkey = HOTKEY;
   readonly type = TYPE;
   readonly hotkey = HOTKEY;
-  cursor: ICursor = 'default';
+  cursor: ICursor = 'pen';
 
   private startPoint: IPoint | null = null;
   private path: Path | null = null;
