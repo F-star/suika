@@ -24,7 +24,6 @@ export class DrawPathTool implements ITool {
   private path: Path | null = null;
   private prevPathData: ISegment[][] = [];
   private pathIdx = 0;
-  private currCursorScenePoint: IPoint | null = null;
 
   constructor(private editor: Editor) {}
   onActive() {
@@ -32,6 +31,7 @@ export class DrawPathTool implements ITool {
       this.path = this.editor.pathEditor.getPath()!;
       this.pathIdx = this.path.attrs.pathData.length;
     }
+    this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
   }
   onInactive() {
     this.editor.commandManager.batchCommandEnd();
@@ -50,12 +50,21 @@ export class DrawPathTool implements ITool {
       point.y = getClosestTimesVal(point.y, 0.5);
     }
 
-    this.currCursorScenePoint = point;
     if (this.editor.hostEventManager.isSpacePressing) {
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.currCursorScenePoint);
+      this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
     }
+  }
+
+  /** get corrected cursor point */
+  private getCursorPoint() {
+    const point = this.editor.toolManager.getCurrPoint();
+    if (this.editor.setting.get('snapToPixelGrid')) {
+      point.x = getClosestTimesVal(point.x, 0.5);
+      point.y = getClosestTimesVal(point.y, 0.5);
+    }
+    return point;
   }
 
   onStart(e: PointerEvent) {
@@ -148,14 +157,13 @@ export class DrawPathTool implements ITool {
     this.editor.render();
   }
 
-  onDrag(e: PointerEvent) {
+  onDrag() {
     if (!this.startPoint) {
       console.warn('startPoint is null, check start()');
       return;
     }
 
-    const point = this.editor.getSceneCursorXY(e);
-    this.currCursorScenePoint = point;
+    const point = this.getCursorPoint();
     if (this.editor.setting.get('snapToPixelGrid')) {
       point.x = getClosestTimesVal(point.x, 0.5);
       point.y = getClosestTimesVal(point.y, 0.5);
@@ -192,9 +200,7 @@ export class DrawPathTool implements ITool {
   }
 
   onCommandChange() {
-    if (this.currCursorScenePoint) {
-      this.updateControlHandlesWithPreviewHandles(this.currCursorScenePoint);
-    }
+    this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
   }
 
   onSpaceToggle(isSpacePressing: boolean) {
@@ -202,10 +208,8 @@ export class DrawPathTool implements ITool {
       this.editor.pathEditor.updateControlHandles();
       this.editor.render();
     } else {
-      if (this.currCursorScenePoint) {
-        this.updateControlHandlesWithPreviewHandles(this.currCursorScenePoint);
-        this.editor.render();
-      }
+      this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
+      this.editor.render();
     }
   }
 
@@ -213,7 +217,7 @@ export class DrawPathTool implements ITool {
     if (this.editor.hostEventManager.isSpacePressing) {
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.currCursorScenePoint!);
+      this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
     }
     this.editor.render();
   }

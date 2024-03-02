@@ -32,12 +32,9 @@ export class ToolManager {
   private keyBindingToken: number[] = [];
   private _isDragging = false;
   private enableToolTypes: string[] = [];
+  private currViewportPoint: IPoint = { x: Infinity, y: Infinity };
 
   _unbindEvent: () => void;
-
-  isDragging() {
-    return this._isDragging;
-  }
 
   constructor(private editor: Editor) {
     this.registerToolCtor(SelectTool);
@@ -139,6 +136,7 @@ export class ToolManager {
       });
     };
     const handleMove = (e: PointerEvent) => {
+      this.currViewportPoint = this.editor.getCursorXY(e);
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
       }
@@ -249,5 +247,16 @@ export class ToolManager {
     if (this.currentTool) {
       this.editor.cursorManager.setCursor(this.currentTool.cursor);
     }
+  }
+
+  isDragging() {
+    return this._isDragging;
+  }
+
+  getCurrPoint() {
+    return this.editor.viewportCoordsToScene(
+      this.currViewportPoint.x,
+      this.currViewportPoint.y,
+    );
   }
 }
