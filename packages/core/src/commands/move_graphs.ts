@@ -12,14 +12,14 @@ export class MoveGraphsCommand implements ICommand {
     const { dx, dy } = this;
     for (let i = 0, len = this.graphs.length; i < len; i++) {
       const element = this.graphs[i];
-      element.updateAttrs({ x: element.x + dx, y: element.y + dy });
+      element.updateAttrs({ x: element.attrs.x + dx, y: element.attrs.y + dy });
     }
   }
   undo() {
     const { dx, dy } = this;
     for (let i = 0, len = this.graphs.length; i < len; i++) {
       const element = this.graphs[i];
-      element.updateAttrs({ x: element.x - dx, y: element.y - dy });
+      element.updateAttrs({ x: element.attrs.x - dx, y: element.attrs.y - dy });
     }
   }
 }

@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { GraphAttrs } from '@suika/core';
+import { Graph } from '@suika/core';
 import { FC, useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -25,7 +25,7 @@ export const InfoPanel: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      const handler = (items: GraphAttrs[]) => {
+      const handler = (items: Graph[]) => {
         setType(items.length ? PanelType.SelectedElements : PanelType.Global);
       };
       editor.selectedElements.on('itemsChange', handler);

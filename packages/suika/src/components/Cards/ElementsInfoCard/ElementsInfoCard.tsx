@@ -52,36 +52,37 @@ export const ElementsInfoCards: FC = () => {
           }: {
             x: number | typeof MIXED;
             y: number | typeof MIXED;
-          } = getRectRotatedXY(items[0]);
+          } = getRectRotatedXY(items[0].attrs);
           let newGraphType: GraphType | typeof MIXED = items[0].type;
-          let newWidth: number | typeof MIXED = items[0].width;
-          let newHeight: number | typeof MIXED = items[0].height;
-          let newRotation: number | typeof MIXED = items[0].rotation || 0;
+          let newWidth: number | typeof MIXED = items[0].attrs.width;
+          let newHeight: number | typeof MIXED = items[0].attrs.height;
+          let newRotation: number | typeof MIXED = items[0].attrs.rotation || 0;
           let newCornerRadius: number | typeof MIXED =
-            items[0].cornerRadius || 0;
+            items[0].attrs.cornerRadius || 0;
 
           for (const element of items) {
             if (element.type !== newGraphType) {
               newGraphType = MIXED;
             }
-            const { x: currentRotatedX, y: currentRotatedY } =
-              getRectRotatedXY(element);
+            const { x: currentRotatedX, y: currentRotatedY } = getRectRotatedXY(
+              element.attrs,
+            );
             if (!isEqual(newRotatedX, currentRotatedX)) {
               newRotatedX = MIXED;
             }
             if (!isEqual(newRotatedY, currentRotatedY)) {
               newRotatedY = MIXED;
             }
-            if (!isEqual(newWidth, element.width)) {
+            if (!isEqual(newWidth, element.attrs.width)) {
               newWidth = MIXED;
             }
-            if (!isEqual(newHeight, element.height)) {
+            if (!isEqual(newHeight, element.attrs.height)) {
               newHeight = MIXED;
             }
-            if (!isEqual(newRotation, element.rotation || 0)) {
+            if (!isEqual(newRotation, element.attrs.rotation || 0)) {
               newRotation = MIXED;
             }
-            if (!isEqual(newCornerRadius, element.cornerRadius || 0)) {
+            if (!isEqual(newCornerRadius, element.attrs.cornerRadius || 0)) {
               newCornerRadius = MIXED;
             }
           }

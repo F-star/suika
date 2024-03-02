@@ -25,7 +25,7 @@ export const StrokeCard: FC = () => {
     if (editor) {
       prevStrokes.current = editor.selectedElements
         .getItems()
-        .map((el) => cloneDeep(el.stroke));
+        .map((el) => cloneDeep(el.attrs.stroke ?? []));
 
       const updateInfo = () => {
         const selectedElements = editor.selectedElements.getItems();
@@ -34,9 +34,9 @@ export const StrokeCard: FC = () => {
            * 显示 stroke 值时，如果有的图形没有 stroke，将其排除。
            * 添加颜色时，如果有的图形不存在 stroke，赋值给它。
            */
-          let strokes = selectedElements[0].stroke;
+          let strokes = selectedElements[0].attrs.stroke ?? [];
           for (let i = 1, len = selectedElements.length; i < len; i++) {
-            const currentStrokes = selectedElements[i].stroke;
+            const currentStrokes = selectedElements[i].attrs.stroke;
             if (!isEqual(strokes, currentStrokes)) {
               // TODO: 标记为不相同，作为文案提示
               strokes = [];
@@ -46,9 +46,10 @@ export const StrokeCard: FC = () => {
           setStrokes(strokes);
 
           // 线宽
-          let strokeWidth = selectedElements[0].strokeWidth ?? 0;
+          let strokeWidth = selectedElements[0].attrs.strokeWidth ?? 0;
           for (let i = 1, len = selectedElements.length; i < len; i++) {
-            const currentStrokeWidth = selectedElements[i].strokeWidth ?? 0;
+            const currentStrokeWidth =
+              selectedElements[i].attrs.strokeWidth ?? 0;
             if (strokeWidth !== currentStrokeWidth) {
               strokeWidth = -1;
               break;
@@ -81,7 +82,7 @@ export const StrokeCard: FC = () => {
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.stroke = cloneDeep(newStrokes);
+      item.attrs.stroke = cloneDeep(newStrokes);
     });
 
     return newStrokes;
@@ -98,7 +99,7 @@ export const StrokeCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.stroke = cloneDeep(newStrokes);
+      item.attrs.stroke = cloneDeep(newStrokes);
     });
     pushToHistory('Add Stroke', selectItems, newStrokes, true);
     editor?.render();
@@ -112,7 +113,7 @@ export const StrokeCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.stroke = cloneDeep(newStrokes);
+      item.attrs.stroke = cloneDeep(newStrokes);
     });
     pushToHistory('Update Stroke', selectItems, newStrokes);
     editor.render();
@@ -136,23 +137,23 @@ export const StrokeCard: FC = () => {
     // case 1: add first stroke，change strokeWidth to 1
     if (isAddAction && newStroke.length === 1) {
       selectedElements.forEach((el, i) => {
-        prevAttrs[i].strokeWidth = el.strokeWidth;
+        prevAttrs[i].strokeWidth = el.attrs.strokeWidth;
       });
 
       const defaultStrokeWidth = editor.setting.get('strokeWidth');
       forEach(selectedElements, (el, i) => {
-        el.strokeWidth = defaultStrokeWidth;
+        el.attrs.strokeWidth = defaultStrokeWidth;
         attrs[i].strokeWidth = defaultStrokeWidth;
       });
     }
     // case 2: delete all stroke，change strokeWidth to 0
     else if (newStroke.length === 0) {
       selectedElements.forEach((el, i) => {
-        prevAttrs[i].strokeWidth = el.strokeWidth;
+        prevAttrs[i].strokeWidth = el.attrs.strokeWidth;
       });
 
       forEach(selectedElements, (el) => {
-        delete el.strokeWidth;
+        delete el.attrs.strokeWidth;
       });
     }
 
@@ -160,7 +161,9 @@ export const StrokeCard: FC = () => {
       new SetGraphsAttrsCmd(cmdDesc, selectedElements, attrs, prevAttrs),
     );
 
-    prevStrokes.current = selectedElements.map((el) => cloneDeep(el.fill));
+    prevStrokes.current = selectedElements.map((el) =>
+      cloneDeep(el.attrs.fill ?? []),
+    );
   };
 
   const updateStrokeWidth = (newStrokeWidth: number) => {
@@ -172,12 +175,14 @@ export const StrokeCard: FC = () => {
         'update strokeWidth',
         selectedElements,
         { strokeWidth: newStrokeWidth },
-        arrMap(selectedElements, (item) => ({ strokeWidth: item.strokeWidth })),
+        arrMap(selectedElements, (item) => ({
+          strokeWidth: item.attrs.strokeWidth,
+        })),
       ),
     );
 
     selectedElements.forEach((item) => {
-      item.strokeWidth = newStrokeWidth;
+      item.attrs.strokeWidth = newStrokeWidth;
     });
     setStrokeWidth(newStrokeWidth);
 

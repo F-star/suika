@@ -34,7 +34,7 @@ class SelectedElements {
     return [...this.items];
   }
   getIdSet() {
-    return new Set(this.items.map((item) => item.id));
+    return new Set(this.items.map((item) => item.attrs.id));
   }
   setItemsById(ids: Set<string>) {
     const items = this.editor.sceneGraph.getElementsByIds(ids);
@@ -118,7 +118,7 @@ class SelectedElements {
     if (this.items.length === 0 || this.items.length > 1) {
       return 0;
     }
-    return this.items[0].rotation || 0;
+    return this.items[0].attrs.rotation ?? 0;
   }
 
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {

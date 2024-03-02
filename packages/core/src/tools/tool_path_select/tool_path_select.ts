@@ -41,7 +41,7 @@ export class PathSelectTool implements ITool {
       if (type === 'anchor') {
         this.startPoint = startPoint;
         this.prevPathData = cloneDeep(
-          this.editor.pathEditor.getPath()!.pathData,
+          this.editor.pathEditor.getPath()!.attrs.pathData,
         );
         this.indexInfo = {
           type: selectedInfo[0] as SelectedIdexType,
@@ -74,7 +74,7 @@ export class PathSelectTool implements ITool {
       new SetGraphsAttrsCmd(
         'update path data',
         [path],
-        [{ pathData: path!.pathData }],
+        [{ pathData: path!.attrs.pathData }],
         [{ pathData: this.prevPathData }],
       ),
     );

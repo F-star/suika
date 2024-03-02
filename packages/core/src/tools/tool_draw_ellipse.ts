@@ -22,6 +22,7 @@ export class DrawEllipseTool extends DrawGraphTool implements ITool {
   protected createGraph(rect: IRect) {
     rect = normalizeRect(rect);
     return new Ellipse({
+      objectName: '',
       ...rect,
       fill: [cloneDeep(this.editor.setting.get('firstFill'))],
     });

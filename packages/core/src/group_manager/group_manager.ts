@@ -45,9 +45,9 @@ export class GroupManager {
     const graphs = this.editor.sceneGraph.children;
     const graphToGroupMap: { [id: string]: string[] } = {};
     for (const graph of graphs) {
-      const groupIds = this.getGraphGroupIds(graph.id);
+      const groupIds = this.getGraphGroupIds(graph.attrs.id);
       if (groupIds.size > 0) {
-        graphToGroupMap[graph.id] = [...groupIds];
+        graphToGroupMap[graph.attrs.id] = [...groupIds];
       }
     }
     return graphToGroupMap;
@@ -58,7 +58,7 @@ export class GroupManager {
     const usedGroupIds = new Set<string>();
     const graphs = this.editor.sceneGraph.children;
     for (const graph of graphs) {
-      this.getGraphGroupIds(graph.id).forEach((groupId) => {
+      this.getGraphGroupIds(graph.attrs.id).forEach((groupId) => {
         usedGroupIds.add(groupId);
       });
     }

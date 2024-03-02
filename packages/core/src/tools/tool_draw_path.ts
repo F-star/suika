@@ -30,7 +30,7 @@ export class DrawPathTool implements ITool {
   onActive() {
     if (this.editor.pathEditor.getActive()) {
       this.path = this.editor.pathEditor.getPath()!;
-      this.pathIdx = this.path.pathData.length;
+      this.pathIdx = this.path.attrs.pathData.length;
     }
   }
   onInactive() {
@@ -79,6 +79,7 @@ export class DrawPathTool implements ITool {
       ];
 
       const path = new Path({
+        objectName: '',
         x: 0,
         y: 0,
         width: 100,
@@ -113,13 +114,13 @@ export class DrawPathTool implements ITool {
       pathEditor.active(path);
     } else {
       const path = this.path!;
-      this.prevPathData = path.pathData;
-      const newPathData = cloneDeep(path.pathData);
+      this.prevPathData = path.attrs.pathData;
+      const newPathData = cloneDeep(path.attrs.pathData);
 
       // TODO: 应该改为判断是否选中了 path 的末尾 anchor
       // 如果是，则继续绘制。
       if (pathEditor.getSelectedIndicesSize() === 0) {
-        this.pathIdx = path.pathData.length;
+        this.pathIdx = newPathData.length;
       }
 
       if (!newPathData[this.pathIdx]) {
@@ -139,7 +140,7 @@ export class DrawPathTool implements ITool {
       {
         type: 'anchor',
         pathIdx: this.pathIdx,
-        segIdx: this.path!.pathData[this.pathIdx].length - 1,
+        segIdx: this.path!.attrs.pathData[this.pathIdx].length - 1,
       },
     ]);
 
@@ -164,7 +165,7 @@ export class DrawPathTool implements ITool {
     const dy = point.y - this.startPoint.y;
 
     const path = this.path!;
-    const currPath = path.pathData[this.pathIdx];
+    const currPath = path.attrs.pathData[this.pathIdx];
     const lastSeg = currPath.at(-1)!;
     // mirror angle and length
     lastSeg.handleOut = { x: dx, y: dy };
@@ -179,7 +180,7 @@ export class DrawPathTool implements ITool {
       new SetGraphsAttrsCmd(
         'Update Path Data',
         [this.path!],
-        [{ pathData: this.path!.pathData }],
+        [{ pathData: this.path!.attrs.pathData }],
         [{ pathData: this.prevPathData }],
       ),
     );
@@ -221,7 +222,7 @@ export class DrawPathTool implements ITool {
     const previewHandles: ControlHandle[] = [];
 
     if (this.editor.pathEditor.getSelectedIndicesSize() > 0) {
-      const lastSeg = this.path?.pathData[this.pathIdx]?.at(-1);
+      const lastSeg = this.path?.attrs.pathData[this.pathIdx]?.at(-1);
       if (lastSeg) {
         const previewCurve = new ControlHandle({
           cx: point.x,
@@ -229,6 +230,7 @@ export class DrawPathTool implements ITool {
           type: 'path-preview-curve',
           getCursor: () => 'default',
           graph: new Path({
+            objectName: '',
             x: 0,
             y: 0,
             width: 0,
@@ -277,6 +279,7 @@ export class DrawPathTool implements ITool {
       type: 'path-preview-anchor',
       getCursor: () => 'default',
       graph: new Ellipse({
+        objectName: '',
         x: point.x,
         y: point.y,
         width: 6,

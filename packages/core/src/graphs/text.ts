@@ -16,11 +16,10 @@ const DEFAULT_TEXT_WEIGHT = 30;
 
 const tmpCtx = document.createElement('canvas').getContext('2d')!;
 
-export class TextGraph extends Graph {
-  content: string;
-  fontSize: number;
-  autoFit?: boolean;
-  constructor(options: Optional<TextAttrs, 'width' | 'height'>) {
+export class TextGraph extends Graph<TextAttrs> {
+  override type = GraphType.Text;
+
+  constructor(options: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height'>) {
     super({
       ...options,
       type: GraphType.Text,
@@ -31,35 +30,26 @@ export class TextGraph extends Graph {
     if (options.autoFit) {
       tmpCtx.font = `${options.fontSize}px sans-serif`;
       const { width } = tmpCtx.measureText(options.content);
-      this.width = width;
-      this.height = options.fontSize;
+      this.attrs.width = width;
+      this.attrs.height = options.fontSize;
     }
-
-    this.autoFit = options.autoFit;
-    this.content = options.content;
-    this.fontSize = options.fontSize;
-  }
-  override getAttrs(): TextAttrs {
-    return {
-      ...super.getAttrs(),
-      content: this.content,
-      fontSize: this.fontSize,
-      autoFit: this.autoFit,
-    };
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
-    if (this.rotation) {
-      const cx = this.x + this.width / 2;
-      const cy = this.y + this.height / 2;
+    const { x, y, width, height, rotation, fill, stroke, fontSize, content } =
+      this.attrs;
 
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+    if (rotation) {
+      const cx = x + width / 2;
+      const cy = y + height / 2;
+
+      rotateInCanvas(ctx, rotation, cx, cy);
     }
     ctx.beginPath();
     ctx.textBaseline = 'top';
-    ctx.font = `${this.fontSize}px sans-serif`;
+    ctx.font = `${fontSize}px sans-serif`;
 
-    for (const texture of this.fill) {
+    for (const texture of fill ?? []) {
       switch (texture.type) {
         case TextureType.Solid: {
           ctx.fillStyle = parseRGBAStr(texture.attrs);
@@ -70,17 +60,10 @@ export class TextGraph extends Graph {
         }
       }
     }
-    if (this.stroke) {
+    if (stroke) {
       // TODO:
     }
 
-    ctx.fillText(this.content, this.x, this.y);
-  }
-
-  override toJSON() {
-    return {
-      ...super.toJSON(),
-      content: this.content,
-    };
+    ctx.fillText(content, x, y);
   }
 }

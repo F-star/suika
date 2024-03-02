@@ -28,6 +28,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
     }
     const attrs = this.calcAttrs(rect);
     return new Line({
+      objectName: '',
       ...attrs,
       height: 0,
       stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],

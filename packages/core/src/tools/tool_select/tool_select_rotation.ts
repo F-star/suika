@@ -54,7 +54,7 @@ export class SelectRotationTool implements IBaseTool {
       const el = selectedElements[i];
       this.prevGraphAttrs[i] = {
         ...el.getRect(),
-        rotation: el.rotation ?? 0,
+        rotation: el.attrs.rotation ?? 0,
       };
     }
 
@@ -132,9 +132,9 @@ export class SelectRotationTool implements IBaseTool {
           commandDesc,
           selectedElements,
           selectedElements.map((el) => ({
-            rotation: el.rotation,
-            x: el.x,
-            y: el.y,
+            rotation: el.attrs.rotation,
+            x: el.attrs.x,
+            y: el.attrs.y,
           })),
           this.prevGraphAttrs.map(({ rotation, x, y }) => ({
             rotation,

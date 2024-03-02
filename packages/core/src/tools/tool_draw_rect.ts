@@ -23,6 +23,7 @@ export class DrawRectTool extends DrawGraphTool implements ITool {
   protected createGraph(rect: IRect) {
     rect = normalizeRect(rect);
     return new Rect({
+      objectName: '',
       ...rect,
       fill: [cloneDeep(this.editor.setting.get('firstFill'))],
     });

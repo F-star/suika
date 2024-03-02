@@ -86,13 +86,12 @@ export class PathEditor {
     this.eventEmitter.emit('toggle', false);
   }
   private removePathIfEmpty() {
-    if (
-      this.path &&
-      (this.path.pathData.length === 0 ||
-        this.path.pathData.every((item) => item.length <= 1))
-    ) {
+    const path = this.path;
+    if (!path) return;
+    const pathData = path.attrs.pathData;
+    if (pathData.length === 0 || pathData.every((item) => item.length <= 1)) {
       this.editor.commandManager.pushCommand(
-        new RemoveGraphsCmd('remove empty path', this.editor, [this.path]),
+        new RemoveGraphsCmd('remove empty path', this.editor, [path]),
       );
     }
   }
@@ -159,10 +158,10 @@ export class PathEditor {
       const { type, pathIdx, segIdx } = selectedIndex;
 
       // invalid index
-      if (pathIdx < 0 || pathIdx >= path.pathData.length) {
+      if (pathIdx < 0 || pathIdx >= path.attrs.pathData.length) {
         continue;
       }
-      const segCount = path.pathData[pathIdx].length;
+      const segCount = path.attrs.pathData[pathIdx].length;
       if (segIdx < 0 || segIdx >= segCount) {
         continue;
       }
@@ -208,7 +207,7 @@ export class PathEditor {
     const handleInOutSize = 4;
     const handleStroke = this.editor.setting.get('handleStroke');
     const zoom = this.editor.zoomManager.getZoom();
-    const pathData = path.pathData;
+    const pathData = path.attrs.pathData;
 
     const handleIndiesNeedDraw = this.getHandleIndiesNeedDraw();
 
@@ -236,6 +235,7 @@ export class PathEditor {
           cy: anchor.y,
           type: ['anchor', i, j].join('-'),
           graph: new Ellipse({
+            objectName: '',
             x: anchor.x,
             y: anchor.y,
             width: anchorSize,
@@ -279,6 +279,7 @@ export class PathEditor {
             type: 'handleLine',
             rotation: rect.rotation,
             graph: new Line({
+              objectName: '',
               ...rect,
               width: rect.width * zoom,
               stroke: [
@@ -299,6 +300,7 @@ export class PathEditor {
             rotation: QUARTER_PI,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
             graph: new Rect({
+              objectName: '',
               x: handle.x,
               y: handle.y,
               width: handleInOutSize,

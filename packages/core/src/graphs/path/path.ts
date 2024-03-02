@@ -6,7 +6,7 @@ import { ImgManager } from '../../Img_manager';
 import { TextureType } from '../../texture';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils';
-import { Graph, GraphAttrs } from './../graph';
+import { Graph, GraphAttrs } from '../graph';
 
 export interface ISegment {
   point: IPoint;
@@ -17,20 +17,19 @@ export interface ISegment {
 }
 
 export interface PathAttrs extends GraphAttrs {
-  pathData?: ISegment[][];
+  pathData: ISegment[][];
 }
 
-export class Path extends Graph {
-  pathData: ISegment[][];
+export class Path extends Graph<PathAttrs> {
+  override type = GraphType.Path;
 
-  constructor(options: PathAttrs) {
+  constructor(options: Omit<PathAttrs, 'id'>) {
     super({ ...options, type: GraphType.Path });
-    this.pathData = options.pathData ?? [];
   }
 
   override getBBox(): IRect {
     // TODO: cache
-    const pathData = this.pathData;
+    const pathData = this.attrs.pathData ?? [];
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -63,18 +62,18 @@ export class Path extends Graph {
   }
 
   override getRectWithRotation(): IRectWithRotation {
-    return { ...this.getBBox(), rotation: this.rotation };
+    return { ...this.getBBox(), rotation: this.attrs.rotation };
   }
 
   override updateAttrs(attrs: Partial<PathAttrs>) {
     if (attrs.pathData) {
-      this.pathData = attrs.pathData;
+      this.attrs.pathData = attrs.pathData;
     }
     if (attrs.x !== undefined) {
       // move all points in pathData
       const originX = this.getRect().x;
       const dx = attrs.x - originX;
-      const pathData = this.pathData;
+      const pathData = this.attrs.pathData;
       for (const pathItem of pathData) {
         for (const seg of pathItem) {
           seg.point.x += dx;
@@ -84,7 +83,7 @@ export class Path extends Graph {
     if (attrs.y !== undefined) {
       const originY = this.getRect().y;
       const dy = attrs.y - originY;
-      const pathData = this.pathData;
+      const pathData = this.attrs.pathData;
       for (const pathItem of pathData) {
         for (const seg of pathItem) {
           seg.point.y += dy;
@@ -103,14 +102,15 @@ export class Path extends Graph {
     imgManager?: ImgManager | undefined,
     smooth?: boolean | undefined,
   ) {
-    if (this.rotation) {
+    const { pathData, rotation, fill, strokeWidth, stroke } = this.attrs;
+    if (rotation) {
       const { x: cx, y: cy } = this.getCenter();
 
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+      rotateInCanvas(ctx, rotation, cx, cy);
     }
 
     ctx.beginPath();
-    for (const path of this.pathData) {
+    for (const path of pathData) {
       const first = path[0];
       ctx.moveTo(first.point.x, first.point.y);
       for (let i = 1; i < path.length; i++) {
@@ -135,7 +135,7 @@ export class Path extends Graph {
       }
     }
 
-    for (const texture of this.fill) {
+    for (const texture of fill ?? []) {
       switch (texture.type) {
         case TextureType.Solid: {
           ctx.fillStyle = parseRGBAStr(texture.attrs);
@@ -152,9 +152,9 @@ export class Path extends Graph {
         }
       }
     }
-    if (this.strokeWidth) {
-      ctx.lineWidth = this.strokeWidth;
-      for (const texture of this.stroke) {
+    if (strokeWidth) {
+      ctx.lineWidth = strokeWidth;
+      for (const texture of stroke ?? []) {
         switch (texture.type) {
           case TextureType.Solid: {
             ctx.strokeStyle = parseRGBAStr(texture.attrs);
@@ -173,14 +173,7 @@ export class Path extends Graph {
   override toJSON() {
     return {
       ...super.toJSON(),
-      pathData: this.pathData,
-    };
-  }
-
-  override getAttrs(): PathAttrs {
-    return {
-      ...super.getAttrs(),
-      pathData: this.pathData,
+      pathData: this.attrs.pathData,
     };
   }
 
@@ -192,7 +185,7 @@ export class Path extends Graph {
   }
 
   getSeg(pathIdx: number, segIdx: number) {
-    return Path.getSeg(this.pathData, pathIdx, segIdx);
+    return Path.getSeg(this.attrs.pathData, pathIdx, segIdx);
   }
   static getSeg(pathData: ISegment[][], pathIdx: number, segIdx: number) {
     const pathDataItem = pathData[pathIdx];
@@ -202,7 +195,7 @@ export class Path extends Graph {
     return pathDataItem[segIdx] ?? null;
   }
   setSeg(pathIdx: number, segIdx: number, seg: ISegment) {
-    const pathData = this.pathData;
+    const pathData = this.attrs.pathData;
     const pathDataItem = pathData[pathIdx];
     if (!pathDataItem) {
       throw new Error(`pathIdx ${pathIdx} is out of range`);

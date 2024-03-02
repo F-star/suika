@@ -54,7 +54,7 @@ export class SelectResizeTool implements IBaseTool {
     this.prevGraphsAttrs = arrMap(selectedItems, (item) => item.getAttrs());
     this.isGraphsRotateAllZero = arrEvery(
       selectedItems,
-      (item) => (item.rotation ?? 0) === 0,
+      (item) => (item.attrs.rotation ?? 0) === 0,
     );
     const startSelectBbox = this.editor.selectedElements.getBBox();
     if (!startSelectBbox) {
@@ -62,8 +62,8 @@ export class SelectResizeTool implements IBaseTool {
     }
     this.startSelectBbox = startSelectBbox;
     this.graphOffsets = arrMap(selectedItems, (item) => ({
-      x: item.x - startSelectBbox.x,
-      y: item.y - startSelectBbox.y,
+      x: item.attrs.x - startSelectBbox.x,
+      y: item.attrs.y - startSelectBbox.y,
     }));
 
     if (isTransformHandle(handleInfo.handleName)) {

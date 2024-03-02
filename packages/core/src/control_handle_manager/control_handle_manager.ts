@@ -142,14 +142,14 @@ export class ControlHandleManager {
     const s = this.transformHandles.get('s')!;
     const w = this.transformHandles.get('w')!;
     const e = this.transformHandles.get('e')!;
-    n.graph.width = s.graph.width =
+    n.graph.attrs.width = s.graph.attrs.width =
       rect.width * zoom - handleSize - handleStrokeWidth;
-    w.graph.height = e.graph.height =
+    w.graph.attrs.height = e.graph.attrs.height =
       rect.height * zoom - handleSize - handleStrokeWidth;
-    n.graph.height =
-      s.graph.height =
-      w.graph.width =
-      e.graph.width =
+    n.graph.attrs.height =
+      s.graph.attrs.height =
+      w.graph.attrs.width =
+      e.graph.attrs.width =
         neswHandleWidth;
   }
 
@@ -173,13 +173,16 @@ export class ControlHandleManager {
           handle.cx,
           handle.cy,
         );
-        graph.updateAttrs({ x: x - graph.width / 2, y: y - graph.height / 2 });
+        graph.updateAttrs({
+          x: x - graph.attrs.width / 2,
+          y: y - graph.attrs.height / 2,
+        });
       }
       if (rect) {
-        graph.rotation = rect.rotation;
+        graph.attrs.rotation = rect.rotation;
       }
       if (handle.rotation !== undefined) {
-        graph.rotation = handle.rotation;
+        graph.attrs.rotation = handle.rotation;
       }
 
       if (!graph.getVisible()) {

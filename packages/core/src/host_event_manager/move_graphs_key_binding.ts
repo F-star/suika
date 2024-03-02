@@ -35,7 +35,7 @@ export class MoveGraphsKeyBinding {
         new SetGraphsAttrsCmd(
           'Move elements',
           moveEls,
-          arrMap(moveEls, ({ x, y }) => ({ x, y })),
+          arrMap(moveEls, (el) => ({ x: el.attrs.x, y: el.attrs.y })),
           startPoints,
         ),
       );
@@ -68,7 +68,10 @@ export class MoveGraphsKeyBinding {
       if (!checkPressed()) return;
 
       if (isEnableUpdateStartPoints) {
-        startPoints = arrMap(movedEls, (el) => ({ x: el.x, y: el.y }));
+        startPoints = arrMap(movedEls, (el) => ({
+          x: el.attrs.x,
+          y: el.attrs.y,
+        }));
         isEnableUpdateStartPoints = false;
       }
 

@@ -18,7 +18,7 @@ export const DebugPanel: FC = () => {
     editor.selectedBox.on('hoverChange', handleSelectedBoxHover);
 
     const handleHoverItemChange = (hoveredItem: Graph | null) => {
-      setHoveredGraphName(hoveredItem ? hoveredItem.objectName : '');
+      setHoveredGraphName(hoveredItem?.attrs?.objectName ?? '');
     };
     editor.selectedElements.on('hoverItemChange', handleHoverItemChange);
 

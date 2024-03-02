@@ -73,7 +73,7 @@ export class SceneGraph {
   }
 
   getElementsByIds(ids: Set<string>) {
-    return this.children.filter((item) => ids.has(item.id));
+    return this.children.filter((item) => ids.has(item.attrs.id));
   }
 
   removeItems(elements: Graph[]) {
@@ -383,7 +383,7 @@ export class SceneGraph {
 
     forEach(graphs, (item) => {
       const obj = item.toObject();
-      const groupIds = Array.from(groupManager.getGraphGroupIds(item.id));
+      const groupIds = Array.from(groupManager.getGraphGroupIds(item.attrs.id));
 
       if (groupIds.length === 0) {
         objects.push(obj);

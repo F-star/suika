@@ -52,6 +52,7 @@ export class TextEditor {
       this.editor.setting.get('snapToPixelGrid'),
     );
     const text = new TextGraph({
+      objectName: '',
       x: sceneXY.x,
       y: sceneXY.y,
       content: this.textarea.value,

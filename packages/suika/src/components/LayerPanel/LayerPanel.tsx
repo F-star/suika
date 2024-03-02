@@ -21,9 +21,9 @@ export const LayerPanel: FC = () => {
         setSelectedIds(editor.selectedElements.getIdSet());
       });
 
-      setHlId(editor.selectedElements.getHighlightedItem()?.id || '');
+      setHlId(editor.selectedElements.getHighlightedItem()?.attrs.id || '');
       editor.selectedElements.on('highlightedItemChange', (item) => {
-        const id = item ? item.id : '';
+        const id = item ? item.attrs.id : '';
         setHlId(id);
       });
     }
@@ -54,7 +54,7 @@ export const LayerPanel: FC = () => {
   const setName = (id: string, newName: string) => {
     if (editor) {
       const graph = editor.sceneGraph.getElementById(id);
-      if (graph && graph.objectName !== newName) {
+      if (graph && graph.attrs.objectName !== newName) {
         MutateGraphsAndRecord.setGraphName(editor, graph, newName);
         editor.render();
       }

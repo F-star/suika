@@ -13,30 +13,26 @@ export interface RectAttrs extends GraphAttrs {
   cornerRadius?: number;
 }
 
-export class Rect extends Graph {
-  constructor(options: RectAttrs) {
+export class Rect extends Graph<RectAttrs> {
+  override type = GraphType.Rect;
+
+  constructor(options: Omit<RectAttrs, 'id'>) {
     super({ ...options, type: GraphType.Rect });
-    if (options.cornerRadius !== undefined) {
-      this.cornerRadius = options.cornerRadius;
-    }
   }
 
   override getAttrs(): RectAttrs {
-    return {
-      ...super.getAttrs(),
-      cornerRadius: this.cornerRadius,
-    };
+    return { ...this.attrs, cornerRadius: this.attrs.cornerRadius ?? 0 };
   }
 
   override toJSON() {
     return {
       ...super.toJSON(),
-      cornerRadius: this.cornerRadius,
+      cornerRadius: this.attrs.cornerRadius,
     };
   }
 
   private getMaxCornerRadius() {
-    return Math.min(this.width, this.height) / 2;
+    return Math.min(this.attrs.width, this.attrs.height) / 2;
   }
 
   override draw(
@@ -44,20 +40,27 @@ export class Rect extends Graph {
     imgManager?: ImgManager,
     smooth?: boolean,
   ) {
-    if (this.rotation) {
-      const cx = this.x + this.width / 2;
-      const cy = this.y + this.height / 2;
+    const attrs = this.attrs;
+    if (attrs.rotation) {
+      const cx = attrs.x + attrs.width / 2;
+      const cy = attrs.y + attrs.height / 2;
 
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+      rotateInCanvas(ctx, attrs.rotation, cx, cy);
     }
     ctx.beginPath();
-    if (this.cornerRadius) {
-      ctx.roundRect(this.x, this.y, this.width, this.height, this.cornerRadius);
+    if (attrs.cornerRadius) {
+      ctx.roundRect(
+        attrs.x,
+        attrs.y,
+        attrs.width,
+        attrs.height,
+        attrs.cornerRadius,
+      );
     } else {
-      ctx.rect(this.x, this.y, this.width, this.height);
+      ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
     }
 
-    for (const texture of this.fill) {
+    for (const texture of attrs.fill ?? []) {
       switch (texture.type) {
         case TextureType.Solid: {
           ctx.fillStyle = parseRGBAStr(texture.attrs);
@@ -68,7 +71,7 @@ export class Rect extends Graph {
           if (imgManager) {
             const maxCornerRadius = this.getMaxCornerRadius();
             const cornerRadius = Math.min(
-              this.cornerRadius ?? 0,
+              attrs.cornerRadius ?? 0,
               maxCornerRadius,
             );
             this.fillImage(ctx, texture, imgManager, smooth, cornerRadius);
@@ -78,9 +81,9 @@ export class Rect extends Graph {
         }
       }
     }
-    if (this.strokeWidth) {
-      ctx.lineWidth = this.strokeWidth;
-      for (const texture of this.stroke) {
+    if (attrs.strokeWidth) {
+      ctx.lineWidth = attrs.strokeWidth;
+      for (const texture of attrs.stroke ?? []) {
         switch (texture.type) {
           case TextureType.Solid: {
             ctx.strokeStyle = parseRGBAStr(texture.attrs);
@@ -101,18 +104,25 @@ export class Rect extends Graph {
     stroke: string,
     strokeWidth: number,
   ) {
-    if (this.rotation) {
-      const cx = this.x + this.width / 2;
-      const cy = this.y + this.height / 2;
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+    const attrs = this.attrs;
+    if (attrs.rotation) {
+      const cx = attrs.x + attrs.width / 2;
+      const cy = attrs.y + attrs.height / 2;
+      rotateInCanvas(ctx, attrs.rotation, cx, cy);
     }
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
     ctx.beginPath();
-    if (this.cornerRadius) {
-      ctx.roundRect(this.x, this.y, this.width, this.height, this.cornerRadius);
+    if (attrs.cornerRadius) {
+      ctx.roundRect(
+        attrs.x,
+        attrs.y,
+        attrs.width,
+        attrs.height,
+        attrs.cornerRadius,
+      );
     } else {
-      ctx.rect(this.x, this.y, this.width, this.height);
+      ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
     }
     ctx.stroke();
     ctx.closePath();
@@ -132,13 +142,14 @@ export class Rect extends Graph {
   }
 
   override hitTest(x: number, y: number, padding = 0): boolean {
-    const strokeWidth = (this.strokeWidth ?? 0) / 2;
     const maxCornerRadius = this.getMaxCornerRadius();
     return isPointInRoundRect(
       { x, y },
-      this,
-      new Array(4).fill(Math.min(this.cornerRadius ?? 0, maxCornerRadius)),
-      padding + strokeWidth,
+      this.attrs,
+      new Array(4).fill(
+        Math.min(this.attrs.cornerRadius ?? 0, maxCornerRadius),
+      ),
+      padding + (this.attrs.strokeWidth ?? 0) / 2,
     );
   }
 
@@ -149,14 +160,15 @@ export class Rect extends Graph {
     }
 
     const MIN_SIZE_TO_SHOW_HANDLE = 108;
+    const attrs = this.attrs;
     if (
-      this.width * zoom < MIN_SIZE_TO_SHOW_HANDLE ||
-      this.height * zoom < MIN_SIZE_TO_SHOW_HANDLE
+      attrs.width * zoom < MIN_SIZE_TO_SHOW_HANDLE ||
+      attrs.height * zoom < MIN_SIZE_TO_SHOW_HANDLE
     ) {
       return [];
     }
-    const maxCornerRadius = Math.min(this.width, this.height) / 2;
-    const cornerRadius = this.cornerRadius ?? 0;
+    const maxCornerRadius = Math.min(attrs.width, attrs.height) / 2;
+    const cornerRadius = attrs.cornerRadius ?? 0;
     const cornerRadii = [
       cornerRadius,
       cornerRadius,
@@ -168,25 +180,25 @@ export class Rect extends Graph {
     const infos = [
       {
         type: 'nwCornerRadius',
-        origin: { x: this.x, y: this.y },
+        origin: { x: attrs.x, y: attrs.y },
         direction: { x: 1, y: 1 },
         cornerRadius: cornerRadii[0],
       },
       {
         type: 'neCornerRadius',
-        origin: { x: this.x + this.width, y: this.y },
+        origin: { x: attrs.x + attrs.width, y: attrs.y },
         direction: { x: -1, y: 1 },
         cornerRadius: cornerRadii[1],
       },
       {
         type: 'seCornerRadius',
-        origin: { x: this.x + this.width, y: this.y + this.height },
+        origin: { x: attrs.x + attrs.width, y: attrs.y + attrs.height },
         direction: { x: -1, y: -1 },
         cornerRadius: cornerRadii[2],
       },
       {
         type: 'swCornerRadius',
-        origin: { x: this.x, y: this.y + this.height },
+        origin: { x: attrs.x, y: attrs.y + attrs.height },
         direction: { x: 1, y: -1 },
         cornerRadius: cornerRadii[3],
       },
@@ -203,9 +215,9 @@ export class Rect extends Graph {
       let x = info.origin.x + info.direction.x * cornerRadius;
       let y = info.origin.y + info.direction.y * cornerRadius;
 
-      if (this.rotation) {
+      if (attrs.rotation) {
         const center = this.getCenter();
-        const pos = transformRotate(x, y, this.rotation, center.x, center.y);
+        const pos = transformRotate(x, y, attrs.rotation, center.x, center.y);
         x = pos.x;
         y = pos.y;
       }
@@ -228,13 +240,14 @@ export class Rect extends Graph {
     oldBox: IBox2WithRotation,
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
-  ): void {
+  ) {
+    const attrs = this.attrs;
     if (type.endsWith('CornerRadius')) {
       const center = this.getCenter();
       const pos = transformRotate(
         newPos.x,
         newPos.y,
-        -(this.rotation ?? 0),
+        -(attrs.rotation ?? 0),
         center.x,
         center.y,
       );
@@ -245,30 +258,30 @@ export class Rect extends Graph {
       switch (type) {
         case 'nwCornerRadius': {
           a = { x: 1, y: 1 };
-          b = { x: pos.x - this.x, y: pos.y - this.y };
+          b = { x: pos.x - attrs.x, y: pos.y - attrs.y };
           break;
         }
         case 'neCornerRadius': {
           a = { x: -1, y: 1 };
-          b = { x: pos.x - (this.x + this.width), y: pos.y - this.y };
+          b = { x: pos.x - (attrs.x + attrs.width), y: pos.y - attrs.y };
           break;
         }
         case 'seCornerRadius': {
           a = { x: -1, y: -1 };
           b = {
-            x: pos.x - (this.x + this.width),
-            y: pos.y - (this.y + this.height),
+            x: pos.x - (attrs.x + attrs.width),
+            y: pos.y - (attrs.y + attrs.height),
           };
           break;
         }
         case 'swCornerRadius': {
           a = { x: 1, y: -1 };
-          b = { x: pos.x - this.x, y: pos.y - (this.y + this.height) };
+          b = { x: pos.x - attrs.x, y: pos.y - (attrs.y + attrs.height) };
           break;
         }
       }
       const dist = (a.x * b.x + a.y * b.y) / Math.sqrt(a.x * a.x + a.y * a.y);
-      this.cornerRadius = Math.min(
+      this.attrs.cornerRadius = Math.min(
         this.getMaxCornerRadius(),
         Math.round(Math.max(dist, 0) * Math.cos(Math.PI / 4)),
       );

@@ -34,7 +34,7 @@ export class GroupCmd implements ICommand {
     const groupedGraphs: Graph[] = [];
 
     for (let i = 0; i < graphs.length; i++) {
-      const prevGraphId = i <= 0 ? '' : graphs[i - 1].id;
+      const prevGraphId = i <= 0 ? '' : graphs[i - 1].attrs.id;
       const graph = graphs[i];
       if (groupedSet.has(graph)) {
         groupedSet.delete(graph);
@@ -42,15 +42,17 @@ export class GroupCmd implements ICommand {
 
         this.prevGroupedElInfoMap.set(prevGraphId, {
           graph,
-          groupIds: this.editor.groupManager.getGraphGroupIds(graph.id),
+          groupIds: this.editor.groupManager.getGraphGroupIds(graph.attrs.id),
         });
 
         if (groupedSet.size === 0) {
           newGraphs.push(...groupedGraphs);
-          const groupIds = this.editor.groupManager.getGraphGroupIds(graph.id);
+          const groupIds = this.editor.groupManager.getGraphGroupIds(
+            graph.attrs.id,
+          );
           for (const groupedGraph of groupedGraphs) {
             this.editor.groupManager.setGraphGroupIds(
-              groupedGraph.id,
+              groupedGraph.attrs.id,
               new Set([...groupIds, this.group.id]),
             );
           }
@@ -85,15 +87,18 @@ export class GroupCmd implements ICommand {
         newGraphs.push(graph);
       }
 
-      let graphId = graph ? graph.id : '';
+      let graphId = graph ? graph.attrs.id : '';
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (prevGroupedElInfoMap.has(graphId)) {
           const { graph: groupedGraph, groupIds } =
             prevGroupedElInfoMap.get(graphId)!;
-          this.editor.groupManager.setGraphGroupIds(groupedGraph.id, groupIds);
+          this.editor.groupManager.setGraphGroupIds(
+            groupedGraph.attrs.id,
+            groupIds,
+          );
           newGraphs.push(groupedGraph);
-          graphId = groupedGraph.id;
+          graphId = groupedGraph.attrs.id;
         } else {
           break;
         }

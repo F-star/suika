@@ -10,21 +10,24 @@ import { Graph, GraphAttrs } from './graph';
 
 export type EllipseAttrs = GraphAttrs;
 
-export class Ellipse extends Graph {
-  constructor(options: EllipseAttrs) {
+export class Ellipse extends Graph<EllipseAttrs> {
+  override type = GraphType.Ellipse;
+
+  constructor(options: Omit<EllipseAttrs, 'id'>) {
     super({ ...options, type: GraphType.Ellipse });
   }
 
   override hitTest(x: number, y: number, padding = 0) {
-    const cx = this.x + this.width / 2;
-    const cy = this.y + this.height / 2;
-    const strokeWidth = (this.strokeWidth || 0) / 2;
+    const attrs = this.attrs;
+    const cx = attrs.x + attrs.width / 2;
+    const cy = attrs.y + attrs.height / 2;
+    const strokeWidth = (attrs.strokeWidth || 0) / 2;
     padding = padding + strokeWidth;
-    const w = this.width / 2 + padding;
-    const h = this.height / 2 + padding;
+    const w = attrs.width / 2 + padding;
+    const h = attrs.height / 2 + padding;
 
-    const rotatedHitPoint = this.rotation
-      ? transformRotate(x, y, -this.rotation, cx, cy)
+    const rotatedHitPoint = attrs.rotation
+      ? transformRotate(x, y, -attrs.rotation, cx, cy)
       : { x, y };
 
     return (
@@ -39,16 +42,17 @@ export class Ellipse extends Graph {
     imgManager?: ImgManager,
     smooth?: boolean,
   ): void {
-    const cx = this.x + this.width / 2;
-    const cy = this.y + this.height / 2;
+    const attrs = this.attrs;
+    const cx = attrs.x + attrs.width / 2;
+    const cy = attrs.y + attrs.height / 2;
 
-    if (this.rotation) {
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+    if (attrs.rotation) {
+      rotateInCanvas(ctx, attrs.rotation, cx, cy);
     }
 
     ctx.beginPath();
-    ctx.ellipse(cx, cy, this.width / 2, this.height / 2, 0, 0, DOUBLE_PI);
-    for (const texture of this.fill) {
+    ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
+    for (const texture of attrs.fill ?? []) {
       if (texture.type === TextureType.Solid) {
         ctx.fillStyle = parseRGBAStr(texture.attrs);
         ctx.fill();
@@ -62,9 +66,9 @@ export class Ellipse extends Graph {
       }
     }
 
-    if (this.strokeWidth) {
-      ctx.lineWidth = this.strokeWidth;
-      for (const texture of this.stroke) {
+    if (attrs.strokeWidth) {
+      ctx.lineWidth = attrs.strokeWidth;
+      for (const texture of attrs.stroke ?? []) {
         if (texture.type === TextureType.Solid) {
           ctx.strokeStyle = parseRGBAStr(texture.attrs);
           ctx.stroke();
@@ -82,17 +86,18 @@ export class Ellipse extends Graph {
     stroke: string,
     strokeWidth: number,
   ) {
-    const cx = this.x + this.width / 2;
-    const cy = this.y + this.height / 2;
+    const { x, y, width, height, rotation } = this.attrs;
+    const cx = x + width / 2;
+    const cy = y + height / 2;
 
-    if (this.rotation) {
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+    if (rotation) {
+      rotateInCanvas(ctx, rotation, cx, cy);
     }
 
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, this.width / 2, this.height / 2, 0, 0, DOUBLE_PI);
+    ctx.ellipse(cx, cy, width / 2, height / 2, 0, 0, DOUBLE_PI);
     ctx.stroke();
     ctx.closePath();
   }

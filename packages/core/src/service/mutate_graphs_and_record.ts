@@ -16,14 +16,14 @@ export const MutateGraphsAndRecord = {
     const prevXs: { x: number }[] = new Array(elements.length);
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
-      prevXs[i] = { x: element.x };
+      prevXs[i] = { x: element.attrs.x };
       element.setRotatedX(rotatedX);
     }
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update X of Elements',
         elements,
-        elements.map((el) => ({ x: el.x })),
+        elements.map((el) => ({ x: el.attrs.x })),
         prevXs,
       ),
     );
@@ -35,14 +35,14 @@ export const MutateGraphsAndRecord = {
     const prevXs: { y: number }[] = new Array(elements.length);
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
-      prevXs[i] = { y: element.y };
+      prevXs[i] = { y: element.attrs.y };
       element.setRotatedY(rotatedY);
     }
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Y of Elements',
         elements,
-        elements.map((el) => ({ y: el.y })),
+        elements.map((el) => ({ y: el.attrs.y })),
         prevXs,
       ),
     );
@@ -53,24 +53,28 @@ export const MutateGraphsAndRecord = {
     }
 
     const prevAttrs = elements.map((el) => ({
-      x: el.x,
-      y: el.y,
-      width: el.width,
+      x: el.attrs.x,
+      y: el.attrs.y,
+      width: el.attrs.width,
     }));
     elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el);
-      el.width = width;
-      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el);
+      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el.attrs);
+      el.attrs.width = width;
+      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el.attrs);
       const dx = rotatedX - preRotatedX;
       const dy = rotatedY - preRotatedY;
-      el.x -= dx;
-      el.y -= dy;
+      el.attrs.x -= dx;
+      el.attrs.y -= dy;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Width of Elements',
         elements,
-        elements.map((el) => ({ width: el.width, x: el.x, y: el.y })),
+        elements.map((el) => ({
+          width: el.attrs.width,
+          x: el.attrs.x,
+          y: el.attrs.y,
+        })),
         prevAttrs,
       ),
     );
@@ -81,24 +85,28 @@ export const MutateGraphsAndRecord = {
     }
 
     const prevAttrs = elements.map((el) => ({
-      x: el.x,
-      y: el.y,
-      height: el.height,
+      x: el.attrs.x,
+      y: el.attrs.y,
+      height: el.attrs.height,
     }));
     elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el);
-      el.height = height;
-      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el);
+      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el.attrs);
+      el.attrs.height = height;
+      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el.attrs);
       const dx = rotatedX - preRotatedX;
       const dy = rotatedY - preRotatedY;
-      el.x -= dx;
-      el.y -= dy;
+      el.attrs.x -= dx;
+      el.attrs.y -= dy;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'update Height of Elements',
         elements,
-        elements.map((el) => ({ height: el.height, x: el.x, y: el.y })),
+        elements.map((el) => ({
+          height: el.attrs.height,
+          x: el.attrs.x,
+          y: el.attrs.y,
+        })),
         prevAttrs,
       ),
     );
@@ -108,9 +116,11 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    const prevAttrs = elements.map((el) => ({ rotation: el.rotation || 0 }));
+    const prevAttrs = elements.map((el) => ({
+      rotation: el.attrs.rotation || 0,
+    }));
     elements.forEach((el) => {
-      el.rotation = rotation;
+      el.attrs.rotation = rotation;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -127,10 +137,10 @@ export const MutateGraphsAndRecord = {
     }
 
     const prevAttrs = elements.map((el) => ({
-      cornerRadius: el.cornerRadius || 0,
+      cornerRadius: el.attrs.cornerRadius || 0,
     }));
     elements.forEach((el) => {
-      el.cornerRadius = cornerRadius;
+      el.attrs.cornerRadius = cornerRadius;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -154,9 +164,9 @@ export const MutateGraphsAndRecord = {
 
     // if at least one graph is hidden, show all graphs; otherwise, hide all graphs
     const newVisible = graphs.some((item) => !item.getVisible());
-    const prevAttrs = graphs.map((el) => ({ visible: el.visible }));
+    const prevAttrs = graphs.map((el) => ({ visible: el.attrs.visible }));
     graphs.forEach((el) => {
-      el.visible = newVisible;
+      el.attrs.visible = newVisible;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -177,9 +187,9 @@ export const MutateGraphsAndRecord = {
 
     // if at least one graph is unlocked, lock all graphs; otherwise, unlock all graphs
     const newLock = graphs.some((item) => !item.getLock());
-    const prevAttrs = graphs.map((el) => ({ lock: el.lock }));
+    const prevAttrs = graphs.map((el) => ({ lock: el.attrs.lock }));
     graphs.forEach((el) => {
-      el.lock = newLock;
+      el.attrs.lock = newLock;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -193,8 +203,8 @@ export const MutateGraphsAndRecord = {
 
   /** set name of graph */
   setGraphName(editor: Editor, graph: Graph, objectName: string) {
-    const prevAttrs = [{ objectName: graph.objectName }];
-    graph.objectName = objectName;
+    const prevAttrs = [{ objectName: graph.attrs.objectName }];
+    graph.attrs.objectName = objectName;
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'update name of graph',

@@ -27,7 +27,7 @@ export const FillCard: FC = () => {
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.fill = cloneDeep(newFills);
+      item.attrs.fill = cloneDeep(newFills);
     });
 
     return newFills;
@@ -44,7 +44,7 @@ export const FillCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.fill = cloneDeep(newFills);
+      item.attrs.fill = cloneDeep(newFills);
     });
     pushToHistory('Add Fill', selectItems, newFills);
     editor?.render();
@@ -58,7 +58,7 @@ export const FillCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.fill = cloneDeep(newFills);
+      item.attrs.fill = cloneDeep(newFills);
     });
     pushToHistory('Update Fill', selectItems, newFills);
     editor.render();
@@ -83,14 +83,16 @@ export const FillCard: FC = () => {
       ),
     );
 
-    prevFills.current = selectedElements.map((el) => cloneDeep(el.fill));
+    prevFills.current = selectedElements.map((el) =>
+      cloneDeep(el.attrs.fill ?? []),
+    );
   };
 
   useEffect(() => {
     if (editor) {
       prevFills.current = editor.selectedElements
         .getItems()
-        .map((el) => cloneDeep(el.fill));
+        .map((el) => cloneDeep(el.attrs.fill ?? []));
 
       const updateInfo = () => {
         const selectedElements = editor.selectedElements.getItems();
@@ -100,9 +102,9 @@ export const FillCard: FC = () => {
            * 显示 fill 值时，如果有的图形没有 fill，将其排除。
            * 添加颜色时，如果有的图形不存在 fill，赋值给它。
            */
-          let newFill = selectedElements[0].fill;
+          let newFill = selectedElements[0].attrs.fill ?? [];
           for (let i = 1, len = selectedElements.length; i < len; i++) {
-            const currentFill = selectedElements[i].fill;
+            const currentFill = selectedElements[i].attrs.fill;
             if (!isEqual(newFill, currentFill)) {
               // TODO: 标记为不相同，作为文案提示
               newFill = [];

@@ -11,108 +11,47 @@ import {
   transformRotate,
 } from '@suika/geo';
 
-import { HALF_PI } from '../constant';
-import { ControlHandle } from '../control_handle_manager';
-import { ImgManager } from '../Img_manager';
-import { getResizedLine } from '../scene/utils';
-import { DEFAULT_IMAGE, ITexture, TextureImage } from '../texture';
-import { GraphType, IBox, IBox2, IBox2WithRotation, IPoint } from '../type';
+import { HALF_PI } from '../../constant';
+import { ControlHandle } from '../../control_handle_manager';
+import { ImgManager } from '../../Img_manager';
+import { getResizedLine } from '../../scene/utils';
+import { DEFAULT_IMAGE, TextureImage } from '../../texture';
+import {
+  GraphType,
+  IBox,
+  IBox2,
+  IBox2WithRotation,
+  IObject,
+  IPoint,
+} from '../../type';
 import {
   drawRoundRectPath,
   getAbsoluteCoords,
   getRectCenterPoint,
   rotateInCanvas,
-} from '../utils';
+} from '../../utils';
+import { GraphAttrs } from './graph_attrs';
 
-export interface GraphAttrs {
-  type?: GraphType;
-  id?: string;
-  objectName?: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  // 颜色
-  fill?: ITexture[];
-  stroke?: ITexture[];
-  strokeWidth?: number;
-  // transform 相关
-  rotation?: number;
-  cornerRadius?: number;
-  visible?: boolean;
-  lock?: boolean;
-}
-
-export class Graph {
+export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   type = GraphType.Graph;
-  id: string;
-  objectName: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  // color
-  fill: ITexture[] = [];
-  stroke: ITexture[] = [];
-  strokeWidth?: number;
-  // transform
-  rotation?: number;
-  cornerRadius?: number;
-  visible?: boolean;
-  lock?: boolean;
+  attrs: ATTRS;
   private _cacheBbox: Readonly<IBox> | null = null;
 
-  constructor(options: GraphAttrs) {
-    this.type = options.type ?? this.type;
-    this.id = options.id ?? genId();
+  constructor(options: Omit<ATTRS, 'id'>) {
+    this.attrs = { ...options } as ATTRS;
+    this.attrs.id ??= genId();
 
-    if (options.objectName) {
-      this.objectName = options.objectName;
+    if (this.attrs.objectName) {
       objectNameGenerator.setMaxIdx(options.objectName);
     } else {
-      this.objectName = objectNameGenerator.gen(options.type ?? this.type);
-    }
-
-    this.x = options.x;
-    this.y = options.y;
-    this.width = options.width;
-    this.height = options.height;
-
-    if (options.fill) {
-      this.fill = options.fill;
-    }
-    if (options.stroke) {
-      this.stroke = options.stroke;
-    }
-    if (options.strokeWidth) {
-      this.strokeWidth = options.strokeWidth;
-    }
-    if (options.rotation) {
-      this.rotation = options.rotation;
-    }
-    if (options.visible !== undefined) {
-      this.visible = options.visible;
-    }
-    if (options.lock !== undefined) {
-      this.lock = options.lock;
+      this.attrs.objectName = objectNameGenerator.gen(this.attrs.type ?? '');
     }
   }
-  getAttrs(): GraphAttrs {
-    return {
-      type: this.type,
-      id: this.id,
-      objectName: this.objectName,
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      fill: this.fill,
-      stroke: this.stroke,
-      strokeWidth: this.strokeWidth,
-      rotation: this.rotation,
-      visible: this.visible,
-    };
+
+  getAttrs(): ATTRS {
+    return { ...this.attrs };
   }
+
   private shouldUpdateBbox(attrs: Partial<GraphAttrs>) {
     // TODO: if x, y, width, height value no change, bbox should not be updated
     return (
@@ -129,18 +68,17 @@ export class Graph {
     }
     for (key in attrs) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
-      const self: any = this;
-      self[key] = attrs[key];
+      (this.attrs as any)[key] = attrs[key];
     }
   }
 
   getRectWithRotation(): IRectWithRotation {
     return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      rotation: this.rotation,
+      x: this.attrs.x,
+      y: this.attrs.y,
+      width: this.attrs.width,
+      height: this.attrs.height,
+      rotation: this.attrs.rotation,
     };
   }
 
@@ -153,8 +91,8 @@ export class Graph {
       return this._cacheBbox;
     }
 
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this);
-    const rotation = this.rotation;
+    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.attrs);
+    const rotation = this.attrs.rotation;
     if (!rotation) {
       return this.getRect();
     }
@@ -192,7 +130,7 @@ export class Graph {
   getBboxVerts(): [IPoint, IPoint, IPoint, IPoint] {
     const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.getRect());
 
-    const rotation = this.rotation;
+    const rotation = this.attrs.rotation;
     if (!rotation) {
       return [
         { x: x, y: y },
@@ -215,10 +153,10 @@ export class Graph {
    */
   getRect() {
     return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
+      x: this.attrs.x,
+      y: this.attrs.y,
+      width: this.attrs.width,
+      height: this.attrs.height,
     };
   }
   getCenter() {
@@ -233,18 +171,17 @@ export class Graph {
     const { x, y } = transformRotate(
       rotatedX,
       rotatedY,
-      -(this.rotation || 0),
+      -(this.attrs.rotation || 0),
       cx,
       cy,
     );
     this.updateAttrs({ x, y });
   }
   hitTest(x: number, y: number, padding = 0) {
-    const strokeWidth = (this.strokeWidth ?? 0) / 2;
     return isPointInRect(
       { x, y },
       this.getRectWithRotation(),
-      padding + strokeWidth,
+      padding + (this.attrs.strokeWidth ?? 0) / 2,
     );
   }
 
@@ -256,14 +193,14 @@ export class Graph {
     if (!isRectIntersect(rect, this.getBBox())) {
       isIntersected = false;
     } else {
-      if (!this.rotation || this.rotation % HALF_PI == 0) {
+      if (!this.attrs.rotation || this.attrs.rotation % HALF_PI == 0) {
         isIntersected = true;
       } else {
         // OBB intersect
         // use SAT algorithm to check intersect
         const bbox = this.getRectWithRotation();
         const [cx, cy] = getRectCenterPoint(bbox);
-        const r = -this.rotation;
+        const r = -this.attrs.rotation;
         const s1 = transformRotate(rect.x, rect.y, r, cx, cy);
         const s2 = transformRotate(
           rect.x + rect.width,
@@ -305,12 +242,12 @@ export class Graph {
   }
 
   setRotatedX(rotatedX: number) {
-    const { x: prevRotatedX } = getRectRotatedXY(this);
-    this.updateAttrs({ x: this.x + rotatedX - prevRotatedX });
+    const { x: prevRotatedX } = getRectRotatedXY(this.attrs);
+    this.updateAttrs({ x: this.attrs.x + rotatedX - prevRotatedX });
   }
   setRotatedY(rotatedY: number) {
-    const { y: prevRotatedY } = getRectRotatedXY(this);
-    this.updateAttrs({ y: this.y + rotatedY - prevRotatedY });
+    const { y: prevRotatedY } = getRectRotatedXY(this.attrs);
+    this.updateAttrs({ y: this.attrs.y + rotatedY - prevRotatedY });
   }
 
   updateByControlHandle(
@@ -321,7 +258,7 @@ export class Graph {
     isAltPressing = false,
   ) {
     const rect =
-      this.height === 0
+      this.attrs.height === 0
         ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
         : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
     this.updateAttrs(rect);
@@ -343,10 +280,10 @@ export class Graph {
     strokeWidth: number,
   ) {
     const { x, y, width, height } = this.getRect();
-    if (this.rotation) {
+    if (this.attrs.rotation) {
       const cx = x + width / 2;
       const cy = y + height / 2;
-      rotateInCanvas(ctx, this.rotation, cx, cy);
+      rotateInCanvas(ctx, this.attrs.rotation, cx, cy);
     }
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
@@ -422,45 +359,31 @@ export class Graph {
 
   static dMove(graphs: Graph[], dx: number, dy: number) {
     for (const graph of graphs) {
-      graph.x += dx;
-      graph.y += dy;
+      graph.attrs.x += dx;
+      graph.attrs.y += dy;
     }
   }
 
   toJSON(): GraphAttrs {
-    return {
-      type: this.type,
-      id: this.id,
-      objectName: this.objectName,
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      fill: this.fill,
-      stroke: this.stroke,
-      strokeWidth: this.strokeWidth,
-      rotation: this.rotation,
-      visible: this.visible,
-      lock: this.lock,
-    };
+    return { ...this.attrs };
   }
 
   getVisible() {
-    return this.visible ?? true;
+    return this.attrs.visible ?? true;
   }
 
   getLock() {
-    return this.lock ?? false;
+    return this.attrs.lock ?? false;
   }
 
   /**
    * get simple info (for layer panel)
    */
-  toObject() {
+  toObject(): IObject {
     return {
       type: this.type,
-      id: this.id,
-      name: this.objectName,
+      id: this.attrs.id,
+      name: this.attrs.objectName,
       visible: this.getVisible(),
       lock: this.getLock(),
     };
@@ -470,7 +393,9 @@ export class Graph {
    * add dRotate to rotation
    */
   dRotate(dRotation: number, initAttrs: IBox2WithRotation, center: IPoint) {
-    this.rotation = normalizeRadian((initAttrs.rotation ?? 0) + dRotation);
+    this.attrs.rotation = normalizeRadian(
+      (initAttrs.rotation ?? 0) + dRotation,
+    );
 
     const [graphCx, graphCy] = getRectCenterPoint(initAttrs);
 
