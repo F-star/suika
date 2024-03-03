@@ -223,12 +223,12 @@ export class PathEditor {
         // 1. draw anchor
         // 是否要高亮。
         let anchorSize = 6;
-        let fillColorStr = '#fff';
-        let strokeColorStr = handleStroke;
+        let anchorFill = '#fff';
+        let anchorStroke = handleStroke;
         if (this.hasSelectedIndex('anchor', i, j)) {
           anchorSize = 8;
-          fillColorStr = handleStroke;
-          strokeColorStr = '#fff';
+          anchorFill = handleStroke;
+          anchorStroke = '#fff';
         }
         const anchorControlHandle = new ControlHandle({
           cx: anchor.x,
@@ -243,13 +243,13 @@ export class PathEditor {
             fill: [
               {
                 type: TextureType.Solid,
-                attrs: parseHexToRGBA(fillColorStr)!,
+                attrs: parseHexToRGBA(anchorFill)!,
               },
             ],
             stroke: [
               {
                 type: TextureType.Solid,
-                attrs: parseHexToRGBA(strokeColorStr)!,
+                attrs: parseHexToRGBA(anchorStroke)!,
               },
             ],
             strokeWidth: 1,
