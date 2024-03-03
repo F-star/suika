@@ -89,7 +89,10 @@ export class PathEditor {
     const path = this.path;
     if (!path) return;
     const pathData = path.attrs.pathData;
-    if (pathData.length === 0 || pathData.every((item) => item.length <= 1)) {
+    if (
+      pathData.length === 0 ||
+      pathData.every((item) => item.segs.length <= 1)
+    ) {
       this.editor.commandManager.pushCommand(
         new RemoveGraphsCmd('remove empty path', this.editor, [path]),
       );
@@ -161,7 +164,9 @@ export class PathEditor {
       if (pathIdx < 0 || pathIdx >= path.attrs.pathData.length) {
         continue;
       }
-      const segCount = path.attrs.pathData[pathIdx].length;
+      const pathItem = path.attrs.pathData[pathIdx];
+      const segCount = pathItem.segs.length;
+      const closed = pathItem.closed;
       if (segIdx < 0 || segIdx >= segCount) {
         continue;
       }
@@ -175,8 +180,11 @@ export class PathEditor {
       segIdxSet.add(segIdx);
 
       if (type === 'anchor') {
-        if (segIdx - 1 >= 0) {
-          segIdxSet.add(segIdx - 1);
+        const leftSegIdx = segIdx - 1;
+        if (leftSegIdx < 0 && closed) {
+          segIdxSet.add(segCount - 1);
+        } else if (leftSegIdx >= 0 && !closed) {
+          segIdxSet.add(leftSegIdx);
         }
         if (segIdx + 1 < segCount) {
           segIdxSet.add(segIdx + 1);
@@ -215,27 +223,27 @@ export class PathEditor {
     const handleLinesAndPoints: ControlHandle[] = [];
 
     for (let i = 0; i < pathData.length; i++) {
-      const pathDataItem = pathData[i];
-      for (let j = 0; j < pathDataItem.length; j++) {
-        const seg = pathDataItem[j];
+      const pathItem = pathData[i];
+      for (let j = 0; j < pathItem.segs.length; j++) {
+        const seg = pathItem.segs[j];
         const anchor = seg.point;
 
         // 1. draw anchor
         // 是否要高亮。
         let anchorSize = 6;
-        let fillColorStr = '#fff';
-        let strokeColorStr = handleStroke;
+        let anchorFill = '#fff';
+        let anchorStroke = handleStroke;
         if (this.hasSelectedIndex('anchor', i, j)) {
           anchorSize = 8;
-          fillColorStr = handleStroke;
-          strokeColorStr = '#fff';
+          anchorFill = handleStroke;
+          anchorStroke = '#fff';
         }
         const anchorControlHandle = new ControlHandle({
           cx: anchor.x,
           cy: anchor.y,
           type: ['anchor', i, j].join('-'),
           graph: new Ellipse({
-            objectName: '',
+            objectName: 'anchor',
             x: anchor.x,
             y: anchor.y,
             width: anchorSize,
@@ -243,13 +251,13 @@ export class PathEditor {
             fill: [
               {
                 type: TextureType.Solid,
-                attrs: parseHexToRGBA(fillColorStr)!,
+                attrs: parseHexToRGBA(anchorFill)!,
               },
             ],
             stroke: [
               {
                 type: TextureType.Solid,
-                attrs: parseHexToRGBA(strokeColorStr)!,
+                attrs: parseHexToRGBA(anchorStroke)!,
               },
             ],
             strokeWidth: 1,
@@ -279,7 +287,7 @@ export class PathEditor {
             type: 'handleLine',
             rotation: rect.rotation,
             graph: new Line({
-              objectName: '',
+              objectName: 'handleLine',
               ...rect,
               width: rect.width * zoom,
               stroke: [
@@ -300,7 +308,7 @@ export class PathEditor {
             rotation: QUARTER_PI,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
             graph: new Rect({
-              objectName: '',
+              objectName: 'pathHandle',
               x: handle.x,
               y: handle.y,
               width: handleInOutSize,

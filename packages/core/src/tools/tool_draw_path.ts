@@ -1,11 +1,11 @@
 import { cloneDeep, getClosestTimesVal, parseHexToRGBA } from '@suika/common';
-import { IPoint } from '@suika/geo';
+import { distance, IPoint } from '@suika/geo';
 
 import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { ICursor } from '../cursor_manager';
 import { Editor } from '../editor';
-import { Ellipse, ISegment, Path } from '../graphs';
+import { Ellipse, IPathItem, Path } from '../graphs';
 import { TextureType } from '../texture';
 import { PathSelectTool } from './tool_path_select';
 import { ITool } from './type';
@@ -22,7 +22,7 @@ export class DrawPathTool implements ITool {
 
   private startPoint: IPoint | null = null;
   private path: Path | null = null;
-  private prevPathData: ISegment[][] = [];
+  private prevPathData: IPathItem[] = [];
   private pathIdx = 0;
 
   constructor(private editor: Editor) {}
@@ -31,7 +31,7 @@ export class DrawPathTool implements ITool {
       this.path = this.editor.pathEditor.getPath()!;
       this.pathIdx = this.path.attrs.pathData.length;
     }
-    this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
+    this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
   }
   onInactive() {
     this.editor.commandManager.batchCommandEnd();
@@ -40,51 +40,46 @@ export class DrawPathTool implements ITool {
     this.editor.render();
   }
 
-  onMoveExcludeDrag(e: PointerEvent, isOutsideCanvas: boolean) {
+  onMoveExcludeDrag(_e: PointerEvent, isOutsideCanvas: boolean) {
     if (isOutsideCanvas) {
+      this.editor.pathEditor.updateControlHandles();
+      this.editor.render();
       return;
-    }
-    const point = this.editor.getSceneCursorXY(e);
-    if (this.editor.setting.get('snapToPixelGrid')) {
-      point.x = getClosestTimesVal(point.x, 0.5);
-      point.y = getClosestTimesVal(point.y, 0.5);
     }
 
     if (this.editor.hostEventManager.isSpacePressing) {
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
+      const snapPoint = this.checkCursorPtInStartAnchor();
+      if (snapPoint) {
+        this.editor.setCursor('pen-close');
+      } else {
+        this.editor.setCursor('pen');
+      }
+      this.updateControlHandlesWithPreviewHandles(
+        snapPoint ?? this.getCorrectedPoint(),
+      );
     }
   }
 
-  /** get corrected cursor point */
-  private getCursorPoint() {
-    const point = this.editor.toolManager.getCurrPoint();
-    if (this.editor.setting.get('snapToPixelGrid')) {
-      point.x = getClosestTimesVal(point.x, 0.5);
-      point.y = getClosestTimesVal(point.y, 0.5);
-    }
-    return point;
-  }
-
-  onStart(e: PointerEvent) {
-    const point = this.editor.getSceneCursorXY(e);
+  onStart() {
     const pathEditor = this.editor.pathEditor;
-    if (this.editor.setting.get('snapToPixelGrid')) {
-      point.x = getClosestTimesVal(point.x, 0.5);
-      point.y = getClosestTimesVal(point.y, 0.5);
-    }
-    this.startPoint = point;
+    const snapPoint = this.checkCursorPtInStartAnchor();
+    this.startPoint = snapPoint ?? this.getCorrectedPoint();
 
+    // create new path
     if (!pathEditor.getActive()) {
-      const pathData: ISegment[][] = [
-        [
-          {
-            point: { ...point },
-            handleIn: { x: 0, y: 0 },
-            handleOut: { x: 0, y: 0 },
-          },
-        ],
+      const pathData: IPathItem[] = [
+        {
+          segs: [
+            {
+              point: { ...this.startPoint },
+              in: { x: 0, y: 0 },
+              out: { x: 0, y: 0 },
+            },
+          ],
+          closed: false,
+        },
       ];
 
       const path = new Path({
@@ -121,7 +116,9 @@ export class DrawPathTool implements ITool {
       this.editor.selectedElements.setItems([path]);
 
       pathEditor.active(path);
-    } else {
+    }
+    // add new anchor
+    else {
       const path = this.path!;
       this.prevPathData = path.attrs.pathData;
       const newPathData = cloneDeep(path.attrs.pathData);
@@ -133,23 +130,35 @@ export class DrawPathTool implements ITool {
       }
 
       if (!newPathData[this.pathIdx]) {
-        newPathData[this.pathIdx] = [];
+        newPathData[this.pathIdx] = {
+          segs: [],
+          closed: false,
+        };
       }
-      newPathData[this.pathIdx].push({
-        point,
-        handleIn: { x: 0, y: 0 },
-        handleOut: { x: 0, y: 0 },
-      });
+      // 是否因为闭合，而修改第一个 anchor 的 in
+      if (snapPoint) {
+        newPathData[this.pathIdx].closed = true;
+        newPathData[this.pathIdx].segs[0].in = { x: 0, y: 0 };
+      } else {
+        newPathData[this.pathIdx].segs.push({
+          point: this.startPoint,
+          in: { x: 0, y: 0 },
+          out: { x: 0, y: 0 },
+        });
+      }
+
       path.updateAttrs({
         pathData: newPathData,
       });
     }
 
+    const lastSegIdx = this.path!.attrs.pathData[this.pathIdx].segs.length - 1;
+    const selectSegIdx = this.checkPathItemClosed() ? 0 : lastSegIdx;
     pathEditor.setSelectedIndices([
       {
         type: 'anchor',
         pathIdx: this.pathIdx,
-        segIdx: this.path!.attrs.pathData[this.pathIdx].length - 1,
+        segIdx: selectSegIdx,
       },
     ]);
 
@@ -163,27 +172,36 @@ export class DrawPathTool implements ITool {
       return;
     }
 
-    const point = this.getCursorPoint();
-    if (this.editor.setting.get('snapToPixelGrid')) {
-      point.x = getClosestTimesVal(point.x, 0.5);
-      point.y = getClosestTimesVal(point.y, 0.5);
-    }
+    const point = this.getCorrectedPoint();
 
     const dx = point.x - this.startPoint.x;
     const dy = point.y - this.startPoint.y;
 
     const path = this.path!;
-    const currPath = path.attrs.pathData[this.pathIdx];
-    const lastSeg = currPath.at(-1)!;
+    const currPathItem = path.attrs.pathData[this.pathIdx];
+    const lastSegIdx = currPathItem.segs.length - 1;
+    const lastSeg = currPathItem.segs[currPathItem.closed ? 0 : lastSegIdx];
     // mirror angle and length
-    lastSeg.handleOut = { x: dx, y: dy };
-    lastSeg.handleIn = { x: -dx, y: -dy };
+
+    lastSeg.out = { x: dx, y: dy };
+    // （1）按住 alt 时不需要满足对称（2）绘制第一个点时，in 保持为 0
+    if (!this.editor.hostEventManager.isAltPressing && lastSegIdx !== 0) {
+      lastSeg.in = { x: -dx, y: -dy };
+    }
 
     this.editor.pathEditor.updateControlHandles();
     this.editor.render();
   }
 
+  private checkPathItemClosed() {
+    return this.path?.attrs.pathData[this.pathIdx].closed ?? false;
+  }
+
   onEnd() {
+    // TODO: 如果是 closed，结束当前 path 的绘制
+    if (this.checkPathItemClosed()) {
+      this.editor.pathEditor.setSelectedIndices([]);
+    }
     this.editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Path Data',
@@ -196,11 +214,11 @@ export class DrawPathTool implements ITool {
   }
 
   afterEnd() {
-    // noop
+    this.startPoint = null;
   }
 
   onCommandChange() {
-    this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
+    this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
   }
 
   onSpaceToggle(isSpacePressing: boolean) {
@@ -208,16 +226,54 @@ export class DrawPathTool implements ITool {
       this.editor.pathEditor.updateControlHandles();
       this.editor.render();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
+      this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
       this.editor.render();
     }
+  }
+
+  onAltToggle() {
+    if (!this.startPoint) return;
+    this.onDrag();
+  }
+
+  /**
+   * check if cursor inside start anchor.
+   * if true, return start anchor point
+   */
+  private checkCursorPtInStartAnchor(): IPoint | null {
+    const point = this.editor.toolManager.getCurrPoint();
+    if (this.path) {
+      const pathItem = this.path.attrs.pathData[this.pathIdx];
+      if (!pathItem) {
+        return null;
+      }
+      if (pathItem.segs.length > 1) {
+        const startAnchorPoint = pathItem.segs.at(0)!.point;
+        const anchorSize = 5;
+        const isInside =
+          distance(startAnchorPoint, point) <=
+          this.editor.viewportSizeToScene(anchorSize);
+        return isInside ? { ...startAnchorPoint } : null;
+      }
+    }
+    return null;
+  }
+
+  /** get corrected cursor point */
+  private getCorrectedPoint() {
+    const point = this.editor.toolManager.getCurrPoint();
+    if (this.editor.setting.get('snapToPixelGrid')) {
+      point.x = getClosestTimesVal(point.x, 0.5);
+      point.y = getClosestTimesVal(point.y, 0.5);
+    }
+    return point;
   }
 
   onViewportXOrYChange() {
     if (this.editor.hostEventManager.isSpacePressing) {
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCursorPoint());
+      this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
     }
     this.editor.render();
   }
@@ -226,7 +282,7 @@ export class DrawPathTool implements ITool {
     const previewHandles: ControlHandle[] = [];
 
     if (this.editor.pathEditor.getSelectedIndicesSize() > 0) {
-      const lastSeg = this.path?.attrs.pathData[this.pathIdx]?.at(-1);
+      const lastSeg = this.path?.attrs.pathData[this.pathIdx]?.segs.at(-1);
       if (lastSeg) {
         const previewCurve = new ControlHandle({
           cx: point.x,
@@ -234,33 +290,36 @@ export class DrawPathTool implements ITool {
           type: 'path-preview-curve',
           getCursor: () => 'default',
           graph: new Path({
-            objectName: '',
+            objectName: 'path-preview-curve',
             x: 0,
             y: 0,
             width: 0,
             height: 0,
             pathData: [
-              [
-                {
-                  point: this.editor.sceneCoordsToViewport(
-                    lastSeg.point.x,
-                    lastSeg.point.y,
-                  ),
-                  handleIn: {
-                    x: this.editor.sceneSizeToViewport(lastSeg.handleIn.x),
-                    y: this.editor.sceneSizeToViewport(lastSeg.handleIn.y),
+              {
+                segs: [
+                  {
+                    point: this.editor.sceneCoordsToViewport(
+                      lastSeg.point.x,
+                      lastSeg.point.y,
+                    ),
+                    in: {
+                      x: this.editor.sceneSizeToViewport(lastSeg.in.x),
+                      y: this.editor.sceneSizeToViewport(lastSeg.in.y),
+                    },
+                    out: {
+                      x: this.editor.sceneSizeToViewport(lastSeg.out.x),
+                      y: this.editor.sceneSizeToViewport(lastSeg.out.y),
+                    },
                   },
-                  handleOut: {
-                    x: this.editor.sceneSizeToViewport(lastSeg.handleOut.x),
-                    y: this.editor.sceneSizeToViewport(lastSeg.handleOut.y),
+                  {
+                    point: this.editor.sceneCoordsToViewport(point.x, point.y),
+                    in: { x: 0, y: 0 },
+                    out: { x: 0, y: 0 },
                   },
-                },
-                {
-                  point: this.editor.sceneCoordsToViewport(point.x, point.y),
-                  handleIn: { x: 0, y: 0 },
-                  handleOut: { x: 0, y: 0 },
-                },
-              ],
+                ],
+                closed: false,
+              },
             ],
             stroke: [
               {
@@ -283,7 +342,7 @@ export class DrawPathTool implements ITool {
       type: 'path-preview-anchor',
       getCursor: () => 'default',
       graph: new Ellipse({
-        objectName: '',
+        objectName: 'path-preview-anchor',
         x: point.x,
         y: point.y,
         width: 6,
