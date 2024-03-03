@@ -188,6 +188,9 @@ export class ToolManager {
     const handleSpaceToggle = (isSpacePressing: boolean) => {
       this.currentTool?.onSpaceToggle?.(isSpacePressing);
     };
+    const handleAltToggle = (isSpacePressing: boolean) => {
+      this.currentTool?.onAltToggle?.(isSpacePressing);
+    };
     const handleViewportXOrYChange = (x: number, y: number) => {
       this.currentTool?.onViewportXOrYChange?.(x, y);
     };
@@ -197,6 +200,7 @@ export class ToolManager {
     window.addEventListener('pointerup', handleUp);
     this.editor.commandManager.on('change', handleCommandChange);
     this.editor.hostEventManager.on('spaceToggle', handleSpaceToggle);
+    this.editor.hostEventManager.on('altToggle', handleAltToggle);
     this.editor.viewportManager.on('xOrYChange', handleViewportXOrYChange);
 
     return () => {

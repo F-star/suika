@@ -1,5 +1,5 @@
 import { parseRGBAStr } from '@suika/common';
-import { addPoint, IPoint, IRect, IRectWithRotation } from '@suika/geo';
+import { addPoint, IRect, IRectWithRotation } from '@suika/geo';
 import { Bezier } from 'bezier-js';
 
 import { ImgManager } from '../../Img_manager';
@@ -7,17 +7,10 @@ import { TextureType } from '../../texture';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils';
 import { Graph, GraphAttrs } from '../graph';
-
-export interface ISegment {
-  point: IPoint;
-  /** the coordinates relative to point */
-  handleIn: IPoint;
-  /** the coordinates relative to point */
-  handleOut: IPoint;
-}
+import { IPathItem, ISegment } from './type';
 
 export interface PathAttrs extends GraphAttrs {
-  pathData: ISegment[][];
+  pathData: IPathItem[];
 }
 
 export class Path extends Graph<PathAttrs> {
@@ -34,10 +27,14 @@ export class Path extends Graph<PathAttrs> {
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
-    for (const path of pathData) {
-      for (let i = 1; i < path.length; i++) {
-        const seg = path[i];
-        const prevSeg = path[i - 1];
+    for (const pathItem of pathData) {
+      const segs = pathItem.segs;
+      for (let i = 1; i <= segs.length; i++) {
+        if (i === segs.length && !pathItem.closed) {
+          continue;
+        }
+        const seg = segs[i % segs.length];
+        const prevSeg = segs[i - 1];
         const bbox = new Bezier(
           prevSeg.point,
           Path.getHandleOut(prevSeg),
@@ -75,7 +72,7 @@ export class Path extends Graph<PathAttrs> {
       const dx = attrs.x - originX;
       const pathData = this.attrs.pathData;
       for (const pathItem of pathData) {
-        for (const seg of pathItem) {
+        for (const seg of pathItem.segs) {
           seg.point.x += dx;
         }
       }
@@ -85,7 +82,7 @@ export class Path extends Graph<PathAttrs> {
       const dy = attrs.y - originY;
       const pathData = this.attrs.pathData;
       for (const pathItem of pathData) {
-        for (const seg of pathItem) {
+        for (const seg of pathItem.segs) {
           seg.point.y += dy;
         }
       }
@@ -110,12 +107,18 @@ export class Path extends Graph<PathAttrs> {
     }
 
     ctx.beginPath();
-    for (const path of pathData) {
-      const first = path[0];
+    for (const pathItem of pathData) {
+      const first = pathItem.segs[0];
+      if (!first) continue;
       ctx.moveTo(first.point.x, first.point.y);
-      for (let i = 1; i < path.length; i++) {
-        const currSeg = path[i];
-        const prevSeg = path[i - 1];
+
+      const segs = pathItem.segs;
+      for (let i = 1; i <= segs.length; i++) {
+        if (i === segs.length && !pathItem.closed) {
+          continue;
+        }
+        const currSeg = segs[i % segs.length];
+        const prevSeg = segs[i - 1];
         const pointX = currSeg.point.x;
         const pointY = currSeg.point.y;
         const handle1 = Path.getHandleOut(prevSeg);
@@ -132,6 +135,9 @@ export class Path extends Graph<PathAttrs> {
             pointY,
           );
         }
+      }
+      if (pathItem.closed) {
+        ctx.closePath();
       }
     }
 
@@ -178,21 +184,21 @@ export class Path extends Graph<PathAttrs> {
   }
 
   static getHandleIn(seg: ISegment) {
-    return addPoint(seg.point, seg.handleIn);
+    return addPoint(seg.point, seg.in);
   }
   static getHandleOut(seg: ISegment) {
-    return addPoint(seg.point, seg.handleOut);
+    return addPoint(seg.point, seg.out);
   }
 
   getSeg(pathIdx: number, segIdx: number) {
     return Path.getSeg(this.attrs.pathData, pathIdx, segIdx);
   }
-  static getSeg(pathData: ISegment[][], pathIdx: number, segIdx: number) {
+  static getSeg(pathData: IPathItem[], pathIdx: number, segIdx: number) {
     const pathDataItem = pathData[pathIdx];
     if (!pathDataItem) {
       return null;
     }
-    return pathDataItem[segIdx] ?? null;
+    return pathDataItem.segs[segIdx] ?? null;
   }
   setSeg(pathIdx: number, segIdx: number, seg: ISegment) {
     const pathData = this.attrs.pathData;
@@ -200,10 +206,10 @@ export class Path extends Graph<PathAttrs> {
     if (!pathDataItem) {
       throw new Error(`pathIdx ${pathIdx} is out of range`);
     }
-    if (segIdx >= pathDataItem.length) {
+    if (segIdx >= pathDataItem.segs.length) {
       throw new Error(`segIdx ${segIdx} is out of range`);
     }
-    pathDataItem[segIdx] = seg;
+    pathDataItem.segs[segIdx] = seg;
     this.updateAttrs({ pathData });
   }
 }

@@ -1,4 +1,4 @@
-import { Graph, ISegment } from '../graphs';
+import { Graph, IPathItem } from '../graphs';
 import { ITexture } from '../texture';
 import { ICommand } from './type';
 
@@ -15,7 +15,7 @@ export type ISetElementsAttrsType = Partial<{
   objectName: string;
   visible: boolean;
   lock: boolean;
-  pathData: ISegment[][];
+  pathData: IPathItem[];
 }>;
 
 export class SetGraphsAttrsCmd implements ICommand {

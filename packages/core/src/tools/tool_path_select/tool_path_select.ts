@@ -4,7 +4,7 @@ import { IPoint } from '@suika/geo';
 import { SetGraphsAttrsCmd } from '../../commands';
 import { ICursor } from '../../cursor_manager';
 import { Editor } from '../../editor';
-import { ISegment } from '../../graphs';
+import { IPathItem } from '../../graphs';
 import { ISelectedIdxInfo, SelectedIdexType } from '../../path_editor';
 import { ITool } from '../type';
 
@@ -18,7 +18,7 @@ export class PathSelectTool implements ITool {
   readonly hotkey = HOTKEY;
   cursor: ICursor = 'default';
   private startPoint: IPoint | null = null;
-  private prevPathData: ISegment[][] = [];
+  private prevPathData: IPathItem[] = [];
   private indexInfo: Readonly<ISelectedIdxInfo> | null = null;
 
   constructor(private editor: Editor) {}

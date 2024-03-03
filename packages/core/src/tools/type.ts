@@ -26,6 +26,8 @@ export interface IBaseTool {
   onCommandChange?: () => void;
   /** space key toggle */
   onSpaceToggle?: (isSpacePressing: boolean) => void;
+  /** alt key toggle */
+  onAltToggle?: (isSpacePressing: boolean) => void;
   /** viewport x or y change */
   onViewportXOrYChange?: (x: number, y: number) => void;
 }
