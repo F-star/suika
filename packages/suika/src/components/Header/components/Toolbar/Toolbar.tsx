@@ -1,5 +1,6 @@
 import './Toolbar.scss';
 
+import { Button } from '@suika/components';
 import {
   EllipseOutlined,
   HandOutlined,
@@ -127,7 +128,10 @@ export const ToolBar = () => {
       })}
 
       {isPathEditorActive && (
-        <button
+        <Button
+          style={{
+            marginLeft: '16px',
+          }}
           onClick={() => {
             if (editor) {
               editor.pathEditor.inactive();
@@ -135,7 +139,7 @@ export const ToolBar = () => {
           }}
         >
           {intl.formatMessage({ id: 'done' })}
-        </button>
+        </Button>
       )}
     </div>
   );
