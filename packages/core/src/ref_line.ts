@@ -84,13 +84,13 @@ export class RefLine {
       const right = bboxVerts.filter((p) => p.y === bbox.maxY);
 
       // top 和 bottom 要绘制水平参考线，不要绘制垂直参照线
-      [...top, ...bottom].forEach((p) => {
+      for (const p of [...top, ...bottom]) {
         this.addBboxToMap(vRefLineMap, p.x, [p.y]);
-      });
+      }
       // left 和 right 要绘制垂直参照线，不要绘制水平参照线
-      [...left, ...right].forEach((p) => {
+      for (const p of [...left, ...right]) {
         this.addBboxToMap(hRefLineMap, p.y, [p.x]);
-      });
+      }
     }
 
     this.sortedXs = Array.from(vRefLineMap.keys()).sort((a, b) => a - b);
@@ -199,9 +199,9 @@ export class RefLine {
 
     // 确定最终偏移值 offsetX
     if (closestXDist <= tol) {
-      for (let i = 0; i < closestXDiffs.length; i++) {
-        if (isEqualNum(closestXDist, Math.abs(closestXDiffs[i]))) {
-          offsetX = closestXDiffs[i];
+      for (const closestXDiff of closestXDiffs) {
+        if (isEqualNum(closestXDist, Math.abs(closestXDiff))) {
+          offsetX = closestXDiff;
           break;
         }
       }
@@ -212,9 +212,9 @@ export class RefLine {
 
     // 再确认偏移值 offsetY
     if (closestYDist <= tol) {
-      for (let i = 0; i < closestYDiffs.length; i++) {
-        if (isEqualNum(closestYDist, Math.abs(closestYDiffs[i]))) {
-          offsetY = closestYDiffs[i];
+      for (const closestYDiff of closestYDiffs) {
+        if (isEqualNum(closestYDist, Math.abs(closestYDiff))) {
+          offsetY = closestYDiff;
           break;
         }
       }
