@@ -67,7 +67,7 @@ export const FillCard: FC = () => {
   const pushToHistory = (
     cmdDesc: string,
     selectedElements: Graph[],
-    newStroke: ITexture[],
+    newPaints: ITexture[],
   ) => {
     if (!editor) return;
 
@@ -75,7 +75,7 @@ export const FillCard: FC = () => {
       new SetGraphsAttrsCmd(
         cmdDesc,
         selectedElements,
-        { fill: newStroke },
+        { fill: newPaints },
         // prev value
         selectedElements.map((_, i) => ({
           fill: cloneDeep(prevFills.current[i]),

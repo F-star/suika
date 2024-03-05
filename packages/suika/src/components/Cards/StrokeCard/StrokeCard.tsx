@@ -23,9 +23,9 @@ export const StrokeCard: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      prevStrokes.current = editor.selectedElements
-        .getItems()
-        .map((el) => cloneDeep(el.attrs.stroke ?? []));
+      const updatePrevStroke = (els: Graph[]) => {
+        prevStrokes.current = els.map((el) => cloneDeep(el.attrs.stroke ?? []));
+      };
 
       const updateInfo = () => {
         const selectedElements = editor.selectedElements.getItems();
@@ -59,11 +59,15 @@ export const StrokeCard: FC = () => {
         }
       };
 
-      updateInfo(); // init
+      // init
+      updateInfo();
+      updatePrevStroke(editor.selectedElements.getItems());
 
       editor.sceneGraph.on('render', updateInfo);
+      editor.selectedElements.on('itemsChange', updatePrevStroke);
       return () => {
         editor.sceneGraph.off('render', updateInfo);
+        editor.selectedElements.off('itemsChange', updatePrevStroke);
       };
     }
   }, [editor]);
@@ -162,7 +166,7 @@ export const StrokeCard: FC = () => {
     );
 
     prevStrokes.current = selectedElements.map((el) =>
-      cloneDeep(el.attrs.fill ?? []),
+      cloneDeep(el.attrs.stroke ?? []),
     );
   };
 
