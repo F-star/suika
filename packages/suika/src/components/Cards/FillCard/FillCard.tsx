@@ -90,10 +90,9 @@ export const FillCard: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      prevFills.current = editor.selectedElements
-        .getItems()
-        .map((el) => cloneDeep(el.attrs.fill ?? []));
-
+      const updatePrevFill = (els: Graph[]) => {
+        prevFills.current = els.map((el) => cloneDeep(el.attrs.fill ?? []));
+      };
       const updateInfo = () => {
         const selectedElements = editor.selectedElements.getItems();
         if (selectedElements.length > 0) {
@@ -115,11 +114,15 @@ export const FillCard: FC = () => {
         }
       };
 
-      updateInfo(); // init
+      // init
+      updatePrevFill(editor.selectedElements.getItems());
+      updateInfo();
 
       editor.sceneGraph.on('render', updateInfo);
+      editor.selectedElements.on('itemsChange', updatePrevFill);
       return () => {
         editor.sceneGraph.off('render', updateInfo);
+        editor.selectedElements.off('itemsChange', updatePrevFill);
       };
     }
   }, [editor]);

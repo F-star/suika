@@ -1,3 +1,5 @@
+import { cloneDeep } from '@suika/common';
+
 import { Graph, IPathItem } from '../graphs';
 import { ITexture } from '../texture';
 import { ICommand } from './type';
@@ -38,7 +40,7 @@ export class SetGraphsAttrsCmd implements ICommand {
       if (Array.isArray(attrs)) {
         elements[i].updateAttrs(attrs[i]);
       } else {
-        elements[i].updateAttrs(attrs);
+        elements[i].updateAttrs(cloneDeep(attrs));
       }
     }
   }
