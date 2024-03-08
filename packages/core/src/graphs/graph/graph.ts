@@ -359,8 +359,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
   static dMove(graphs: Graph[], dx: number, dy: number) {
     for (const graph of graphs) {
-      graph.attrs.x += dx;
-      graph.attrs.y += dy;
+      const bbox = graph.getBBox();
+      graph.updateAttrs({
+        x: bbox.x + dx,
+        y: bbox.y + dy,
+      });
     }
   }
 
