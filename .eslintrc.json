@@ -64,6 +64,10 @@
     ],
     "@typescript-eslint/no-non-null-assertion": 0,
     "@typescript-eslint/no-explicit-any": 0, // 允许使用 any
+    "@typescript-eslint/consistent-type-imports": [
+      "warn",
+      { "fixStyle": "inline-type-imports" }
+    ],
 
     // -------- React 相关 --------------
     // jsx 如果有多行，用括号包裹，且括号独自一行
