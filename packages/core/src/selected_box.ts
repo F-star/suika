@@ -74,7 +74,8 @@ export class SelectedBox {
     ctx.restore();
   }
 
-  isPointInBox(point: IPoint) {
+  /** check if the point is in the selected box */
+  hitTest(point: IPoint) {
     if (!this.box) {
       return false;
     }
@@ -95,7 +96,7 @@ export class SelectedBox {
   }
 
   setHoverByPoint(point: IPoint) {
-    const hover = this.isPointInBox(point);
+    const hover = this.hitTest(point);
     this.setHover(hover);
   }
 

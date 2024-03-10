@@ -32,9 +32,10 @@ export class SelectTool implements ITool {
   private readonly strategySelectRotation: SelectRotationTool;
   private readonly strategySelectResize: SelectResizeTool;
 
-  // 鼠标按下时选中的元素，在鼠标释放时可能会用到。shift 取消一个元素时需要使用
-  private topHitElementWhenStart: Graph | null = null;
-  private isDragHappened = false; // 发生过拖拽
+  /** the graph should be removed from selected if not moved */
+  private graphShouldRemovedFromSelectedIfNotMoved: Graph | null = null;
+  /** whether drag happened */
+  private isDragHappened = false;
 
   constructor(private editor: Editor) {
     this.strategyMove = new SelectMoveTool(editor);
@@ -49,27 +50,17 @@ export class SelectTool implements ITool {
     }
   };
 
-  private handleSpaceToggle = (press: boolean) => {
-    if (press) {
-      this.editor.selectedElements.setHoverItem(null);
-    }
-    // TODO: resetHoverItem after drag canvas end
-  };
-
   onActive() {
     this.editor.selectedElements.on(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
   }
   onInactive() {
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.hostEventManager.off('spaceToggle', this.handleSpaceToggle);
-
     this.editor.render();
   }
 
@@ -103,7 +94,7 @@ export class SelectTool implements ITool {
 
   onStart(e: PointerEvent) {
     this.currStrategy = null;
-    this.topHitElementWhenStart = null;
+    this.graphShouldRemovedFromSelectedIfNotMoved = null;
     this.isDragHappened = false;
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -133,36 +124,47 @@ export class SelectTool implements ITool {
       } else {
         this.currStrategy = this.strategySelectResize;
       }
-    }
-
-    // 1. 点击落在选中盒中
-    else if (this.editor.selectedBox.isPointInBox(this.startPoint)) {
-      this.currStrategy = this.strategyMove;
     } else {
+      const isInsideSelectedBox = this.editor.selectedBox.hitTest(
+        this.startPoint,
+      );
       const topHitElement = sceneGraph.getTopHitElement(
         this.startPoint.x,
         this.startPoint.y,
       );
-      // 2. 点中一个元素
-      if (topHitElement) {
-        // 按住 shift 键的选中，添加或移除一个选中元素
-        if (isShiftPressing) {
-          // 延迟到鼠标释放时才将元素从选中元素中移出
-          if (selectedElements.getItems().includes(topHitElement)) {
-            this.topHitElementWhenStart = topHitElement;
-          } else {
-            selectedElements.toggleItems([topHitElement]);
-          }
-        } else {
-          selectedElements.setItems([topHitElement]);
-        }
+      if (
+        topHitElement &&
+        isShiftPressing &&
+        selectedElements.getItems().includes(topHitElement)
+      ) {
+        this.graphShouldRemovedFromSelectedIfNotMoved = topHitElement;
+      }
 
-        this.editor.selectedBox.setHover(true);
-        sceneGraph.render();
+      // 1. 点击落在选中盒中
+      if (isInsideSelectedBox) {
         this.currStrategy = this.strategyMove;
       } else {
-        // 3. 点击到空白区域
-        this.currStrategy = this.strategyDrawSelectionBox;
+        // 2. 点中一个元素
+        if (topHitElement) {
+          // 单选
+          if (!isShiftPressing) {
+            selectedElements.setItems([topHitElement]);
+          }
+          // 连选：按住 shift 键的选中，添加或移除一个选中元素
+          else {
+            // 延迟到鼠标释放时才将元素从选中元素中移出
+            if (!selectedElements.getItems().includes(topHitElement)) {
+              selectedElements.toggleItems([topHitElement]);
+            }
+          }
+
+          this.editor.selectedBox.setHover(true);
+          sceneGraph.render();
+          this.currStrategy = this.strategyMove;
+        } else {
+          // 3. 点击到空白区域
+          this.currStrategy = this.strategyDrawSelectionBox;
+        }
       }
     }
 
@@ -193,8 +195,10 @@ export class SelectTool implements ITool {
       return;
     }
 
-    if (this.topHitElementWhenStart && !this.isDragHappened) {
-      this.editor.selectedElements.toggleItems([this.topHitElementWhenStart]);
+    if (!this.isDragHappened && this.graphShouldRemovedFromSelectedIfNotMoved) {
+      this.editor.selectedElements.toggleItems([
+        this.graphShouldRemovedFromSelectedIfNotMoved,
+      ]);
       this.editor.render();
     }
 
@@ -210,7 +214,7 @@ export class SelectTool implements ITool {
     if (!this.editor.hostEventManager.isDraggingCanvasBySpace) {
       this.editor.setCursor('default');
     }
-    this.topHitElementWhenStart = null;
+    this.graphShouldRemovedFromSelectedIfNotMoved = null;
     this.isDragHappened = false;
     this.currStrategy?.afterEnd(e);
     this.currStrategy = null;
@@ -218,5 +222,13 @@ export class SelectTool implements ITool {
     const point = this.editor.getSceneCursorXY(e);
     this.editor.selectedBox.setHoverByPoint(point);
     this.updateCursorAndHlHoverGraph(point);
+  }
+
+  onSpaceToggle(isSpacePressing: boolean) {
+    // drag canvas action active
+    if (isSpacePressing) {
+      this.editor.selectedElements.setHoverItem(null);
+    }
+    // TODO: resetHoverItem after drag canvas end
   }
 }
