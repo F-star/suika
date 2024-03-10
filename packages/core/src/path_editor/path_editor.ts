@@ -3,12 +3,12 @@ import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { RemoveGraphsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
-import { Editor } from '../editor';
-import { Ellipse, Graph, Line, Path, Rect } from '../graphs';
+import { type Editor } from '../editor';
+import { Ellipse, type Graph, Line, Path, Rect } from '../graphs';
 import { TextureType } from '../texture';
 import { DrawPathTool, PathSelectTool } from '../tools';
 import { SelectTool } from '../tools/tool_select';
-import { ISelectedIdxInfo, SelectedIdexType } from './type';
+import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
 
 interface Events {
   toggle: (active: boolean) => void;
@@ -42,19 +42,25 @@ export class PathEditor {
     this._active = true;
     this.path = path;
 
-    this.editor.sceneGraph.showSelectedGraphsOutline = false;
-    this.editor.sceneGraph.highlightLayersOnHover = false;
+    const editor = this.editor;
+    editor.sceneGraph.showSelectedGraphsOutline = false;
+    editor.sceneGraph.highlightLayersOnHover = false;
 
     this.unbindHotkeys();
     this.bindHotkeys();
 
-    this.prevToolKeys = this.editor.toolManager.getEnableTools();
-    this.editor.toolManager.setEnableHotKeyTools([
+    this.prevToolKeys = editor.toolManager.getEnableTools();
+    editor.toolManager.setEnableHotKeyTools([
       PathSelectTool.type,
       DrawPathTool.type,
     ]);
+    const currTool = editor.toolManager.getActiveToolName();
+    if (currTool !== PathSelectTool.type && currTool !== DrawPathTool.type) {
+      editor.toolManager.setActiveTool(PathSelectTool.type);
+    }
 
-    this.editor.selectedElements.on('itemsChange', this.onSelectedChange);
+    editor.selectedElements.on('itemsChange', this.onSelectedChange);
+    editor.pathEditor.updateControlHandles();
     this.eventEmitter.emit('toggle', true);
   }
   inactive(source?: 'undo') {

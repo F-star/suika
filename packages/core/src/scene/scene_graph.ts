@@ -4,20 +4,20 @@ import {
   forEach,
   getDevicePixelRatio,
 } from '@suika/common';
-import { IRect, isRectIntersect } from '@suika/geo';
+import { type IPoint, type IRect, isRectIntersect } from '@suika/geo';
 
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import {
   Ellipse,
   Graph,
-  GraphAttrs,
+  type GraphAttrs,
   Line,
   Path,
   Rect,
   TextGraph,
 } from '../graphs';
 import Grid from '../grid';
-import { GraphType, IEditorPaperData, IObject } from '../type';
+import { GraphType, type IEditorPaperData, type IObject } from '../type';
 import { rafThrottle } from '../utils';
 
 const graphCtorMap = {
@@ -319,7 +319,7 @@ export class SceneGraph {
   //   ctx.restore();
   // }
 
-  getTopHitElement(x: number, y: number): Graph | null {
+  getTopHitElement(point: IPoint): Graph | null {
     const padding =
       this.editor.setting.get('selectionHitPadding') /
       this.editor.zoomManager.getZoom();
@@ -328,7 +328,11 @@ export class SceneGraph {
     // TODO: optimize, use r-tree to reduce time complexity
     for (let i = this.children.length - 1; i >= 0; i--) {
       const el = this.children[i];
-      if (el.getVisible() && !el.getLock() && el.hitTest(x, y, padding)) {
+      if (
+        el.getVisible() &&
+        !el.getLock() &&
+        el.hitTest(point.x, point.y, padding)
+      ) {
         topHitElement = el;
         break;
       }
