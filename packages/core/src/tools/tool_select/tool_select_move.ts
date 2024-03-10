@@ -1,9 +1,9 @@
 import { noop } from '@suika/common';
 
 import { MoveGraphsCommand } from '../../commands/move_graphs';
-import { Editor } from '../../editor';
-import { IPoint } from '../../type';
-import { IBaseTool } from '../type';
+import { type Editor } from '../../editor';
+import { type IPoint } from '../../type';
+import { type IBaseTool } from '../type';
 
 /**
  * select tool
@@ -131,10 +131,7 @@ export class SelectMoveTool implements IBaseTool {
     if (!isDragHappened) {
       // clear selected elements if click on blank area and not dragging
       const point = this.editor.getSceneCursorXY(e);
-      const topHitElement = this.editor.sceneGraph.getTopHitElement(
-        point.x,
-        point.y,
-      );
+      const topHitElement = this.editor.sceneGraph.getTopHitElement(point);
       if (!topHitElement && !this.editor.hostEventManager.isShiftPressing) {
         this.editor.selectedElements.clear();
       }

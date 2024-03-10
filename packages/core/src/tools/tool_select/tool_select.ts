@@ -1,10 +1,10 @@
 import { throttle } from '@suika/common';
 
-import { ICursor, isRotationCursor } from '../../cursor_manager';
-import { Editor } from '../../editor';
-import { Graph } from '../../graphs';
-import { IPoint } from '../../type';
-import { IBaseTool, ITool } from '../type';
+import { type ICursor, isRotationCursor } from '../../cursor_manager';
+import { type Editor } from '../../editor';
+import { type Graph, type Path } from '../../graphs';
+import { GraphType, type IPoint } from '../../type';
+import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectResizeTool } from './tool_select_resize';
 import { SelectRotationTool } from './tool_select_rotation';
@@ -50,17 +50,35 @@ export class SelectTool implements ITool {
     }
   };
 
+  // double click to active path editor
+  private onDblClick = () => {
+    const point = this.editor.toolManager.getCurrPoint();
+    const editor = this.editor;
+    if (editor.hostEventManager.isShiftPressing) return;
+    const handleInfo = editor.controlHandleManager.getHandleInfoByPoint(point);
+    if (handleInfo) return;
+
+    const topHitElement = editor.sceneGraph.getTopHitElement(point);
+    if (!topHitElement) return;
+
+    if (topHitElement.type === GraphType.Path) {
+      editor.pathEditor.active(topHitElement as Path);
+    }
+  };
+
   onActive() {
     this.editor.selectedElements.on(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
+    this.editor.canvasElement.addEventListener('dblclick', this.onDblClick);
   }
   onInactive() {
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
+    this.editor.canvasElement.removeEventListener('dblclick', this.onDblClick);
     this.editor.render();
   }
 
@@ -84,10 +102,7 @@ export class SelectTool implements ITool {
     if (handleInfo) {
       this.editor.selectedElements.setHoverItem(null);
     } else {
-      const topHitElement = this.editor.sceneGraph.getTopHitElement(
-        point.x,
-        point.y,
-      );
+      const topHitElement = this.editor.sceneGraph.getTopHitElement(point);
       this.editor.selectedElements.setHoverItem(topHitElement);
     }
   }, 20);
@@ -128,10 +143,7 @@ export class SelectTool implements ITool {
       const isInsideSelectedBox = this.editor.selectedBox.hitTest(
         this.startPoint,
       );
-      const topHitElement = sceneGraph.getTopHitElement(
-        this.startPoint.x,
-        this.startPoint.y,
-      );
+      const topHitElement = sceneGraph.getTopHitElement(this.startPoint);
       if (
         topHitElement &&
         isShiftPressing &&
