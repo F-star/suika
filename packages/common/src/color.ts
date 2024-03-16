@@ -51,7 +51,10 @@ export const parseRGBToHex = (rgb: { r: number; g: number; b: number }) => {
   const hex = (r << 16) | (g << 8) | b;
   return hex.toString(16).toUpperCase().padStart(6, '0');
 };
-
+/**
+ * parse hex to rgb
+ * e.g. #FF0000 -> { r: 255, g: 0, b: 0 }
+ */
 export const parseHexToRGB = (hex: string): IRGB | null => {
   hex = normalizeHex(hex);
   if (!hex) {
@@ -63,6 +66,10 @@ export const parseHexToRGB = (hex: string): IRGB | null => {
   return { r, g, b };
 };
 
+/**
+ * parse hex to rgba
+ * e.g. #FF0000FF -> { r: 255, g: 0, b: 0, a: 1 }
+ */
 export const parseHexToRGBA = (hex: string): IRGBA | null => {
   hex = normalizeHex(hex);
   if (!hex) {

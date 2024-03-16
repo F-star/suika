@@ -1,13 +1,13 @@
-import { parseRGBAStr } from '@suika/common';
-import { addPoint, IRect, IRectWithRotation } from '@suika/geo';
+import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import { addPoint, type IRect, type IRectWithRotation } from '@suika/geo';
 import { Bezier } from 'bezier-js';
 
-import { ImgManager } from '../../Img_manager';
-import { TextureType } from '../../texture';
+import { type ImgManager } from '../../Img_manager';
+import { type ITexture, TextureType } from '../../texture';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils';
-import { Graph, GraphAttrs } from '../graph';
-import { IPathItem, ISegment } from './type';
+import { Graph, type GraphAttrs } from '../graph';
+import { type IPathItem, type ISegment } from './type';
 
 export interface PathAttrs extends GraphAttrs {
   pathData: IPathItem[];
@@ -99,7 +99,37 @@ export class Path extends Graph<PathAttrs> {
     imgManager?: ImgManager | undefined,
     smooth?: boolean | undefined,
   ) {
-    const { pathData, rotation, fill, strokeWidth, stroke } = this.attrs;
+    this.realDraw(ctx, imgManager, smooth);
+  }
+
+  override drawOutline(
+    ctx: CanvasRenderingContext2D,
+    stroke: string,
+    strokeWidth: number,
+  ) {
+    this.realDraw(ctx, undefined, undefined, {
+      stroke: [
+        {
+          type: TextureType.Solid,
+          attrs: parseHexToRGBA(stroke)!,
+        },
+      ],
+      strokeWidth,
+    });
+  }
+
+  private realDraw(
+    ctx: CanvasRenderingContext2D,
+    imgManager?: ImgManager,
+    smooth?: boolean,
+    overrideStyle?: {
+      fill?: ITexture[];
+      stroke?: ITexture[];
+      strokeWidth?: number;
+    },
+  ) {
+    const { pathData, rotation } = this.attrs;
+    const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
     if (rotation) {
       const { x: cx, y: cy } = this.getCenter();
 
