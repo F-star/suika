@@ -161,6 +161,7 @@ export class SceneGraph {
         this.drawGraphsOutline(
           [hlItem],
           setting.get('hoverOutlineStrokeWidth'),
+          this.editor.setting.get('hoverOutlineStroke'),
         );
       }
     }
@@ -174,8 +175,21 @@ export class SceneGraph {
           .getItems()
           .filter((item) => item.getVisible()),
         setting.get('selectedOutlineStrokeWidth'),
+        this.editor.setting.get('hoverOutlineStroke'),
       );
       this.editor.selectedBox.draw();
+    }
+
+    // draw path editor path outline
+    if (this.editor.pathEditor.isActive()) {
+      const path = this.editor.pathEditor.getPath();
+      if (path) {
+        this.drawGraphsOutline(
+          [path],
+          setting.get('selectedOutlineStrokeWidth'),
+          this.editor.setting.get('pathLineStroke'),
+        );
+      }
     }
 
     /** draw transform handle */
@@ -226,7 +240,11 @@ export class SceneGraph {
     this.eventEmitter.emit('render');
   });
 
-  private drawGraphsOutline(graphs: Graph[], strokeWidth: number) {
+  private drawGraphsOutline(
+    graphs: Graph[],
+    strokeWidth: number,
+    stroke: string,
+  ) {
     const ctx = this.editor.ctx;
     const dpr = getDevicePixelRatio();
     const viewport = this.editor.viewportManager.getViewport();
@@ -239,7 +257,6 @@ export class SceneGraph {
     ctx.scale(dpr * zoom, dpr * zoom);
     ctx.translate(dx, dy);
 
-    const stroke = this.editor.setting.get('hoverOutlineStroke');
     strokeWidth /= zoom;
     for (const graph of graphs) {
       ctx.save();

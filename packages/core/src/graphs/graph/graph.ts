@@ -2,8 +2,8 @@ import { calcCoverScale, genId, objectNameGenerator } from '@suika/common';
 import {
   getRectRotatedXY,
   getResizedRect,
-  IRect,
-  IRectWithRotation,
+  type IRect,
+  type IRectWithRotation,
   isPointInRect,
   isRectContain,
   isRectIntersect,
@@ -12,17 +12,17 @@ import {
 } from '@suika/geo';
 
 import { HALF_PI } from '../../constant';
-import { ControlHandle } from '../../control_handle_manager';
-import { ImgManager } from '../../Img_manager';
+import { type ControlHandle } from '../../control_handle_manager';
+import { type ImgManager } from '../../Img_manager';
 import { getResizedLine } from '../../scene/utils';
-import { DEFAULT_IMAGE, TextureImage } from '../../texture';
+import { DEFAULT_IMAGE, type TextureImage } from '../../texture';
 import {
   GraphType,
-  IBox,
-  IBox2,
-  IBox2WithRotation,
-  IObject,
-  IPoint,
+  type IBox,
+  type IBox2,
+  type IBox2WithRotation,
+  type IObject,
+  type IPoint,
 } from '../../type';
 import {
   drawRoundRectPath,
@@ -30,7 +30,7 @@ import {
   getRectCenterPoint,
   rotateInCanvas,
 } from '../../utils';
-import { GraphAttrs } from './graph_attrs';
+import { type GraphAttrs } from './graph_attrs';
 
 export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   type = GraphType.Graph;

@@ -8,7 +8,7 @@ import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectResizeTool } from './tool_select_resize';
 import { SelectRotationTool } from './tool_select_rotation';
-import { DrawSelectionBox } from './tool_select_selection';
+import { DrawSelection as DrawSelectionTool } from './tool_select_selection';
 
 const TYPE = 'select';
 const HOTKEY = 'v';
@@ -28,18 +28,16 @@ export class SelectTool implements ITool {
   private currStrategy: IBaseTool | null = null;
   // 策略
   private readonly strategyMove: SelectMoveTool;
-  private readonly strategyDrawSelectionBox: DrawSelectionBox;
+  private readonly strategyDrawSelection: DrawSelectionTool;
   private readonly strategySelectRotation: SelectRotationTool;
   private readonly strategySelectResize: SelectResizeTool;
 
   /** the graph should be removed from selected if not moved */
   private graphShouldRemovedFromSelectedIfNotMoved: Graph | null = null;
-  /** whether drag happened */
-  private isDragHappened = false;
 
   constructor(private editor: Editor) {
     this.strategyMove = new SelectMoveTool(editor);
-    this.strategyDrawSelectionBox = new DrawSelectionBox(editor);
+    this.strategyDrawSelection = new DrawSelectionTool(editor);
     this.strategySelectRotation = new SelectRotationTool(editor);
     this.strategySelectResize = new SelectResizeTool(editor);
   }
@@ -110,7 +108,6 @@ export class SelectTool implements ITool {
   onStart(e: PointerEvent) {
     this.currStrategy = null;
     this.graphShouldRemovedFromSelectedIfNotMoved = null;
-    this.isDragHappened = false;
 
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
@@ -175,7 +172,7 @@ export class SelectTool implements ITool {
           this.currStrategy = this.strategyMove;
         } else {
           // 3. 点击到空白区域
-          this.currStrategy = this.strategyDrawSelectionBox;
+          this.currStrategy = this.strategyDrawSelection;
         }
       }
     }
@@ -188,8 +185,6 @@ export class SelectTool implements ITool {
     }
   }
   onDrag(e: PointerEvent) {
-    this.isDragHappened = true;
-
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
@@ -207,7 +202,7 @@ export class SelectTool implements ITool {
       return;
     }
 
-    if (!this.isDragHappened && this.graphShouldRemovedFromSelectedIfNotMoved) {
+    if (!isDragHappened && this.graphShouldRemovedFromSelectedIfNotMoved) {
       this.editor.selectedElements.toggleItems([
         this.graphShouldRemovedFromSelectedIfNotMoved,
       ]);
@@ -227,7 +222,6 @@ export class SelectTool implements ITool {
       this.editor.setCursor('default');
     }
     this.graphShouldRemovedFromSelectedIfNotMoved = null;
-    this.isDragHappened = false;
     this.currStrategy?.afterEnd(e);
     this.currStrategy = null;
 

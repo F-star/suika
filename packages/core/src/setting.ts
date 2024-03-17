@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
 
-import { ITexture, TextureType } from './texture';
-import { BooleanKeys } from './type';
+import { type ITexture, TextureType } from './texture';
+import { type BooleanKeys } from './type';
 
 interface Events {
   update(attrs: SettingValue): void;
@@ -108,6 +108,9 @@ export class Setting {
 
     /**** tool ****/
     keepToolSelectedAfterUse: false,
+
+    /******** path control handle ******/
+    pathLineStroke: '#a4a4a4',
   };
   toggle<K extends BooleanKeys<Setting['value']>>(key: K) {
     const value = this.value[key];

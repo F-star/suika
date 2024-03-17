@@ -15,7 +15,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../../context';
-import { MessageIds } from '../../../../locale';
+import { type MessageIds } from '../../../../locale';
 import { ToolBtn } from './components/ToolBtn';
 import { Menu } from './menu';
 
@@ -30,7 +30,7 @@ export const ToolBar = () => {
     if (editor) {
       setCurrTool(editor.toolManager.getActiveToolName() || '');
       setEnableTools(editor.toolManager.getEnableTools());
-      setIsPathEditorActive(editor.pathEditor.getActive());
+      setIsPathEditorActive(editor.pathEditor.isActive());
 
       const onTogglePathEditor = (active: boolean) => {
         setIsPathEditorActive(active);
