@@ -1,14 +1,14 @@
 import { getRectByTwoPoint } from '@suika/geo';
 
-import { Editor } from '../../editor';
-import { Graph } from '../../graphs';
-import { IPoint } from '../../type';
-import { IBaseTool } from '../type';
+import { type Editor } from '../../editor';
+import { type Graph } from '../../graphs';
+import { type IPoint } from '../../type';
+import { type IBaseTool } from '../type';
 
 /**
  * draw selection box
  */
-export class DrawSelectionBox implements IBaseTool {
+export class DrawSelection implements IBaseTool {
   private lastPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
   private startSelectedGraphs: Graph[] = [];

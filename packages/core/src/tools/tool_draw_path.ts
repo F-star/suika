@@ -1,14 +1,14 @@
 import { cloneDeep, getClosestTimesVal, parseHexToRGBA } from '@suika/common';
-import { distance, IPoint } from '@suika/geo';
+import { distance, type IPoint } from '@suika/geo';
 
 import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
-import { ICursor } from '../cursor_manager';
-import { Editor } from '../editor';
-import { Ellipse, IPathItem, Path } from '../graphs';
+import { type ICursor } from '../cursor_manager';
+import { type Editor } from '../editor';
+import { Ellipse, type IPathItem, Path } from '../graphs';
 import { TextureType } from '../texture';
 import { PathSelectTool } from './tool_path_select';
-import { ITool } from './type';
+import { type ITool } from './type';
 
 const TYPE = 'drawPath';
 const HOTKEY = 'p';
@@ -27,7 +27,7 @@ export class DrawPathTool implements ITool {
 
   constructor(private editor: Editor) {}
   onActive() {
-    if (this.editor.pathEditor.getActive()) {
+    if (this.editor.pathEditor.isActive()) {
       this.path = this.editor.pathEditor.getPath()!;
       this.pathIdx = this.path.attrs.pathData.length;
     }
@@ -68,7 +68,7 @@ export class DrawPathTool implements ITool {
     this.startPoint = snapPoint ?? this.getCorrectedPoint();
 
     // create new path
-    if (!pathEditor.getActive()) {
+    if (!pathEditor.isActive()) {
       const pathData: IPathItem[] = [
         {
           segs: [

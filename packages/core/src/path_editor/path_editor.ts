@@ -1,4 +1,9 @@
-import { EventEmitter, parseHexToRGBA } from '@suika/common';
+import {
+  cloneDeep,
+  EventEmitter,
+  parseHexToRGBA,
+  throttle,
+} from '@suika/common';
 import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { RemoveGraphsCmd } from '../commands';
@@ -35,7 +40,7 @@ export class PathEditor {
   getPath() {
     return this.path;
   }
-  getActive() {
+  isActive() {
     return this._active;
   }
   active(path: Path) {
@@ -212,7 +217,7 @@ export class PathEditor {
   /**
    * get anchor and control handles
    */
-  private getControlHandles(path: Path | null): ControlHandle[] {
+  private getPathControlHandles(path: Path | null): ControlHandle[] {
     if (!path) {
       return [];
     }
@@ -235,11 +240,10 @@ export class PathEditor {
         const anchor = seg.point;
 
         // 1. draw anchor
-        // 是否要高亮。
         let anchorSize = 6;
         let anchorFill = '#fff';
         let anchorStroke = handleStroke;
-        if (this.hasSelectedIndex('anchor', i, j)) {
+        if (this.containsSelectedIndex('anchor', i, j)) {
           anchorSize = 8;
           anchorFill = handleStroke;
           anchorStroke = '#fff';
@@ -250,8 +254,10 @@ export class PathEditor {
           type: ['anchor', i, j].join('-'),
           graph: new Ellipse({
             objectName: 'anchor',
-            x: anchor.x,
-            y: anchor.y,
+            ...this.editor.sceneCoordsToViewport(
+              anchor.x + anchorSize / 2,
+              anchor.y + anchorSize / 2,
+            ),
             width: anchorSize,
             height: anchorSize,
             fill: [
@@ -279,6 +285,9 @@ export class PathEditor {
           continue;
         }
 
+        const pathLineStroke = parseHexToRGBA(
+          this.editor.setting.get('pathLineStroke'),
+        )!;
         const handles = [Path.getHandleIn(seg), Path.getHandleOut(seg)];
         for (let handleIdx = 0; handleIdx < handles.length; handleIdx++) {
           const handle = handles[handleIdx];
@@ -299,7 +308,7 @@ export class PathEditor {
               stroke: [
                 {
                   type: TextureType.Solid,
-                  attrs: parseHexToRGBA('#a4a4a4')!,
+                  attrs: pathLineStroke,
                 },
               ],
               strokeWidth: 1,
@@ -348,12 +357,31 @@ export class PathEditor {
   getSelectedIndicesSize() {
     return this.selectedIndices.length;
   }
-
+  getSelectedIndices() {
+    return cloneDeep(this.selectedIndices);
+  }
   setSelectedIndices(items: ISelectedIdxInfo[]) {
+    // TODO: solve duplicate indices
     this.selectedIndices = items;
   }
+  clearSelectedIndices() {
+    this.selectedIndices = [];
+  }
+  /**
+   * parse selected index from string
+   * e.g. 'anchor-0-1' -> { type: 'anchor', pathIdx: 0, segIdx: 1 }
+   */
+  static parseSelectedIndex(selectedIndex: string): ISelectedIdxInfo | null {
+    const selectedInfo = selectedIndex.split('-');
+    if (selectedInfo.length !== 3) return null;
+    return {
+      type: selectedInfo[0] as SelectedIdexType,
+      pathIdx: parseInt(selectedInfo[1]),
+      segIdx: parseInt(selectedInfo[2]),
+    };
+  }
 
-  private hasSelectedIndex(
+  containsSelectedIndex(
     type: SelectedIdexType,
     pathIdx: number,
     segIdx: number,
@@ -373,13 +401,14 @@ export class PathEditor {
     this.eventEmitter.off(eventName, handler);
   }
 
-  updateControlHandles(addedControlHandles: ControlHandle[] = []) {
-    const path = this.path!;
+  updateControlHandles = throttle(
+    (addedControlHandles: ControlHandle[] = []) => {
+      const path = this.path!;
+      addedControlHandles =
+        this.getPathControlHandles(path).concat(addedControlHandles);
 
-    addedControlHandles =
-      this.getControlHandles(path).concat(addedControlHandles);
-
-    this.editor.controlHandleManager.setCustomHandles(addedControlHandles);
-    this.editor.controlHandleManager.showCustomHandles();
-  }
+      this.editor.controlHandleManager.setCustomHandles(addedControlHandles);
+      this.editor.controlHandleManager.showCustomHandles();
+    },
+  );
 }

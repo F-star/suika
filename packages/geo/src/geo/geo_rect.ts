@@ -1,5 +1,5 @@
 import { transformRotate } from '../transform';
-import { IPoint, IRect, IRectWithRotation } from '../type';
+import { type IPoint, type IRect, type IRectWithRotation } from '../type';
 import { normalizeRadian } from './geo_angle';
 
 export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
@@ -230,6 +230,9 @@ export const getRectRotatedXY = (rect: IRectWithRotation) => {
   return transformRotate(rect.x, rect.y, rect.rotation || 0, cx, cy);
 };
 
+/**
+ * line -> rect with rotation, and height is 0
+ */
 export const getRotatedRectByTwoPoint = (
   point1: IPoint,
   point2: IPoint,

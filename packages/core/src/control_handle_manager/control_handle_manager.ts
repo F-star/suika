@@ -1,16 +1,17 @@
 import {
-  IPoint,
-  IRectWithRotation,
+  type IPoint,
+  type IRect,
+  type IRectWithRotation,
   offsetRect,
   rectToMidPoints,
   rectToPoints,
 } from '@suika/geo';
 
-import { ICursor } from '../cursor_manager';
-import { Editor } from '../editor';
+import { type ICursor } from '../cursor_manager';
+import { type Editor } from '../editor';
 import { GraphType } from '../type';
-import { ControlHandle } from './control_handle';
-import { ITransformHandleType } from './type';
+import { type ControlHandle } from './control_handle';
+import { type ITransformHandleType } from './type';
 import { createTransformHandles } from './util';
 
 const types = [
@@ -49,7 +50,7 @@ export class ControlHandleManager {
   }
 
   private onHoverItemChange = () => {
-    if (!this.editor.pathEditor.getActive()) {
+    if (!this.editor.pathEditor.isActive()) {
       const hoverItem = this.editor.selectedElements.getHoverItem();
       const isSingleSelectedGraph = this.editor.selectedElements.size() === 1;
       const selectedGraph = isSingleSelectedGraph
@@ -85,7 +86,7 @@ export class ControlHandleManager {
   }
 
   private updateTransformHandles(rect: IRectWithRotation | null) {
-    if (!rect || this.editor.pathEditor.getActive()) {
+    if (!rect || this.editor.pathEditor.isActive()) {
       this.transformHandlesVisible = false;
       return;
     }
@@ -248,6 +249,24 @@ export class ControlHandleManager {
   setCustomHandles(handles: ControlHandle[]) {
     this.customHandles = handles;
   }
+  getCustomHandlesIntersectedWithRect(rect: IRect) {
+    // convert rect to viewport
+    const leftTop = this.editor.sceneCoordsToViewport(rect.x, rect.y);
+    const bottomRight = this.editor.sceneCoordsToViewport(
+      rect.x + rect.width,
+      rect.y + rect.height,
+    );
+    rect = {
+      x: leftTop.x,
+      y: leftTop.y,
+      width: bottomRight.x - leftTop.x,
+      height: bottomRight.y - leftTop.y,
+    };
+    return this.customHandles.filter((handle) =>
+      handle.graph.intersectWithRect(rect),
+    );
+  }
+
   clearCustomHandles() {
     this.customHandles = [];
   }
