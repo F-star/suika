@@ -1,7 +1,7 @@
 import { EventEmitter, getDevicePixelRatio } from '@suika/common';
 
-import { Editor } from './editor';
-import { IBox, IBox2 } from './type';
+import { type Editor } from './editor';
+import { type IBox, type IBox2 } from './type';
 
 interface Events {
   xOrYChange(x: number | undefined, y: number): void;

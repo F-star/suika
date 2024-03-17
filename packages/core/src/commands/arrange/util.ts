@@ -1,4 +1,4 @@
-import { Graph } from '../../graphs';
+import { type Graph } from '../../graphs';
 
 /**
  * return

@@ -5,15 +5,15 @@ import {
   flip,
   FloatingPortal,
   offset as floatUiOffset,
-  OffsetOptions,
-  Placement,
+  type OffsetOptions,
+  type Placement,
   useClick,
   useDismiss,
   useFloating,
   useHover,
   useInteractions,
 } from '@floating-ui/react';
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 interface PopoverProps {
   content: React.ReactNode;

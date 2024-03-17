@@ -1,4 +1,4 @@
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 
 export const exportService = {
   exportOriginFile: (editor: Editor, filename = 'design') => {

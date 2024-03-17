@@ -3,7 +3,7 @@ import './cursor.css';
 import { isEqual } from '@suika/common';
 import { normalizeDegree } from '@suika/geo';
 
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { getIconSvgDataUrl } from './util';
 
 export interface ICursorRotation {

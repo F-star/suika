@@ -1,9 +1,9 @@
 import { parseRGBAStr } from '@suika/common';
 
 import { TextureType } from '../texture';
-import { GraphType, Optional } from '../type';
+import { GraphType, type Optional } from '../type';
 import { rotateInCanvas } from '../utils';
-import { Graph, GraphAttrs } from './graph';
+import { Graph, type GraphAttrs } from './graph';
 
 export interface TextAttrs extends GraphAttrs {
   content: string;

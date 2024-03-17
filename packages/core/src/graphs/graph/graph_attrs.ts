@@ -1,5 +1,5 @@
-import { ITexture } from '../../texture';
-import { GraphType } from '../../type';
+import { type ITexture } from '../../texture';
+import { type GraphType } from '../../type';
 
 export interface GraphAttrs {
   type?: GraphType;

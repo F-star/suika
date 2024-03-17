@@ -5,7 +5,7 @@ import { IntlProvider } from 'react-intl';
 
 import Editor from './components/Editor';
 import { appEventEmitter } from './events';
-import { en, SupportedLocale, zh } from './locale';
+import { en, type SupportedLocale, zh } from './locale';
 
 const messageMap = {
   zh,

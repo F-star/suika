@@ -9,13 +9,13 @@ import {
 import { IconButton, Popover } from '@suika/components';
 import {
   DEFAULT_IMAGE_SRC,
-  IRGBA,
-  ITexture,
-  TextureSolid,
+  type IRGBA,
+  type ITexture,
+  type TextureSolid,
   TextureType,
 } from '@suika/core';
 import { AddOutlined, RemoveOutlined } from '@suika/icons';
-import { FC, useState } from 'react';
+import { type FC, useState } from 'react';
 
 import { TexturePicker } from '../../ColorPicker/TexturePicker';
 import { ColorHexInput } from '../../input/ColorHexInput';

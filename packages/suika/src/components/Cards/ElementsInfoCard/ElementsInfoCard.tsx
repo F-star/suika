@@ -8,7 +8,7 @@ import {
   normalizeRadian,
   rad2Deg,
 } from '@suika/geo';
-import { FC, useContext, useEffect, useState } from 'react';
+import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';

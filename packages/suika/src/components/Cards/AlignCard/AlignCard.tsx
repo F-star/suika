@@ -1,6 +1,6 @@
 import './AlignCard.scss';
 
-import { alignAndRecord, AlignType, Graph } from '@suika/core';
+import { alignAndRecord, AlignType, type Graph } from '@suika/core';
 import {
   AlignHCenter,
   AlignLeft,
@@ -10,7 +10,7 @@ import {
   IconAlignBottom,
 } from '@suika/icons';
 import classNames from 'classnames';
-import { FC, useContext, useEffect, useState } from 'react';
+import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../../context';
 import { BaseCard } from '../BaseCard';

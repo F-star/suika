@@ -1,11 +1,11 @@
 import { parseHexToRGBA } from '@suika/common';
-import { IRectWithRotation, normalizeDegree, rad2Deg } from '@suika/geo';
+import { type IRectWithRotation, normalizeDegree, rad2Deg } from '@suika/geo';
 
-import { ICursor } from '../cursor_manager';
+import { type ICursor } from '../cursor_manager';
 import { Rect } from '../graphs';
-import { ITexture, TextureType } from '../texture';
+import { type ITexture, TextureType } from '../texture';
 import { ControlHandle } from './control_handle';
-import { ITransformHandleType } from './type';
+import { type ITransformHandleType } from './type';
 
 const getResizeCursor = (
   type: string,

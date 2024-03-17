@@ -1,7 +1,7 @@
 import './ContextMenuItem.scss';
 
 import classNames from 'classnames';
-import { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren } from 'react';
 
 interface IProps extends PropsWithChildren {
   suffix?: string;

@@ -1,7 +1,7 @@
-import { Editor } from '../editor';
-import { Graph } from '../graphs';
+import { type Editor } from '../editor';
+import { type Graph } from '../graphs';
 import { Group } from '../group_manager';
-import { ICommand } from './type';
+import { type ICommand } from './type';
 
 export class GroupCmd implements ICommand {
   private groupedElSet = new Set<Graph>();

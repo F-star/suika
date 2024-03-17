@@ -1,12 +1,12 @@
 import './dropdown-item.scss';
 
-import { EventEmitter } from '@suika/common';
+import { type EventEmitter } from '@suika/common';
 import { CheckOutlined, RightOutlined } from '@suika/icons';
 import classNames from 'classnames';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
 import { Dropdown } from '../dropdown';
-import { DropdownEvents, Item } from '../type';
+import { type DropdownEvents, type Item } from '../type';
 
 interface IProps {
   itemKey: string;

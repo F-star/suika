@@ -1,4 +1,4 @@
-import { MessageIds, SupportedLocale } from './locale';
+import { type MessageIds, type SupportedLocale } from './locale';
 
 declare global {
   namespace FormatjsIntl {

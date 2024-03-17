@@ -1,6 +1,6 @@
 import { isWindows } from '@suika/common';
 
-import { Editor } from './editor';
+import { type Editor } from './editor';
 
 interface IKey {
   ctrlKey?: boolean;

@@ -1,6 +1,6 @@
 import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
 
-import { Editor } from './editor';
+import { type Editor } from './editor';
 
 /**
  * draw grid

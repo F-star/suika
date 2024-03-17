@@ -1,7 +1,7 @@
 import './style.scss';
 
-import { Graph } from '@suika/core';
-import { FC, useContext, useEffect, useState } from 'react';
+import { type Graph } from '@suika/core';
+import { type FC, useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { EditorContext } from '../../context';

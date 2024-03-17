@@ -1,6 +1,6 @@
 import './button.scss';
 
-import { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren } from 'react';
 
 interface IProps extends PropsWithChildren {
   style?: React.CSSProperties;

@@ -1,6 +1,6 @@
 import { normalizeRect } from './geo';
 import { transformRotate } from './transform';
-import { IPoint, IRectWithRotation } from './type';
+import { type IPoint, type IRectWithRotation } from './type';
 
 /**
  * get resized rect

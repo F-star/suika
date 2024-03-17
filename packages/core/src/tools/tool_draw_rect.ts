@@ -1,10 +1,10 @@
 import { cloneDeep } from '@suika/common';
-import { IRect, normalizeRect } from '@suika/geo';
+import { type IRect, normalizeRect } from '@suika/geo';
 
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { Rect } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
-import { ITool } from './type';
+import { type ITool } from './type';
 
 const TYPE = 'drawRect';
 const HOTKEY = 'r';

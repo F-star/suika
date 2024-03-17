@@ -1,9 +1,9 @@
 import { arrMap, debounce, noop } from '@suika/common';
 
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
-import { Editor } from '../editor';
-import { Graph } from '../graphs';
-import { IPoint } from '../type';
+import { type Editor } from '../editor';
+import { type Graph } from '../graphs';
+import { type IPoint } from '../type';
 
 /**
  * move graphs by arrow key binding

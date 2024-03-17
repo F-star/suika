@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
-import { IPoint, IRectWithRotation, isPointInRect } from '@suika/geo';
+import { type IPoint, type IRectWithRotation, isPointInRect } from '@suika/geo';
 
-import { Editor } from './editor';
+import { type Editor } from './editor';
 import { getRectCenterPoint, rotateInCanvas } from './utils';
 
 interface Events {

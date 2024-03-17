@@ -1,6 +1,6 @@
 import './Header.scss';
 
-import { FC } from 'react';
+import { type FC } from 'react';
 
 import { LocaleSelector } from '../LocaleSelector';
 import { ZoomActions } from '../ZoomActions';

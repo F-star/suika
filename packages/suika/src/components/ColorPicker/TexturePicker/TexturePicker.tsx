@@ -1,9 +1,9 @@
 import './TexturePicker.scss';
 
 import { Select } from '@suika/components';
-import { DEFAULT_TEXTURES, ITexture, TextureType } from '@suika/core';
+import { DEFAULT_TEXTURES, type ITexture, TextureType } from '@suika/core';
 import { CloseOutlined } from '@suika/icons';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { useIntl } from 'react-intl';
 
 import { ImagePicker } from '../ImagePicker';

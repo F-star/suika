@@ -1,5 +1,5 @@
-import { Graph } from '../graphs';
-import { ICommand } from './type';
+import { type Graph } from '../graphs';
+import { type ICommand } from './type';
 
 export enum AlignType {
   Left = 'Left',

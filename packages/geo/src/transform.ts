@@ -1,4 +1,4 @@
-import { IPoint } from './type';
+import { type IPoint } from './type';
 
 export const transformRotate = (
   x: number,

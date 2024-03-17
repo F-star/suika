@@ -1,4 +1,4 @@
-import { IPoint } from '../type';
+import { type IPoint } from '../type';
 
 export const getMidPoint = (p1: IPoint, p2: IPoint) => {
   return {

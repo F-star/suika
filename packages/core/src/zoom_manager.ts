@@ -1,8 +1,8 @@
 import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
-import { getMergedRect, IPoint } from '@suika/geo';
+import { getMergedRect, type IPoint } from '@suika/geo';
 
-import { Editor } from './editor';
-import { IBox } from './type';
+import { type Editor } from './editor';
+import { type IBox } from './type';
 
 interface Events {
   zoomChange(zoom: number, prevZoom: number): void;

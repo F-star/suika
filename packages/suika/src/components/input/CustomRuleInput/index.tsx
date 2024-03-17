@@ -1,6 +1,6 @@
 import './style.scss';
 
-import React, { FC, useEffect, useRef } from 'react';
+import React, { type FC, useEffect, useRef } from 'react';
 
 interface ICustomRuleInputProps {
   parser: (newValue: string, preValue: string | number) => string | false;

@@ -1,8 +1,8 @@
-import { FC } from 'react';
+import { type FC } from 'react';
 
-import { IObject } from '../../../type';
+import { type IObject } from '../../../type';
 import LayerItem from './LayerItem';
-import { IBaseEvents } from './type';
+import { type IBaseEvents } from './type';
 
 interface IProps extends IBaseEvents {
   treeData: IObject[];

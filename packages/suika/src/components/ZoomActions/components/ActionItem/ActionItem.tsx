@@ -1,7 +1,7 @@
 import './ActionItem.scss';
 
 import { CheckOutlined } from '@suika/icons';
-import { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren } from 'react';
 
 interface IProps extends PropsWithChildren {
   suffix?: string;

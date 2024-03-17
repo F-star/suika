@@ -1,15 +1,15 @@
 import './ZoomActions.scss';
 
 import { isWindows } from '@suika/common';
-import { SettingValue } from '@suika/core';
+import { type SettingValue } from '@suika/core';
 import { ArrowDownOutlined } from '@suika/icons';
 import { useClickAway } from 'ahooks';
 import classNames from 'classnames';
-import { FC, useContext, useEffect, useRef, useState } from 'react';
+import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { EditorContext } from '../../context';
-import { MessageIds } from '../../locale';
+import { type MessageIds } from '../../locale';
 import { ActionItem } from './components/ActionItem';
 import { ZoomInput } from './components/ZoomInput';
 

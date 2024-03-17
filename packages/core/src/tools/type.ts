@@ -1,5 +1,5 @@
-import { ICursor } from '../cursor_manager';
-import { Editor } from '../editor';
+import { type ICursor } from '../cursor_manager';
+import { type Editor } from '../editor';
 
 export interface ITool extends IBaseTool {
   hotkey: string;

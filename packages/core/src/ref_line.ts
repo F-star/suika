@@ -1,7 +1,7 @@
 import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
 
-import { Editor } from './editor';
-import { IHorizontalLine, IPoint, IVerticalLine } from './type';
+import { type Editor } from './editor';
+import { type IHorizontalLine, type IPoint, type IVerticalLine } from './type';
 import {
   bboxToBbox2,
   bboxToBboxWithMid,

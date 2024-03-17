@@ -1,6 +1,6 @@
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { Group } from './group';
-import { IGroupsData } from './type';
+import { type IGroupsData } from './type';
 
 export class GroupManager {
   private dataSet = new Set<Group>();

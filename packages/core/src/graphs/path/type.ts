@@ -1,4 +1,4 @@
-import { IPoint } from '@suika/geo';
+import { type IPoint } from '@suika/geo';
 
 export type PathSegPointType = 'in' | 'out' | 'anchor';
 

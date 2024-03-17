@@ -10,7 +10,7 @@ import {
 import { I18nOutlined } from '@suika/icons';
 import { useClickAway } from 'ahooks';
 import classNames from 'classnames';
-import { FC, useState } from 'react';
+import { type FC, useState } from 'react';
 
 import { appEventEmitter } from '../../events';
 

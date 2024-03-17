@@ -7,10 +7,10 @@ import {
   UnlockFilled,
 } from '@suika/icons';
 import classNames from 'classnames';
-import { FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 
-import { IObject } from '../../../type';
-import { IBaseEvents } from './type';
+import { type IObject } from '../../../type';
+import { type IBaseEvents } from './type';
 
 interface IProps extends IBaseEvents {
   id: string;

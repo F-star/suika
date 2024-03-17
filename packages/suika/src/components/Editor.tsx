@@ -2,7 +2,7 @@ import './Editor.scss';
 
 import { throttle } from '@suika/common';
 import { Editor as GraphEditor } from '@suika/core';
-import { FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../context';
 import { ContextMenu } from './ContextMenu';

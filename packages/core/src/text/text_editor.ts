@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 
 import { AddGraphCmd } from '../commands/add_graphs';
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { TextGraph } from '../graphs';
 
 export class TextEditor {

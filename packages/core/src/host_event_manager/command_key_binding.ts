@@ -1,5 +1,5 @@
 import { ArrangeType } from '../commands/arrange';
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { arrangeAndRecord, MutateGraphsAndRecord } from '../service';
 
 export class CommandKeyBinding {

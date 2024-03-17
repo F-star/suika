@@ -1,6 +1,6 @@
-import { IPoint } from '@suika/geo';
+import { type IPoint } from '@suika/geo';
 
-import { Editor } from './editor';
+import { type Editor } from './editor';
 
 /**
  * drag canvas

@@ -1,7 +1,7 @@
-import { IRectWithRotation } from '@suika/geo';
+import { type IRectWithRotation } from '@suika/geo';
 
-import { ICursor } from '../cursor_manager';
-import { Graph } from '../graphs';
+import { type ICursor } from '../cursor_manager';
+import { type Graph } from '../graphs';
 
 type HitTest = (
   x: number,

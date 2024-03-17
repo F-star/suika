@@ -1,6 +1,6 @@
-import { ICursor } from '../cursor_manager';
-import { Editor } from '../editor';
-import { ITool } from './type';
+import { type ICursor } from '../cursor_manager';
+import { type Editor } from '../editor';
+import { type ITool } from './type';
 
 const TYPE = 'drawText';
 const HOTKEY = 't';

@@ -1,12 +1,12 @@
 import {
   getRectRotatedXY,
-  IPoint,
-  IRect,
+  type IPoint,
+  type IRect,
   normalizeRadian,
   transformRotate,
 } from '@suika/geo';
 
-import { IBox2WithRotation } from '../type';
+import { type IBox2WithRotation } from '../type';
 import { adjustSizeToKeepPolarSnap, getRectCenterPoint } from '../utils';
 
 /**

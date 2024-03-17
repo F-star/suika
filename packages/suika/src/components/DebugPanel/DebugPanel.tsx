@@ -1,5 +1,5 @@
-import { Graph } from '@suika/core';
-import { FC, useContext, useEffect, useState } from 'react';
+import { type Graph } from '@suika/core';
+import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../context';
 

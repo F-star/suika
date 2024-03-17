@@ -1,7 +1,7 @@
 import { debounce } from '@suika/common';
 
-import { Editor } from '../editor';
-import { IEditorPaperData } from '../type';
+import { type Editor } from '../editor';
+import { type IEditorPaperData } from '../type';
 
 const STORE_KEY = 'suika-paper';
 

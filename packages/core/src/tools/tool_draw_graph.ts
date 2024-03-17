@@ -1,11 +1,11 @@
 import { noop } from '@suika/common';
-import { IPoint, IRect, normalizeRect } from '@suika/geo';
+import { type IPoint, type IRect, normalizeRect } from '@suika/geo';
 
 import { AddGraphCmd } from '../commands/add_graphs';
-import { ICursor } from '../cursor_manager';
-import { Editor } from '../editor';
-import { Graph } from '../graphs';
-import { ITool } from './type';
+import { type ICursor } from '../cursor_manager';
+import { type Editor } from '../editor';
+import { type Graph } from '../graphs';
+import { type ITool } from './type';
 
 /**
  * Draw Graph Tool

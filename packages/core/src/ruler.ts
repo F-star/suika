@@ -1,7 +1,7 @@
 import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
 
 import { HALF_PI } from './constant';
-import { Editor } from './editor';
+import { type Editor } from './editor';
 import { rotateInCanvas } from './utils';
 
 const getStepByZoom = (zoom: number) => {

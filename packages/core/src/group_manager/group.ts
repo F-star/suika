@@ -1,7 +1,7 @@
 import { genId, objectNameGenerator } from '@suika/common';
 
-import { IObject } from '../type';
-import { IGroupAttrs } from './type';
+import { type IObject } from '../type';
+import { type IGroupAttrs } from './type';
 
 export class Group implements IGroupAttrs {
   id: string;

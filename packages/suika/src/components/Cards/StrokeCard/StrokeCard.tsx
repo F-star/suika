@@ -1,12 +1,12 @@
 import { arrMap, cloneDeep, forEach, isEqual } from '@suika/common';
 import {
-  Graph,
-  ISetElementsAttrsType,
-  ITexture,
+  type Graph,
+  type ISetElementsAttrsType,
+  type ITexture,
   SetGraphsAttrsCmd,
 } from '@suika/core';
 import { LineWidthOutlined } from '@suika/icons';
-import { FC, useContext, useEffect, useRef, useState } from 'react';
+import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';

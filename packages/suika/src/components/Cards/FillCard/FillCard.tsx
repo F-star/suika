@@ -1,6 +1,6 @@
 import { cloneDeep, isEqual } from '@suika/common';
-import { Graph, ITexture, SetGraphsAttrsCmd } from '@suika/core';
-import { FC, useContext, useEffect, useRef, useState } from 'react';
+import { type Graph, type ITexture, SetGraphsAttrsCmd } from '@suika/core';
+import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';

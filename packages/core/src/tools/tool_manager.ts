@@ -1,7 +1,7 @@
 import { EventEmitter, noop } from '@suika/common';
-import { IPoint } from '@suika/geo';
+import { type IPoint } from '@suika/geo';
 
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawLineTool } from './tool_draw_line';
@@ -10,7 +10,7 @@ import { DrawRectTool } from './tool_draw_rect';
 import { DrawTextTool } from './tool_draw_text';
 import { PathSelectTool } from './tool_path_select/tool_path_select';
 import { SelectTool } from './tool_select';
-import { ITool, IToolClassConstructor } from './type';
+import { type ITool, type IToolClassConstructor } from './type';
 
 interface Events {
   switchTool(type: string): void;

@@ -1,5 +1,5 @@
-import { AlignCmd, AlignType } from '../commands/align';
-import { Editor } from '../editor';
+import { AlignCmd, type AlignType } from '../commands/align';
+import { type Editor } from '../editor';
 
 export const alignAndRecord = (editor: Editor, type: AlignType) => {
   if (editor.selectedElements.size() < 2) {

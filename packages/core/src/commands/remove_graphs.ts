@@ -1,6 +1,6 @@
-import { Editor } from '../editor';
-import { Graph } from '../graphs';
-import { ICommand } from './type';
+import { type Editor } from '../editor';
+import { type Graph } from '../graphs';
+import { type ICommand } from './type';
 
 export class RemoveGraphsCmd implements ICommand {
   private removedIndexes: number[] = [];

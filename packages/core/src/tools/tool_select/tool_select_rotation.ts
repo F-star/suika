@@ -3,10 +3,10 @@ import { normalizeRadian, rad2Deg } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { getRotationCursor } from '../../control_handle_manager';
-import { Editor } from '../../editor';
-import { IPoint } from '../../type';
+import { type Editor } from '../../editor';
+import { type IPoint } from '../../type';
 import { calcVectorRadian } from '../../utils';
-import { IBaseTool } from '../type';
+import { type IBaseTool } from '../type';
 
 /**
  * select tool

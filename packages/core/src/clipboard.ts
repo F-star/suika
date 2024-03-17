@@ -1,9 +1,9 @@
 import { arrMap, noop, omit } from '@suika/common';
 
 import { AddGraphCmd } from './commands/add_graphs';
-import { Editor } from './editor';
+import { type Editor } from './editor';
 import { Graph } from './graphs';
-import { IEditorPaperData } from './type';
+import { type IEditorPaperData } from './type';
 
 /**
  * Clipboard Manager

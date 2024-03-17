@@ -1,8 +1,8 @@
 import { cloneDeep } from '@suika/common';
 
-import { Graph, IPathItem } from '../graphs';
-import { ITexture } from '../texture';
-import { ICommand } from './type';
+import { type Graph, type IPathItem } from '../graphs';
+import { type ITexture } from '../texture';
+import { type ICommand } from './type';
 
 export type ISetElementsAttrsType = Partial<{
   x: number;

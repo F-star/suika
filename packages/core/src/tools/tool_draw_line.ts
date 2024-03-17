@@ -1,11 +1,11 @@
 import { cloneDeep } from '@suika/common';
-import { IRect, normalizeRadian, transformRotate } from '@suika/geo';
+import { type IRect, normalizeRadian, transformRotate } from '@suika/geo';
 
-import { Editor } from '../editor';
+import { type Editor } from '../editor';
 import { Line } from '../graphs';
 import { adjustSizeToKeepPolarSnap } from '../utils';
 import { DrawGraphTool } from './tool_draw_graph';
-import { ITool } from './type';
+import { type ITool } from './type';
 
 const TYPE = 'drawLine';
 const HOTKEY = 'l';

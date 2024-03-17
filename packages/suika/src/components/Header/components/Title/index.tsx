@@ -1,7 +1,7 @@
 import './style.scss';
 
 import { GithubOutlined } from '@suika/icons';
-import { FC } from 'react';
+import { type FC } from 'react';
 
 const Title: FC = () => {
   return (

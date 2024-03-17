@@ -1,5 +1,5 @@
-import { ArrangeCmd, ArrangeType } from '../commands/arrange';
-import { Editor } from '../editor';
+import { ArrangeCmd, type ArrangeType } from '../commands/arrange';
+import { type Editor } from '../editor';
 
 export const arrangeAndRecord = (editor: Editor, type: ArrangeType) => {
   if (editor.selectedElements.size() === 0) {

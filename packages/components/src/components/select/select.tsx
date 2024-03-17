@@ -9,7 +9,7 @@ import {
 } from '@floating-ui/react';
 import { ArrowDownOutlined, CheckOutlined } from '@suika/icons';
 import classNames from 'classnames';
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 type ValueType = string;
 

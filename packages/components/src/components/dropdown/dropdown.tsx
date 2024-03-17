@@ -1,12 +1,12 @@
 import './dropdown.scss';
 
-import { OffsetOptions, Placement } from '@floating-ui/react';
+import { type OffsetOptions, type Placement } from '@floating-ui/react';
 import { EventEmitter } from '@suika/common';
-import React, { FC, useRef, useState } from 'react';
+import React, { type FC, useRef, useState } from 'react';
 
 import { Popover } from '../popover';
 import { DropdownItem } from './dropdown-item';
-import { DropdownDivider, DropdownEvents, Item } from './type';
+import { type DropdownDivider, type DropdownEvents, type Item } from './type';
 
 export interface IDropdownProps {
   items: Item[];

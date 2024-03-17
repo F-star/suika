@@ -1,4 +1,4 @@
-import { ICircle, IPoint } from '../type';
+import { type ICircle, type IPoint } from '../type';
 
 export function isPointInCircle(point: IPoint, circle: ICircle) {
   const dx = point.x - circle.x;

@@ -3,9 +3,9 @@ import { getMergedRect } from '@suika/geo';
 
 import { GroupCmd } from './commands/group';
 import { RemoveGraphsCmd } from './commands/remove_graphs';
-import { Editor } from './editor';
-import { Graph } from './graphs';
-import { IBox } from './type';
+import { type Editor } from './editor';
+import { type Graph } from './graphs';
+import { type IBox } from './type';
 import { getRectCenterPoint } from './utils';
 
 interface Events {

@@ -1,6 +1,6 @@
 import './ContextMenuSep.scss';
 
-import { FC } from 'react';
+import { type FC } from 'react';
 
 const ContextMenuSep: FC = () => {
   return <div className="suika-context-menu-sep" />;

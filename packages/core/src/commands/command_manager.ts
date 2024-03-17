@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
 
-import { Editor } from '../editor';
-import { ICommand } from './type';
+import { type Editor } from '../editor';
+import { type ICommand } from './type';
 
 export interface IHistoryStatus {
   canRedo: boolean;
