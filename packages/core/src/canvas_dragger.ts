@@ -1,6 +1,11 @@
+import { EventEmitter } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type Editor } from './editor';
+
+interface Events {
+  activeDrag(press: boolean): void;
+}
 
 /**
  * drag canvas
@@ -10,17 +15,28 @@ export class CanvasDragger {
   private _active = false;
   private inactiveAfterPointerUp = false;
   private isEnableDragCanvasBySpace = true;
-
+  private eventEmitter = new EventEmitter<Events>();
   private _isPressing = false;
   private isDragging = false;
   private startPoint: IPoint = { x: 0, y: 0 };
   private startViewportPos: IPoint = { x: 0, y: 0 };
+
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
+    this.eventEmitter.on(eventName, handler);
+  }
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
+    this.eventEmitter.off(eventName, handler);
+  }
 
   isPressing() {
     return this._isPressing;
   }
 
   private handleSpaceToggle = (isSpacePressing: boolean) => {
+    this.eventEmitter.emit(
+      'activeDrag',
+      this.isEnableDragCanvasBySpace && isSpacePressing,
+    );
     if (!this.isEnableDragCanvasBySpace) return;
     if (isSpacePressing) {
       this.active();

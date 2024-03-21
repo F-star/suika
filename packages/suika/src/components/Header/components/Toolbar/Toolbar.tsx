@@ -22,6 +22,7 @@ import { Menu } from './menu';
 export const ToolBar = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
+  const [isSpaceDrag, setIsSpaceDrag] = useState(false);
   const [currTool, setCurrTool] = useState('');
   const [enableTools, setEnableTools] = useState<string[]>([]);
   const [isPathEditorActive, setIsPathEditorActive] = useState(false);
@@ -42,13 +43,19 @@ export const ToolBar = () => {
         setEnableTools(tools);
       };
 
+      const onActiveDrag = (enable: boolean) => {
+        setIsSpaceDrag(enable);
+      };
+
       editor.toolManager.on('switchTool', onSwitchTool);
       editor.toolManager.on('changeEnableTools', onChangeEnableTools);
       editor.pathEditor.on('toggle', onTogglePathEditor);
+      editor.canvasDragger.on('activeDrag', onActiveDrag);
       return () => {
         editor.toolManager.off('switchTool', onSwitchTool);
         editor.toolManager.off('changeEnableTools', onChangeEnableTools);
         editor.pathEditor.off('toggle', onTogglePathEditor);
+        editor.canvasDragger.off('activeDrag', onActiveDrag);
       };
     }
   }, [editor]);
@@ -115,7 +122,11 @@ export const ToolBar = () => {
         return (
           <ToolBtn
             key={tool.name}
-            className={classNames({ active: currTool === tool.name })}
+            className={classNames({
+              active: [currTool, isSpaceDrag ? 'dragCanvas' : ''].includes(
+                tool.name,
+              ),
+            })}
             tooltipContent={intl.formatMessage({ id: tool.intlId })}
             hotkey={tool.hotkey}
             onMouseDown={() => {
