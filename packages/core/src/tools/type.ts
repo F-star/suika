@@ -30,6 +30,8 @@ export interface IBaseTool {
   onAltToggle?: (isSpacePressing: boolean) => void;
   /** viewport x or y change */
   onViewportXOrYChange?: (x: number, y: number) => void;
+  /** canvas drag active change */
+  onCanvasDragActiveChange?: (isActive: boolean) => void;
 }
 
 export interface IToolClassConstructor {

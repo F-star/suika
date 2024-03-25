@@ -1,6 +1,11 @@
+import { EventEmitter } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type Editor } from './editor';
+
+interface Events {
+  activeChange(active: boolean): void;
+}
 
 /**
  * drag canvas
@@ -15,6 +20,8 @@ export class CanvasDragger {
   private isDragging = false;
   private startPoint: IPoint = { x: 0, y: 0 };
   private startViewportPos: IPoint = { x: 0, y: 0 };
+
+  private eventEmitter = new EventEmitter<Events>();
 
   isPressing() {
     return this._isPressing;
@@ -59,6 +66,7 @@ export class CanvasDragger {
       console.warn('CanvasDragger already active');
       return;
     }
+    this.eventEmitter.emit('activeChange', true);
     this._active = true;
     this.editor.setCursor('grab');
     this.bindEvent();
@@ -83,6 +91,7 @@ export class CanvasDragger {
         // console.warn('CanvasDragger already inactive');
         return;
       }
+      this.eventEmitter.emit('activeChange', false);
       this._active = false;
       this.unbindEvent();
     }
@@ -152,5 +161,13 @@ export class CanvasDragger {
       this.handleWheelBtnToggle,
     );
     this.unbindEvent();
+  }
+
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
+    this.eventEmitter.on(eventName, handler);
+  }
+
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
+    this.eventEmitter.off(eventName, handler);
   }
 }

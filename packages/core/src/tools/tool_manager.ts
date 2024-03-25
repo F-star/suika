@@ -194,6 +194,9 @@ export class ToolManager {
     const handleViewportXOrYChange = (x: number, y: number) => {
       this.currentTool?.onViewportXOrYChange?.(x, y);
     };
+    const handleCanvasDragActiveChange = (active: boolean) => {
+      this.currentTool?.onCanvasDragActiveChange?.(active);
+    };
     const canvas = this.editor.canvasElement;
     canvas.addEventListener('pointerdown', handleDown);
     window.addEventListener('pointermove', handleMove);
@@ -202,6 +205,7 @@ export class ToolManager {
     this.editor.hostEventManager.on('spaceToggle', handleSpaceToggle);
     this.editor.hostEventManager.on('altToggle', handleAltToggle);
     this.editor.viewportManager.on('xOrYChange', handleViewportXOrYChange);
+    this.editor.canvasDragger.on('activeChange', handleCanvasDragActiveChange);
 
     return () => {
       canvas.removeEventListener('pointerdown', handleDown);
@@ -209,6 +213,12 @@ export class ToolManager {
       window.removeEventListener('pointerup', handleUp);
       this.editor.commandManager.off('change', handleCommandChange);
       this.editor.hostEventManager.off('spaceToggle', handleSpaceToggle);
+      this.editor.hostEventManager.off('altToggle', handleAltToggle);
+      this.editor.viewportManager.off('xOrYChange', handleViewportXOrYChange);
+      this.editor.canvasDragger.off(
+        'activeChange',
+        handleCanvasDragActiveChange,
+      );
     };
   }
   unbindEvent() {

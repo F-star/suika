@@ -230,9 +230,9 @@ export class SelectTool implements ITool {
     this.updateCursorAndHlHoverGraph(point);
   }
 
-  onSpaceToggle(isSpacePressing: boolean) {
+  onCanvasDragActiveChange(active: boolean) {
     // drag canvas action active
-    if (isSpacePressing) {
+    if (active) {
       this.editor.selectedElements.setHoverItem(null);
     }
     // TODO: resetHoverItem after drag canvas end

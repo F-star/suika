@@ -41,20 +41,21 @@ export class DrawPathTool implements ITool {
   }
 
   onMoveExcludeDrag(_e: PointerEvent, isOutsideCanvas: boolean) {
+    const editor = this.editor;
     if (isOutsideCanvas) {
-      this.editor.pathEditor.updateControlHandles();
-      this.editor.render();
+      editor.pathEditor.updateControlHandles();
+      editor.render();
       return;
     }
 
-    if (this.editor.hostEventManager.isSpacePressing) {
-      this.editor.pathEditor.updateControlHandles();
+    if (this.editor.canvasDragger.isActive()) {
+      editor.pathEditor.updateControlHandles();
     } else {
       const snapPoint = this.checkCursorPtInStartAnchor();
       if (snapPoint) {
-        this.editor.setCursor('pen-close');
+        editor.setCursor('pen-close');
       } else {
-        this.editor.setCursor('pen');
+        editor.setCursor('pen');
       }
       this.updateControlHandlesWithPreviewHandles(
         snapPoint ?? this.getCorrectedPoint(),
@@ -221,14 +222,13 @@ export class DrawPathTool implements ITool {
     this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
   }
 
-  onSpaceToggle(isSpacePressing: boolean) {
-    if (isSpacePressing) {
+  onCanvasDragActiveChange(active: boolean) {
+    if (active) {
       this.editor.pathEditor.updateControlHandles();
-      this.editor.render();
     } else {
       this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
-      this.editor.render();
     }
+    this.editor.render();
   }
 
   onAltToggle() {
@@ -270,7 +270,7 @@ export class DrawPathTool implements ITool {
   }
 
   onViewportXOrYChange() {
-    if (this.editor.hostEventManager.isSpacePressing) {
+    if (this.editor.canvasDragger.isActive()) {
       this.editor.pathEditor.updateControlHandles();
     } else {
       this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());

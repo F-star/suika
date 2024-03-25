@@ -1,9 +1,11 @@
 import { EventEmitter } from '@suika/common';
 
+interface Events {
+  added(img: HTMLImageElement): void;
+}
+
 export class ImgManager {
-  eventEmitter = new EventEmitter<{
-    added(img: HTMLImageElement): void;
-  }>();
+  private eventEmitter = new EventEmitter<Events>();
 
   private imgMap = new Map<string, HTMLImageElement>();
   private loadingImgSet = new Set<string>();
@@ -32,5 +34,13 @@ export class ImgManager {
 
   getImg(url: string) {
     return this.imgMap.get(url);
+  }
+
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
+    this.eventEmitter.on(eventName, handler);
+  }
+
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
+    this.eventEmitter.off(eventName, handler);
   }
 }

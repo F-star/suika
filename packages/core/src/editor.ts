@@ -123,7 +123,7 @@ export class Editor {
 
     this.autoSaveGraphs = new AutoSaveGraphs(this);
 
-    this.imgManager.eventEmitter.on('added', () => {
+    this.imgManager.on('added', () => {
       this.render();
     });
 
