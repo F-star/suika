@@ -253,3 +253,16 @@ export const getRotatedRectByTwoPoint = (
     rotation,
   };
 };
+
+/**
+ * Convert a rectangle to an array of vertices
+ */
+export const rectToVertices = (rect: IRect) => {
+  const { x, y, width, height } = rect;
+  return [
+    { x, y },
+    { x: x + width, y },
+    { x: x + width, y: y + height },
+    { x, y: y + height },
+  ];
+};

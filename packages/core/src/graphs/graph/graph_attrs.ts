@@ -10,6 +10,15 @@ export interface GraphAttrs {
   width: number;
   height: number;
 
+  /**
+   * | a | c | tx|
+   * | b | d | ty|
+   * | 0 | 0 | 1 |
+   *
+   * // 替代原来的 x/y，以及 rotation
+   */
+  // transform?: number[];
+
   fill?: ITexture[];
   stroke?: ITexture[];
   strokeWidth?: number;

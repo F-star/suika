@@ -35,7 +35,7 @@ import { type GraphAttrs } from './graph_attrs';
 export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   type = GraphType.Graph;
   attrs: ATTRS;
-  private _cacheBbox: Readonly<IBox> | null = null;
+  protected _cacheBbox: Readonly<IBox> | null = null;
 
   constructor(options: Omit<ATTRS, 'id'>) {
     this.attrs = { ...options } as ATTRS;
@@ -74,10 +74,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
   getRectWithRotation(): IRectWithRotation {
     return {
-      x: this.attrs.x,
-      y: this.attrs.y,
-      width: this.attrs.width,
-      height: this.attrs.height,
+      ...this.getRect(),
       rotation: this.attrs.rotation,
     };
   }
@@ -91,7 +88,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       return this._cacheBbox;
     }
 
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.attrs);
+    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.getRect());
     const rotation = this.attrs.rotation;
     if (!rotation) {
       return this.getRect();
@@ -148,13 +145,16 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return [nw, ne, se, sw];
   }
 
+  protected getPosition() {
+    return { x: this.attrs.x, y: this.attrs.y };
+  }
+
   /**
    * get rect before rotation
    */
   getRect() {
     return {
-      x: this.attrs.x,
-      y: this.attrs.y,
+      ...this.getPosition(),
       width: this.attrs.width,
       height: this.attrs.height,
     };
@@ -243,11 +243,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
   setRotatedX(rotatedX: number) {
     const { x: prevRotatedX } = getRectRotatedXY(this.attrs);
-    this.updateAttrs({ x: this.attrs.x + rotatedX - prevRotatedX });
+    this.updateAttrs({ x: this.getPosition().x + rotatedX - prevRotatedX });
   }
   setRotatedY(rotatedY: number) {
     const { y: prevRotatedY } = getRectRotatedXY(this.attrs);
-    this.updateAttrs({ y: this.attrs.y + rotatedY - prevRotatedY });
+    this.updateAttrs({ y: this.getPosition().y + rotatedY - prevRotatedY });
   }
 
   updateByControlHandle(
@@ -310,7 +310,10 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     cornerRadius = 0,
   ) {
     const src = texture.attrs.src;
-    const { x, y, width, height } = this.getRect();
+    const width = this.attrs.width;
+    const height = this.attrs.height;
+    const x = 0;
+    const y = 0;
     let img: CanvasImageSource | undefined = undefined;
 
     // anti-aliasing
