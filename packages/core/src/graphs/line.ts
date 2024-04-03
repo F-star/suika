@@ -1,6 +1,6 @@
 import { parseRGBAStr } from '@suika/common';
 
-import { TextureType } from '../texture';
+import { PaintType } from '../paint';
 import { GraphType } from '../type';
 import { rotateInCanvas } from '../utils';
 import { Graph, type GraphAttrs } from './graph';
@@ -34,14 +34,14 @@ export class Line extends Graph<LineAttrs> {
     ctx.lineTo(x + width, y);
     if (strokeWidth) {
       ctx.lineWidth = strokeWidth;
-      for (const texture of stroke ?? []) {
-        switch (texture.type) {
-          case TextureType.Solid: {
-            ctx.strokeStyle = parseRGBAStr(texture.attrs);
+      for (const paint of stroke ?? []) {
+        switch (paint.type) {
+          case PaintType.Solid: {
+            ctx.strokeStyle = parseRGBAStr(paint.attrs);
             ctx.stroke();
             break;
           }
-          case TextureType.Image: {
+          case PaintType.Image: {
             // TODO: stroke image
           }
         }

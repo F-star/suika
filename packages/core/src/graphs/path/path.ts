@@ -3,7 +3,7 @@ import { addPoint, type IRect, type IRectWithRotation } from '@suika/geo';
 import { Bezier } from 'bezier-js';
 
 import { type ImgManager } from '../../Img_manager';
-import { type ITexture, TextureType } from '../../texture';
+import { type IPaint, PaintType } from '../../paint';
 import { GraphType } from '../../type';
 import { rotateInCanvas } from '../../utils';
 import { Graph, type GraphAttrs } from '../graph';
@@ -110,7 +110,7 @@ export class Path extends Graph<PathAttrs> {
     this.realDraw(ctx, undefined, undefined, {
       stroke: [
         {
-          type: TextureType.Solid,
+          type: PaintType.Solid,
           attrs: parseHexToRGBA(stroke)!,
         },
       ],
@@ -123,8 +123,8 @@ export class Path extends Graph<PathAttrs> {
     imgManager?: ImgManager,
     smooth?: boolean,
     overrideStyle?: {
-      fill?: ITexture[];
-      stroke?: ITexture[];
+      fill?: IPaint[];
+      stroke?: IPaint[];
       strokeWidth?: number;
     },
   ) {
@@ -171,17 +171,17 @@ export class Path extends Graph<PathAttrs> {
       }
     }
 
-    for (const texture of fill ?? []) {
-      switch (texture.type) {
-        case TextureType.Solid: {
-          ctx.fillStyle = parseRGBAStr(texture.attrs);
+    for (const paint of fill ?? []) {
+      switch (paint.type) {
+        case PaintType.Solid: {
+          ctx.fillStyle = parseRGBAStr(paint.attrs);
           ctx.fill();
           break;
         }
-        case TextureType.Image: {
+        case PaintType.Image: {
           if (imgManager) {
             ctx.clip();
-            this.fillImage(ctx, texture, imgManager, smooth);
+            this.fillImage(ctx, paint, imgManager, smooth);
           } else {
             console.warn('ImgManager is not provided');
           }
@@ -190,14 +190,14 @@ export class Path extends Graph<PathAttrs> {
     }
     if (strokeWidth) {
       ctx.lineWidth = strokeWidth;
-      for (const texture of stroke ?? []) {
-        switch (texture.type) {
-          case TextureType.Solid: {
-            ctx.strokeStyle = parseRGBAStr(texture.attrs);
+      for (const paint of stroke ?? []) {
+        switch (paint.type) {
+          case PaintType.Solid: {
+            ctx.strokeStyle = parseRGBAStr(paint.attrs);
             ctx.stroke();
             break;
           }
-          case TextureType.Image: {
+          case PaintType.Image: {
             // TODO: stroke image
           }
         }

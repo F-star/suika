@@ -3,7 +3,7 @@ import { transformRotate } from '@suika/geo';
 
 import { DOUBLE_PI } from '../constant';
 import { type ImgManager } from '../Img_manager';
-import { TextureType } from '../texture';
+import { PaintType } from '../paint';
 import { GraphType } from '../type';
 import { rotateInCanvas } from '../utils';
 import { Graph, type GraphAttrs } from './graph';
@@ -52,14 +52,14 @@ export class Ellipse extends Graph<EllipseAttrs> {
 
     ctx.beginPath();
     ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
-    for (const texture of attrs.fill ?? []) {
-      if (texture.type === TextureType.Solid) {
-        ctx.fillStyle = parseRGBAStr(texture.attrs);
+    for (const paint of attrs.fill ?? []) {
+      if (paint.type === PaintType.Solid) {
+        ctx.fillStyle = parseRGBAStr(paint.attrs);
         ctx.fill();
-      } else if (texture.type === TextureType.Image) {
+      } else if (paint.type === PaintType.Image) {
         if (imgManager) {
           ctx.clip();
-          this.fillImage(ctx, texture, imgManager, smooth);
+          this.fillImage(ctx, paint, imgManager, smooth);
         } else {
           console.warn('ImgManager is not provided');
         }
@@ -68,11 +68,11 @@ export class Ellipse extends Graph<EllipseAttrs> {
 
     if (attrs.strokeWidth) {
       ctx.lineWidth = attrs.strokeWidth;
-      for (const texture of attrs.stroke ?? []) {
-        if (texture.type === TextureType.Solid) {
-          ctx.strokeStyle = parseRGBAStr(texture.attrs);
+      for (const paint of attrs.stroke ?? []) {
+        if (paint.type === PaintType.Solid) {
+          ctx.strokeStyle = parseRGBAStr(paint.attrs);
           ctx.stroke();
-        } else if (texture.type === TextureType.Image) {
+        } else if (paint.type === PaintType.Image) {
           // TODO:
         }
       }

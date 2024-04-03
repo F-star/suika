@@ -1,6 +1,6 @@
 import { EventEmitter } from '@suika/common';
 
-import { type ITexture, TextureType } from './texture';
+import { type IPaint, PaintType } from './paint';
 import { type BooleanKeys } from './type';
 
 interface Events {
@@ -10,23 +10,23 @@ interface Events {
 export class Setting {
   private eventEmitter = new EventEmitter<Events>();
   private value = {
-    /***** texture ****/
+    /***** paint ****/
     canvasBgColor: '#f4f4f4',
     firstStroke: {
-      type: TextureType.Solid,
+      type: PaintType.Solid,
       attrs: { r: 0, g: 0, b: 0, a: 1 },
-    } as ITexture,
+    } as IPaint,
     strokeWidth: 1,
 
     firstFill: {
-      type: TextureType.Solid,
+      type: PaintType.Solid,
       attrs: { r: 217, g: 217, b: 217, a: 1 },
-    } as ITexture,
+    } as IPaint,
 
-    addedTexture: {
-      type: TextureType.Solid,
+    addedPaint: {
+      type: PaintType.Solid,
       attrs: { r: 0, g: 0, b: 0, a: 0.2 },
-    } as ITexture,
+    } as IPaint,
 
     guideBBoxStroke: '#1592fe',
     selectionStroke: '#0f8eff',
@@ -53,10 +53,10 @@ export class Setting {
     defaultFontSize: 12,
     textFill: [
       {
-        type: TextureType.Solid,
+        type: PaintType.Solid,
         attrs: { r: 0, g: 0, b: 0, a: 1 },
       },
-    ] as ITexture[],
+    ] as IPaint[],
 
     lockRotation: Math.PI / 12, // 旋转时，通过 shift 约束旋转角度为该值的整数倍。
 

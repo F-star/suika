@@ -3,7 +3,7 @@ import { type IRectWithRotation, normalizeDegree, rad2Deg } from '@suika/geo';
 
 import { type ICursor } from '../cursor_manager';
 import { Rect } from '../graphs';
-import { type ITexture, TextureType } from '../texture';
+import { type IPaint, PaintType } from '../paint';
 import { ControlHandle } from './control_handle';
 import { type ITransformHandleType } from './type';
 
@@ -87,8 +87,8 @@ export const createTransformHandles = (params: {
       y: number;
       width: number;
       height: number;
-      fill: ITexture[];
-      stroke: ITexture[];
+      fill: IPaint[];
+      stroke: IPaint[];
       strokeWidth: number;
     } = {
       x: 0,
@@ -97,13 +97,13 @@ export const createTransformHandles = (params: {
       height: params.size,
       fill: [
         {
-          type: TextureType.Solid,
+          type: PaintType.Solid,
           attrs: parseHexToRGBA(params.fill)!,
         },
       ],
       stroke: [
         {
-          type: TextureType.Solid,
+          type: PaintType.Solid,
           attrs: parseHexToRGBA(params.stroke)!,
         },
       ],

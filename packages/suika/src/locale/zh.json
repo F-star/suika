@@ -36,8 +36,8 @@
   "setting.grid.snapToPixelGrid": "对齐像素网格",
   "setting.rulers": "显示标尺",
 
-  "textureType.solid": "纯色",
-  "textureType.image": "图片",
+  "paintType.solid": "纯色",
+  "paintType.image": "图片",
 
   "group": "创建编组",
   "showOrHide": "显示/隐藏",

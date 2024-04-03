@@ -1,4 +1,4 @@
-import './TextureCard.scss';
+import './PaintCard.scss';
 
 import {
   arrMapRevert,
@@ -9,15 +9,15 @@ import {
 import { IconButton, Popover } from '@suika/components';
 import {
   DEFAULT_IMAGE_SRC,
+  type IPaint,
   type IRGBA,
-  type ITexture,
-  type TextureSolid,
-  TextureType,
+  type PaintSolid,
+  PaintType,
 } from '@suika/core';
 import { AddOutlined, RemoveOutlined } from '@suika/icons';
 import { type FC, useState } from 'react';
 
-import { TexturePicker } from '../../ColorPicker/TexturePicker';
+import { PaintPicker } from '../../ColorPicker/PaintPicker';
 import { ColorHexInput } from '../../input/ColorHexInput';
 import { BaseCard } from '../BaseCard';
 
@@ -32,9 +32,9 @@ const isNearWhite = (rgba: IRGBA, threshold = 85) => {
 
 interface IProps {
   title: string;
-  textures: ITexture[];
-  onChange: (fill: ITexture, index: number) => void;
-  onChangeComplete: (fill: ITexture, index: number) => void;
+  paints: IPaint[];
+  onChange: (fill: IPaint, index: number) => void;
+  onChangeComplete: (fill: IPaint, index: number) => void;
 
   onDelete: (index: number) => void;
   onAdd: () => void;
@@ -42,9 +42,9 @@ interface IProps {
   appendedContent?: React.ReactNode;
 }
 
-export const TextureCard: FC<IProps> = ({
+export const PaintCard: FC<IProps> = ({
   title,
-  textures,
+  paints,
   onChange,
   onChangeComplete,
 
@@ -56,8 +56,8 @@ export const TextureCard: FC<IProps> = ({
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const pickerPopover = (
-    <TexturePicker
-      texture={textures[activeIndex]}
+    <PaintPicker
+      paint={paints[activeIndex]}
       onClose={() => {
         setActiveIndex(-1);
       }}
@@ -66,7 +66,7 @@ export const TextureCard: FC<IProps> = ({
     />
   );
 
-  if (textures.length == 0) {
+  if (paints.length == 0) {
     return (
       <BaseCard
         title={title}
@@ -107,9 +107,9 @@ export const TextureCard: FC<IProps> = ({
             </IconButton>
           }
         >
-          {arrMapRevert(textures, (texture, index) => {
+          {arrMapRevert(paints, (paint, index) => {
             /** SOLID **/
-            if (texture.type === TextureType.Solid) {
+            if (paint.type === PaintType.Solid) {
               return (
                 <div className="fill-item" key={index}>
                   <ColorHexInput
@@ -117,8 +117,8 @@ export const TextureCard: FC<IProps> = ({
                       <div
                         className="color-block"
                         style={{
-                          backgroundColor: parseRGBAStr(texture.attrs),
-                          boxShadow: isNearWhite(texture.attrs)
+                          backgroundColor: parseRGBAStr(paint.attrs),
+                          boxShadow: isNearWhite(paint.attrs)
                             ? '0 0 0 1px rgba(0,0,0,0.1) inset'
                             : undefined,
                         }}
@@ -127,19 +127,19 @@ export const TextureCard: FC<IProps> = ({
                         }}
                       />
                     }
-                    value={parseRGBToHex(texture.attrs)}
+                    value={parseRGBToHex(paint.attrs)}
                     onBlur={(newHex) => {
                       const rgb = parseHexToRGB(newHex);
 
                       if (rgb) {
-                        const newSolidTexture: TextureSolid = {
-                          type: TextureType.Solid,
+                        const newSolidPaint: PaintSolid = {
+                          type: PaintType.Solid,
                           attrs: {
                             ...rgb,
-                            a: texture.attrs.a,
+                            a: paint.attrs.a,
                           },
                         };
-                        onChangeComplete(newSolidTexture, index);
+                        onChangeComplete(newSolidPaint, index);
                       }
                     }}
                   />
@@ -151,7 +151,7 @@ export const TextureCard: FC<IProps> = ({
             }
 
             /** IMAGE */
-            if (texture.type === TextureType.Image) {
+            if (paint.type === PaintType.Image) {
               return (
                 <div className="fill-item" key={index}>
                   <div
@@ -162,13 +162,13 @@ export const TextureCard: FC<IProps> = ({
                   >
                     <img
                       style={{
-                        backgroundImage: `url(${texture.attrs.src})`,
+                        backgroundImage: `url(${paint.attrs.src})`,
                         objectFit: 'contain',
                         width: '100%',
                         height: '100%',
                       }}
                       alt="img"
-                      src={texture.attrs.src || DEFAULT_IMAGE_SRC}
+                      src={paint.attrs.src || DEFAULT_IMAGE_SRC}
                     />
                   </div>
                   <IconButton onClick={() => onDelete(index)}>

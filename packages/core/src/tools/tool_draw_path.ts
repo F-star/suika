@@ -6,7 +6,7 @@ import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
 import { Ellipse, type IPathItem, Path } from '../graphs';
-import { TextureType } from '../texture';
+import { PaintType } from '../paint';
 import { PathSelectTool } from './tool_path_select';
 import { type ITool } from './type';
 
@@ -92,7 +92,7 @@ export class DrawPathTool implements ITool {
         strokeWidth: 1,
         stroke: [
           {
-            type: TextureType.Solid,
+            type: PaintType.Solid,
             attrs: parseHexToRGBA('#000')!,
           },
         ],
@@ -323,7 +323,7 @@ export class DrawPathTool implements ITool {
             ],
             stroke: [
               {
-                type: TextureType.Solid,
+                type: PaintType.Solid,
                 attrs: parseHexToRGBA('#1592fe')!,
               },
             ],
@@ -349,13 +349,13 @@ export class DrawPathTool implements ITool {
         height: 6,
         fill: [
           {
-            type: TextureType.Solid,
+            type: PaintType.Solid,
             attrs: parseHexToRGBA('#fff')!,
           },
         ],
         stroke: [
           {
-            type: TextureType.Solid,
+            type: PaintType.Solid,
             attrs: parseHexToRGBA(handleStroke)!,
           },
         ],

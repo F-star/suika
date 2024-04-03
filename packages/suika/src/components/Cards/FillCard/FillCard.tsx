@@ -1,27 +1,27 @@
 import { cloneDeep, isEqual } from '@suika/common';
-import { type Graph, type ITexture, SetGraphsAttrsCmd } from '@suika/core';
+import { type Graph, type IPaint, SetGraphsAttrsCmd } from '@suika/core';
 import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';
-import { TextureCard } from '../TextureCard';
+import { PaintCard } from '../PaintCard';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
 
-  const [fill, setFill] = useState<ITexture[]>([]);
-  const prevFills = useRef<ITexture[][]>([]);
+  const [fill, setFill] = useState<IPaint[]>([]);
+  const prevFills = useRef<IPaint[][]>([]);
 
   /**
    * update fill and return a new fill
    */
-  const updateSelectedFill = (newTexture: ITexture, index: number) => {
+  const updateSelectedFill = (newPaint: IPaint, index: number) => {
     if (!editor) return;
 
     const newFills = [...fill];
 
-    newFills[index] = newTexture;
+    newFills[index] = newPaint;
     setFill(newFills);
 
     const selectItems = editor.selectedElements.getItems();
@@ -36,10 +36,10 @@ export const FillCard: FC = () => {
   const addFill = () => {
     if (!editor) return;
 
-    const newTexture = cloneDeep(
-      editor.setting.get(fill.length ? 'addedTexture' : 'firstFill'),
+    const newPaint = cloneDeep(
+      editor.setting.get(fill.length ? 'addedPaint' : 'firstFill'),
     );
-    const newFills = [...fill, newTexture];
+    const newFills = [...fill, newPaint];
     setFill(newFills);
 
     const selectItems = editor.selectedElements.getItems();
@@ -67,7 +67,7 @@ export const FillCard: FC = () => {
   const pushToHistory = (
     cmdDesc: string,
     selectedElements: Graph[],
-    newPaints: ITexture[],
+    newPaints: IPaint[],
   ) => {
     if (!editor) return;
 
@@ -128,17 +128,17 @@ export const FillCard: FC = () => {
   }, [editor]);
 
   return (
-    <TextureCard
+    <PaintCard
       title={intl.formatMessage({ id: 'fill' })}
-      textures={fill}
-      onChange={(newTexture, i) => {
+      paints={fill}
+      onChange={(newPaint, i) => {
         if (!editor) return;
-        updateSelectedFill(newTexture, i);
+        updateSelectedFill(newPaint, i);
         editor.render();
       }}
-      onChangeComplete={(newTexture, i) => {
+      onChangeComplete={(newPaint, i) => {
         if (!editor) return;
-        const newFill = updateSelectedFill(newTexture, i);
+        const newFill = updateSelectedFill(newPaint, i);
 
         pushToHistory(
           'Update fill',

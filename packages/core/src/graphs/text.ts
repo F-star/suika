@@ -1,6 +1,6 @@
 import { parseRGBAStr } from '@suika/common';
 
-import { TextureType } from '../texture';
+import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
 import { rotateInCanvas } from '../utils';
 import { Graph, type GraphAttrs } from './graph';
@@ -49,13 +49,13 @@ export class TextGraph extends Graph<TextAttrs> {
     ctx.textBaseline = 'top';
     ctx.font = `${fontSize}px sans-serif`;
 
-    for (const texture of fill ?? []) {
-      switch (texture.type) {
-        case TextureType.Solid: {
-          ctx.fillStyle = parseRGBAStr(texture.attrs);
+    for (const paint of fill ?? []) {
+      switch (paint.type) {
+        case PaintType.Solid: {
+          ctx.fillStyle = parseRGBAStr(paint.attrs);
           break;
         }
-        case TextureType.Image: {
+        case PaintType.Image: {
           // TODO:
         }
       }

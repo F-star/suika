@@ -14,8 +14,8 @@ import {
 import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
+import { DEFAULT_IMAGE, type PaintImage } from '../../paint';
 import { getResizedLine } from '../../scene/utils';
-import { DEFAULT_IMAGE, type TextureImage } from '../../texture';
 import {
   GraphType,
   type IBox,
@@ -293,10 +293,6 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     ctx.closePath();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  strokeTexture(_ctx: CanvasRenderingContext2D) {
-    throw new Error('Method not implemented.');
-  }
   /**
    * fill image
    *
@@ -304,12 +300,12 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
    */
   protected fillImage(
     ctx: CanvasRenderingContext2D,
-    texture: TextureImage,
+    paint: PaintImage,
     imgManager: ImgManager,
     smooth = true,
     cornerRadius = 0,
   ) {
-    const src = texture.attrs.src;
+    const src = paint.attrs.src;
     const { x, y, width, height } = this.getRect();
     let img: CanvasImageSource | undefined = undefined;
 

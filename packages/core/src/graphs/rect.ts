@@ -3,7 +3,7 @@ import { isPointInRoundRect, transformRotate } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type ImgManager } from '../Img_manager';
-import { TextureType } from '../texture';
+import { PaintType } from '../paint';
 import { GraphType, type IBox2WithRotation, type IPoint } from '../type';
 import { rotateInCanvas } from '../utils';
 import { Ellipse } from './ellipse';
@@ -60,21 +60,21 @@ export class Rect extends Graph<RectAttrs> {
       ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
     }
 
-    for (const texture of attrs.fill ?? []) {
-      switch (texture.type) {
-        case TextureType.Solid: {
-          ctx.fillStyle = parseRGBAStr(texture.attrs);
+    for (const paint of attrs.fill ?? []) {
+      switch (paint.type) {
+        case PaintType.Solid: {
+          ctx.fillStyle = parseRGBAStr(paint.attrs);
           ctx.fill();
           break;
         }
-        case TextureType.Image: {
+        case PaintType.Image: {
           if (imgManager) {
             const maxCornerRadius = this.getMaxCornerRadius();
             const cornerRadius = Math.min(
               attrs.cornerRadius ?? 0,
               maxCornerRadius,
             );
-            this.fillImage(ctx, texture, imgManager, smooth, cornerRadius);
+            this.fillImage(ctx, paint, imgManager, smooth, cornerRadius);
           } else {
             console.warn('ImgManager is not provided');
           }
@@ -83,14 +83,14 @@ export class Rect extends Graph<RectAttrs> {
     }
     if (attrs.strokeWidth) {
       ctx.lineWidth = attrs.strokeWidth;
-      for (const texture of attrs.stroke ?? []) {
-        switch (texture.type) {
-          case TextureType.Solid: {
-            ctx.strokeStyle = parseRGBAStr(texture.attrs);
+      for (const paint of attrs.stroke ?? []) {
+        switch (paint.type) {
+          case PaintType.Solid: {
+            ctx.strokeStyle = parseRGBAStr(paint.attrs);
             ctx.stroke();
             break;
           }
-          case TextureType.Image: {
+          case PaintType.Image: {
             // TODO: stroke image
           }
         }
@@ -135,8 +135,8 @@ export class Rect extends Graph<RectAttrs> {
       y: 0,
       width: 8,
       height: 8,
-      fill: [{ type: TextureType.Solid, attrs: parseHexToRGBA('#fff')! }],
-      stroke: [{ type: TextureType.Solid, attrs: parseHexToRGBA('#1592fe')! }],
+      fill: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#fff')! }],
+      stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#1592fe')! }],
       strokeWidth: 1,
     });
   }

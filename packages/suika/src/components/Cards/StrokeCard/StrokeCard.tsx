@@ -1,8 +1,8 @@
 import { arrMap, cloneDeep, forEach, isEqual } from '@suika/common';
 import {
   type Graph,
+  type IPaint,
   type ISetElementsAttrsType,
-  type ITexture,
   SetGraphsAttrsCmd,
 } from '@suika/core';
 import { LineWidthOutlined } from '@suika/icons';
@@ -11,15 +11,15 @@ import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';
 import NumberInput from '../../input/NumberInput';
-import { TextureCard } from '../TextureCard';
+import { PaintCard } from '../PaintCard';
 
 export const StrokeCard: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
 
-  const [strokes, setStrokes] = useState<ITexture[]>([]);
+  const [strokes, setStrokes] = useState<IPaint[]>([]);
   const [strokeWidth, setStrokeWidth] = useState(-1); // -1 means elements have different stroke width
-  const prevStrokes = useRef<ITexture[][]>([]);
+  const prevStrokes = useRef<IPaint[][]>([]);
 
   useEffect(() => {
     if (editor) {
@@ -75,12 +75,12 @@ export const StrokeCard: FC = () => {
   /**
    * update stroke and return a new stroke
    */
-  const updateStrokeWithoutRecord = (newTexture: ITexture, index: number) => {
+  const updateStrokeWithoutRecord = (newPaint: IPaint, index: number) => {
     if (!editor) return;
 
     const newStrokes = [...strokes];
 
-    newStrokes[index] = newTexture;
+    newStrokes[index] = newPaint;
     setStrokes(newStrokes);
 
     const selectItems = editor.selectedElements.getItems();
@@ -95,10 +95,10 @@ export const StrokeCard: FC = () => {
   const addStroke = () => {
     if (!editor) return;
 
-    const newTexture = cloneDeep(
-      editor.setting.get(strokes.length ? 'addedTexture' : 'firstStroke'),
+    const newPaint = cloneDeep(
+      editor.setting.get(strokes.length ? 'addedPaint' : 'firstStroke'),
     );
-    const newStrokes = [...strokes, newTexture];
+    const newStrokes = [...strokes, newPaint];
     setStrokes(newStrokes);
 
     const selectItems = editor.selectedElements.getItems();
@@ -126,7 +126,7 @@ export const StrokeCard: FC = () => {
   const pushToHistory = (
     cmdDesc: string,
     selectedElements: Graph[],
-    newStroke: ITexture[],
+    newStroke: IPaint[],
     isAddAction?: boolean,
   ) => {
     if (!editor) return;
@@ -194,9 +194,9 @@ export const StrokeCard: FC = () => {
   };
 
   return (
-    <TextureCard
+    <PaintCard
       title={intl.formatMessage({ id: 'stroke' })}
-      textures={strokes}
+      paints={strokes}
       appendedContent={
         <div style={{ padding: '0 8px' }}>
           <NumberInput
@@ -217,14 +217,14 @@ export const StrokeCard: FC = () => {
           />
         </div>
       }
-      onChange={(newTexture, i) => {
+      onChange={(newPaint, i) => {
         if (!editor) return;
-        updateStrokeWithoutRecord(newTexture, i);
+        updateStrokeWithoutRecord(newPaint, i);
         editor.render();
       }}
-      onChangeComplete={(newTexture, i) => {
+      onChangeComplete={(newPaint, i) => {
         if (!editor) return;
-        const newStrokes = updateStrokeWithoutRecord(newTexture, i);
+        const newStrokes = updateStrokeWithoutRecord(newPaint, i);
 
         pushToHistory(
           'Change Stroke',

@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 
 import { type Graph, type IPathItem } from '../graphs';
-import { type ITexture } from '../texture';
+import { type IPaint } from '../paint';
 import { type ICommand } from './type';
 
 export type ISetElementsAttrsType = Partial<{
@@ -11,8 +11,8 @@ export type ISetElementsAttrsType = Partial<{
   height: number;
   rotation: number;
   cornerRadius: number;
-  fill: ITexture[];
-  stroke: ITexture[];
+  fill: IPaint[];
+  stroke: IPaint[];
   strokeWidth: number;
   objectName: string;
   visible: boolean;

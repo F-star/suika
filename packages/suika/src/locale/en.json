@@ -36,8 +36,8 @@
   "setting.grid.snapToPixelGrid": "Snap to pixel grid",
   "setting.rulers": "rulers",
 
-  "textureType.solid": "Solid",
-  "textureType.image": "Image",
+  "paintType.solid": "Solid",
+  "paintType.image": "Image",
 
   "group": "Group selection",
 

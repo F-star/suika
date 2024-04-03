@@ -10,7 +10,7 @@ import { RemoveGraphsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type Editor } from '../editor';
 import { Ellipse, type Graph, Line, Path, Rect } from '../graphs';
-import { TextureType } from '../texture';
+import { PaintType } from '../paint';
 import { DrawPathTool, PathSelectTool } from '../tools';
 import { SelectTool } from '../tools/tool_select';
 import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
@@ -262,13 +262,13 @@ export class PathEditor {
             height: anchorSize,
             fill: [
               {
-                type: TextureType.Solid,
+                type: PaintType.Solid,
                 attrs: parseHexToRGBA(anchorFill)!,
               },
             ],
             stroke: [
               {
-                type: TextureType.Solid,
+                type: PaintType.Solid,
                 attrs: parseHexToRGBA(anchorStroke)!,
               },
             ],
@@ -307,7 +307,7 @@ export class PathEditor {
               width: rect.width * zoom,
               stroke: [
                 {
-                  type: TextureType.Solid,
+                  type: PaintType.Solid,
                   attrs: pathLineStroke,
                 },
               ],
@@ -330,13 +330,13 @@ export class PathEditor {
               height: handleInOutSize,
               fill: [
                 {
-                  type: TextureType.Solid,
+                  type: PaintType.Solid,
                   attrs: parseHexToRGBA('#fff')!,
                 },
               ],
               stroke: [
                 {
-                  type: TextureType.Solid,
+                  type: PaintType.Solid,
                   attrs: parseHexToRGBA(handleStroke)!,
                 },
               ],

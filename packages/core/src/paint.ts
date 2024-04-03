@@ -1,4 +1,4 @@
-export enum TextureType {
+export enum PaintType {
   Solid = 'Solid',
   Image = 'Image',
 }
@@ -10,34 +10,34 @@ export interface IRGBA {
   a: number;
 }
 
-export interface TextureSolid {
-  type: TextureType.Solid;
+export interface PaintSolid {
+  type: PaintType.Solid;
   attrs: IRGBA;
 }
 
-export interface TextureImage {
-  type: TextureType.Image;
+export interface PaintImage {
+  type: PaintType.Image;
   attrs: {
     src?: string;
     opacity?: number;
   };
 }
 
-export type ITexture = TextureSolid | TextureImage;
+export type IPaint = PaintSolid | PaintImage;
 
-export const DEFAULT_SOLID_TEXTURE: TextureSolid = {
-  type: TextureType.Solid,
+export const DEFAULT_SOLID_PAINT: PaintSolid = {
+  type: PaintType.Solid,
   attrs: { r: 217, g: 217, b: 217, a: 1 },
 };
 
-export const DEFAULT_IMAGE_TEXTURE: TextureImage = {
-  type: TextureType.Image,
+export const DEFAULT_IMAGE_PAINT: PaintImage = {
+  type: PaintType.Image,
   attrs: {},
 };
 
-export const DEFAULT_TEXTURES = {
-  [TextureType.Solid]: DEFAULT_SOLID_TEXTURE,
-  [TextureType.Image]: DEFAULT_IMAGE_TEXTURE,
+export const DEFAULT_PAINTS = {
+  [PaintType.Solid]: DEFAULT_SOLID_PAINT,
+  [PaintType.Image]: DEFAULT_IMAGE_PAINT,
 };
 
 export const DEFAULT_IMAGE = (() => {

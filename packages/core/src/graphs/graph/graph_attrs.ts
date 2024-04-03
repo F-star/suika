@@ -1,4 +1,4 @@
-import { type ITexture } from '../../texture';
+import { type IPaint } from '../../paint';
 import { type GraphType } from '../../type';
 
 export interface GraphAttrs {
@@ -10,8 +10,8 @@ export interface GraphAttrs {
   width: number;
   height: number;
 
-  fill?: ITexture[];
-  stroke?: ITexture[];
+  fill?: IPaint[];
+  stroke?: IPaint[];
   strokeWidth?: number;
 
   rotation?: number;
