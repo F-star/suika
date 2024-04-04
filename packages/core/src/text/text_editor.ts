@@ -12,7 +12,7 @@ export class TextEditor {
   constructor(private editor: Editor) {
     this.textarea = document.createElement('input');
     this.setStyle();
-    this.hide();
+    this.inactive();
     this.bindEvent();
     editor.containerElement.appendChild(this.textarea);
   }
@@ -35,12 +35,12 @@ export class TextEditor {
   private bindEvent() {
     this.textarea.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        this.hide();
+        this.inactive();
       }
     });
     this.textarea.addEventListener('blur', () => {
       this.createTextGraph();
-      this.hide();
+      this.inactive();
     });
   }
   private createTextGraph() {
@@ -72,7 +72,7 @@ export class TextEditor {
       new AddGraphCmd('draw text', this.editor, [text]),
     );
   }
-  visible(x: number, y: number) {
+  active(x: number, y: number) {
     this.x = x;
     this.y = y;
     const zoom = this.editor.zoomManager.getZoom();
@@ -90,7 +90,7 @@ export class TextEditor {
 
     textarea.focus();
   }
-  hide() {
+  inactive() {
     this.textarea.style.display = 'none';
     this.textarea.value = '';
   }
