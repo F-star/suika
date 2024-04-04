@@ -59,8 +59,10 @@ export const Select: FC<SelectProps> = ({
   const activeLabel =
     options.find((option) => option.value === value)?.label ?? '';
 
-  const handleChange = (value: ValueType) => {
-    onSelect && onSelect(value);
+  const handleChange = (newVal: ValueType) => {
+    if (onSelect && value != newVal) {
+      onSelect(newVal);
+    }
     setIsOpen(false);
   };
 
