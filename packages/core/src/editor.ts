@@ -9,7 +9,6 @@ import { ClipboardManager } from './clipboard';
 import { CommandManager } from './commands/command_manager';
 import { ControlHandleManager } from './control_handle_manager';
 import { CursorManger, type ICursor } from './cursor_manager';
-import { type Graph } from './graphs';
 import { GroupManager } from './group_manager';
 import { HostEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
@@ -218,12 +217,6 @@ export class Editor {
   getSceneCursorXY(event: { clientX: number; clientY: number }, round = false) {
     const { x, y } = this.getCursorXY(event);
     return this.viewportCoordsToScene(x, y, round);
-  }
-  moveElements(elements: Graph[], dx: number, dy: number) {
-    for (const element of elements) {
-      element.attrs.x += dx;
-      element.attrs.y += dy;
-    }
   }
   render() {
     this.sceneGraph.render();

@@ -1,5 +1,5 @@
-import { arrEvery, arrMap, noop } from '@suika/common';
-import { getResizedRect, type IRect } from '@suika/geo';
+import { arrEvery, arrMap, noop, omit } from '@suika/common';
+import { getRectApplyMatrix, type IRect, resizeRect } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { isTransformHandle } from '../../control_handle_manager';
@@ -54,7 +54,7 @@ export class SelectResizeTool implements IBaseTool {
     this.prevGraphsAttrs = arrMap(selectedItems, (item) => item.getAttrs());
     this.isGraphsRotateAllZero = arrEvery(
       selectedItems,
-      (item) => (item.attrs.rotation ?? 0) === 0,
+      (item) => item.getRotate() === 0,
     );
     const startSelectBbox = this.editor.selectedElements.getBBox();
     if (!startSelectBbox) {
@@ -62,8 +62,8 @@ export class SelectResizeTool implements IBaseTool {
     }
     this.startSelectBbox = startSelectBbox;
     this.graphOffsets = arrMap(selectedItems, (item) => ({
-      x: item.attrs.x - startSelectBbox.x,
-      y: item.attrs.y - startSelectBbox.y,
+      x: item.getX() - startSelectBbox.x,
+      y: item.getY() - startSelectBbox.y,
     }));
 
     if (isTransformHandle(handleInfo.handleName)) {
@@ -116,27 +116,41 @@ export class SelectResizeTool implements IBaseTool {
       const keepRatio = this.isGraphsRotateAllZero
         ? this.editor.hostEventManager.isShiftPressing
         : true;
-      const newSelectBbox = getResizedRect(
-        this.handleName,
-        this.lastPoint,
-        this.startSelectBbox,
-        keepRatio,
-        this.editor.hostEventManager.isAltPressing,
+      const newSelectBbox = getRectApplyMatrix(
+        resizeRect(
+          this.handleName,
+          this.lastPoint,
+          {
+            width: this.startSelectBbox.width,
+            height: this.startSelectBbox.height,
+            transform: [
+              1,
+              0,
+              0,
+              1,
+              this.startSelectBbox.x,
+              this.startSelectBbox.y,
+            ],
+          },
+          {
+            keepRatio,
+            scaleFromCenter: this.editor.hostEventManager.isAltPressing,
+          },
+        ),
       );
 
       const widthRatio = newSelectBbox.width / this.startSelectBbox.width;
       const heightRatio = newSelectBbox.height / this.startSelectBbox.height;
 
-      // TODO: flip
       for (let i = 0; i < selectItems.length; i++) {
         const graph = selectItems[i];
         const x = newSelectBbox.x + this.graphOffsets[i].x * widthRatio;
         const y = newSelectBbox.y + this.graphOffsets[i].y * heightRatio;
+        const tf = graph.attrs.transform;
         graph.updateAttrs({
-          x,
-          y,
           width: this.prevGraphsAttrs[i].width * widthRatio,
           height: this.prevGraphsAttrs[i].height * heightRatio,
+          transform: [tf[0], tf[1], tf[2], tf[3], x, y],
         });
       }
     }
@@ -150,10 +164,10 @@ export class SelectResizeTool implements IBaseTool {
     const items = this.editor.selectedElements.getItems();
     this.editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
-        'scale select elements',
+        'Scale Selected Graphs',
         items,
-        arrMap(items, (item) => item.getAttrs()),
-        this.prevGraphsAttrs,
+        arrMap(items, (item) => omit(item.getAttrs(), 'x', 'y')),
+        this.prevGraphsAttrs.map((item) => omit(item, 'x', 'y')),
       ),
     );
 

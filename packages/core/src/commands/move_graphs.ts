@@ -1,4 +1,4 @@
-import { type Graph } from '../graphs';
+import { Graph } from '../graphs';
 import { type ICommand } from './type';
 
 export class MoveGraphsCommand implements ICommand {
@@ -9,17 +9,9 @@ export class MoveGraphsCommand implements ICommand {
     private dy: number,
   ) {}
   redo() {
-    const { dx, dy } = this;
-    for (let i = 0, len = this.graphs.length; i < len; i++) {
-      const element = this.graphs[i];
-      element.updateAttrs({ x: element.attrs.x + dx, y: element.attrs.y + dy });
-    }
+    Graph.dMove(this.graphs, this.dx, this.dy);
   }
   undo() {
-    const { dx, dy } = this;
-    for (let i = 0, len = this.graphs.length; i < len; i++) {
-      const element = this.graphs[i];
-      element.updateAttrs({ x: element.attrs.x - dx, y: element.attrs.y - dy });
-    }
+    Graph.dMove(this.graphs, -this.dx, -this.dy);
   }
 }

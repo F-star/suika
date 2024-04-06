@@ -1,11 +1,10 @@
 import { parseRGBAStr } from '@suika/common';
-import { transformRotate } from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
 import { DOUBLE_PI } from '../constant';
 import { type ImgManager } from '../Img_manager';
 import { PaintType } from '../paint';
-import { GraphType } from '../type';
-import { rotateInCanvas } from '../utils';
+import { GraphType, type Optional } from '../type';
 import { Graph, type GraphAttrs } from './graph';
 
 export type EllipseAttrs = GraphAttrs;
@@ -13,22 +12,21 @@ export type EllipseAttrs = GraphAttrs;
 export class Ellipse extends Graph<EllipseAttrs> {
   override type = GraphType.Ellipse;
 
-  constructor(options: Omit<EllipseAttrs, 'id'>) {
+  constructor(options: Optional<EllipseAttrs, 'id' | 'transform'>) {
     super({ ...options, type: GraphType.Ellipse });
   }
 
   override hitTest(x: number, y: number, padding = 0) {
     const attrs = this.attrs;
-    const cx = attrs.x + attrs.width / 2;
-    const cy = attrs.y + attrs.height / 2;
+    const cx = attrs.width / 2;
+    const cy = attrs.height / 2;
     const strokeWidth = (attrs.strokeWidth || 0) / 2;
     padding = padding + strokeWidth;
     const w = attrs.width / 2 + padding;
     const h = attrs.height / 2 + padding;
 
-    const rotatedHitPoint = attrs.rotation
-      ? transformRotate(x, y, -attrs.rotation, cx, cy)
-      : { x, y };
+    const tf = new Matrix(...this.attrs.transform);
+    const rotatedHitPoint = tf.applyInverse({ x, y });
 
     return (
       (rotatedHitPoint.x - cx) ** 2 / w ** 2 +
@@ -43,12 +41,10 @@ export class Ellipse extends Graph<EllipseAttrs> {
     smooth?: boolean,
   ): void {
     const attrs = this.attrs;
-    const cx = attrs.x + attrs.width / 2;
-    const cy = attrs.y + attrs.height / 2;
+    const cx = attrs.width / 2;
+    const cy = attrs.height / 2;
 
-    if (attrs.rotation) {
-      rotateInCanvas(ctx, attrs.rotation, cx, cy);
-    }
+    ctx.transform(...attrs.transform);
 
     ctx.beginPath();
     ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
@@ -86,13 +82,11 @@ export class Ellipse extends Graph<EllipseAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    const { x, y, width, height, rotation } = this.attrs;
-    const cx = x + width / 2;
-    const cy = y + height / 2;
+    const { width, height, transform } = this.attrs;
+    const cx = width / 2;
+    const cy = height / 2;
 
-    if (rotation) {
-      rotateInCanvas(ctx, rotation, cx, cy);
-    }
+    ctx.transform(...transform);
 
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;

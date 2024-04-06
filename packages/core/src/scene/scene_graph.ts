@@ -166,7 +166,7 @@ export class SceneGraph {
       }
     }
 
-    const selectedRect = this.editor.selectedBox.updateBbox();
+    const selectedTransformBox = this.editor.selectedBox.updateBbox();
 
     /** draw selected elements outline */
     if (this.showSelectedGraphsOutline) {
@@ -194,15 +194,7 @@ export class SceneGraph {
 
     /** draw transform handle */
     if (this.showBoxAndHandleWhenSelected) {
-      // rect +  rotation
-      this.editor.controlHandleManager.draw(
-        selectedRect
-          ? {
-              ...selectedRect,
-              rotation: this.editor.selectedElements.getRotation(),
-            }
-          : null,
-      );
+      this.editor.controlHandleManager.draw(selectedTransformBox);
     }
 
     /** draw selection */

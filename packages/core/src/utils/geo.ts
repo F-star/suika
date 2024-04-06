@@ -1,6 +1,6 @@
-import { type IRect } from '@suika/geo';
+import { getSweepAngle, type IRect } from '@suika/geo';
 
-import { DOUBLE_PI, HALF_PI } from '../constant';
+import { HALF_PI } from '../constant';
 import { type IBox, type IBox2, type IBox2WithMid, type IPoint } from '../type';
 
 export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
@@ -31,25 +31,6 @@ export function getRectCenterPoint({
   height,
 }: IRect): [cx: number, cy: number] {
   return [x + width / 2, y + height / 2];
-}
-
-/**
- * 求向量到上边(y负半轴)的夹角
- * 范围在 [0, Math.PI * 2)
- */
-export function calcVectorRadian(cx: number, cy: number, x: number, y: number) {
-  const a = [x - cx, y - cy];
-  const b = [0, -1];
-
-  const dotProduct = a[0] * b[0] + a[1] * b[1];
-  const d =
-    Math.sqrt(a[0] * a[0] + a[1] * a[1]) * Math.sqrt(b[0] * b[0] + b[1] * b[1]);
-  let radian = Math.acos(dotProduct / d);
-
-  if (x < cx) {
-    radian = DOUBLE_PI - radian;
-  }
-  return radian;
 }
 
 /**
@@ -110,11 +91,12 @@ export const pointsToHLines = (points: IPoint[]): Map<number, number[]> => {
 };
 
 export const adjustSizeToKeepPolarSnap = (rect: IRect): IRect => {
-  const radian = calcVectorRadian(
-    rect.x,
-    rect.y,
-    rect.x + rect.width,
-    rect.y + rect.height,
+  const radian = getSweepAngle(
+    { x: 0, y: -1 },
+    {
+      x: rect.width,
+      y: rect.height,
+    },
   );
 
   const { width, height } = rect;

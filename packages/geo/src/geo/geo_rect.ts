@@ -1,5 +1,13 @@
+import { Matrix } from 'pixi.js';
+
 import { transformRotate } from '../transform';
-import { type IPoint, type IRect, type IRectWithRotation } from '../type';
+import {
+  type IMatrixArr,
+  type IPoint,
+  type IRect,
+  type IRectWithRotation,
+  type ITransformRect,
+} from '../type';
 import { normalizeRadian } from './geo_angle';
 
 export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
@@ -21,7 +29,7 @@ export const getRectByPoints = (points: IPoint[]): IRect => {
   return { x, y, width, height };
 };
 
-export const isPointInRect = (
+export const isPointInRect3 = (
   point: IPoint,
   rect: IRectWithRotation,
   padding = 0,
@@ -36,6 +44,28 @@ export const isPointInRect = (
     point.y >= rect.y - padding &&
     point.x <= rect.x + rect.width + padding &&
     point.y <= rect.y + rect.height + padding
+  );
+};
+
+export const isPointInRect = (
+  point: IPoint,
+  rect: {
+    width: number;
+    height: number;
+    transform?: IMatrixArr;
+  },
+  padding = 0,
+) => {
+  if (rect.transform) {
+    const matrix = new Matrix(...rect.transform);
+    point = matrix.applyInverse(point);
+  }
+
+  return (
+    point.x >= -padding &&
+    point.y >= -padding &&
+    point.x <= rect.width + padding &&
+    point.y <= rect.height + padding
   );
 };
 
@@ -120,10 +150,16 @@ export const getMergedRect = (...rects: IRect[]): IRect => {
     throw new Error('the count of rect can not be 0');
   }
 
-  const minX = Math.min(...rects.map((rect) => rect.x));
-  const minY = Math.min(...rects.map((rect) => rect.y));
-  const maxX = Math.max(...rects.map((rect) => rect.x + rect.width));
-  const maxY = Math.max(...rects.map((rect) => rect.y + rect.height));
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const rect of rects) {
+    minX = Math.min(minX, rect.x);
+    minY = Math.min(minY, rect.y);
+    maxX = Math.max(maxX, rect.x + rect.width);
+    maxY = Math.max(maxY, rect.y + rect.height);
+  }
 
   return {
     x: minX,
@@ -152,30 +188,6 @@ export const isRectContain = (rect1: IRect, rect2: IRect) => {
   );
 };
 
-export const rectToPoints = (rect: IRectWithRotation) => {
-  const { x, y, width, height, rotation = 0 } = rect;
-  const [cx, cy] = [x + width / 2, y + height / 2];
-  let points = [
-    { x, y },
-    { x: x + width, y },
-    { x: x + width, y: y + height },
-    { x, y: y + height },
-  ];
-
-  if (rotation) {
-    points = points.map((point) =>
-      transformRotate(point.x, point.y, rotation, cx, cy),
-    );
-  }
-
-  return {
-    nw: points[0],
-    ne: points[1],
-    se: points[2],
-    sw: points[3],
-  };
-};
-
 export const offsetRect = (
   rect: IRectWithRotation,
   padding: number | number[],
@@ -195,30 +207,16 @@ export const offsetRect = (
 };
 
 /** get mid-point of each segment */
-export const rectToMidPoints = (rect: IRectWithRotation) => {
-  const { x, y, width, height, rotation = 0 } = rect;
+export const rectToMidPoints = (rect: IRect) => {
+  const { x, y, width, height } = rect;
   const halfWidth = width / 2;
   const halfHeight = height / 2;
-  const [cx, cy] = [x + halfWidth, y + halfHeight];
-  let points = [
+  return [
     { x: x + halfWidth, y },
     { x: x + width, y: y + halfHeight },
     { x: x + halfWidth, y: y + height },
     { x, y: y + halfHeight },
   ];
-
-  if (rotation) {
-    points = points.map((point) =>
-      transformRotate(point.x, point.y, rotation, cx, cy),
-    );
-  }
-
-  return {
-    n: points[0],
-    e: points[1],
-    s: points[2],
-    w: points[3],
-  };
 };
 
 /**
@@ -251,5 +249,61 @@ export const getRotatedRectByTwoPoint = (
     width: Math.sqrt(width * width + height * height),
     height: 0,
     rotation,
+  };
+};
+
+/**
+ * Convert a rectangle to an array of vertices
+ */
+export const rectToVertices = (rect: IRect, tf?: IMatrixArr): IPoint[] => {
+  const { x, y, width, height } = rect;
+  let pts = [
+    { x, y },
+    { x: x + width, y },
+    { x: x + width, y: y + height },
+    { x, y: y + height },
+  ];
+  if (tf) {
+    const matrix = new Matrix(...tf);
+    pts = pts.map((point) => {
+      const pt = matrix.apply(point);
+      return { x: pt.x, y: pt.y };
+    });
+  }
+  return pts;
+};
+
+/**
+ * get bbox after transform
+ * then get the rect of the bbox
+ */
+export const getRectApplyMatrix = (rect: ITransformRect) => {
+  const pts = rectToVertices(
+    {
+      x: 0,
+      y: 0,
+      width: rect.width,
+      height: rect.height,
+    },
+    rect.transform,
+  );
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const pt of pts) {
+    minX = Math.min(minX, pt.x);
+    minY = Math.min(minY, pt.y);
+    maxX = Math.max(maxX, pt.x);
+    maxY = Math.max(maxY, pt.y);
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
   };
 };

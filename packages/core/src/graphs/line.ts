@@ -1,8 +1,7 @@
 import { parseRGBAStr } from '@suika/common';
 
 import { PaintType } from '../paint';
-import { GraphType } from '../type';
-import { rotateInCanvas } from '../utils';
+import { GraphType, type Optional } from '../type';
 import { Graph, type GraphAttrs } from './graph';
 
 export type LineAttrs = GraphAttrs;
@@ -18,20 +17,16 @@ export type LineAttrs = GraphAttrs;
 export class Line extends Graph<LineAttrs> {
   override type = GraphType.Line;
 
-  constructor(options: Omit<LineAttrs, 'id'>) {
+  constructor(options: Optional<LineAttrs, 'id' | 'transform'>) {
     super({ ...options, height: 0, type: GraphType.Line });
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
-    const { x, y, width, rotation, stroke, strokeWidth } = this.attrs;
-    if (rotation) {
-      const { x: cx, y: cy } = this.getCenter();
-
-      rotateInCanvas(ctx, rotation, cx, cy);
-    }
+    const { width, transform, stroke, strokeWidth } = this.attrs;
+    ctx.transform(...transform);
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + width, y);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(width, 0);
     if (strokeWidth) {
       ctx.lineWidth = strokeWidth;
       for (const paint of stroke ?? []) {
@@ -56,15 +51,11 @@ export class Line extends Graph<LineAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    const { x, y, width, rotation } = this.attrs;
-    if (rotation) {
-      const { x: cx, y: cy } = this.getCenter();
-
-      rotateInCanvas(ctx, rotation, cx, cy);
-    }
+    const { width, transform } = this.attrs;
+    ctx.transform(...transform);
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + width, y);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(width, 0);
     ctx.lineWidth = strokeWidth;
     ctx.strokeStyle = stroke;
     ctx.stroke();

@@ -1,11 +1,18 @@
-import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { addPoint, type IRect, type IRectWithRotation } from '@suika/geo';
+import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import {
+  addPoint,
+  type IMatrixArr,
+  type IPoint,
+  type IRect,
+  type ITransformRect,
+  resizeRect,
+} from '@suika/geo';
 import { Bezier } from 'bezier-js';
+import { Matrix } from 'pixi.js';
 
 import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
-import { GraphType } from '../../type';
-import { rotateInCanvas } from '../../utils';
+import { GraphType, type Optional } from '../../type';
 import { Graph, type GraphAttrs } from '../graph';
 import { type IPathItem, type ISegment } from './type';
 
@@ -16,13 +23,11 @@ export interface PathAttrs extends GraphAttrs {
 export class Path extends Graph<PathAttrs> {
   override type = GraphType.Path;
 
-  constructor(options: Omit<PathAttrs, 'id'>) {
+  constructor(options: Optional<PathAttrs, 'id' | 'transform'>) {
     super({ ...options, type: GraphType.Path });
   }
 
-  override getBBox(): IRect {
-    // TODO: cache
-    const pathData = this.attrs.pathData ?? [];
+  static computeRect(pathData: IPathItem[]): IRect {
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -58,40 +63,103 @@ export class Path extends Graph<PathAttrs> {
     };
   }
 
-  override getRectWithRotation(): IRectWithRotation {
-    return { ...this.getBBox(), rotation: this.attrs.rotation };
-  }
-
-  override updateAttrs(attrs: Partial<PathAttrs>) {
-    if (attrs.pathData) {
-      this.attrs.pathData = attrs.pathData;
-    }
-    if (attrs.x !== undefined) {
-      // move all points in pathData
-      const originX = this.getRect().x;
-      const dx = attrs.x - originX;
-      const pathData = this.attrs.pathData;
-      for (const pathItem of pathData) {
-        for (const seg of pathItem.segs) {
-          seg.point.x += dx;
-        }
+  static recomputeAttrs(pathData: IPathItem[], transform: IMatrixArr) {
+    const rect = Path.computeRect(pathData);
+    for (const pathItem of pathData) {
+      for (const seg of pathItem.segs) {
+        seg.point = {
+          x: seg.point.x - rect.x,
+          y: seg.point.y - rect.y,
+        };
       }
     }
-    if (attrs.y !== undefined) {
-      const originY = this.getRect().y;
-      const dy = attrs.y - originY;
-      const pathData = this.attrs.pathData;
-      for (const pathItem of pathData) {
-        for (const seg of pathItem.segs) {
-          seg.point.y += dy;
-        }
-      }
-    }
-    super.updateAttrs(attrs);
+    const offset = new Matrix(...transform).apply(rect);
+    return {
+      x: offset.x,
+      y: offset.y,
+      width: rect.width,
+      height: rect.height,
+      pathData,
+    };
   }
 
-  override getRect() {
-    return this.getBBox();
+  private checkAndFixUpdatedAttrs(partialAttrs: Partial<PathAttrs>) {
+    if (
+      ('width' in partialAttrs || 'height' in partialAttrs) &&
+      'pathData' in partialAttrs
+    ) {
+      delete partialAttrs.width;
+      delete partialAttrs.height;
+      console.warn(
+        'width or height and pathData cannot coexist when updating attribute, removed width and height',
+      );
+    }
+  }
+
+  /**
+   * update attributes
+   * TODO: optimize
+   */
+  override updateAttrs(partialAttrs: Partial<PathAttrs>) {
+    partialAttrs = cloneDeep(partialAttrs);
+    this.checkAndFixUpdatedAttrs(partialAttrs);
+
+    const keys = Object.keys(partialAttrs);
+
+    if (partialAttrs.pathData) {
+      const transform = partialAttrs.transform ?? this.attrs.transform;
+      this.attrs.pathData = partialAttrs.pathData;
+      partialAttrs = {
+        ...partialAttrs,
+        ...Path.recomputeAttrs(partialAttrs.pathData!, transform),
+      };
+    }
+
+    if (keys.includes('width') || keys.includes('height')) {
+      const newPathData = this.recomputedPathData(
+        partialAttrs.width ?? this.attrs.width,
+        partialAttrs.height ?? this.attrs.height,
+      );
+      this.attrs.pathData = newPathData;
+    }
+
+    super.updateAttrs(partialAttrs);
+  }
+
+  override updateByControlHandle(
+    /** 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w' */
+    type: string,
+    newPos: IPoint,
+    oldTransformRect: ITransformRect,
+    keepRatio = false,
+    scaleFromCenter = false,
+  ) {
+    const rect = resizeRect(type, newPos, oldTransformRect, {
+      keepRatio,
+      scaleFromCenter,
+    });
+
+    const newPathData = this.recomputedPathData(rect.width, rect.height);
+    this.attrs.pathData = newPathData;
+    super.updateAttrs(rect);
+  }
+
+  private recomputedPathData(width: number, height: number) {
+    const scaleX = width / this.attrs.width;
+    const scaleY = height / this.attrs.height;
+
+    const pathData = this.attrs.pathData;
+    for (const pathItem of this.attrs.pathData) {
+      for (const seg of pathItem.segs) {
+        seg.point.x *= scaleX;
+        seg.point.y *= scaleY;
+        seg.in.x *= scaleX;
+        seg.in.y *= scaleY;
+        seg.out.x *= scaleX;
+        seg.out.y *= scaleY;
+      }
+    }
+    return pathData;
   }
 
   override draw(
@@ -99,7 +167,7 @@ export class Path extends Graph<PathAttrs> {
     imgManager?: ImgManager | undefined,
     smooth?: boolean | undefined,
   ) {
-    this.realDraw(ctx, imgManager, smooth);
+    this._realDraw(ctx, imgManager, smooth);
   }
 
   override drawOutline(
@@ -107,7 +175,7 @@ export class Path extends Graph<PathAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    this.realDraw(ctx, undefined, undefined, {
+    this._realDraw(ctx, undefined, undefined, {
       stroke: [
         {
           type: PaintType.Solid,
@@ -118,7 +186,7 @@ export class Path extends Graph<PathAttrs> {
     });
   }
 
-  private realDraw(
+  private _realDraw(
     ctx: CanvasRenderingContext2D,
     imgManager?: ImgManager,
     smooth?: boolean,
@@ -128,13 +196,9 @@ export class Path extends Graph<PathAttrs> {
       strokeWidth?: number;
     },
   ) {
-    const { pathData, rotation } = this.attrs;
+    const { pathData, transform } = this.attrs;
     const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
-    if (rotation) {
-      const { x: cx, y: cy } = this.getCenter();
-
-      rotateInCanvas(ctx, rotation, cx, cy);
-    }
+    ctx.transform(...transform);
 
     ctx.beginPath();
     for (const pathItem of pathData) {
@@ -219,10 +283,6 @@ export class Path extends Graph<PathAttrs> {
   static getHandleOut(seg: ISegment) {
     return addPoint(seg.point, seg.out);
   }
-
-  getSeg(pathIdx: number, segIdx: number) {
-    return Path.getSeg(this.attrs.pathData, pathIdx, segIdx);
-  }
   static getSeg(pathData: IPathItem[], pathIdx: number, segIdx: number) {
     const pathDataItem = pathData[pathIdx];
     if (!pathDataItem) {
@@ -230,16 +290,131 @@ export class Path extends Graph<PathAttrs> {
     }
     return pathDataItem.segs[segIdx] ?? null;
   }
-  setSeg(pathIdx: number, segIdx: number, seg: ISegment) {
+
+  getLastSeg(pathIdx: number, options?: { applyTransform: boolean }) {
+    const lastSegIdx = this.getSegCount(pathIdx) - 1;
+    return this.getSeg(pathIdx, lastSegIdx, options);
+  }
+
+  getSeg(
+    pathIdx: number,
+    segIdx: number,
+    options?: { applyTransform: boolean },
+  ) {
+    let seg = Path.getSeg(this.attrs.pathData, pathIdx, segIdx);
+    seg = cloneDeep(seg);
+    if (seg && options?.applyTransform) {
+      const tf = new Matrix(...this.attrs.transform);
+      const transformedPt = tf.apply(seg.point);
+      seg.point.x = transformedPt.x;
+      seg.point.y = transformedPt.y;
+
+      tf.tx = 0;
+      tf.ty = 0;
+      const inPt = tf.apply(seg.in);
+      seg.in.x = inPt.x;
+      seg.in.y = inPt.y;
+      const outPt = tf.apply(seg.out);
+      seg.out.x = outPt.x;
+      seg.out.y = outPt.y;
+    }
+    return seg;
+  }
+
+  setSeg(pathIdx: number, segIdx: number, partialSeg: Partial<ISegment>) {
     const pathData = this.attrs.pathData;
-    const pathDataItem = pathData[pathIdx];
-    if (!pathDataItem) {
+    const pathItem = { ...pathData[pathIdx] };
+    const seg = this.getSeg(pathIdx, segIdx);
+    if (!seg) {
+      throw new Error(`can not find pathIdx ${pathIdx} segIdx ${segIdx}`);
+    }
+
+    partialSeg = cloneDeep(partialSeg);
+    const transform = this.attrs.transform;
+    if (partialSeg.point) {
+      const tf = new Matrix(...transform);
+      const anchor = tf.invert().apply(partialSeg.point);
+      partialSeg.point.x = anchor.x;
+      partialSeg.point.y = anchor.y;
+    }
+    if (partialSeg.in || partialSeg.out) {
+      const invertTf = new Matrix(
+        transform[0],
+        transform[1],
+        transform[2],
+        transform[3],
+        0,
+        0,
+      ).invert();
+      if (partialSeg.in) {
+        const inPt = invertTf.apply(partialSeg.in);
+        partialSeg.in.x = inPt.x;
+        partialSeg.in.y = inPt.y;
+      }
+      if (partialSeg.out) {
+        const outPt = invertTf.apply(partialSeg.out);
+        partialSeg.out.x = outPt.x;
+        partialSeg.out.y = outPt.y;
+      }
+    }
+
+    pathItem.segs[segIdx] = {
+      ...seg,
+      ...partialSeg,
+    };
+    this.updateAttrs({ pathData });
+  }
+  addSeg(pathIdx: number, seg: ISegment) {
+    const pathData = this.attrs.pathData;
+    const pathItem = pathData[pathIdx];
+    if (!pathItem) {
       throw new Error(`pathIdx ${pathIdx} is out of range`);
     }
-    if (segIdx >= pathDataItem.segs.length) {
-      throw new Error(`segIdx ${segIdx} is out of range`);
-    }
-    pathDataItem.segs[segIdx] = seg;
+    const tf = new Matrix(...this.attrs.transform);
+    const anchor = tf.invert().apply(seg.point);
+    pathItem.segs.push({
+      point: anchor,
+      in: seg.in,
+      out: seg.out,
+    });
     this.updateAttrs({ pathData });
+  }
+  addEmptyPath() {
+    const pathData = this.attrs.pathData;
+    pathData.push({
+      segs: [],
+      closed: false,
+    });
+    this.updateAttrs({ pathData });
+  }
+  setPathItemClosed(pathIdx: number, closed: boolean) {
+    const pathData = this.attrs.pathData;
+    const pathItem = pathData[pathIdx];
+    if (!pathItem) {
+      throw new Error(`pathIdx ${pathIdx} is out of range`);
+    }
+    pathItem.closed = closed;
+    this.updateAttrs({ pathData });
+  }
+  checkPathItemClosed(pathIdx: number) {
+    const pathData = this.attrs.pathData;
+    const pathItem = pathData[pathIdx];
+    if (!pathItem) {
+      throw new Error(`pathIdx ${pathIdx} is out of range`);
+    }
+    return pathItem.closed;
+  }
+  getPathItemCount() {
+    return this.attrs.pathData.length;
+  }
+  hasPath(pathIdx: number) {
+    return !!this.attrs.pathData[pathIdx];
+  }
+  getSegCount(pathIdx: number) {
+    const pathItem = this.attrs.pathData[pathIdx];
+    if (!pathItem) {
+      return 0;
+    }
+    return pathItem.segs.length;
   }
 }

@@ -1,11 +1,13 @@
 import {
+  getTransformAngle,
   type IPoint,
   type IRect,
-  type IRectWithRotation,
+  type ITransformRect,
   offsetRect,
   rectToMidPoints,
-  rectToPoints,
+  rectToVertices,
 } from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
@@ -85,7 +87,7 @@ export class ControlHandleManager {
     this.editor.commandManager.off('change', this.onHoverItemChange);
   }
 
-  private updateTransformHandles(rect: IRectWithRotation | null) {
+  private updateTransformHandles(rect: ITransformRect | null) {
     if (!rect || this.editor.pathEditor.isActive()) {
       this.transformHandlesVisible = false;
       return;
@@ -98,11 +100,20 @@ export class ControlHandleManager {
     const neswHandleWidth = this.editor.setting.get('neswHandleWidth');
 
     // calculate handle position
+    const _rect = {
+      x: 0,
+      y: 0,
+      width: rect.width,
+      height: rect.height,
+    };
     const handlePoints = (() => {
-      const cornerPoints = rectToPoints(rect);
+      const cornerPoints = rectToVertices(_rect, rect.transform);
 
       const offset = handleSize / 2 / zoom;
-      const cornerRotation = rectToPoints(offsetRect(rect, offset));
+      const cornerRotates = rectToVertices(
+        offsetRect(_rect, offset),
+        rect.transform,
+      );
 
       // when rect size < 40（viewport）, nwse handle should outside the selectedBox
       const MIN_SIZE = 40;
@@ -113,16 +124,29 @@ export class ControlHandleManager {
       if (rect.height * zoom < MIN_SIZE) {
         offsets[0] = offsets[2] = neswHandleWidth / 2 / zoom;
       }
-      const neswRect = offsetRect(rect, offsets);
-      const midPoints = rectToMidPoints(neswRect);
+      const neswRect = offsetRect(_rect, offsets);
+
+      const tf = new Matrix(...rect.transform);
+      const midPoints = rectToMidPoints(neswRect).map((point) => {
+        const { x, y } = tf.apply(point);
+        return { x, y };
+      });
 
       return {
-        ...cornerPoints,
-        ...midPoints,
-        nwRotation: cornerRotation.nw,
-        neRotation: cornerRotation.ne,
-        seRotation: cornerRotation.se,
-        swRotation: cornerRotation.sw,
+        nw: cornerPoints[0],
+        ne: cornerPoints[1],
+        se: cornerPoints[2],
+        sw: cornerPoints[3],
+
+        n: midPoints[0],
+        e: midPoints[1],
+        s: midPoints[2],
+        w: midPoints[3],
+
+        nwRotation: cornerRotates[0],
+        neRotation: cornerRotates[1],
+        seRotation: cornerRotates[2],
+        swRotation: cornerRotates[3],
       };
     })();
 
@@ -154,7 +178,7 @@ export class ControlHandleManager {
         neswHandleWidth;
   }
 
-  draw(rect: IRectWithRotation | null) {
+  draw(rect: ITransformRect | null) {
     this.updateTransformHandles(rect);
     const handles: ControlHandle[] = [];
     if (this.transformHandlesVisible) {
@@ -165,6 +189,7 @@ export class ControlHandleManager {
     }
 
     const ctx = this.editor.ctx;
+    const rotate = rect ? getTransformAngle(rect.transform) : 0;
     handles.forEach((handle) => {
       const graph = handle.graph;
       if (graph.type === GraphType.Path) {
@@ -175,15 +200,21 @@ export class ControlHandleManager {
           handle.cy,
         );
         graph.updateAttrs({
-          x: x - graph.attrs.width / 2,
-          y: y - graph.attrs.height / 2,
+          transform: [
+            1,
+            0,
+            0,
+            1,
+            x - graph.attrs.width / 2,
+            y - graph.attrs.height / 2,
+          ],
         });
       }
-      if (rect) {
-        graph.attrs.rotation = rect.rotation;
+      if (rect && handle.isTransformHandle) {
+        graph.setRotate(rotate);
       }
       if (handle.rotation !== undefined) {
-        graph.attrs.rotation = handle.rotation;
+        graph.setRotate(handle.rotation);
       }
 
       if (!graph.getVisible()) {

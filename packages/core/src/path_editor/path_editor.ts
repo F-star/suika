@@ -236,7 +236,9 @@ export class PathEditor {
     for (let i = 0; i < pathData.length; i++) {
       const pathItem = pathData[i];
       for (let j = 0; j < pathItem.segs.length; j++) {
-        const seg = pathItem.segs[j];
+        const seg = path.getSeg(i, j, {
+          applyTransform: true,
+        })!;
         const anchor = seg.point;
 
         // 1. draw anchor

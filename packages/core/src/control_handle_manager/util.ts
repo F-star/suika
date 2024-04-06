@@ -1,5 +1,11 @@
 import { parseHexToRGBA } from '@suika/common';
-import { type IRectWithRotation, normalizeDegree, rad2Deg } from '@suika/geo';
+import {
+  checkTransformFlip,
+  getTransformAngle,
+  type ITransformRect,
+  normalizeDegree,
+  rad2Deg,
+} from '@suika/geo';
 
 import { type ICursor } from '../cursor_manager';
 import { Rect } from '../graphs';
@@ -9,7 +15,7 @@ import { type ITransformHandleType } from './type';
 
 const getResizeCursor = (
   type: string,
-  selectedBox: IRectWithRotation | null,
+  selectedBox: ITransformRect | null,
 ): ICursor => {
   if (!selectedBox) {
     return 'default';
@@ -18,7 +24,9 @@ const getResizeCursor = (
     // be considered as a line
     return 'move';
   }
-  const rotation = selectedBox.rotation ?? 0;
+  const rotation = getTransformAngle(selectedBox.transform);
+  const isFlip = checkTransformFlip(selectedBox.transform);
+
   let dDegree = 0;
   switch (type) {
     case 'se':
@@ -41,18 +49,19 @@ const getResizeCursor = (
       console.warn('unknown type', type);
   }
 
-  const degree = rad2Deg(rotation) + dDegree;
+  const degree = rad2Deg(rotation) + (isFlip ? -dDegree : dDegree);
   return { type: 'resize', degree };
 };
 
 export const getRotationCursor = (
   type: string,
-  selectedBox: IRectWithRotation | null,
+  selectedBox: ITransformRect | null,
 ): ICursor => {
   if (!selectedBox) {
     return 'default';
   }
-  const rotation = selectedBox.rotation ?? 0;
+  const rotation = getTransformAngle(selectedBox.transform);
+  const isFlip = checkTransformFlip(selectedBox.transform);
   let dDegree = 0;
 
   if (selectedBox.height === 0) {
@@ -71,8 +80,11 @@ export const getRotationCursor = (
       nwRotation: 315,
     }[type]!;
   }
-  const degree = normalizeDegree(rad2Deg(rotation) + dDegree);
-  return { type: 'rotation', degree };
+  const degree = normalizeDegree(
+    rad2Deg(rotation) + (isFlip ? -dDegree : dDegree),
+  );
+  const r = { type: 'rotation', degree } as const;
+  return r;
 };
 
 export const createTransformHandles = (params: {
@@ -122,6 +134,7 @@ export const createTransformHandles = (params: {
     type: 'nw',
     padding: 3,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   const ne = new ControlHandle({
@@ -132,6 +145,7 @@ export const createTransformHandles = (params: {
     type: 'ne',
     padding: 3,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   const se = new ControlHandle({
@@ -142,6 +156,7 @@ export const createTransformHandles = (params: {
     type: 'se',
     padding: 3,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   const sw = new ControlHandle({
@@ -152,6 +167,7 @@ export const createTransformHandles = (params: {
     type: 'sw',
     padding: 3,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   /************************* rotation handle  **********************/
@@ -166,6 +182,7 @@ export const createTransformHandles = (params: {
     }),
     type: 'nwRotation',
     getCursor: getRotationCursor,
+    isTransformHandle: true,
   });
 
   const neRotation = new ControlHandle({
@@ -178,6 +195,7 @@ export const createTransformHandles = (params: {
     }),
     type: 'neRotation',
     getCursor: getRotationCursor,
+    isTransformHandle: true,
   });
 
   const seRotation = new ControlHandle({
@@ -190,6 +208,7 @@ export const createTransformHandles = (params: {
     }),
     type: 'seRotation',
     getCursor: getRotationCursor,
+    isTransformHandle: true,
   });
 
   const swRotation = new ControlHandle({
@@ -202,6 +221,7 @@ export const createTransformHandles = (params: {
     }),
     type: 'swRotation',
     getCursor: getRotationCursor,
+    isTransformHandle: true,
   });
 
   /************* north/south/west/east ************/
@@ -210,7 +230,7 @@ export const createTransformHandles = (params: {
     x: number,
     y: number,
     tol: number,
-    rect: { x: number; y: number; width: number; height: number } | null,
+    rect: ITransformRect | null,
   ) {
     if (!rect || rect.width === 0 || rect.height === 0) {
       return false;
@@ -227,6 +247,7 @@ export const createTransformHandles = (params: {
     type: 'n',
     hitTest,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
   const e = new ControlHandle({
     graph: new Rect({
@@ -237,6 +258,7 @@ export const createTransformHandles = (params: {
     type: 'e',
     hitTest,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   const s = new ControlHandle({
@@ -248,6 +270,7 @@ export const createTransformHandles = (params: {
     type: 's',
     hitTest,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   const w = new ControlHandle({
@@ -259,6 +282,7 @@ export const createTransformHandles = (params: {
     type: 'w',
     hitTest,
     getCursor: getResizeCursor,
+    isTransformHandle: true,
   });
 
   return new Map<ITransformHandleType, ControlHandle>([

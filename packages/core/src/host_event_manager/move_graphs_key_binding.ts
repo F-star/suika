@@ -2,7 +2,7 @@ import { arrMap, debounce, noop } from '@suika/common';
 
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
-import { type Graph } from '../graphs';
+import { Graph } from '../graphs';
 import { type IPoint } from '../type';
 
 /**
@@ -35,7 +35,7 @@ export class MoveGraphsKeyBinding {
         new SetGraphsAttrsCmd(
           'Move elements',
           moveEls,
-          arrMap(moveEls, (el) => ({ x: el.attrs.x, y: el.attrs.y })),
+          arrMap(moveEls, (el) => el.getPosition()),
           startPoints,
         ),
       );
@@ -69,8 +69,7 @@ export class MoveGraphsKeyBinding {
 
       if (isEnableUpdateStartPoints) {
         startPoints = arrMap(movedEls, (el) => ({
-          x: el.attrs.x,
-          y: el.attrs.y,
+          ...el.getPosition(),
         }));
         isEnableUpdateStartPoints = false;
       }
@@ -79,16 +78,16 @@ export class MoveGraphsKeyBinding {
       if (event.shiftKey) nudge = editor.setting.get('bigNudge');
 
       if (pressed.ArrowLeft) {
-        editor.moveElements(movedEls, -nudge, 0);
+        Graph.dMove(movedEls, -nudge, 0);
       }
       if (pressed.ArrowRight) {
-        editor.moveElements(movedEls, nudge, 0);
+        Graph.dMove(movedEls, nudge, 0);
       }
       if (pressed.ArrowUp) {
-        editor.moveElements(movedEls, 0, -nudge);
+        Graph.dMove(movedEls, 0, -nudge);
       }
       if (pressed.ArrowDown) {
-        editor.moveElements(movedEls, 0, nudge);
+        Graph.dMove(movedEls, 0, nudge);
       }
 
       this.editor.commandManager.disableRedoUndo();

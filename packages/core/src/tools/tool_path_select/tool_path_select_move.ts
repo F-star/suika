@@ -1,5 +1,5 @@
 import { cloneDeep } from '@suika/common';
-import { type IPoint } from '@suika/geo';
+import { type IMatrixArr, type IPoint } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../../commands';
 import { type ICursor } from '../../cursor_manager';
@@ -22,7 +22,8 @@ export class PathSelectMoveTool implements ITool {
   readonly hotkey = HOTKEY;
   cursor: ICursor = 'default';
   private startPoint: IPoint | null = null;
-  private prevPathData: IPathItem[] = [];
+  private prevAttrs: { transform: IMatrixArr; pathData: IPathItem[] } | null =
+    null;
   private indiesInfo: Readonly<ISelectedIdxInfo>[] = [];
   private anchorPoints: Readonly<IPoint>[] = [];
 
@@ -45,7 +46,11 @@ export class PathSelectMoveTool implements ITool {
     const type = selectedInfo[0] as SelectedIdexType;
 
     if (type === 'anchor') {
-      this.prevPathData = cloneDeep(pathEditor.getPath()!.attrs.pathData);
+      const path = pathEditor.getPath()!;
+      this.prevAttrs = cloneDeep({
+        transform: path.attrs.transform,
+        pathData: path.attrs.pathData,
+      });
 
       const hitAnchor = PathEditor.parseSelectedIndex(control.handleName)!;
 
@@ -64,7 +69,9 @@ export class PathSelectMoveTool implements ITool {
 
       this.anchorPoints = this.indiesInfo.map(
         ({ pathIdx, segIdx }) =>
-          pathEditor.getPath()!.getSeg(pathIdx, segIdx)!.point,
+          pathEditor
+            .getPath()!
+            .getSeg(pathIdx, segIdx, { applyTransform: true })!.point,
       );
 
       pathEditor.setSelectedIndices(this.indiesInfo);
@@ -87,7 +94,6 @@ export class PathSelectMoveTool implements ITool {
       const seg = path.getSeg(pathIdx, segIdx);
       if (seg) {
         path.setSeg(pathIdx, segIdx, {
-          ...seg,
           point: {
             x: this.anchorPoints[i].x + dx,
             y: this.anchorPoints[i].y + dy,
@@ -104,8 +110,8 @@ export class PathSelectMoveTool implements ITool {
       new SetGraphsAttrsCmd(
         'UpdatePathData',
         [path],
-        [{ pathData: path!.attrs.pathData }],
-        [{ pathData: this.prevPathData }],
+        [{ transform: path.attrs.transform, pathData: path.attrs.pathData }],
+        [this.prevAttrs!],
       ),
     );
     this.editor.commandManager.batchCommandEnd();
@@ -116,7 +122,7 @@ export class PathSelectMoveTool implements ITool {
   }
   afterEnd() {
     this.startPoint = null;
-    this.prevPathData = [];
+    this.prevAttrs = null;
     this.indiesInfo = [];
     this.anchorPoints = [];
   }

@@ -45,7 +45,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dx[i] = mixedBBox.minX - bBoxes[i].minX;
-          el.updateAttrs({ x: el.attrs.x + this.dx[i] });
+          el.updateAttrs({ x: el.getX() + this.dx[i] });
         }
         break;
       }
@@ -54,7 +54,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dx[i] = centerX - (bBoxes[i].minX / 2 + bBoxes[i].maxX / 2);
-          el.updateAttrs({ x: el.attrs.x + this.dx[i] });
+          el.updateAttrs({ x: el.getX() + this.dx[i] });
         }
         break;
       }
@@ -62,7 +62,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dx[i] = mixedBBox.maxX - bBoxes[i].maxX;
-          el.updateAttrs({ x: el.attrs.x + this.dx[i] });
+          el.updateAttrs({ x: el.getX() + this.dx[i] });
         }
         break;
       }
@@ -70,7 +70,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dy[i] = mixedBBox.minY - bBoxes[i].minY;
-          el.updateAttrs({ y: el.attrs.y + this.dy[i] });
+          el.updateAttrs({ y: el.getY() + this.dy[i] });
         }
         break;
       }
@@ -79,7 +79,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dy[i] = centerY - (bBoxes[i].minY / 2 + bBoxes[i].maxY / 2);
-          el.updateAttrs({ y: el.attrs.y + this.dy[i] });
+          el.updateAttrs({ y: el.getY() + this.dy[i] });
         }
         break;
       }
@@ -87,7 +87,7 @@ export class AlignCmd implements ICommand {
         for (let i = 0; i < elements.length; i++) {
           const el = elements[i];
           this.dy[i] = mixedBBox.maxY - bBoxes[i].maxY;
-          el.updateAttrs({ y: el.attrs.y + this.dy[i] });
+          el.updateAttrs({ y: el.getY() + this.dy[i] });
         }
         break;
       }
@@ -100,8 +100,8 @@ export class AlignCmd implements ICommand {
     for (let i = 0; i < this.elements.length; i++) {
       const el = this.elements[i];
       el.updateAttrs({
-        x: el.attrs.x + (this.dx[i] ?? 0),
-        y: el.attrs.y + (this.dy[i] ?? 0),
+        x: el.getX() + (this.dx[i] ?? 0),
+        y: el.getY() + (this.dy[i] ?? 0),
       });
     }
   }
@@ -109,8 +109,8 @@ export class AlignCmd implements ICommand {
     for (let i = 0; i < this.elements.length; i++) {
       const el = this.elements[i];
       el.updateAttrs({
-        x: el.attrs.x - (this.dx[i] ?? 0),
-        y: el.attrs.y - (this.dy[i] ?? 0),
+        x: el.getX() - (this.dx[i] ?? 0),
+        y: el.getY() - (this.dy[i] ?? 0),
       });
     }
   }

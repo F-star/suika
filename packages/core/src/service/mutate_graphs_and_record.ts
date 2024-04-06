@@ -1,5 +1,3 @@
-import { getRectRotatedXY } from '@suika/geo';
-
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
 import { type Graph } from '../graphs';
@@ -8,7 +6,7 @@ import { type Graph } from '../graphs';
  * mutate elements and record to history
  */
 export const MutateGraphsAndRecord = {
-  setRotateX(editor: Editor, elements: Graph[], rotatedX: number) {
+  setX(editor: Editor, elements: Graph[], newX: number) {
     if (elements.length === 0) {
       return;
     }
@@ -16,96 +14,82 @@ export const MutateGraphsAndRecord = {
     const prevXs: { x: number }[] = new Array(elements.length);
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
-      prevXs[i] = { x: element.attrs.x };
-      element.setRotatedX(rotatedX);
+      prevXs[i] = { x: element.getX() };
+      element.updateAttrs({
+        x: newX,
+      });
     }
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update X of Elements',
         elements,
-        elements.map((el) => ({ x: el.attrs.x })),
+        elements.map((el) => ({ x: el.getX() })),
         prevXs,
       ),
     );
   },
-  setRotateY(editor: Editor, elements: Graph[], rotatedY: number) {
+  setY(editor: Editor, elements: Graph[], newY: number) {
     if (elements.length === 0) {
       return;
     }
     const prevXs: { y: number }[] = new Array(elements.length);
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
-      prevXs[i] = { y: element.attrs.y };
-      element.setRotatedY(rotatedY);
+      prevXs[i] = { y: element.getY() };
+      element.updateAttrs({
+        y: newY,
+      });
     }
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Y of Elements',
         elements,
-        elements.map((el) => ({ y: el.attrs.y })),
+        elements.map((el) => ({ y: el.getY() })),
         prevXs,
       ),
     );
   },
-  setWidth(editor: Editor, elements: Graph[], width: number) {
-    if (elements.length === 0) {
+  setWidth(editor: Editor, graphs: Graph[], width: number) {
+    if (graphs.length === 0) {
       return;
     }
 
-    const prevAttrs = elements.map((el) => ({
-      x: el.attrs.x,
-      y: el.attrs.y,
+    const prevAttrs = graphs.map((el) => ({
       width: el.attrs.width,
     }));
-    elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el.attrs);
-      el.attrs.width = width;
-      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el.attrs);
-      const dx = rotatedX - preRotatedX;
-      const dy = rotatedY - preRotatedY;
-      el.attrs.x -= dx;
-      el.attrs.y -= dy;
+    graphs.forEach((graph) => {
+      graph.updateAttrs({ width });
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Width of Elements',
-        elements,
-        elements.map((el) => ({
-          width: el.attrs.width,
-          x: el.attrs.x,
-          y: el.attrs.y,
+        graphs,
+        graphs.map((item) => ({
+          width: item.attrs.width,
         })),
         prevAttrs,
       ),
     );
   },
-  setHeight(editor: Editor, elements: Graph[], height: number) {
-    if (elements.length === 0) {
+  setHeight(editor: Editor, graphs: Graph[], height: number) {
+    if (graphs.length === 0) {
       return;
     }
 
-    const prevAttrs = elements.map((el) => ({
-      x: el.attrs.x,
-      y: el.attrs.y,
+    const prevAttrs = graphs.map((el) => ({
       height: el.attrs.height,
     }));
-    elements.forEach((el) => {
-      const { x: preRotatedX, y: preRotatedY } = getRectRotatedXY(el.attrs);
-      el.attrs.height = height;
-      const { x: rotatedX, y: rotatedY } = getRectRotatedXY(el.attrs);
-      const dx = rotatedX - preRotatedX;
-      const dy = rotatedY - preRotatedY;
-      el.attrs.x -= dx;
-      el.attrs.y -= dy;
+    graphs.forEach((graph) => {
+      graph.updateAttrs({
+        height,
+      });
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'update Height of Elements',
-        elements,
-        elements.map((el) => ({
+        graphs,
+        graphs.map((el) => ({
           height: el.attrs.height,
-          x: el.attrs.x,
-          y: el.attrs.y,
         })),
         prevAttrs,
       ),
@@ -117,10 +101,10 @@ export const MutateGraphsAndRecord = {
     }
 
     const prevAttrs = elements.map((el) => ({
-      rotation: el.attrs.rotation || 0,
+      rotation: el.getRotate(),
     }));
     elements.forEach((el) => {
-      el.attrs.rotation = rotation;
+      el.setRotate(rotation);
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(

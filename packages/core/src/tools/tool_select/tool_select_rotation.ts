@@ -1,11 +1,10 @@
 import { forEach, getClosestTimesVal } from '@suika/common';
-import { normalizeRadian, rad2Deg } from '@suika/geo';
+import { getSweepAngle, type IMatrixArr, rad2Deg } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { getRotationCursor } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
 import { type IPoint } from '../../type';
-import { calcVectorRadian } from '../../utils';
 import { type IBaseTool } from '../type';
 
 /**
@@ -27,6 +26,7 @@ export class SelectRotationTool implements IBaseTool {
     y: number;
     width: number;
     height: number;
+    transform: IMatrixArr;
   }[] = [];
   handleType = '';
 
@@ -54,18 +54,20 @@ export class SelectRotationTool implements IBaseTool {
       const el = selectedElements[i];
       this.prevGraphAttrs[i] = {
         ...el.getRect(),
-        rotation: el.attrs.rotation ?? 0,
+        rotation: el.getRotate(),
+        transform: el.attrs.transform,
       };
     }
 
     this.selectedBoxCenter = this.editor.selectedElements.getCenterPoint(); // getRectCenterPoint(selectedElementsBBox);
 
     const mousePoint = this.editor.getSceneCursorXY(e);
-    this.startRotation = calcVectorRadian(
-      this.selectedBoxCenter[0],
-      this.selectedBoxCenter[1],
-      mousePoint.x,
-      mousePoint.y,
+    this.startRotation = getSweepAngle(
+      { x: 0, y: -1 },
+      {
+        x: mousePoint.x - this.selectedBoxCenter[0],
+        y: mousePoint.y - this.selectedBoxCenter[1],
+      },
     );
     this.startBboxRotation = this.editor.selectedElements.getRotation();
   }
@@ -84,11 +86,12 @@ export class SelectRotationTool implements IBaseTool {
       const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] = this
         .selectedBoxCenter as [number, number];
 
-      const lastMouseRotation = calcVectorRadian(
-        cxInSelectedElementsBBox,
-        cyInSelectedElementsBBox,
-        lastPoint.x,
-        lastPoint.y,
+      const lastMouseRotation = getSweepAngle(
+        { x: 0, y: -1 },
+        {
+          x: lastPoint.x - cxInSelectedElementsBBox,
+          y: lastPoint.y - cyInSelectedElementsBBox,
+        },
       );
 
       this.dRotation = lastMouseRotation - this.startRotation;
@@ -99,7 +102,6 @@ export class SelectRotationTool implements IBaseTool {
           getClosestTimesVal(bboxRotation, lockRotation) -
           this.startBboxRotation;
       }
-      this.dRotation = normalizeRadian(this.dRotation);
 
       if (this.editor.selectedElements.size() === 1) {
         this.editor.setCursor(
@@ -132,14 +134,14 @@ export class SelectRotationTool implements IBaseTool {
           commandDesc,
           selectedElements,
           selectedElements.map((el) => ({
-            rotation: el.attrs.rotation,
-            x: el.attrs.x,
-            y: el.attrs.y,
+            rotation: el.getRotate(),
+            ...el.getPosition(),
           })),
-          this.prevGraphAttrs.map(({ rotation, x, y }) => ({
-            rotation,
+          this.prevGraphAttrs.map(({ rotation, x, y, transform }) => ({
             x,
             y,
+            rotation,
+            transform,
           })),
         ),
       );

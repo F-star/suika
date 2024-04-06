@@ -1,6 +1,8 @@
 import { cloneDeep } from '@suika/common';
-import { type IRect, normalizeRadian, transformRotate } from '@suika/geo';
+import { getSweepAngle, type IMatrixArr, type IRect } from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
+import { HALF_PI } from '../constant';
 import { type Editor } from '../editor';
 import { Line } from '../graphs';
 import { adjustSizeToKeepPolarSnap } from '../utils';
@@ -29,6 +31,8 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
     const attrs = this.calcAttrs(rect);
     return new Line({
       objectName: '',
+      x: 0,
+      y: 0,
       ...attrs,
       height: 0,
       stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
@@ -46,16 +50,22 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
   }
 
   private calcAttrs({ x, y, width, height }: IRect) {
-    const rotation = normalizeRadian(Math.atan2(height, width));
+    const rotate =
+      getSweepAngle({ x: 0, y: -1 }, { x: width, y: height }) - HALF_PI;
+
     const cx = x + width / 2;
     const cy = y + height / 2;
-    const p = transformRotate(x, y, -rotation, cx, cy);
-    width = Math.sqrt(width * width + height * height);
+
+    const tf = new Matrix()
+      .translate(cx, cy)
+      .rotate(rotate)
+      .translate(-cx, -cy);
+    tf.tx = x;
+    tf.ty = y;
+
     return {
-      x: p.x,
-      y: p.y,
-      width,
-      rotation,
+      width: Math.sqrt(width * width + height * height),
+      transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty] as IMatrixArr,
     };
   }
 }
