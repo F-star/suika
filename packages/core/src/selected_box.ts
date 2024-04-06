@@ -1,15 +1,19 @@
 import { EventEmitter } from '@suika/common';
-import { type IPoint, type IRectWithRotation, isPointInRect } from '@suika/geo';
+import {
+  type IPoint,
+  isPointInRect,
+  type ITransformRect,
+  rectToVertices,
+} from '@suika/geo';
 
 import { type Editor } from './editor';
-import { getRectCenterPoint, rotateInCanvas } from './utils';
 
 interface Events {
   hoverChange(isHover: boolean): void;
 }
 
 export class SelectedBox {
-  private box: IRectWithRotation | null = null;
+  private box: ITransformRect | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private _hover = false;
 
@@ -19,57 +23,67 @@ export class SelectedBox {
     return this._hover;
   }
 
-  getBox(): IRectWithRotation | null {
+  getBox(): ITransformRect | null {
     return this.box ? { ...this.box } : null;
   }
 
   updateBbox() {
     const selectedElements = this.editor.selectedElements;
 
-    let selectedRect: IRectWithRotation | null = null;
-    const selectedSize = selectedElements.size();
-    if (selectedSize > 0) {
-      if (selectedSize === 1) {
+    const count = selectedElements.size();
+    if (count > 0) {
+      if (count === 1) {
         const selectedGraph = selectedElements.getItems()[0];
-        selectedRect = selectedGraph.getRectWithRotation();
+        const rect = selectedGraph.getSize();
+        this.box = {
+          width: rect.width,
+          height: rect.height,
+          transform: selectedGraph.attrs.transform!,
+        };
       } else {
-        selectedRect = selectedElements.getBBox();
+        const rect = selectedElements.getBBox()!;
+        this.box = {
+          width: rect.width,
+          height: rect.height,
+          transform: [1, 0, 0, 1, rect.x, rect.y],
+        };
       }
+    } else {
+      this.box = null;
     }
-    this.box = selectedRect;
 
-    return selectedRect;
+    return this.box;
   }
 
   draw() {
-    const bBox = this.box;
-    if (!bBox) {
+    const bbox = this.box;
+    if (!bbox) {
       return;
     }
 
-    const zoom = this.editor.zoomManager.getZoom();
     const ctx = this.editor.ctx;
-
     const stroke = this.editor.setting.get('guideBBoxStroke');
 
     ctx.save();
     ctx.strokeStyle = stroke;
-    const { x: xInViewport, y: yInViewport } =
-      this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
 
-    if (bBox.rotation) {
-      const [cx, cy] = getRectCenterPoint(bBox);
-      const { x: cxInViewport, y: cyInViewport } =
-        this.editor.sceneCoordsToViewport(cx, cy);
-      rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
+    const polygon = rectToVertices(
+      {
+        x: 0,
+        y: 0,
+        width: bbox.width,
+        height: bbox.height,
+      },
+      bbox.transform,
+    ).map((pt) => this.editor.sceneCoordsToViewport(pt.x, pt.y));
+
+    ctx.beginPath();
+    ctx.moveTo(polygon[0].x, polygon[0].y);
+    for (let i = 1; i < polygon.length; i++) {
+      ctx.lineTo(polygon[i].x, polygon[i].y);
     }
-
-    ctx.strokeRect(
-      xInViewport,
-      yInViewport,
-      bBox.width * zoom,
-      bBox.height * zoom,
-    );
+    ctx.closePath();
+    ctx.stroke();
 
     ctx.restore();
   }

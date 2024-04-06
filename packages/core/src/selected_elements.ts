@@ -111,14 +111,20 @@ class SelectedElements {
     if (this.isEmpty()) {
       return null;
     }
-    const bBoxesWithRotation = this.items.map((element) => element.getBBox());
-    return getMergedRect(...bBoxesWithRotation);
+    const rects = this.items.map((element) => element.getBBox());
+    return getMergedRect(...rects);
   }
   getRotation() {
     if (this.items.length === 0 || this.items.length > 1) {
       return 0;
     }
-    return this.items[0].attrs.rotation ?? 0;
+    return this.items[0].getRotate() ?? 0;
+  }
+  getTransform() {
+    if (this.items.length === 0 || this.items.length > 1) {
+      return null;
+    }
+    return this.items[0].attrs.transform;
   }
 
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {

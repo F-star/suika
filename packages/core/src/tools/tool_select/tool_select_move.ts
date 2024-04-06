@@ -44,11 +44,7 @@ export class SelectMoveTool implements IBaseTool {
       excludeLocked: true,
     });
     this.startPoints = selectedElements.map((graph) => {
-      const rect = graph.getRect();
-      return {
-        x: rect.x,
-        y: rect.y,
-      };
+      return graph.getPosition();
     });
     const bBox = this.editor.selectedElements.getBBox();
     if (!bBox) {

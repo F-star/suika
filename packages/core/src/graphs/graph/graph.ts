@@ -1,21 +1,29 @@
-import { calcCoverScale, genId, objectNameGenerator } from '@suika/common';
 import {
-  getRectRotatedXY,
-  getResizedRect,
+  calcCoverScale,
+  cloneDeep,
+  genId,
+  objectNameGenerator,
+  omit,
+} from '@suika/common';
+import {
+  distance,
+  getTransformAngle,
+  identityMatrix,
+  type IMatrixArr,
   type IRect,
-  type IRectWithRotation,
   isPointInRect,
   isRectContain,
   isRectIntersect,
-  normalizeRadian,
-  transformRotate,
+  type ITransformRect,
+  rectToVertices,
+  resizeRect,
 } from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
 import { DEFAULT_IMAGE, type PaintImage } from '../../paint';
-import { getResizedLine } from '../../scene/utils';
 import {
   GraphType,
   type IBox,
@@ -23,23 +31,31 @@ import {
   type IBox2WithRotation,
   type IObject,
   type IPoint,
+  type Optional,
 } from '../../type';
-import {
-  drawRoundRectPath,
-  getAbsoluteCoords,
-  getRectCenterPoint,
-  rotateInCanvas,
-} from '../../utils';
+import { drawRoundRectPath } from '../../utils';
 import { type GraphAttrs } from './graph_attrs';
 
 export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   type = GraphType.Graph;
   attrs: ATTRS;
-  private _cacheBbox: Readonly<IBox> | null = null;
+  protected _cacheBbox: Readonly<IBox> | null = null;
 
-  constructor(options: Omit<ATTRS, 'id'>) {
+  constructor(options: Omit<Optional<ATTRS, 'transform'>, 'id'>) {
+    const transform = options.transform ?? identityMatrix();
+
+    if (!options.transform) {
+      if (options.x !== undefined) {
+        transform[4] = options.x;
+      }
+      if (options.y !== undefined) {
+        transform[5] = options.y;
+      }
+    }
+
     this.attrs = { ...options } as ATTRS;
     this.attrs.id ??= genId();
+    this.attrs.transform = transform;
 
     if (this.attrs.objectName) {
       objectNameGenerator.setMaxIdx(options.objectName);
@@ -49,37 +65,48 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   getAttrs(): ATTRS {
-    return { ...this.attrs };
+    return cloneDeep(this.attrs);
   }
 
-  private shouldUpdateBbox(attrs: Partial<GraphAttrs>) {
+  protected shouldUpdateBbox(attrs: Partial<GraphAttrs>) {
     // TODO: if x, y, width, height value no change, bbox should not be updated
     return (
       attrs.x !== undefined ||
       attrs.y !== undefined ||
       attrs.width !== undefined ||
-      attrs.height !== undefined
+      attrs.height !== undefined ||
+      attrs.transform !== undefined
     );
   }
-  updateAttrs(attrs: Partial<GraphAttrs>) {
-    let key: keyof Partial<GraphAttrs>;
-    if (this.shouldUpdateBbox(attrs)) {
+  updateAttrs(
+    partialAttrs: Partial<GraphAttrs> & {
+      x?: number;
+      y?: number;
+      rotation?: number;
+    },
+  ) {
+    // TODO: 提示，x、y、rotation 不能和 transform 同时存在，否则效果不可预测
+    // 目前是后者会覆盖前者
+    if (this.shouldUpdateBbox(partialAttrs)) {
       this._cacheBbox = null;
     }
-    for (key in attrs) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
-      (this.attrs as any)[key] = attrs[key];
+    if (!partialAttrs.transform) {
+      if (partialAttrs.x !== undefined) {
+        this.attrs.transform[4] = partialAttrs.x;
+      }
+      if (partialAttrs.y !== undefined) {
+        this.attrs.transform[5] = partialAttrs.y;
+      }
     }
-  }
 
-  getRectWithRotation(): IRectWithRotation {
-    return {
-      x: this.attrs.x,
-      y: this.attrs.y,
-      width: this.attrs.width,
-      height: this.attrs.height,
-      rotation: this.attrs.rotation,
-    };
+    if (partialAttrs.rotation !== undefined) {
+      this.setRotate(partialAttrs.rotation);
+    }
+    partialAttrs = omit(partialAttrs, 'x', 'y', 'rotation');
+    for (const key in partialAttrs) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
+      (this.attrs as any)[key] = partialAttrs[key as keyof typeof partialAttrs];
+    }
   }
 
   /**
@@ -91,28 +118,36 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       return this._cacheBbox;
     }
 
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.attrs);
-    const rotation = this.attrs.rotation;
-    if (!rotation) {
-      return this.getRect();
+    const tf = new Matrix(...this.attrs.transform);
+    const vertices = rectToVertices({
+      x: 0,
+      y: 0,
+      width: this.attrs.width,
+      height: this.attrs.height,
+    }).map((item) => {
+      const pos = tf.apply(item);
+      return { x: pos.x, y: pos.y };
+    });
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const vertex of vertices) {
+      minX = Math.min(minX, vertex.x);
+      minY = Math.min(minY, vertex.y);
+      maxX = Math.max(maxX, vertex.x);
+      maxY = Math.max(maxY, vertex.y);
     }
 
-    const { x: nwX, y: nwY } = transformRotate(x, y, rotation, cx, cy); // 左上
-    const { x: neX, y: neY } = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const { x: seX, y: seY } = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const { x: swX, y: swY } = transformRotate(x, y2, rotation, cx, cy); // 右下
-
-    const minX = Math.min(nwX, neX, seX, swX);
-    const minY = Math.min(nwY, neY, seY, swY);
-    const maxX = Math.max(nwX, neX, seX, swX);
-    const maxY = Math.max(nwY, neY, seY, swY);
     this._cacheBbox = {
       x: minX,
       y: minY,
       width: maxX - minX,
       height: maxY - minY,
     };
-    return this._cacheBbox;
+    return { ...this._cacheBbox };
   }
   /**
    * other getBBox with
@@ -127,60 +162,75 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       maxY: bbox.y + bbox.height,
     };
   }
-  getBboxVerts(): [IPoint, IPoint, IPoint, IPoint] {
-    const [x, y, x2, y2, cx, cy] = getAbsoluteCoords(this.getRect());
-
-    const rotation = this.attrs.rotation;
-    if (!rotation) {
-      return [
-        { x: x, y: y },
-        { x: x2, y: y },
-        { x: x2, y: y2 },
-        { x: x, y: y2 },
-      ];
-    }
-
-    const nw = transformRotate(x, y, rotation, cx, cy); // 左上
-    const ne = transformRotate(x2, y, rotation, cx, cy); // 右上
-    const se = transformRotate(x2, y2, rotation, cx, cy); // 右下
-    const sw = transformRotate(x, y2, rotation, cx, cy); // 右下
-
-    return [nw, ne, se, sw];
+  getBboxVerts(): IPoint[] {
+    const rect = {
+      x: 0,
+      y: 0,
+      width: this.attrs.width,
+      height: this.attrs.height,
+    };
+    return rectToVertices(rect, this.attrs.transform);
   }
 
-  /**
-   * get rect before rotation
-   */
+  getPosition() {
+    return { x: this.attrs.transform[4], y: this.attrs.transform[5] };
+  }
+
+  getX() {
+    return this.attrs.transform[4];
+  }
+
+  getY() {
+    return this.attrs.transform[5];
+  }
+
+  getSize() {
+    return { width: this.attrs.width, height: this.attrs.height };
+  }
+
   getRect() {
     return {
-      x: this.attrs.x,
-      y: this.attrs.y,
+      ...this.getPosition(),
       width: this.attrs.width,
       height: this.attrs.height,
     };
   }
-  getCenter() {
-    const rect = this.getRect();
+
+  getTransformSize() {
+    const transform = this.attrs.transform;
+    const tf = new Matrix(
+      transform[0],
+      transform[1],
+      transform[2],
+      transform[3],
+      0,
+      0,
+    );
+    const rightTop = tf.apply({ x: this.attrs.width, y: 0 });
+    const leftBottom = tf.apply({ x: 0, y: this.attrs.height });
+    const zero = { x: 0, y: 0 };
     return {
-      x: rect.x + rect.width / 2,
-      y: rect.y + rect.height / 2,
+      width: distance(rightTop, zero),
+      height: distance(leftBottom, zero),
     };
   }
-  setRotateXY(rotatedX: number, rotatedY: number) {
-    const { x: cx, y: cy } = this.getCenter();
-    const { x, y } = transformRotate(
-      rotatedX,
-      rotatedY,
-      -(this.attrs.rotation || 0),
-      cx,
-      cy,
-    );
-    this.updateAttrs({ x, y });
+
+  getCenter(): IPoint {
+    const tf = new Matrix(...this.attrs.transform);
+    const center = tf.apply({
+      x: this.attrs.width / 2,
+      y: this.attrs.height / 2,
+    });
+    return { x: center.x, y: center.y };
   }
+
   hitTest(x: number, y: number, padding = 0) {
     return isPointInRect(
       { x, y },
-      this.getRectWithRotation(),
+      {
+        ...this.getSize(),
+        transform: this.attrs.transform,
+      },
       padding + (this.attrs.strokeWidth ?? 0) / 2,
     );
   }
@@ -193,40 +243,39 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     if (!isRectIntersect(rect, this.getBBox())) {
       isIntersected = false;
     } else {
-      if (!this.attrs.rotation || this.attrs.rotation % HALF_PI == 0) {
+      const rotate = this.getRotate();
+      if (!rotate || rotate % HALF_PI == 0) {
         isIntersected = true;
       } else {
         // OBB intersect
         // use SAT algorithm to check intersect
-        const bbox = this.getRectWithRotation();
-        const [cx, cy] = getRectCenterPoint(bbox);
-        const r = -this.attrs.rotation;
-        const s1 = transformRotate(rect.x, rect.y, r, cx, cy);
-        const s2 = transformRotate(
-          rect.x + rect.width,
-          rect.y + rect.height,
-          r,
-          cx,
-          cy,
-        );
-        const s3 = transformRotate(rect.x + rect.width, rect.y, r, cx, cy);
-        const s4 = transformRotate(rect.x, rect.y + rect.height, r, cx, cy);
+        const tf = new Matrix(...this.attrs.transform).invert();
+        const [s1, s2, s3, s4] = rectToVertices(rect, [
+          tf.a,
+          tf.b,
+          tf.c,
+          tf.d,
+          tf.tx,
+          tf.ty,
+        ]);
 
-        const rotatedSelectionX = Math.min(s1.x, s2.x, s3.x, s4.x);
-        const rotatedSelectionY = Math.min(s1.y, s2.y, s3.y, s4.y);
-        const rotatedSelectionWidth =
-          Math.max(s1.x, s2.x, s3.x, s4.x) - rotatedSelectionX;
-        const rotatedSelectionHeight =
-          Math.max(s1.y, s2.y, s3.y, s4.y) - rotatedSelectionY;
+        const minX = Math.min(s1.x, s2.x, s3.x, s4.x);
+        const minY = Math.min(s1.y, s2.y, s3.y, s4.y);
+        const maxX = Math.max(s1.x, s2.x, s3.x, s4.x);
+        const maxY = Math.max(s1.y, s2.y, s3.y, s4.y);
 
         const rotatedSelection = {
-          x: rotatedSelectionX,
-          y: rotatedSelectionY,
-          width: rotatedSelectionWidth,
-          height: rotatedSelectionHeight,
+          x: minX,
+          y: minY,
+          width: maxX - minX,
+          height: maxY - minY,
         };
 
-        isIntersected = isRectIntersect(rotatedSelection, bbox);
+        isIntersected = isRectIntersect(rotatedSelection, {
+          x: 0,
+          y: 0,
+          ...this.getSize(),
+        });
       }
     }
 
@@ -241,26 +290,24 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return isRectContain(rect, bbox) || isRectContain(bbox, rect);
   }
 
-  setRotatedX(rotatedX: number) {
-    const { x: prevRotatedX } = getRectRotatedXY(this.attrs);
-    this.updateAttrs({ x: this.attrs.x + rotatedX - prevRotatedX });
-  }
-  setRotatedY(rotatedY: number) {
-    const { y: prevRotatedY } = getRectRotatedXY(this.attrs);
-    this.updateAttrs({ y: this.attrs.y + rotatedY - prevRotatedY });
-  }
-
   updateByControlHandle(
-    type: string, // 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w',
+    /** 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w' */
+    type: string,
     newPos: IPoint,
-    oldBox: IBox2WithRotation,
-    isShiftPressing = false,
-    isAltPressing = false,
+    oldBox: ITransformRect,
+    keepRatio = false,
+    scaleFromCenter = false,
   ) {
-    const rect =
-      this.attrs.height === 0
-        ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
-        : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
+    // TODO: FIXME: refactor getResizedLine
+    // const rect =
+    //   this.attrs.height === 0
+    //     ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
+    //     : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
+    const rect = resizeRect(type, newPos, oldBox, {
+      keepRatio,
+      scaleFromCenter,
+    });
+
     this.updateAttrs(rect);
   }
   draw(
@@ -279,16 +326,12 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    const { x, y, width, height } = this.getRect();
-    if (this.attrs.rotation) {
-      const cx = x + width / 2;
-      const cy = y + height / 2;
-      rotateInCanvas(ctx, this.attrs.rotation, cx, cy);
-    }
+    const { width, height, transform } = this.attrs;
+    ctx.transform(...transform);
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
     ctx.beginPath();
-    ctx.rect(x, y, width, height);
+    ctx.rect(0, 0, width, height);
     ctx.stroke();
     ctx.closePath();
   }
@@ -306,7 +349,10 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     cornerRadius = 0,
   ) {
     const src = paint.attrs.src;
-    const { x, y, width, height } = this.getRect();
+    const width = this.attrs.width;
+    const height = this.attrs.height;
+    const x = 0;
+    const y = 0;
     let img: CanvasImageSource | undefined = undefined;
 
     // anti-aliasing
@@ -355,10 +401,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
   static dMove(graphs: Graph[], dx: number, dy: number) {
     for (const graph of graphs) {
-      const bbox = graph.getBBox();
+      const transform = graph.attrs.transform;
+      transform[4] += dx;
+      transform[5] += dy;
       graph.updateAttrs({
-        x: bbox.x + dx,
-        y: bbox.y + dy,
+        transform,
       });
     }
   }
@@ -388,32 +435,42 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     };
   }
 
-  /**
-   * add dRotate to rotation
-   */
-  dRotate(dRotation: number, initAttrs: IBox2WithRotation, center: IPoint) {
-    this.attrs.rotation = normalizeRadian(
-      (initAttrs.rotation ?? 0) + dRotation,
-    );
-
-    const [graphCx, graphCy] = getRectCenterPoint(initAttrs);
-
-    const { x, y } = transformRotate(
-      graphCx,
-      graphCy,
-      dRotation,
-      center.x,
-      center.y,
-    );
-
-    this.updateAttrs({
-      x: x - initAttrs.width / 2,
-      y: y - initAttrs.height / 2,
-    });
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getControlHandles(_zoom: number, _initial?: boolean): ControlHandle[] {
     return [];
+  }
+
+  getRotate() {
+    return getTransformAngle(this.attrs.transform);
+  }
+  setRotate(newRotate: number, center?: IPoint) {
+    const rotate = this.getRotate();
+    const delta = newRotate - rotate;
+    center ??= this.getCenter();
+    const rotateMatrix = new Matrix()
+      .translate(-center.x, -center.y)
+      .rotate(delta)
+      .translate(center.x, center.y);
+    const tf = new Matrix(...this.attrs.transform);
+    const newTf = rotateMatrix.append(tf);
+    this.updateAttrs({
+      transform: [newTf.a, newTf.b, newTf.c, newTf.d, newTf.tx, newTf.ty],
+    });
+  }
+
+  dRotate(
+    dRotation: number,
+    initAttrs: IBox2WithRotation & { transform: IMatrixArr },
+    center: IPoint,
+  ) {
+    const rotateMatrix = new Matrix()
+      .translate(-center.x, -center.y)
+      .rotate(dRotation)
+      .translate(center.x, center.y);
+    const tf = new Matrix(...initAttrs.transform);
+    const newTf = rotateMatrix.append(tf);
+    this.updateAttrs({
+      transform: [newTf.a, newTf.b, newTf.c, newTf.d, newTf.tx, newTf.ty],
+    });
   }
 }

@@ -1,4 +1,5 @@
 import { cloneDeep } from '@suika/common';
+import { type IMatrixArr } from '@suika/geo';
 
 import { type Graph, type IPathItem } from '../graphs';
 import { type IPaint } from '../paint';
@@ -17,6 +18,7 @@ export type ISetElementsAttrsType = Partial<{
   objectName: string;
   visible: boolean;
   lock: boolean;
+  transform: IMatrixArr;
   pathData: IPathItem[];
 }>;
 

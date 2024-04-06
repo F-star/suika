@@ -1,11 +1,11 @@
 import { cloneDeep, getClosestTimesVal, parseHexToRGBA } from '@suika/common';
-import { distance, type IPoint } from '@suika/geo';
+import { distance, type IMatrixArr, type IPoint } from '@suika/geo';
 
 import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
-import { Ellipse, type IPathItem, Path } from '../graphs';
+import { Ellipse, type IPathItem, type ISegment, Path } from '../graphs';
 import { PaintType } from '../paint';
 import { PathSelectTool } from './tool_path_select';
 import { type ITool } from './type';
@@ -22,7 +22,10 @@ export class DrawPathTool implements ITool {
 
   private startPoint: IPoint | null = null;
   private path: Path | null = null;
-  private prevPathData: IPathItem[] = [];
+  private prevAttrs: {
+    transform: IMatrixArr;
+    pathData: IPathItem[];
+  } | null = null;
   private pathIdx = 0;
 
   constructor(private editor: Editor) {}
@@ -74,7 +77,7 @@ export class DrawPathTool implements ITool {
         {
           segs: [
             {
-              point: { ...this.startPoint },
+              point: { x: 0, y: 0 },
               in: { x: 0, y: 0 },
               out: { x: 0, y: 0 },
             },
@@ -85,8 +88,7 @@ export class DrawPathTool implements ITool {
 
       const path = new Path({
         objectName: '',
-        x: 0,
-        y: 0,
+        ...this.startPoint,
         width: 100,
         height: 100,
         strokeWidth: 1,
@@ -121,39 +123,36 @@ export class DrawPathTool implements ITool {
     // add new anchor
     else {
       const path = this.path!;
-      this.prevPathData = path.attrs.pathData;
-      const newPathData = cloneDeep(path.attrs.pathData);
+      this.prevAttrs = cloneDeep({
+        transform: path.attrs.transform,
+        pathData: path.attrs.pathData,
+      });
 
       // TODO: 应该改为判断是否选中了 path 的末尾 anchor
       // 如果是，则继续绘制。
       if (pathEditor.getSelectedIndicesSize() === 0) {
-        this.pathIdx = newPathData.length;
+        this.pathIdx = path.getPathItemCount();
       }
 
-      if (!newPathData[this.pathIdx]) {
-        newPathData[this.pathIdx] = {
-          segs: [],
-          closed: false,
-        };
+      if (!path.hasPath(this.pathIdx)) {
+        path.addEmptyPath();
       }
       // 是否因为闭合，而修改第一个 anchor 的 in
       if (snapPoint) {
-        newPathData[this.pathIdx].closed = true;
-        newPathData[this.pathIdx].segs[0].in = { x: 0, y: 0 };
+        path.setPathItemClosed(this.pathIdx, true);
+        path.setSeg(this.pathIdx, 0, {
+          in: { x: 0, y: 0 },
+        });
       } else {
-        newPathData[this.pathIdx].segs.push({
+        path.addSeg(this.pathIdx, {
           point: this.startPoint,
           in: { x: 0, y: 0 },
           out: { x: 0, y: 0 },
         });
       }
-
-      path.updateAttrs({
-        pathData: newPathData,
-      });
     }
 
-    const lastSegIdx = this.path!.attrs.pathData[this.pathIdx].segs.length - 1;
+    const lastSegIdx = this.path!.getSegCount(this.pathIdx) - 1;
     const selectSegIdx = this.checkPathItemClosed() ? 0 : lastSegIdx;
     pathEditor.setSelectedIndices([
       {
@@ -179,23 +178,27 @@ export class DrawPathTool implements ITool {
     const dy = point.y - this.startPoint.y;
 
     const path = this.path!;
-    const currPathItem = path.attrs.pathData[this.pathIdx];
-    const lastSegIdx = currPathItem.segs.length - 1;
-    const lastSeg = currPathItem.segs[currPathItem.closed ? 0 : lastSegIdx];
+    const lastSegIdx = path.getSegCount(this.pathIdx) - 1;
     // mirror angle and length
-
-    lastSeg.out = { x: dx, y: dy };
+    const inAndOut: Partial<ISegment> = {
+      out: { x: dx, y: dy },
+    };
     // （1）按住 alt 时不需要满足对称（2）绘制第一个点时，in 保持为 0
     if (!this.editor.hostEventManager.isAltPressing && lastSegIdx !== 0) {
-      lastSeg.in = { x: -dx, y: -dy };
+      inAndOut.in = { x: -dx, y: -dy };
     }
+    path.setSeg(
+      this.pathIdx,
+      path.checkPathItemClosed(this.pathIdx) ? 0 : lastSegIdx,
+      inAndOut,
+    );
 
     this.editor.pathEditor.updateControlHandles();
     this.editor.render();
   }
 
   private checkPathItemClosed() {
-    return this.path?.attrs.pathData[this.pathIdx].closed ?? false;
+    return this.path?.checkPathItemClosed(this.pathIdx) ?? false;
   }
 
   onEnd() {
@@ -203,12 +206,19 @@ export class DrawPathTool implements ITool {
     if (this.checkPathItemClosed()) {
       this.editor.pathEditor.setSelectedIndices([]);
     }
+    const path = this.path!;
+    path.updateAttrs({ pathData: path.attrs.pathData });
     this.editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Path Data',
-        [this.path!],
-        [{ pathData: this.path!.attrs.pathData }],
-        [{ pathData: this.prevPathData }],
+        [path],
+        [
+          cloneDeep({
+            transform: path.attrs.transform,
+            pathData: path.attrs.pathData,
+          }),
+        ],
+        [this.prevAttrs!],
       ),
     );
     this.editor.commandManager.batchCommandEnd();
@@ -241,14 +251,16 @@ export class DrawPathTool implements ITool {
    * if true, return start anchor point
    */
   private checkCursorPtInStartAnchor(): IPoint | null {
-    const point = this.editor.toolManager.getCurrPoint();
-    if (this.path) {
-      const pathItem = this.path.attrs.pathData[this.pathIdx];
-      if (!pathItem) {
+    const path = this.path;
+    if (path) {
+      if (path.getPathItemCount() <= this.pathIdx) {
         return null;
       }
-      if (pathItem.segs.length > 1) {
-        const startAnchorPoint = pathItem.segs.at(0)!.point;
+      if (path.getSegCount(this.pathIdx) > 1) {
+        const startAnchorPoint = path.getSeg(this.pathIdx, 0, {
+          applyTransform: true,
+        })!.point;
+        const point = this.editor.toolManager.getCurrPoint();
         const anchorSize = 5;
         const isInside =
           distance(startAnchorPoint, point) <=
@@ -282,7 +294,11 @@ export class DrawPathTool implements ITool {
     const previewHandles: ControlHandle[] = [];
 
     if (this.editor.pathEditor.getSelectedIndicesSize() > 0) {
-      const lastSeg = this.path?.attrs.pathData[this.pathIdx]?.segs.at(-1);
+      const path = this.path;
+      if (!path) return;
+      const lastSeg = path.getLastSeg(this.pathIdx, {
+        applyTransform: true,
+      });
       if (lastSeg) {
         const previewCurve = new ControlHandle({
           cx: point.x,

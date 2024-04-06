@@ -2,7 +2,6 @@ import { parseRGBAStr } from '@suika/common';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
-import { rotateInCanvas } from '../utils';
 import { Graph, type GraphAttrs } from './graph';
 
 export interface TextAttrs extends GraphAttrs {
@@ -19,7 +18,9 @@ const tmpCtx = document.createElement('canvas').getContext('2d')!;
 export class TextGraph extends Graph<TextAttrs> {
   override type = GraphType.Text;
 
-  constructor(options: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height'>) {
+  constructor(
+    options: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height' | 'transform'>,
+  ) {
     super({
       ...options,
       type: GraphType.Text,
@@ -36,15 +37,8 @@ export class TextGraph extends Graph<TextAttrs> {
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
-    const { x, y, width, height, rotation, fill, stroke, fontSize, content } =
-      this.attrs;
-
-    if (rotation) {
-      const cx = x + width / 2;
-      const cy = y + height / 2;
-
-      rotateInCanvas(ctx, rotation, cx, cy);
-    }
+    const { transform, fill, stroke, fontSize, content } = this.attrs;
+    ctx.transform(...transform);
     ctx.beginPath();
     ctx.textBaseline = 'top';
     ctx.font = `${fontSize}px sans-serif`;
@@ -64,6 +58,6 @@ export class TextGraph extends Graph<TextAttrs> {
       // TODO:
     }
 
-    ctx.fillText(content, x, y);
+    ctx.fillText(content, 0, 0);
   }
 }

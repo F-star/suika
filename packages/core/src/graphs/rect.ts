@@ -1,11 +1,11 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { isPointInRoundRect, transformRotate } from '@suika/geo';
+import { identityMatrix, isPointInRoundRect } from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type ImgManager } from '../Img_manager';
-import { PaintType } from '../paint';
-import { GraphType, type IBox2WithRotation, type IPoint } from '../type';
-import { rotateInCanvas } from '../utils';
+import { type IPaint, PaintType } from '../paint';
+import { GraphType, type IPoint, type Optional } from '../type';
 import { Ellipse } from './ellipse';
 import { Graph, type GraphAttrs } from './graph';
 
@@ -16,8 +16,13 @@ export interface RectAttrs extends GraphAttrs {
 export class Rect extends Graph<RectAttrs> {
   override type = GraphType.Rect;
 
-  constructor(options: Omit<RectAttrs, 'id'>) {
-    super({ ...options, type: GraphType.Rect });
+  constructor(options: Optional<RectAttrs, 'transform' | 'id'>) {
+    const transform = options.transform ?? identityMatrix();
+    super({
+      ...options,
+      type: GraphType.Rect,
+      transform,
+    });
   }
 
   override getAttrs(): RectAttrs {
@@ -35,32 +40,29 @@ export class Rect extends Graph<RectAttrs> {
     return Math.min(this.attrs.width, this.attrs.height) / 2;
   }
 
-  override draw(
+  private _realDraw(
     ctx: CanvasRenderingContext2D,
     imgManager?: ImgManager,
     smooth?: boolean,
+    overrideStyle?: {
+      fill?: IPaint[];
+      stroke?: IPaint[];
+      strokeWidth?: number;
+    },
   ) {
     const attrs = this.attrs;
-    if (attrs.rotation) {
-      const cx = attrs.x + attrs.width / 2;
-      const cy = attrs.y + attrs.height / 2;
+    const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
 
-      rotateInCanvas(ctx, attrs.rotation, cx, cy);
-    }
+    ctx.transform(...attrs.transform);
+
     ctx.beginPath();
     if (attrs.cornerRadius) {
-      ctx.roundRect(
-        attrs.x,
-        attrs.y,
-        attrs.width,
-        attrs.height,
-        attrs.cornerRadius,
-      );
+      ctx.roundRect(0, 0, attrs.width, attrs.height, attrs.cornerRadius);
     } else {
-      ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
+      ctx.rect(0, 0, attrs.width, attrs.height);
     }
 
-    for (const paint of attrs.fill ?? []) {
+    for (const paint of fill ?? []) {
       switch (paint.type) {
         case PaintType.Solid: {
           ctx.fillStyle = parseRGBAStr(paint.attrs);
@@ -81,9 +83,9 @@ export class Rect extends Graph<RectAttrs> {
         }
       }
     }
-    if (attrs.strokeWidth) {
-      ctx.lineWidth = attrs.strokeWidth;
-      for (const paint of attrs.stroke ?? []) {
+    if (strokeWidth) {
+      ctx.lineWidth = strokeWidth;
+      for (const paint of stroke ?? []) {
         switch (paint.type) {
           case PaintType.Solid: {
             ctx.strokeStyle = parseRGBAStr(paint.attrs);
@@ -99,33 +101,34 @@ export class Rect extends Graph<RectAttrs> {
     ctx.closePath();
   }
 
+  override draw(
+    ctx: CanvasRenderingContext2D,
+    imgManager?: ImgManager,
+    smooth?: boolean,
+  ) {
+    this._realDraw(ctx, imgManager, smooth);
+  }
+
   override drawOutline(
     ctx: CanvasRenderingContext2D,
     stroke: string,
     strokeWidth: number,
   ) {
-    const attrs = this.attrs;
-    if (attrs.rotation) {
-      const cx = attrs.x + attrs.width / 2;
-      const cy = attrs.y + attrs.height / 2;
-      rotateInCanvas(ctx, attrs.rotation, cx, cy);
-    }
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = strokeWidth;
-    ctx.beginPath();
-    if (attrs.cornerRadius) {
-      ctx.roundRect(
-        attrs.x,
-        attrs.y,
-        attrs.width,
-        attrs.height,
-        attrs.cornerRadius,
-      );
-    } else {
-      ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
-    }
-    ctx.stroke();
-    ctx.closePath();
+    this._realDraw(ctx, undefined, undefined, {
+      stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
+      strokeWidth,
+    });
+  }
+
+  /**
+   * get rect before transform
+   */
+  override getRect() {
+    return {
+      ...this.getPosition(),
+      width: this.attrs.width,
+      height: this.attrs.height,
+    };
   }
 
   private createCornerRadiusHandleGraph() {
@@ -142,10 +145,17 @@ export class Rect extends Graph<RectAttrs> {
   }
 
   override hitTest(x: number, y: number, padding = 0): boolean {
+    const tf = new Matrix(...this.attrs.transform);
+    const point = tf.applyInverse({ x, y });
     const maxCornerRadius = this.getMaxCornerRadius();
     return isPointInRoundRect(
-      { x, y },
-      this.attrs,
+      point,
+      {
+        x: 0,
+        y: 0,
+        width: this.attrs.width,
+        height: this.attrs.height,
+      },
       new Array(4).fill(
         Math.min(this.attrs.cornerRadius ?? 0, maxCornerRadius),
       ),
@@ -177,28 +187,34 @@ export class Rect extends Graph<RectAttrs> {
     ];
 
     const handles: ControlHandle[] = [];
+    const rect = {
+      x: 0,
+      y: 0,
+      width: attrs.width,
+      height: attrs.height,
+    };
     const infos = [
       {
         type: 'nwCornerRadius',
-        origin: { x: attrs.x, y: attrs.y },
+        origin: { x: rect.x, y: rect.y },
         direction: { x: 1, y: 1 },
         cornerRadius: cornerRadii[0],
       },
       {
         type: 'neCornerRadius',
-        origin: { x: attrs.x + attrs.width, y: attrs.y },
+        origin: { x: rect.x + rect.width, y: rect.y },
         direction: { x: -1, y: 1 },
         cornerRadius: cornerRadii[1],
       },
       {
         type: 'seCornerRadius',
-        origin: { x: attrs.x + attrs.width, y: attrs.y + attrs.height },
+        origin: { x: rect.x + rect.width, y: rect.y + rect.height },
         direction: { x: -1, y: -1 },
         cornerRadius: cornerRadii[2],
       },
       {
         type: 'swCornerRadius',
-        origin: { x: attrs.x, y: attrs.y + attrs.height },
+        origin: { x: rect.x, y: rect.y + rect.height },
         direction: { x: 1, y: -1 },
         cornerRadius: cornerRadii[3],
       },
@@ -215,12 +231,10 @@ export class Rect extends Graph<RectAttrs> {
       let x = info.origin.x + info.direction.x * cornerRadius;
       let y = info.origin.y + info.direction.y * cornerRadius;
 
-      if (attrs.rotation) {
-        const center = this.getCenter();
-        const pos = transformRotate(x, y, attrs.rotation, center.x, center.y);
-        x = pos.x;
-        y = pos.y;
-      }
+      const tf = new Matrix(...attrs.transform);
+      const pos = tf.apply({ x, y });
+      x = pos.x;
+      y = pos.y;
 
       const handle = new ControlHandle({
         cx: x,
@@ -237,46 +251,46 @@ export class Rect extends Graph<RectAttrs> {
   override updateByControlHandle(
     type: string,
     newPos: IPoint,
-    oldBox: IBox2WithRotation,
+    oldBox: RectAttrs,
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
   ) {
-    const attrs = this.attrs;
     if (type.endsWith('CornerRadius')) {
-      const center = this.getCenter();
-      const pos = transformRotate(
-        newPos.x,
-        newPos.y,
-        -(attrs.rotation ?? 0),
-        center.x,
-        center.y,
-      );
+      const attrs = this.attrs;
+      const tf = new Matrix(...attrs.transform);
+      const pos = tf.applyInverse(newPos);
 
       let a = { x: 0, y: 0 };
       let b = { x: 0, y: 0 };
 
+      const rect = {
+        x: 0,
+        y: 0,
+        width: attrs.width,
+        height: attrs.height,
+      };
       switch (type) {
         case 'nwCornerRadius': {
           a = { x: 1, y: 1 };
-          b = { x: pos.x - attrs.x, y: pos.y - attrs.y };
+          b = { x: pos.x - rect.x, y: pos.y - rect.y };
           break;
         }
         case 'neCornerRadius': {
           a = { x: -1, y: 1 };
-          b = { x: pos.x - (attrs.x + attrs.width), y: pos.y - attrs.y };
+          b = { x: pos.x - (rect.x + rect.width), y: pos.y - rect.y };
           break;
         }
         case 'seCornerRadius': {
           a = { x: -1, y: -1 };
           b = {
-            x: pos.x - (attrs.x + attrs.width),
-            y: pos.y - (attrs.y + attrs.height),
+            x: pos.x - (rect.x + rect.width),
+            y: pos.y - (rect.y + rect.height),
           };
           break;
         }
         case 'swCornerRadius': {
           a = { x: 1, y: -1 };
-          b = { x: pos.x - attrs.x, y: pos.y - (attrs.y + attrs.height) };
+          b = { x: pos.x - rect.x, y: pos.y - (rect.y + rect.height) };
           break;
         }
       }

@@ -2,12 +2,7 @@ import './style.scss';
 
 import { remainDecimal } from '@suika/common';
 import { MutateGraphsAndRecord } from '@suika/core';
-import {
-  deg2Rad,
-  getRectRotatedXY,
-  normalizeRadian,
-  rad2Deg,
-} from '@suika/geo';
+import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -52,11 +47,14 @@ export const ElementsInfoCards: FC = () => {
           }: {
             x: number | typeof MIXED;
             y: number | typeof MIXED;
-          } = getRectRotatedXY(items[0].attrs);
+          } = items[0].getPosition();
           let newGraphType: GraphType | typeof MIXED = items[0].type;
-          let newWidth: number | typeof MIXED = items[0].attrs.width;
-          let newHeight: number | typeof MIXED = items[0].attrs.height;
-          let newRotation: number | typeof MIXED = items[0].attrs.rotation || 0;
+
+          const size = items[0].getTransformSize();
+          let newWidth: number | typeof MIXED = size.width;
+          let newHeight: number | typeof MIXED = size.height;
+
+          let newRotation: number | typeof MIXED = items[0].getRotate();
           let newCornerRadius: number | typeof MIXED =
             items[0].attrs.cornerRadius || 0;
 
@@ -64,22 +62,22 @@ export const ElementsInfoCards: FC = () => {
             if (element.type !== newGraphType) {
               newGraphType = MIXED;
             }
-            const { x: currentRotatedX, y: currentRotatedY } = getRectRotatedXY(
-              element.attrs,
-            );
+            const { x: currentRotatedX, y: currentRotatedY } =
+              element.getPosition();
             if (!isEqual(newRotatedX, currentRotatedX)) {
               newRotatedX = MIXED;
             }
             if (!isEqual(newRotatedY, currentRotatedY)) {
               newRotatedY = MIXED;
             }
-            if (!isEqual(newWidth, element.attrs.width)) {
+            const size = element.getTransformSize();
+            if (!isEqual(newWidth, size.width)) {
               newWidth = MIXED;
             }
-            if (!isEqual(newHeight, element.attrs.height)) {
+            if (!isEqual(newHeight, size.height)) {
               newHeight = MIXED;
             }
-            if (!isEqual(newRotation, element.attrs.rotation || 0)) {
+            if (!isEqual(newRotation, element.getRotate())) {
               newRotation = MIXED;
             }
             if (!isEqual(newCornerRadius, element.attrs.cornerRadius || 0)) {
@@ -137,7 +135,7 @@ export const ElementsInfoCards: FC = () => {
       onBlur: (newRotatedX: number) => {
         if (editor) {
           const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setRotateX(editor, elements, newRotatedX);
+          MutateGraphsAndRecord.setX(editor, elements, newRotatedX);
           editor.render();
         }
       },
@@ -148,7 +146,7 @@ export const ElementsInfoCards: FC = () => {
       onBlur: (newRotatedY: number) => {
         if (editor) {
           const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setRotateY(editor, elements, newRotatedY);
+          MutateGraphsAndRecord.setY(editor, elements, newRotatedY);
           editor.render();
         }
       },

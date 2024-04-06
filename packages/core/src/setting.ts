@@ -111,6 +111,9 @@ export class Setting {
 
     /******** path control handle ******/
     pathLineStroke: '#a4a4a4',
+
+    /**** angle ****/
+    angleBase: { x: 0, y: -1 }, // no use now
   };
   toggle<K extends BooleanKeys<Setting['value']>>(key: K) {
     const value = this.value[key];
