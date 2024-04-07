@@ -16,6 +16,7 @@ import {
   isRectIntersect,
   type ITransformRect,
   rectToVertices,
+  resizeLine,
   resizeRect,
 } from '@suika/geo';
 import { Matrix } from 'pixi.js';
@@ -295,18 +296,24 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     type: string,
     newPos: IPoint,
     oldBox: ITransformRect,
-    keepRatio = false,
-    scaleFromCenter = false,
+    isShiftPressing = false,
+    isAltPressing = false,
   ) {
     // TODO: FIXME: refactor getResizedLine
     // const rect =
     //   this.attrs.height === 0
     //     ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
     //     : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
-    const rect = resizeRect(type, newPos, oldBox, {
-      keepRatio,
-      scaleFromCenter,
-    });
+    const rect =
+      this.attrs.height === 0
+        ? resizeLine(type, newPos, oldBox, {
+            keepPolarSnap: isShiftPressing,
+            scaleFromCenter: isAltPressing,
+          })
+        : resizeRect(type, newPos, oldBox, {
+            keepRatio: isShiftPressing,
+            scaleFromCenter: isAltPressing,
+          });
 
     this.updateAttrs(rect);
   }
