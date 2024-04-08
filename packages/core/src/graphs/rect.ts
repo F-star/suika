@@ -1,5 +1,5 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { identityMatrix, isPointInRoundRect } from '@suika/geo';
+import { isPointInRoundRect } from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
 import { ControlHandle } from '../control_handle_manager';
@@ -17,11 +17,9 @@ export class Rect extends Graph<RectAttrs> {
   override type = GraphType.Rect;
 
   constructor(options: Optional<RectAttrs, 'transform' | 'id'>) {
-    const transform = options.transform ?? identityMatrix();
     super({
       ...options,
       type: GraphType.Rect,
-      transform,
     });
   }
 
