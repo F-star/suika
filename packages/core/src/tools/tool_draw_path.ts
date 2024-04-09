@@ -1,5 +1,10 @@
 import { cloneDeep, getClosestTimesVal, parseHexToRGBA } from '@suika/common';
-import { distance, type IMatrixArr, type IPoint } from '@suika/geo';
+import {
+  closestPolarPt as closestPolarTrackingPt,
+  distance,
+  type IMatrixArr,
+  type IPoint,
+} from '@suika/geo';
 
 import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
@@ -34,7 +39,7 @@ export class DrawPathTool implements ITool {
       this.path = this.editor.pathEditor.getPath()!;
       this.pathIdx = this.path.attrs.pathData.length;
     }
-    this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+    this.updateControlHandlesWithPreviewHandles(this.getPixelGridPoint());
   }
   onInactive() {
     this.editor.commandManager.batchCommandEnd();
@@ -54,22 +59,17 @@ export class DrawPathTool implements ITool {
     if (this.editor.canvasDragger.isActive()) {
       editor.pathEditor.updateControlHandles();
     } else {
-      const snapPoint = this.checkCursorPtInStartAnchor();
-      if (snapPoint) {
-        editor.setCursor('pen-close');
-      } else {
-        editor.setCursor('pen');
-      }
-      this.updateControlHandlesWithPreviewHandles(
-        snapPoint ?? this.getCorrectedPoint(),
-      );
+      const { point, isClosedPt } = this.getNextPoint();
+      editor.setCursor(isClosedPt ? 'pen-close' : 'pen');
+      this.updateControlHandlesWithPreviewHandles(point);
     }
   }
 
   onStart() {
     const pathEditor = this.editor.pathEditor;
-    const snapPoint = this.checkCursorPtInStartAnchor();
-    this.startPoint = snapPoint ?? this.getCorrectedPoint();
+
+    const nextPointInfo = this.getNextPoint();
+    this.startPoint = nextPointInfo.point;
 
     // create new path
     if (!pathEditor.isActive()) {
@@ -138,7 +138,7 @@ export class DrawPathTool implements ITool {
         path.addEmptyPath();
       }
       // 是否因为闭合，而修改第一个 anchor 的 in
-      if (snapPoint) {
+      if (nextPointInfo.isClosedPt) {
         path.setPathItemClosed(this.pathIdx, true);
         path.setSeg(this.pathIdx, 0, {
           in: { x: 0, y: 0 },
@@ -172,7 +172,7 @@ export class DrawPathTool implements ITool {
       return;
     }
 
-    const point = this.getCorrectedPoint();
+    const point = this.getPixelGridPoint();
 
     const dx = point.x - this.startPoint.x;
     const dy = point.y - this.startPoint.y;
@@ -229,14 +229,14 @@ export class DrawPathTool implements ITool {
   }
 
   onCommandChange() {
-    this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+    this.updateControlHandlesWithPreviewHandles(this.getPixelGridPoint());
   }
 
   onCanvasDragActiveChange(active: boolean) {
     if (active) {
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+      this.updateControlHandlesWithPreviewHandles(this.getPixelGridPoint());
     }
     this.editor.render();
   }
@@ -250,7 +250,7 @@ export class DrawPathTool implements ITool {
    * check if cursor inside start anchor.
    * if true, return start anchor point
    */
-  private checkCursorPtInStartAnchor(): IPoint | null {
+  private checkCursorPtInStartAnchor(point: IPoint): IPoint | null {
     const path = this.path;
     if (path) {
       if (path.getPathItemCount() <= this.pathIdx) {
@@ -260,7 +260,6 @@ export class DrawPathTool implements ITool {
         const startAnchorPoint = path.getSeg(this.pathIdx, 0, {
           applyTransform: true,
         })!.point;
-        const point = this.editor.toolManager.getCurrPoint();
         const anchorSize = 5;
         const isInside =
           distance(startAnchorPoint, point) <=
@@ -271,8 +270,7 @@ export class DrawPathTool implements ITool {
     return null;
   }
 
-  /** get corrected cursor point */
-  private getCorrectedPoint() {
+  private getPixelGridPoint() {
     const point = this.editor.toolManager.getCurrPoint();
     if (this.editor.setting.get('snapToPixelGrid')) {
       point.x = getClosestTimesVal(point.x, 0.5);
@@ -281,11 +279,30 @@ export class DrawPathTool implements ITool {
     return point;
   }
 
+  /**
+   * 计算下一个点，并标明是否为闭合点
+   */
+  private getNextPoint(): { point: IPoint; isClosedPt: boolean } {
+    const point = this.editor.toolManager.getCurrPoint();
+    const closedPt = this.checkCursorPtInStartAnchor(point);
+    if (closedPt) {
+      return {
+        point: closedPt,
+        isClosedPt: true,
+      };
+    }
+
+    return {
+      point: this.getPixelGridPoint(),
+      isClosedPt: false,
+    };
+  }
+
   onViewportXOrYChange() {
     if (this.editor.canvasDragger.isActive()) {
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+      this.updateControlHandlesWithPreviewHandles(this.getPixelGridPoint());
     }
     this.editor.render();
   }
