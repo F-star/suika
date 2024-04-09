@@ -17,8 +17,8 @@ export type LineAttrs = GraphAttrs;
 export class Line extends Graph<LineAttrs> {
   override type = GraphType.Line;
 
-  constructor(options: Optional<LineAttrs, 'id' | 'transform'>) {
-    super({ ...options, height: 0, type: GraphType.Line });
+  constructor(attrs: Optional<LineAttrs, 'id' | 'transform'>) {
+    super({ ...attrs, height: 0, type: GraphType.Line });
   }
 
   override draw(ctx: CanvasRenderingContext2D) {

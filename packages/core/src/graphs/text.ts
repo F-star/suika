@@ -19,20 +19,20 @@ export class TextGraph extends Graph<TextAttrs> {
   override type = GraphType.Text;
 
   constructor(
-    options: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height' | 'transform'>,
+    attrs: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height' | 'transform'>,
   ) {
     super({
-      ...options,
+      ...attrs,
       type: GraphType.Text,
-      width: options.width ?? DEFAULT_TEXT_WIDTH,
-      height: options.height ?? DEFAULT_TEXT_WEIGHT,
+      width: attrs.width ?? DEFAULT_TEXT_WIDTH,
+      height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
     });
 
-    if (options.autoFit) {
-      tmpCtx.font = `${options.fontSize}px sans-serif`;
-      const { width } = tmpCtx.measureText(options.content);
+    if (attrs.autoFit) {
+      tmpCtx.font = `${attrs.fontSize}px sans-serif`;
+      const { width } = tmpCtx.measureText(attrs.content);
       this.attrs.width = width;
-      this.attrs.height = options.fontSize;
+      this.attrs.height = attrs.fontSize;
     }
   }
 

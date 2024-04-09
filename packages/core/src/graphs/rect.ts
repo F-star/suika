@@ -16,9 +16,9 @@ export interface RectAttrs extends GraphAttrs {
 export class Rect extends Graph<RectAttrs> {
   override type = GraphType.Rect;
 
-  constructor(options: Optional<RectAttrs, 'transform' | 'id'>) {
+  constructor(attrs: Optional<RectAttrs, 'transform' | 'id'>) {
     super({
-      ...options,
+      ...attrs,
       type: GraphType.Rect,
     });
   }

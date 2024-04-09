@@ -12,8 +12,8 @@ export type EllipseAttrs = GraphAttrs;
 export class Ellipse extends Graph<EllipseAttrs> {
   override type = GraphType.Ellipse;
 
-  constructor(options: Optional<EllipseAttrs, 'id' | 'transform'>) {
-    super({ ...options, type: GraphType.Ellipse });
+  constructor(attrs: Optional<EllipseAttrs, 'id' | 'transform'>) {
+    super({ ...attrs, type: GraphType.Ellipse });
   }
 
   override hitTest(x: number, y: number, padding = 0) {

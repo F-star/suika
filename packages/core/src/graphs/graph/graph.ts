@@ -42,24 +42,24 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   attrs: ATTRS;
   protected _cacheBbox: Readonly<IBox> | null = null;
 
-  constructor(options: Omit<Optional<ATTRS, 'transform'>, 'id'>) {
-    const transform = options.transform ?? identityMatrix();
+  constructor(attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>) {
+    const transform = attrs.transform ?? identityMatrix();
 
-    if (!options.transform) {
-      if (options.x !== undefined) {
-        transform[4] = options.x;
+    if (!attrs.transform) {
+      if (attrs.x !== undefined) {
+        transform[4] = attrs.x;
       }
-      if (options.y !== undefined) {
-        transform[5] = options.y;
+      if (attrs.y !== undefined) {
+        transform[5] = attrs.y;
       }
     }
 
-    this.attrs = { ...options } as ATTRS;
+    this.attrs = { ...attrs } as ATTRS;
     this.attrs.id ??= genId();
     this.attrs.transform = transform;
 
     if (this.attrs.objectName) {
-      objectNameGenerator.setMaxIdx(options.objectName);
+      objectNameGenerator.setMaxIdx(attrs.objectName);
     } else {
       this.attrs.objectName = objectNameGenerator.gen(this.attrs.type ?? '');
     }

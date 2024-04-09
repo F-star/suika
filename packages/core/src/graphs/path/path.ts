@@ -23,8 +23,8 @@ export interface PathAttrs extends GraphAttrs {
 export class Path extends Graph<PathAttrs> {
   override type = GraphType.Path;
 
-  constructor(options: Optional<PathAttrs, 'id' | 'transform'>) {
-    super({ ...options, type: GraphType.Path });
+  constructor(attrs: Optional<PathAttrs, 'id' | 'transform'>) {
+    super({ ...attrs, type: GraphType.Path });
   }
 
   static computeRect(pathData: IPathItem[]): IRect {
