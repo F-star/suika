@@ -1,10 +1,16 @@
-import { arrEvery, arrMap, noop, omit } from '@suika/common';
-import { getRectApplyMatrix, type IRect, resizeRect } from '@suika/geo';
+import { arrMap, noop, omit } from '@suika/common';
+import {
+  type IMatrixArr,
+  type IRect,
+  recomputeTransformRect,
+  resizeRect,
+} from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
 import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
-import { type GraphAttrs } from '../../graphs';
+import { type Graph, type GraphAttrs } from '../../graphs';
 import { type IPoint } from '../../type';
 import { type IBaseTool } from '../type';
 
@@ -15,10 +21,7 @@ export class SelectResizeTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private handleName!: string;
   private startSelectBbox: IRect | null = null;
-  private prevGraphsAttrs: GraphAttrs[] = [];
-  /** offset of left-top of startSelectBbox */
-  private graphOffsets: IPoint[] = [];
-  private isGraphsRotateAllZero = false;
+  private startGraphsAttrs: GraphAttrs[] = [];
   private lastPoint: IPoint | null = null;
   private unbind = noop;
 
@@ -51,20 +54,12 @@ export class SelectResizeTool implements IBaseTool {
 
     const selectedItems = this.editor.selectedElements.getItems();
 
-    this.prevGraphsAttrs = arrMap(selectedItems, (item) => item.getAttrs());
-    this.isGraphsRotateAllZero = arrEvery(
-      selectedItems,
-      (item) => item.getRotate() === 0,
-    );
+    this.startGraphsAttrs = arrMap(selectedItems, (item) => item.getAttrs());
     const startSelectBbox = this.editor.selectedElements.getBBox();
     if (!startSelectBbox) {
       throw new Error('startSelectBbox should not be null, please issue to us');
     }
     this.startSelectBbox = startSelectBbox;
-    this.graphOffsets = arrMap(selectedItems, (item) => ({
-      x: item.getX() - startSelectBbox.x,
-      y: item.getY() - startSelectBbox.y,
-    }));
 
     if (isTransformHandle(handleInfo.handleName)) {
       this.editor.controlHandleManager.hideCustomHandles();
@@ -86,7 +81,7 @@ export class SelectResizeTool implements IBaseTool {
       selectItems[0].updateByControlHandle(
         this.handleName,
         this.lastPoint,
-        this.prevGraphsAttrs[0],
+        this.startGraphsAttrs[0],
         this.editor.hostEventManager.isShiftPressing,
         this.editor.hostEventManager.isAltPressing,
       );
@@ -106,57 +101,64 @@ export class SelectResizeTool implements IBaseTool {
       }
     } else {
       // multi elements case
-      if (!this.startSelectBbox) {
-        throw new Error(
-          'startSelectBbox should not be null, please issue to us',
-        );
-      }
-
-      // force keep width height ratio, if graphs rotate has no zero
-      const keepRatio = this.isGraphsRotateAllZero
-        ? this.editor.hostEventManager.isShiftPressing
-        : true;
-      const newSelectBbox = getRectApplyMatrix(
-        resizeRect(
-          this.handleName,
-          this.lastPoint,
-          {
-            width: this.startSelectBbox.width,
-            height: this.startSelectBbox.height,
-            transform: [
-              1,
-              0,
-              0,
-              1,
-              this.startSelectBbox.x,
-              this.startSelectBbox.y,
-            ],
-          },
-          {
-            keepRatio,
-            scaleFromCenter: this.editor.hostEventManager.isAltPressing,
-          },
-        ),
-      );
-
-      const widthRatio = newSelectBbox.width / this.startSelectBbox.width;
-      const heightRatio = newSelectBbox.height / this.startSelectBbox.height;
-
-      for (let i = 0; i < selectItems.length; i++) {
-        const graph = selectItems[i];
-        const x = newSelectBbox.x + this.graphOffsets[i].x * widthRatio;
-        const y = newSelectBbox.y + this.graphOffsets[i].y * heightRatio;
-        const tf = graph.attrs.transform;
-        graph.updateAttrs({
-          width: this.prevGraphsAttrs[i].width * widthRatio,
-          height: this.prevGraphsAttrs[i].height * heightRatio,
-          transform: [tf[0], tf[1], tf[2], tf[3], x, y],
-        });
-      }
+      this.resizeMultiGraphs(selectItems);
     }
 
     this.editor.render();
   }
+
+  private resizeMultiGraphs(selectItems: Graph[]) {
+    if (!this.lastPoint) return;
+
+    // multi elements case
+    if (!this.startSelectBbox) {
+      throw new Error('startSelectBbox should not be null, please issue to us');
+    }
+
+    const startTransform: IMatrixArr = [
+      1,
+      0,
+      0,
+      1,
+      this.startSelectBbox.x,
+      this.startSelectBbox.y,
+    ];
+    const transformRect = resizeRect(
+      this.handleName,
+      this.lastPoint,
+      {
+        width: this.startSelectBbox.width,
+        height: this.startSelectBbox.height,
+        transform: startTransform,
+      },
+      {
+        keepRatio: this.editor.hostEventManager.isShiftPressing,
+        scaleFromCenter: this.editor.hostEventManager.isAltPressing,
+        noChangeWidthAndHeight: true,
+      },
+    );
+
+    const scaleTf = new Matrix(...transformRect.transform).append(
+      new Matrix(...startTransform).invert(),
+    );
+
+    for (let i = 0; i < selectItems.length; i++) {
+      const startAttrs = this.startGraphsAttrs[i];
+      const graph = selectItems[i];
+
+      const tf = new Matrix(...this.startGraphsAttrs[i].transform).prepend(
+        scaleTf,
+      );
+      graph.updateAttrs(
+        recomputeTransformRect({
+          width: startAttrs.width,
+          height: startAttrs.height,
+          transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
+        }),
+      );
+    }
+  }
+
   onEnd(_e: PointerEvent, isDragHappened: boolean) {
     if (this.editor.selectedElements.size() === 0 || !isDragHappened) {
       return;
@@ -164,10 +166,10 @@ export class SelectResizeTool implements IBaseTool {
     const items = this.editor.selectedElements.getItems();
     this.editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
-        'Scale Selected Graphs',
+        'Update Selected Graphs by Control Handle',
         items,
         arrMap(items, (item) => omit(item.getAttrs(), 'x', 'y')),
-        this.prevGraphsAttrs.map((item) => omit(item, 'x', 'y')),
+        this.startGraphsAttrs.map((item) => omit(item, 'x', 'y')),
       ),
     );
 
@@ -182,7 +184,7 @@ export class SelectResizeTool implements IBaseTool {
     this.editor.hostEventManager.enableDelete();
   }
   afterEnd() {
-    this.prevGraphsAttrs = [];
+    this.startGraphsAttrs = [];
     this.lastPoint = null;
   }
 }

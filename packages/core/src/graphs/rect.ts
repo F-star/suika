@@ -1,5 +1,5 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { isPointInRoundRect } from '@suika/geo';
+import { isPointInRoundRect, offsetRect } from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
 import { ControlHandle } from '../control_handle_manager';
@@ -306,5 +306,22 @@ export class Rect extends Graph<RectAttrs> {
         scaleFromCenter,
       );
     }
+  }
+
+  /**
+   * parse to svg string
+   * for debug
+   * wip
+   */
+  toSVG() {
+    const rect = offsetRect(this.getBBox(), (this.attrs.strokeWidth ?? 0) / 2);
+    const svgHead = `<svg width="${rect.width}" height="${rect.height}" viewBox="0 0 ${rect.width} ${rect.height}" fill="none" xmlns="http://www.w3.org/2000/svg">`;
+    const content = `<rect width="${this.attrs.width}" height="${
+      this.attrs.height
+    }" transform="matrix(${this.attrs.transform.join(
+      ' ',
+    )})" fill="#D9D9D9" stroke="black" stroke-width="10"></rect>`;
+    const svgTail = `</svg>`;
+    return svgHead + content + svgTail;
   }
 }

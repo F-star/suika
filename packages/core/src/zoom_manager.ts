@@ -1,5 +1,5 @@
 import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
-import { getMergedRect, type IPoint } from '@suika/geo';
+import { type IPoint, mergeRect } from '@suika/geo';
 
 import { type Editor } from './editor';
 import { type IBox } from './type';
@@ -166,7 +166,7 @@ export class ZoomManager {
       return;
     }
     const bboxs = visibleGraphs.map((item) => item.getBBox());
-    this.zoomBoxToFit(getMergedRect(...bboxs), maxZoom);
+    this.zoomBoxToFit(mergeRect(...bboxs), maxZoom);
   }
   private getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();

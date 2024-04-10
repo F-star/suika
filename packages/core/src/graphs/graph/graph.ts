@@ -6,8 +6,8 @@ import {
   omit,
 } from '@suika/common';
 import {
-  distance,
   getTransformAngle,
+  getTransformedSize,
   identityMatrix,
   type IMatrixArr,
   type IRect,
@@ -198,22 +198,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   getTransformSize() {
-    const transform = this.attrs.transform;
-    const tf = new Matrix(
-      transform[0],
-      transform[1],
-      transform[2],
-      transform[3],
-      0,
-      0,
-    );
-    const rightTop = tf.apply({ x: this.attrs.width, y: 0 });
-    const leftBottom = tf.apply({ x: 0, y: this.attrs.height });
-    const zero = { x: 0, y: 0 };
-    return {
-      width: distance(rightTop, zero),
-      height: distance(leftBottom, zero),
-    };
+    return getTransformedSize(this.attrs);
   }
 
   getCenter(): IPoint {

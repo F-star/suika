@@ -6,9 +6,11 @@ import {
   type IPoint,
   type IRect,
   type IRectWithRotation,
+  type ISize,
   type ITransformRect,
 } from '../type';
 import { normalizeRadian } from './geo_angle';
+import { distance } from './geo_point';
 
 export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
   return {
@@ -27,24 +29,6 @@ export const getRectByPoints = (points: IPoint[]): IRect => {
   const width = Math.max(...xs) - x;
   const height = Math.max(...ys) - y;
   return { x, y, width, height };
-};
-
-export const isPointInRect3 = (
-  point: IPoint,
-  rect: IRectWithRotation,
-  padding = 0,
-) => {
-  if (rect.rotation) {
-    const [cx, cy] = [rect.x + rect.width / 2, rect.y + rect.height / 2];
-    point = transformRotate(point.x, point.y, -rect.rotation, cx, cy);
-  }
-
-  return (
-    point.x >= rect.x - padding &&
-    point.y >= rect.y - padding &&
-    point.x <= rect.x + rect.width + padding &&
-    point.y <= rect.y + rect.height + padding
-  );
 };
 
 export const isPointInRect = (
@@ -145,7 +129,7 @@ export const normalizeRect = ({ x, y, width, height }: IRect): IRect => {
 /**
  * get merged rect from rects
  */
-export const getMergedRect = (...rects: IRect[]): IRect => {
+export const mergeRect = (...rects: IRect[]): IRect => {
   if (rects.length === 0) {
     throw new Error('the count of rect can not be 0');
   }
@@ -188,10 +172,7 @@ export const isRectContain = (rect1: IRect, rect2: IRect) => {
   );
 };
 
-export const offsetRect = (
-  rect: IRectWithRotation,
-  padding: number | number[],
-) => {
+export const offsetRect = (rect: IRect, padding: number | number[]) => {
   if (typeof padding === 'number') {
     padding = [padding, padding, padding, padding];
   }
@@ -202,7 +183,6 @@ export const offsetRect = (
     y: y - padding[0],
     width: width + padding[1] + padding[3],
     height: height + padding[0] + padding[2],
-    rotation: rect.rotation,
   };
 };
 
@@ -305,5 +285,44 @@ export const getRectApplyMatrix = (rect: ITransformRect) => {
     y: minY,
     width: maxX - minX,
     height: maxY - minY,
+  };
+};
+
+export const getTransformedSize = (rect: ITransformRect): ISize => {
+  const tf = new Matrix(
+    rect.transform[0],
+    rect.transform[1],
+    rect.transform[2],
+    rect.transform[3],
+    0,
+    0,
+  );
+  const rightTop = tf.apply({ x: rect.width, y: 0 });
+  const leftBottom = tf.apply({ x: 0, y: rect.height });
+  const zero = { x: 0, y: 0 };
+  return {
+    width: distance(rightTop, zero),
+    height: distance(leftBottom, zero),
+  };
+};
+
+/**
+ * 重新计算 width、height 和 transform
+ * 确保 transform 后的 size 和 transform 前的 size 相同
+ */
+export const recomputeTransformRect = (
+  rect: ITransformRect,
+): ITransformRect => {
+  const newSize = getTransformedSize(rect);
+  const scaleMatrix = new Matrix().scale(
+    rect.width / newSize.width,
+    rect.height / newSize.height,
+  );
+
+  const tf = new Matrix(...rect.transform).append(scaleMatrix);
+  return {
+    width: newSize.width,
+    height: newSize.height,
+    transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
   };
 };
