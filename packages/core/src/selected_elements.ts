@@ -1,5 +1,5 @@
 import { EventEmitter, isSameArray } from '@suika/common';
-import { getMergedRect } from '@suika/geo';
+import { mergeRect } from '@suika/geo';
 
 import { GroupCmd } from './commands/group';
 import { RemoveGraphsCmd } from './commands/remove_graphs';
@@ -112,7 +112,7 @@ class SelectedElements {
       return null;
     }
     const rects = this.items.map((element) => element.getBBox());
-    return getMergedRect(...rects);
+    return mergeRect(...rects);
   }
   getRotation() {
     if (this.items.length === 0 || this.items.length > 1) {

@@ -133,9 +133,11 @@ export const resizeRect = (
   options: {
     keepRatio?: boolean;
     scaleFromCenter?: boolean;
+    noChangeWidthAndHeight?: boolean;
   } = {
     keepRatio: false,
     scaleFromCenter: false,
+    noChangeWidthAndHeight: false,
   },
 ): ITransformRect => {
   const resizeOp = resizeOps[type];
@@ -179,6 +181,17 @@ export const resizeRect = (
   const scaleTransform = new Matrix().scale(scaleX, scaleY);
 
   newRect.transform = newRect.transform.append(scaleTransform);
+
+  if (options.noChangeWidthAndHeight) {
+    // FIXME: consider case when width or height is 0
+    newRect.transform.scale(
+      newRect.width / rect.width,
+      newRect.height / rect.height,
+    );
+    newRect.width = rect.width;
+    newRect.height = rect.height;
+  }
+
   const newGlobalOrigin = newRect.transform.apply(
     scaleFromCenter
       ? { x: newRect.width / 2, y: newRect.height / 2 }

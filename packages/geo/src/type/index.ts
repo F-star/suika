@@ -3,6 +3,11 @@ export interface IPoint {
   y: number;
 }
 
+export interface ISize {
+  width: number;
+  height: number;
+}
+
 export interface IRect {
   x: number;
   y: number;
