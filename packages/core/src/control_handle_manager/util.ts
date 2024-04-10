@@ -6,7 +6,9 @@ import {
   normalizeDegree,
   rad2Deg,
 } from '@suika/geo';
+import { Matrix } from 'pixi.js';
 
+import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
 import { Rect } from '../graphs';
 import { type IPaint, PaintType } from '../paint';
@@ -24,6 +26,24 @@ const getResizeCursor = (
     // be considered as a line
     return 'move';
   }
+
+  if (type === 'n' || type === 's') {
+    const heightTransform = new Matrix()
+      .rotate(HALF_PI)
+      .prepend(new Matrix(...selectedBox.transform))
+      .rotate(HALF_PI);
+    const heightRotate = getTransformAngle([
+      heightTransform.a,
+      heightTransform.b,
+      heightTransform.c,
+      heightTransform.d,
+      heightTransform.tx,
+      heightTransform.ty,
+    ]);
+    const degree = rad2Deg(heightRotate);
+    return { type: 'resize', degree };
+  }
+
   const rotation = getTransformAngle(selectedBox.transform);
   const isFlip = checkTransformFlip(selectedBox.transform);
 
@@ -36,10 +56,6 @@ const getResizeCursor = (
     case 'ne':
     case 'sw':
       dDegree = 45;
-      break;
-    case 'n':
-    case 's':
-      dDegree = 0;
       break;
     case 'e':
     case 'w':

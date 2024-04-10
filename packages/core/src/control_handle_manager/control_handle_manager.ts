@@ -9,6 +9,7 @@ import {
 } from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
+import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
 import { GraphType } from '../type';
@@ -176,6 +177,21 @@ export class ControlHandleManager {
       w.graph.attrs.width =
       e.graph.attrs.width =
         neswHandleWidth;
+
+    const heightTransform = new Matrix()
+      .rotate(HALF_PI)
+      .prepend(new Matrix(...rect.transform))
+      .rotate(HALF_PI);
+    const heightRotate = getTransformAngle([
+      heightTransform.a,
+      heightTransform.b,
+      heightTransform.c,
+      heightTransform.d,
+      heightTransform.tx,
+      heightTransform.ty,
+    ]);
+    n.rotation = heightRotate;
+    s.rotation = heightRotate;
   }
 
   draw(rect: ITransformRect | null) {
