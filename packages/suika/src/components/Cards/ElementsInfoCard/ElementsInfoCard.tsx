@@ -107,7 +107,7 @@ export const ElementsInfoCards: FC = () => {
           setRotation(
             newRotation === MIXED
               ? newRotation
-              : remainDecimal(rad2Deg(newRotation as number)),
+              : remainDecimal(rad2Deg(normalizeRadian(newRotation as number))),
           );
           setCornerRadius(
             newCornerRadius === MIXED
