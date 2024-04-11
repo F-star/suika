@@ -5,7 +5,6 @@ import {
   type IMatrixArr,
   type IPoint,
   type IRect,
-  type IRectWithRotation,
   type ISize,
   type ITransformRect,
 } from '../type';
@@ -55,7 +54,7 @@ export const isPointInRect = (
 
 export const isPointInRoundRect = (
   point: IPoint,
-  rect: IRectWithRotation,
+  rect: IRect,
   cornerRadii: number[],
   padding = 0,
 ) => {
@@ -63,11 +62,6 @@ export const isPointInRoundRect = (
   const y = rect.y - padding;
   const width = rect.width + padding * 2;
   const height = rect.height + padding * 2;
-
-  if (rect.rotation) {
-    const [cx, cy] = [x + width / 2, y + height / 2];
-    point = transformRotate(point.x, point.y, -rect.rotation, cx, cy);
-  }
 
   if (
     point.x >= x &&
@@ -200,21 +194,12 @@ export const rectToMidPoints = (rect: IRect) => {
 };
 
 /**
- * Calculate the coordinates of the upper left corner of a shape, considering rotation
- */
-export const getRectRotatedXY = (rect: IRectWithRotation) => {
-  const cx = rect.x + rect.width / 2;
-  const cy = rect.y + rect.height / 2;
-  return transformRotate(rect.x, rect.y, rect.rotation || 0, cx, cy);
-};
-
-/**
  * line -> rect with rotation, and height is 0
  */
 export const getRotatedRectByTwoPoint = (
   point1: IPoint,
   point2: IPoint,
-): IRectWithRotation => {
+): IRect & { rotation: number } => {
   const { x, y } = point1;
   const width = point2.x - point1.x;
   const height = point2.y - point1.y;

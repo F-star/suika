@@ -17,10 +17,6 @@ export interface IRect {
 
 export type IBox = IRect;
 
-export interface IRectWithRotation extends IRect {
-  rotation?: number;
-}
-
 export interface ITransformRect {
   width: number;
   height: number;

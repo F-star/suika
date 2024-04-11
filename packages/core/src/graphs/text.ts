@@ -2,7 +2,7 @@ import { parseRGBAStr } from '@suika/common';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
-import { Graph, type GraphAttrs } from './graph';
+import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
 
 export interface TextAttrs extends GraphAttrs {
   content: string;
@@ -20,13 +20,17 @@ export class TextGraph extends Graph<TextAttrs> {
 
   constructor(
     attrs: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height' | 'transform'>,
+    opts?: IGraphOpts,
   ) {
-    super({
-      ...attrs,
-      type: GraphType.Text,
-      width: attrs.width ?? DEFAULT_TEXT_WIDTH,
-      height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
-    });
+    super(
+      {
+        ...attrs,
+        type: GraphType.Text,
+        width: attrs.width ?? DEFAULT_TEXT_WIDTH,
+        height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
+      },
+      opts,
+    );
 
     if (attrs.autoFit) {
       tmpCtx.font = `${attrs.fontSize}px sans-serif`;

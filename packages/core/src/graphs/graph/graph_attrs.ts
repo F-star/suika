@@ -7,8 +7,6 @@ export interface GraphAttrs {
   type?: GraphType;
   id: string;
   objectName: string;
-  x: number; // TODO: to delete
-  y: number;
   width: number;
   height: number;
   /**
@@ -25,4 +23,11 @@ export interface GraphAttrs {
   cornerRadius?: number;
   visible?: boolean;
   lock?: boolean;
+}
+
+export interface IGraphOpts {
+  // advance attribute, will convert to 'attrs.transform'
+  x?: number;
+  y?: number;
+  rotate?: number;
 }

@@ -35,22 +35,25 @@ import {
   type Optional,
 } from '../../type';
 import { drawRoundRectPath } from '../../utils';
-import { type GraphAttrs } from './graph_attrs';
+import { type GraphAttrs, type IGraphOpts } from './graph_attrs';
 
 export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   type = GraphType.Graph;
   attrs: ATTRS;
   protected _cacheBbox: Readonly<IBox> | null = null;
 
-  constructor(attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>) {
+  constructor(
+    attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
+    opts?: IGraphOpts,
+  ) {
     const transform = attrs.transform ?? identityMatrix();
 
-    if (!attrs.transform) {
-      if (attrs.x !== undefined) {
-        transform[4] = attrs.x;
+    if (opts && !attrs.transform) {
+      if (opts.x !== undefined) {
+        transform[4] = opts.x;
       }
-      if (attrs.y !== undefined) {
-        transform[5] = attrs.y;
+      if (opts.y !== undefined) {
+        transform[5] = opts.y;
       }
     }
 
@@ -69,7 +72,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return cloneDeep(this.attrs);
   }
 
-  protected shouldUpdateBbox(attrs: Partial<GraphAttrs>) {
+  protected shouldUpdateBbox(attrs: Partial<GraphAttrs> & IGraphOpts) {
     // TODO: if x, y, width, height value no change, bbox should not be updated
     return (
       attrs.x !== undefined ||
@@ -79,13 +82,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       attrs.transform !== undefined
     );
   }
-  updateAttrs(
-    partialAttrs: Partial<GraphAttrs> & {
-      x?: number;
-      y?: number;
-      rotation?: number;
-    },
-  ) {
+  updateAttrs(partialAttrs: Partial<GraphAttrs> & IGraphOpts) {
     // TODO: 提示，x、y、rotation 不能和 transform 同时存在，否则效果不可预测
     // 目前是后者会覆盖前者
     if (this.shouldUpdateBbox(partialAttrs)) {
@@ -100,10 +97,10 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       }
     }
 
-    if (partialAttrs.rotation !== undefined) {
-      this.setRotate(partialAttrs.rotation);
+    if (partialAttrs.rotate !== undefined) {
+      this.setRotate(partialAttrs.rotate);
     }
-    partialAttrs = omit(partialAttrs, 'x', 'y', 'rotation');
+    partialAttrs = omit(partialAttrs, 'x', 'y', 'rotate');
     for (const key in partialAttrs) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       (this.attrs as any)[key] = partialAttrs[key as keyof typeof partialAttrs];

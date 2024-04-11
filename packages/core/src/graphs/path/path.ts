@@ -13,7 +13,7 @@ import { Matrix } from 'pixi.js';
 import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
 import { GraphType, type Optional } from '../../type';
-import { Graph, type GraphAttrs } from '../graph';
+import { Graph, type GraphAttrs, type IGraphOpts } from '../graph';
 import { type IPathItem, type ISegment } from './type';
 
 export interface PathAttrs extends GraphAttrs {
@@ -23,8 +23,11 @@ export interface PathAttrs extends GraphAttrs {
 export class Path extends Graph<PathAttrs> {
   override type = GraphType.Path;
 
-  constructor(attrs: Optional<PathAttrs, 'id' | 'transform'>) {
-    super({ ...attrs, type: GraphType.Path });
+  constructor(
+    attrs: Optional<PathAttrs, 'id' | 'transform'>,
+    opts?: IGraphOpts,
+  ) {
+    super({ ...attrs, type: GraphType.Path }, opts);
   }
 
   static computeRect(pathData: IPathItem[]): IRect {

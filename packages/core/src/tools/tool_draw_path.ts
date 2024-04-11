@@ -86,20 +86,22 @@ export class DrawPathTool implements ITool {
         },
       ];
 
-      const path = new Path({
-        objectName: '',
-        ...this.startPoint,
-        width: 100,
-        height: 100,
-        strokeWidth: 1,
-        stroke: [
-          {
-            type: PaintType.Solid,
-            attrs: parseHexToRGBA('#000')!,
-          },
-        ],
-        pathData,
-      });
+      const path = new Path(
+        {
+          objectName: '',
+          width: 100,
+          height: 100,
+          strokeWidth: 1,
+          stroke: [
+            {
+              type: PaintType.Solid,
+              attrs: parseHexToRGBA('#000')!,
+            },
+          ],
+          pathData,
+        },
+        this.startPoint,
+      );
       this.path = path;
 
       this.editor.sceneGraph.addItems([path]);
@@ -307,8 +309,6 @@ export class DrawPathTool implements ITool {
           getCursor: () => 'default',
           graph: new Path({
             objectName: 'path-preview-curve',
-            x: 0,
-            y: 0,
             width: 0,
             height: 0,
             pathData: [
@@ -357,26 +357,27 @@ export class DrawPathTool implements ITool {
       cy: point.y,
       type: 'path-preview-anchor',
       getCursor: () => 'default',
-      graph: new Ellipse({
-        objectName: 'path-preview-anchor',
-        x: point.x,
-        y: point.y,
-        width: 6,
-        height: 6,
-        fill: [
-          {
-            type: PaintType.Solid,
-            attrs: parseHexToRGBA('#fff')!,
-          },
-        ],
-        stroke: [
-          {
-            type: PaintType.Solid,
-            attrs: parseHexToRGBA(handleStroke)!,
-          },
-        ],
-        strokeWidth: 1,
-      }),
+      graph: new Ellipse(
+        {
+          objectName: 'path-preview-anchor',
+          width: 6,
+          height: 6,
+          fill: [
+            {
+              type: PaintType.Solid,
+              attrs: parseHexToRGBA('#fff')!,
+            },
+          ],
+          stroke: [
+            {
+              type: PaintType.Solid,
+              attrs: parseHexToRGBA(handleStroke)!,
+            },
+          ],
+          strokeWidth: 1,
+        },
+        point,
+      ),
     });
     previewHandles.push(previewPoint);
 

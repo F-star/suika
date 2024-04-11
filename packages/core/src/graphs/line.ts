@@ -2,7 +2,7 @@ import { parseRGBAStr } from '@suika/common';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
-import { Graph, type GraphAttrs } from './graph';
+import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
 
 export type LineAttrs = GraphAttrs;
 
@@ -17,8 +17,11 @@ export type LineAttrs = GraphAttrs;
 export class Line extends Graph<LineAttrs> {
   override type = GraphType.Line;
 
-  constructor(attrs: Optional<LineAttrs, 'id' | 'transform'>) {
-    super({ ...attrs, height: 0, type: GraphType.Line });
+  constructor(
+    attrs: Optional<LineAttrs, 'id' | 'transform'>,
+    opts?: IGraphOpts,
+  ) {
+    super({ ...attrs, height: 0, type: GraphType.Line }, opts);
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
