@@ -111,16 +111,12 @@ export const createTransformHandles = (params: {
 }) => {
   const getDefaultAttrs = () => {
     const attrs: {
-      x: number;
-      y: number;
       width: number;
       height: number;
       fill: IPaint[];
       stroke: IPaint[];
       strokeWidth: number;
     } = {
-      x: 0,
-      y: 0,
       width: params.size,
       height: params.size,
       fill: [

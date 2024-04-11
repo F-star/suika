@@ -254,28 +254,30 @@ export class PathEditor {
           cx: anchor.x,
           cy: anchor.y,
           type: ['anchor', i, j].join('-'),
-          graph: new Ellipse({
-            objectName: 'anchor',
-            ...this.editor.sceneCoordsToViewport(
+          graph: new Ellipse(
+            {
+              objectName: 'anchor',
+              width: anchorSize,
+              height: anchorSize,
+              fill: [
+                {
+                  type: PaintType.Solid,
+                  attrs: parseHexToRGBA(anchorFill)!,
+                },
+              ],
+              stroke: [
+                {
+                  type: PaintType.Solid,
+                  attrs: parseHexToRGBA(anchorStroke)!,
+                },
+              ],
+              strokeWidth: 1,
+            },
+            this.editor.sceneCoordsToViewport(
               anchor.x + anchorSize / 2,
               anchor.y + anchorSize / 2,
             ),
-            width: anchorSize,
-            height: anchorSize,
-            fill: [
-              {
-                type: PaintType.Solid,
-                attrs: parseHexToRGBA(anchorFill)!,
-              },
-            ],
-            stroke: [
-              {
-                type: PaintType.Solid,
-                attrs: parseHexToRGBA(anchorStroke)!,
-              },
-            ],
-            strokeWidth: 1,
-          }),
+          ),
           padding,
           getCursor: () => 'default',
         });
@@ -303,18 +305,21 @@ export class PathEditor {
             cy: rect.y + rect.height / 2,
             type: 'handleLine',
             rotation: rect.rotation,
-            graph: new Line({
-              objectName: 'handleLine',
-              ...rect,
-              width: rect.width * zoom,
-              stroke: [
-                {
-                  type: PaintType.Solid,
-                  attrs: pathLineStroke,
-                },
-              ],
-              strokeWidth: 1,
-            }),
+            graph: new Line(
+              {
+                objectName: 'handleLine',
+                height: rect.height,
+                width: rect.width * zoom,
+                stroke: [
+                  {
+                    type: PaintType.Solid,
+                    attrs: pathLineStroke,
+                  },
+                ],
+                strokeWidth: 1,
+              },
+              { x: rect.x, y: rect.y },
+            ),
             hitTest: () => false,
             getCursor: () => 'default',
           });
@@ -324,26 +329,27 @@ export class PathEditor {
             cy: handle.y,
             rotation: QUARTER_PI,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
-            graph: new Rect({
-              objectName: 'pathHandle',
-              x: handle.x,
-              y: handle.y,
-              width: handleInOutSize,
-              height: handleInOutSize,
-              fill: [
-                {
-                  type: PaintType.Solid,
-                  attrs: parseHexToRGBA('#fff')!,
-                },
-              ],
-              stroke: [
-                {
-                  type: PaintType.Solid,
-                  attrs: parseHexToRGBA(handleStroke)!,
-                },
-              ],
-              strokeWidth: 1,
-            }),
+            graph: new Rect(
+              {
+                objectName: 'pathHandle',
+                width: handleInOutSize,
+                height: handleInOutSize,
+                fill: [
+                  {
+                    type: PaintType.Solid,
+                    attrs: parseHexToRGBA('#fff')!,
+                  },
+                ],
+                stroke: [
+                  {
+                    type: PaintType.Solid,
+                    attrs: parseHexToRGBA(handleStroke)!,
+                  },
+                ],
+                strokeWidth: 1,
+              },
+              handle,
+            ),
             padding,
             getCursor: () => 'default',
           });

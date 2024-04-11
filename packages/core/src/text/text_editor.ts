@@ -51,16 +51,17 @@ export class TextEditor {
       this.y,
       this.editor.setting.get('snapToPixelGrid'),
     );
-    const text = new TextGraph({
-      objectName: '',
-      x: sceneXY.x,
-      y: sceneXY.y,
-      content: this.textarea.value,
-      autoFit: true,
-      fontSize: this.editor.setting.get('defaultFontSize'),
-      height: this.editor.setting.get('defaultFontSize'),
-      fill: cloneDeep(this.editor.setting.get('textFill')),
-    });
+    const text = new TextGraph(
+      {
+        objectName: '',
+        content: this.textarea.value,
+        autoFit: true,
+        fontSize: this.editor.setting.get('defaultFontSize'),
+        height: this.editor.setting.get('defaultFontSize'),
+        fill: cloneDeep(this.editor.setting.get('textFill')),
+      },
+      sceneXY,
+    );
     this.editor.sceneGraph.addItems([text]);
 
     if (!this.editor.setting.get('keepToolSelectedAfterUse')) {

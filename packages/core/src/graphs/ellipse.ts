@@ -5,15 +5,18 @@ import { DOUBLE_PI } from '../constant';
 import { type ImgManager } from '../Img_manager';
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
-import { Graph, type GraphAttrs } from './graph';
+import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
 
 export type EllipseAttrs = GraphAttrs;
 
 export class Ellipse extends Graph<EllipseAttrs> {
   override type = GraphType.Ellipse;
 
-  constructor(attrs: Optional<EllipseAttrs, 'id' | 'transform'>) {
-    super({ ...attrs, type: GraphType.Ellipse });
+  constructor(
+    attrs: Optional<EllipseAttrs, 'id' | 'transform'>,
+    opts?: IGraphOpts,
+  ) {
+    super({ ...attrs, type: GraphType.Ellipse }, opts);
   }
 
   override hitTest(x: number, y: number, padding = 0) {

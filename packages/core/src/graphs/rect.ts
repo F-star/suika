@@ -7,7 +7,7 @@ import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
 import { GraphType, type IPoint, type Optional } from '../type';
 import { Ellipse } from './ellipse';
-import { Graph, type GraphAttrs } from './graph';
+import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
 
 export interface RectAttrs extends GraphAttrs {
   cornerRadius?: number;
@@ -16,11 +16,17 @@ export interface RectAttrs extends GraphAttrs {
 export class Rect extends Graph<RectAttrs> {
   override type = GraphType.Rect;
 
-  constructor(attrs: Optional<RectAttrs, 'transform' | 'id'>) {
-    super({
-      ...attrs,
-      type: GraphType.Rect,
-    });
+  constructor(
+    attrs: Optional<RectAttrs, 'transform' | 'id'>,
+    opts?: IGraphOpts,
+  ) {
+    super(
+      {
+        ...attrs,
+        type: GraphType.Rect,
+      },
+      opts,
+    );
   }
 
   override getAttrs(): RectAttrs {
@@ -132,8 +138,6 @@ export class Rect extends Graph<RectAttrs> {
   private createCornerRadiusHandleGraph() {
     return new Ellipse({
       objectName: 'cornerRadius',
-      x: 0,
-      y: 0,
       width: 8,
       height: 8,
       fill: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#fff')! }],

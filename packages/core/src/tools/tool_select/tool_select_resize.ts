@@ -1,4 +1,4 @@
-import { arrMap, noop, omit } from '@suika/common';
+import { arrMap, noop } from '@suika/common';
 import {
   type IMatrixArr,
   type IRect,
@@ -168,8 +168,8 @@ export class SelectResizeTool implements IBaseTool {
       new SetGraphsAttrsCmd(
         'Update Selected Graphs by Control Handle',
         items,
-        arrMap(items, (item) => omit(item.getAttrs(), 'x', 'y')),
-        this.startGraphsAttrs.map((item) => omit(item, 'x', 'y')),
+        arrMap(items, (item) => item.getAttrs()),
+        this.startGraphsAttrs,
       ),
     );
 
