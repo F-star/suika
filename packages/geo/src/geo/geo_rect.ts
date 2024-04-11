@@ -314,10 +314,9 @@ export const recomputeTransformRect = (
   rect: ITransformRect,
 ): ITransformRect => {
   const newSize = getTransformedSize(rect);
-  const scaleMatrix = new Matrix().scale(
-    rect.width / newSize.width,
-    rect.height / newSize.height,
-  );
+  const scaleX = newSize.width ? rect.width / newSize.width : 1;
+  const scaleY = newSize.height ? rect.height / newSize.height : 1;
+  const scaleMatrix = new Matrix().scale(scaleX, scaleY);
 
   const tf = new Matrix(...rect.transform).append(scaleMatrix);
   return {
