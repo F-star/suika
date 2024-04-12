@@ -95,7 +95,7 @@ class SelectedElements {
     }
   }
   getCenterPoint() {
-    const bBox = this.getBBox();
+    const bBox = this.getBbox();
     if (!bBox) {
       throw new Error('no selected elements');
     }
@@ -107,11 +107,11 @@ class SelectedElements {
   isEmpty() {
     return this.items.length === 0;
   }
-  getBBox(): IBox | null {
+  getBbox(): IBox | null {
     if (this.isEmpty()) {
       return null;
     }
-    const rects = this.items.map((element) => element.getBBox());
+    const rects = this.items.map((element) => element.getBbox());
     return mergeRect(...rects);
   }
   getRotation() {

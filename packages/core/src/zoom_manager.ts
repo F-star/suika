@@ -148,7 +148,7 @@ export class ZoomManager {
     });
   }
   zoomToSelection() {
-    const selectionBox = this.editor.selectedElements.getBBox();
+    const selectionBox = this.editor.selectedElements.getBbox();
     if (!selectionBox) {
       this.zoomToFit();
     } else {
@@ -165,7 +165,7 @@ export class ZoomManager {
       this.reset();
       return;
     }
-    const bboxs = visibleGraphs.map((item) => item.getBBox());
+    const bboxs = visibleGraphs.map((item) => item.getBbox());
     this.zoomBoxToFit(mergeRect(...bboxs), maxZoom);
   }
   private getCanvasCenter() {

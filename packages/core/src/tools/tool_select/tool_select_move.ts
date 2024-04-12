@@ -46,7 +46,7 @@ export class SelectMoveTool implements IBaseTool {
     this.startPoints = selectedElements.map((graph) => {
       return graph.getPosition();
     });
-    const bBox = this.editor.selectedElements.getBBox();
+    const bBox = this.editor.selectedElements.getBbox();
     if (!bBox) {
       console.error(
         "selected elements should't be empty when moving, please report us issue",

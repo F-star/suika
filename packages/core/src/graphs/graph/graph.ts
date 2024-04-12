@@ -107,21 +107,33 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     }
   }
 
+  getStrokeWidth() {
+    return this.attrs.strokeWidth ?? 0;
+  }
+
   /**
    * AABB (axis-aligned bounding box), without considering strokeWidth)
    * Consider rotation (orthogonal bounding box after rotation)
    */
-  getBBox(): Readonly<IBox> {
+  getBbox(opt?: { includeStroke?: boolean }): Readonly<IBox> {
     if (this._cacheBbox) {
       return this._cacheBbox;
+    }
+
+    let width = this.attrs.width;
+    let height = this.attrs.height;
+    if (opt?.includeStroke) {
+      const strokeWidth = this.getStrokeWidth() / 2;
+      width += strokeWidth;
+      height += strokeWidth;
     }
 
     const tf = new Matrix(...this.attrs.transform);
     const vertices = rectToVertices({
       x: 0,
       y: 0,
-      width: this.attrs.width,
-      height: this.attrs.height,
+      width,
+      height,
     }).map((item) => {
       const pos = tf.apply(item);
       return { x: pos.x, y: pos.y };
@@ -148,11 +160,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return { ...this._cacheBbox };
   }
   /**
-   * other getBBox with
+   * other getBbox with
    * minX, minY, maxX, maxY style
    */
-  getBBox2(): Readonly<IBox2> {
-    const bbox = this.getBBox();
+  getBbox2(): Readonly<IBox2> {
+    const bbox = this.getBbox();
     return {
       minX: bbox.x,
       minY: bbox.y,
@@ -214,7 +226,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
         ...this.getSize(),
         transform: this.attrs.transform,
       },
-      padding + (this.attrs.strokeWidth ?? 0) / 2,
+      padding + this.getStrokeWidth() / 2,
     );
   }
 
@@ -223,7 +235,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
    */
   intersectWithRect(rect: IRect) {
     let isIntersected = false;
-    if (!isRectIntersect(rect, this.getBBox())) {
+    if (!isRectIntersect(rect, this.getBbox())) {
       isIntersected = false;
     } else {
       const rotate = this.getRotate();
@@ -269,7 +281,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
    * whether the element contain with the rect
    */
   containWithRect(rect: IRect) {
-    const bbox = this.getBBox();
+    const bbox = this.getBbox();
     return isRectContain(rect, bbox) || isRectContain(bbox, rect);
   }
 

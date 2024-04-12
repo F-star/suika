@@ -48,7 +48,7 @@ export class RefLine {
         continue;
       }
 
-      const bbox = bboxToBboxWithMid(graph.getBBox2());
+      const bbox = bboxToBboxWithMid(graph.getBbox2());
       if (!isRectIntersect2(viewportBbox, bbox)) {
         continue;
       }
@@ -127,7 +127,7 @@ export class RefLine {
       targetPoints = [...targetGraph.getBboxVerts(), targetGraph.getCenter()];
     } else {
       const targetBbox = bboxToBboxWithMid(
-        bboxToBbox2(this.editor.selectedElements.getBBox()!),
+        bboxToBbox2(this.editor.selectedElements.getBbox()!),
       );
       targetPoints = [
         { x: targetBbox.minX, y: targetBbox.minY },

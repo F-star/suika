@@ -22,7 +22,7 @@ export class AlignCmd implements ICommand {
     if (elements.length < 2) {
       throw new Error('you can not algin zero or one element');
     }
-    const bBoxes = elements.map((item) => item.getBBox2());
+    const bBoxes = elements.map((item) => item.getBbox2());
     const mixedBBox = bBoxes.reduce(
       (m, box) => {
         return {

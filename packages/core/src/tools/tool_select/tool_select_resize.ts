@@ -55,7 +55,7 @@ export class SelectResizeTool implements IBaseTool {
     const selectedItems = this.editor.selectedElements.getItems();
 
     this.startGraphsAttrs = arrMap(selectedItems, (item) => item.getAttrs());
-    const startSelectBbox = this.editor.selectedElements.getBBox();
+    const startSelectBbox = this.editor.selectedElements.getBbox();
     if (!startSelectBbox) {
       throw new Error('startSelectBbox should not be null, please issue to us');
     }

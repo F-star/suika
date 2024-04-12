@@ -41,7 +41,7 @@ export class SelectedBox {
           transform: selectedGraph.attrs.transform!,
         };
       } else {
-        const rect = selectedElements.getBBox()!;
+        const rect = selectedElements.getBbox()!;
         this.box = {
           width: rect.width,
           height: rect.height,

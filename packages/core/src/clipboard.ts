@@ -124,7 +124,7 @@ export class ClipboardManager {
     );
     editor.selectedElements.setItems(pastedGraphs);
 
-    const bbox = editor.selectedElements.getBBox()!;
+    const bbox = editor.selectedElements.getBbox()!;
     if (
       (x === undefined || y === undefined) &&
       pastedData.paperId !== editor.paperId

@@ -81,7 +81,7 @@ export class SelectRotationTool implements IBaseTool {
 
     const selectedElements = this.editor.selectedElements.getItems();
     /**** 旋转多个元素 ****/
-    const selectedElementsBBox = this.editor.selectedElements.getBBox();
+    const selectedElementsBBox = this.editor.selectedElements.getBbox();
     if (selectedElementsBBox) {
       const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] = this
         .selectedBoxCenter as [number, number];
