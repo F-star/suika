@@ -1,8 +1,7 @@
 import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
-import { type IPoint, mergeRect } from '@suika/geo';
+import { boxToRect, type IPoint, type IRect, mergeRect } from '@suika/geo';
 
 import { type Editor } from './editor';
-import { type IBox } from './type';
 
 interface Events {
   zoomChange(zoom: number, prevZoom: number): void;
@@ -102,7 +101,7 @@ export class ZoomManager {
       y: -viewport.height / 2,
     });
   }
-  private zoomBoxToFit(composedBBox: IBox, maxZoom?: number) {
+  private zoomBoxToFit(composedBBox: IRect, maxZoom?: number) {
     const padding = this.editor.setting.get('zoomToFixPadding');
     const viewport = this.editor.viewportManager.getViewport();
 
@@ -165,8 +164,8 @@ export class ZoomManager {
       this.reset();
       return;
     }
-    const bboxs = visibleGraphs.map((item) => item.getBbox());
-    this.zoomBoxToFit(mergeRect(...bboxs), maxZoom);
+    const rects = visibleGraphs.map((item) => boxToRect(item.getBbox()));
+    this.zoomBoxToFit(mergeRect(...rects), maxZoom);
   }
   private getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();

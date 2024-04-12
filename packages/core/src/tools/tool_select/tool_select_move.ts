@@ -1,8 +1,8 @@
 import { noop } from '@suika/common';
+import { type IPoint } from '@suika/geo';
 
 import { MoveGraphsCommand } from '../../commands/move_graphs';
 import { type Editor } from '../../editor';
-import { type IPoint } from '../../type';
 import { type IBaseTool } from '../type';
 
 /**

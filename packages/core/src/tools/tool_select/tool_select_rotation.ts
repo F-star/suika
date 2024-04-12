@@ -1,10 +1,14 @@
 import { forEach, getClosestTimesVal } from '@suika/common';
-import { getSweepAngle, type IMatrixArr, rad2Deg } from '@suika/geo';
+import {
+  getSweepAngle,
+  type IMatrixArr,
+  type IPoint,
+  rad2Deg,
+} from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { getRotationCursor } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
-import { type IPoint } from '../../type';
 import { type IBaseTool } from '../type';
 
 /**

@@ -1,6 +1,7 @@
 import { arrMap, noop } from '@suika/common';
 import {
   type IMatrixArr,
+  type IPoint,
   type IRect,
   recomputeTransformRect,
   resizeRect,
@@ -11,7 +12,6 @@ import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
 import { type Graph, type GraphAttrs } from '../../graphs';
-import { type IPoint } from '../../type';
 import { type IBaseTool } from '../type';
 
 /**

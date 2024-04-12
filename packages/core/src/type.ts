@@ -1,41 +1,10 @@
-import { type IRect } from '@suika/geo';
-
 import { type GraphAttrs } from './graphs';
 import { type IGroupsData } from './group_manager';
-
-export type IBox = IRect;
-
-export interface IBox2 {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
-
-export interface IBox2WithMid extends IBox2 {
-  midX: number;
-  midY: number;
-}
-
-export interface IBox2WithRotation extends IBox {
-  rotation?: number;
-}
-
-export interface ICircle {
-  x: number;
-  y: number;
-  radius: number;
-}
 
 /**
  * 数组长度必须大于等于 1 的数组
  */
 export type INoEmptyArray<T> = [T, ...T[]];
-
-export interface IPoint {
-  x: number;
-  y: number;
-}
 
 export interface IObject {
   id: string;

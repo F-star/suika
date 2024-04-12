@@ -1,13 +1,12 @@
 import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
+import { type IPoint, isBoxIntersect, rectToBox } from '@suika/geo';
 
 import { type Editor } from './editor';
-import { type IHorizontalLine, type IPoint, type IVerticalLine } from './type';
+import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
-  bboxToBbox2,
   bboxToBboxWithMid,
   drawLine,
   drawXShape,
-  isRectIntersect2,
   pointsToHLines,
   pointsToVLines,
 } from './utils';
@@ -42,14 +41,14 @@ export class RefLine {
     const hRefLineMap = this.hRefLineMap;
 
     const selectIdSet = this.editor.selectedElements.getIdSet();
-    const viewportBbox = this.editor.viewportManager.getBbox2();
+    const viewportBbox = this.editor.viewportManager.getBbox();
     for (const graph of this.editor.sceneGraph.getVisibleItems()) {
       if (selectIdSet.has(graph.attrs.id)) {
         continue;
       }
 
-      const bbox = bboxToBboxWithMid(graph.getBbox2());
-      if (!isRectIntersect2(viewportBbox, bbox)) {
+      const bbox = bboxToBboxWithMid(graph.getBbox());
+      if (!isBoxIntersect(viewportBbox, bbox)) {
         continue;
       }
 
@@ -127,7 +126,7 @@ export class RefLine {
       targetPoints = [...targetGraph.getBboxVerts(), targetGraph.getCenter()];
     } else {
       const targetBbox = bboxToBboxWithMid(
-        bboxToBbox2(this.editor.selectedElements.getBbox()!),
+        rectToBox(this.editor.selectedElements.getBbox()!),
       );
       targetPoints = [
         { x: targetBbox.minX, y: targetBbox.minY },

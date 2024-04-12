@@ -6,13 +6,16 @@ import {
   omit,
 } from '@suika/common';
 import {
+  boxToRect,
   getTransformAngle,
   getTransformedSize,
+  type IBox,
   identityMatrix,
   type IMatrixArr,
-  type IRect,
+  type IPoint,
+  isBoxContain,
+  isBoxIntersect,
   isPointInRect,
-  isRectContain,
   isRectIntersect,
   type ITransformRect,
   rectToVertices,
@@ -25,15 +28,7 @@ import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
 import { DEFAULT_IMAGE, type PaintImage } from '../../paint';
-import {
-  GraphType,
-  type IBox,
-  type IBox2,
-  type IBox2WithRotation,
-  type IObject,
-  type IPoint,
-  type Optional,
-} from '../../type';
+import { GraphType, type IObject, type Optional } from '../../type';
 import { drawRoundRectPath } from '../../utils';
 import { type GraphAttrs, type IGraphOpts } from './graph_attrs';
 
@@ -171,25 +166,13 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     }
 
     return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
+      minX,
+      minY,
+      maxX,
+      maxY,
     };
   }
-  /**
-   * other getBbox with
-   * minX, minY, maxX, maxY style
-   */
-  getBbox2(): Readonly<IBox2> {
-    const bbox = this.getBbox();
-    return {
-      minX: bbox.x,
-      minY: bbox.y,
-      maxX: bbox.x + bbox.width,
-      maxY: bbox.y + bbox.height,
-    };
-  }
+
   getBboxVerts(): IPoint[] {
     const rect = {
       x: 0,
@@ -249,11 +232,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   /**
-   * whether the element intersect with the rect
+   * whether the element intersect with the box
    */
-  intersectWithRect(rect: IRect) {
+  intersectWithBox(box: IBox) {
     let isIntersected = false;
-    if (!isRectIntersect(rect, this.getBbox())) {
+    if (!isBoxIntersect(box, this.getBbox())) {
       isIntersected = false;
     } else {
       const rotate = this.getRotate();
@@ -263,7 +246,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
         // OBB intersect
         // use SAT algorithm to check intersect
         const tf = new Matrix(...this.attrs.transform).invert();
-        const [s1, s2, s3, s4] = rectToVertices(rect, [
+        const [s1, s2, s3, s4] = rectToVertices(boxToRect(box), [
           tf.a,
           tf.b,
           tf.c,
@@ -298,9 +281,9 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   /**
    * whether the element contain with the rect
    */
-  containWithRect(rect: IRect) {
+  containWithBox(box: IBox) {
     const bbox = this.getBbox();
-    return isRectContain(rect, bbox) || isRectContain(bbox, rect);
+    return isBoxContain(box, bbox) || isBoxContain(bbox, box);
   }
 
   updateByControlHandle(
@@ -479,7 +462,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
   dRotate(
     dRotation: number,
-    initAttrs: IBox2WithRotation & { transform: IMatrixArr },
+    initAttrs: { transform: IMatrixArr },
     center: IPoint,
   ) {
     const rotateMatrix = new Matrix()

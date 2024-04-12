@@ -1,8 +1,7 @@
-import { getRectByTwoPoint } from '@suika/geo';
+import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../../editor';
 import { type Graph } from '../../graphs';
-import { type IPoint } from '../../type';
 import { type IBaseTool } from '../type';
 
 /**

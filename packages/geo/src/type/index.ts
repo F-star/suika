@@ -15,7 +15,12 @@ export interface IRect {
   height: number;
 }
 
-export type IBox = IRect;
+export interface IBox {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
 
 export interface ITransformRect {
   width: number;

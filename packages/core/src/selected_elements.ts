@@ -1,11 +1,10 @@
 import { EventEmitter, isSameArray } from '@suika/common';
-import { mergeRect } from '@suika/geo';
+import { boxToRect, type IRect, mergeRect } from '@suika/geo';
 
 import { GroupCmd } from './commands/group';
 import { RemoveGraphsCmd } from './commands/remove_graphs';
 import { type Editor } from './editor';
 import { type Graph } from './graphs';
-import { type IBox } from './type';
 import { getRectCenterPoint } from './utils';
 
 interface Events {
@@ -107,11 +106,11 @@ class SelectedElements {
   isEmpty() {
     return this.items.length === 0;
   }
-  getBbox(): IBox | null {
+  getBbox(): IRect | null {
     if (this.isEmpty()) {
       return null;
     }
-    const rects = this.items.map((element) => element.getBbox());
+    const rects = this.items.map((element) => boxToRect(element.getBbox()));
     return mergeRect(...rects);
   }
   getRotation() {

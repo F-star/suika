@@ -1,7 +1,7 @@
 import { EventEmitter, getDevicePixelRatio } from '@suika/common';
+import { type IBox, type IRect } from '@suika/geo';
 
 import { type Editor } from './editor';
-import { type IBox, type IBox2 } from './type';
 
 interface Events {
   xOrYChange(x: number | undefined, y: number): void;
@@ -13,7 +13,7 @@ export class ViewportManager {
   private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
-  getViewport(): IBox {
+  getViewport(): IRect {
     return {
       x: this.scrollX,
       y: this.scrollY,
@@ -21,7 +21,7 @@ export class ViewportManager {
       height: parseFloat(this.editor.canvasElement.style.height),
     };
   }
-  setViewport({ x, y, width, height }: Partial<IBox>) {
+  setViewport({ x, y, width, height }: Partial<IRect>) {
     const prevX = this.scrollX;
     const prevY = this.scrollY;
     const dpr = getDevicePixelRatio();
@@ -57,17 +57,17 @@ export class ViewportManager {
     this.scrollY += dy;
     this.eventEmitter.emit('xOrYChange', this.scrollX, this.scrollY);
   }
+  // getBbox(): IRect {
+  //   const { x, y, width, height } = this.getViewport();
+  //   const zoom = this.editor.zoomManager.getZoom();
+  //   return {
+  //     x: x,
+  //     y: y,
+  //     width: width / zoom,
+  //     height: height / zoom,
+  //   };
+  // }
   getBbox(): IBox {
-    const { x, y, width, height } = this.getViewport();
-    const zoom = this.editor.zoomManager.getZoom();
-    return {
-      x: x,
-      y: y,
-      width: width / zoom,
-      height: height / zoom,
-    };
-  }
-  getBbox2(): IBox2 {
     const { x, y, width, height } = this.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
     return {

@@ -1,25 +1,6 @@
-import { getSweepAngle, type IRect } from '@suika/geo';
+import { getSweepAngle, type IBox, type IPoint, type IRect } from '@suika/geo';
 
 import { HALF_PI } from '../constant';
-import { type IBox, type IBox2, type IBox2WithMid, type IPoint } from '../type';
-
-export function isRectIntersect2(rect1: IBox2, rect2: IBox2) {
-  return (
-    rect1.minX <= rect2.maxX &&
-    rect1.maxX >= rect2.minX &&
-    rect1.minY <= rect2.maxY &&
-    rect1.maxY >= rect2.minY
-  );
-}
-
-export function isRectContain2(rect1: IBox2, rect2: IBox2) {
-  return (
-    rect1.minX <= rect2.minX &&
-    rect1.minY <= rect2.minY &&
-    rect1.maxX >= rect2.maxX &&
-    rect1.maxY >= rect2.maxY
-  );
-}
 
 /**
  * rect 中心点
@@ -49,16 +30,9 @@ export function getAbsoluteCoords(
   ];
 }
 
-export const bboxToBbox2 = (bbox: IBox): IBox2 => {
-  return {
-    minX: bbox.x,
-    minY: bbox.y,
-    maxX: bbox.x + bbox.width,
-    maxY: bbox.y + bbox.height,
-  };
-};
-
-export const bboxToBboxWithMid = (box: IBox2): IBox2WithMid => {
+export const bboxToBboxWithMid = (
+  box: IBox,
+): IBox & { midX: number; midY: number } => {
   return {
     ...box,
     midX: box.minX / 2 + box.maxX / 2,

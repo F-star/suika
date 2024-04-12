@@ -2,6 +2,7 @@ import { Matrix } from 'pixi.js';
 
 import { transformRotate } from '../transform';
 import {
+  type IBox,
   type IMatrixArr,
   type IPoint,
   type IRect,
@@ -156,6 +157,15 @@ export const isRectIntersect = (rect1: IRect, rect2: IRect) => {
   );
 };
 
+export const isBoxIntersect = (box1: IBox, box2: IBox) => {
+  return (
+    box1.minX <= box2.maxX &&
+    box1.maxX >= box2.minX &&
+    box1.minY <= box2.maxY &&
+    box1.maxY >= box2.minY
+  );
+};
+
 /** whether rect1 contains rect2 */
 export const isRectContain = (rect1: IRect, rect2: IRect) => {
   return (
@@ -163,6 +173,16 @@ export const isRectContain = (rect1: IRect, rect2: IRect) => {
     rect1.y <= rect2.y &&
     rect1.x + rect1.width >= rect2.x + rect2.width &&
     rect1.y + rect1.height >= rect2.y + rect2.height
+  );
+};
+
+/** whether box1 contains box2 */
+export const isBoxContain = (box1: IBox, box2: IBox) => {
+  return (
+    box1.minX <= box2.minX &&
+    box1.minY <= box2.minY &&
+    box1.maxX >= box2.maxX &&
+    box1.maxY >= box2.maxY
   );
 };
 
@@ -308,5 +328,23 @@ export const recomputeTransformRect = (
     width: newSize.width,
     height: newSize.height,
     transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
+  };
+};
+
+export const rectToBox = (rect: IRect): IBox => {
+  return {
+    minX: rect.x,
+    minY: rect.y,
+    maxX: rect.x + rect.width,
+    maxY: rect.y + rect.height,
+  };
+};
+
+export const boxToRect = (box: IBox): IRect => {
+  return {
+    x: box.minX,
+    y: box.minY,
+    width: box.maxX - box.minX,
+    height: box.maxY - box.minY,
   };
 };
