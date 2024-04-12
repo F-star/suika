@@ -7,11 +7,11 @@ import {
   type IHistoryStatus,
   MutateGraphsAndRecord,
 } from '@suika/core';
+import { type IPoint } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { EditorContext } from '../../context';
-import { type IPoint } from '../../type';
 import ContextMenuItem from './components/ContextMenuItem';
 import ContextMenuSep from './components/ContextMenuSep';
 

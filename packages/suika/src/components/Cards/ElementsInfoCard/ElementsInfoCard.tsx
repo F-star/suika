@@ -1,13 +1,12 @@
 import './style.scss';
 
 import { remainDecimal } from '@suika/common';
-import { MutateGraphsAndRecord } from '@suika/core';
+import { GraphType, MutateGraphsAndRecord } from '@suika/core';
 import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';
-import { GraphType } from '../../../type';
 import NumberInput from '../../input/NumberInput';
 import { BaseCard } from '../BaseCard';
 

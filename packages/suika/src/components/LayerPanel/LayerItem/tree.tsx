@@ -1,6 +1,6 @@
+import { type IObject } from '@suika/core';
 import { type FC } from 'react';
 
-import { type IObject } from '../../../type';
 import LayerItem from './LayerItem';
 import { type IBaseEvents } from './type';
 

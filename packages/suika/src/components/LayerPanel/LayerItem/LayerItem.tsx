@@ -1,5 +1,6 @@
 import './LayerItem.scss';
 
+import { type IObject } from '@suika/core';
 import {
   HideOutlined,
   LockFilled,
@@ -9,7 +10,6 @@ import {
 import classNames from 'classnames';
 import { type FC, useEffect, useRef, useState } from 'react';
 
-import { type IObject } from '../../../type';
 import { type IBaseEvents } from './type';
 
 interface IProps extends IBaseEvents {
