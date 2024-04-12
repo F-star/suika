@@ -1,11 +1,11 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { isPointInRoundRect } from '@suika/geo';
+import { boxToRect, type IPoint, isPointInRoundRect } from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
-import { GraphType, type IPoint, type Optional } from '../type';
+import { GraphType, type Optional } from '../type';
 import { Ellipse } from './ellipse';
 import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
 
@@ -318,7 +318,7 @@ export class Rect extends Graph<RectAttrs> {
    * wip
    */
   toSVG() {
-    const container = this.getBboxWithStroke();
+    const container = boxToRect(this.getBboxWithStroke());
     const center = this.getCenter();
     const offsetX = container.width / 2 - center.x;
     const offsetY = container.height / 2 - center.y;

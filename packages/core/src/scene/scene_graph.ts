@@ -4,7 +4,7 @@ import {
   forEach,
   getDevicePixelRatio,
 } from '@suika/common';
-import { type IPoint, type IRect, isRectIntersect } from '@suika/geo';
+import { type IPoint, type IRect, isBoxIntersect, rectToBox } from '@suika/geo';
 
 import { type Editor } from '../editor';
 import {
@@ -108,7 +108,7 @@ export class SceneGraph {
     // 1. 找出视口下所有元素
     // 暂时都认为是矩形
     for (const graph of visibleGraphs) {
-      if (isRectIntersect(graph.getBboxWithStroke(), viewportBoxInScene)) {
+      if (isBoxIntersect(graph.getBboxWithStroke(), viewportBoxInScene)) {
         visibleGraphsInViewport.push(graph);
       }
     }
@@ -367,15 +367,16 @@ export class SceneGraph {
     const elements = this.getVisibleItems();
     const containedElements: Graph[] = [];
     // TODO: optimize, use r-tree to reduce time complexity
+    const selectionBox = rectToBox(selection);
     for (const el of elements) {
       if (el.getLock()) {
         continue;
       }
       let isSelected = false;
       if (selectionMode === 'contain') {
-        isSelected = el.containWithRect(selection);
+        isSelected = el.containWithBox(selectionBox);
       } else {
-        isSelected = el.intersectWithRect(selection);
+        isSelected = el.intersectWithBox(selectionBox);
       }
       if (isSelected) {
         containedElements.push(el);

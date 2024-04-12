@@ -303,14 +303,14 @@ export class ControlHandleManager {
       rect.x + rect.width,
       rect.y + rect.height,
     );
-    rect = {
-      x: leftTop.x,
-      y: leftTop.y,
-      width: bottomRight.x - leftTop.x,
-      height: bottomRight.y - leftTop.y,
+    const box = {
+      minX: leftTop.x,
+      minY: leftTop.y,
+      maxX: bottomRight.x,
+      maxY: bottomRight.y,
     };
     return this.customHandles.filter((handle) =>
-      handle.graph.intersectWithRect(rect),
+      handle.graph.intersectWithBox(box),
     );
   }
 

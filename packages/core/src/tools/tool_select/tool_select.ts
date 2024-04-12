@@ -1,9 +1,10 @@
 import { throttle } from '@suika/common';
+import { type IPoint } from '@suika/geo';
 
 import { type ICursor, isRotationCursor } from '../../cursor_manager';
 import { type Editor } from '../../editor';
 import { type Graph, type Path } from '../../graphs';
-import { GraphType, type IPoint } from '../../type';
+import { GraphType } from '../../type';
 import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectResizeTool } from './tool_select_resize';

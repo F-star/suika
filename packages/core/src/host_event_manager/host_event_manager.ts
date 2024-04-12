@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
+import { type IPoint } from '@suika/geo';
 
 import { type Editor } from '../editor';
-import { type IPoint } from '../type';
 import { CommandKeyBinding } from './command_key_binding';
 import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
 
