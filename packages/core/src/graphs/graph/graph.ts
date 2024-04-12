@@ -40,6 +40,7 @@ import { type GraphAttrs, type IGraphOpts } from './graph_attrs';
 export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   type = GraphType.Graph;
   attrs: ATTRS;
+  protected _cacheBboxWithStroke: Readonly<IBox> | null = null;
   protected _cacheBbox: Readonly<IBox> | null = null;
 
   constructor(
@@ -87,6 +88,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     // 目前是后者会覆盖前者
     if (this.shouldUpdateBbox(partialAttrs)) {
       this._cacheBbox = null;
+      this._cacheBboxWithStroke = null;
     }
     if (!partialAttrs.transform) {
       if (partialAttrs.x !== undefined) {
@@ -111,27 +113,44 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return this.attrs.strokeWidth ?? 0;
   }
 
+  getBboxWithStroke() {
+    if (this._cacheBboxWithStroke) {
+      return this._cacheBboxWithStroke;
+    }
+    const bbox = this._calcBbox(this.getStrokeWidth() / 2);
+    this._cacheBboxWithStroke = bbox;
+    return bbox;
+  }
+
+  getBbox(): Readonly<IBox> {
+    if (this._cacheBbox) {
+      return this._cacheBbox;
+    }
+    const bbox = this._calcBbox();
+    this._cacheBbox = bbox;
+    return bbox;
+  }
+
   /**
    * AABB (axis-aligned bounding box), without considering strokeWidth)
    * Consider rotation (orthogonal bounding box after rotation)
    */
-  getBbox(opt?: { includeStroke?: boolean }): Readonly<IBox> {
-    if (this._cacheBbox) {
-      return this._cacheBbox;
-    }
-
+  private _calcBbox(padding?: number): Readonly<IBox> {
+    let x = 0;
+    let y = 0;
     let width = this.attrs.width;
     let height = this.attrs.height;
-    if (opt?.includeStroke) {
-      const strokeWidth = this.getStrokeWidth() / 2;
-      width += strokeWidth;
-      height += strokeWidth;
+    if (padding) {
+      x -= padding;
+      y -= padding;
+      width += padding * 2;
+      height += padding * 2;
     }
 
     const tf = new Matrix(...this.attrs.transform);
     const vertices = rectToVertices({
-      x: 0,
-      y: 0,
+      x,
+      y,
       width,
       height,
     }).map((item) => {
@@ -151,13 +170,12 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       maxY = Math.max(maxY, vertex.y);
     }
 
-    this._cacheBbox = {
+    return {
       x: minX,
       y: minY,
       width: maxX - minX,
       height: maxY - minY,
     };
-    return { ...this._cacheBbox };
   }
   /**
    * other getBbox with

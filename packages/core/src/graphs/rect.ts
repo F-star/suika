@@ -1,5 +1,5 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { isPointInRoundRect, offsetRect } from '@suika/geo';
+import { isPointInRoundRect } from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
 import { ControlHandle } from '../control_handle_manager';
@@ -318,14 +318,20 @@ export class Rect extends Graph<RectAttrs> {
    * wip
    */
   toSVG() {
-    const rect = offsetRect(this.getBBox(), (this.attrs.strokeWidth ?? 0) / 2);
-    const svgHead = `<svg width="${rect.width}" height="${rect.height}" viewBox="0 0 ${rect.width} ${rect.height}" fill="none" xmlns="http://www.w3.org/2000/svg">`;
+    const container = this.getBboxWithStroke();
+    const center = this.getCenter();
+    const offsetX = container.width / 2 - center.x;
+    const offsetY = container.height / 2 - center.y;
+    const tf = [...this.attrs.transform];
+    tf[4] += offsetX;
+    tf[5] += offsetY;
+    const matrixStr = tf.join(' ');
+
+    const svgHead = `<svg width="${container.width}" height="${container.height}" viewBox="0 0 ${container.width} ${container.height}" fill="none" xmlns="http://www.w3.org/2000/svg"><br>`;
     const content = `<rect width="${this.attrs.width}" height="${
       this.attrs.height
-    }" transform="matrix(${this.attrs.transform.join(
-      ' ',
-    )})" fill="#D9D9D9" stroke="black" stroke-width="10"></rect>`;
+    }" transform="matrix(${matrixStr})" fill="#D9D9D9" stroke="black" stroke-width="${this.getStrokeWidth()}"></rect>`;
     const svgTail = `</svg>`;
-    return svgHead + content + svgTail;
+    return svgHead + '\n' + content + '\n' + svgTail;
   }
 }

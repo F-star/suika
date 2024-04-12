@@ -107,11 +107,8 @@ export class SceneGraph {
     const visibleGraphsInViewport: Graph[] = [];
     // 1. 找出视口下所有元素
     // 暂时都认为是矩形
-    const bboxOpts = {
-      includeStroke: true,
-    };
     for (const graph of visibleGraphs) {
-      if (isRectIntersect(graph.getBbox(bboxOpts), viewportBoxInScene)) {
+      if (isRectIntersect(graph.getBboxWithStroke(), viewportBoxInScene)) {
         visibleGraphsInViewport.push(graph);
       }
     }
