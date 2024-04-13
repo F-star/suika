@@ -1,1 +1,3 @@
-Common
+@suika/common
+
+Common Utils

@@ -1,1 +1,3 @@
+@suika/core
+
 editor core
