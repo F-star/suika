@@ -1,5 +1,6 @@
 import { ArrangeType } from '../commands/arrange';
 import { type Editor } from '../editor';
+import { Path } from '../graphs';
 import { arrangeAndRecord, MutateGraphsAndRecord } from '../service';
 
 export class CommandKeyBinding {
@@ -282,6 +283,25 @@ export class CommandKeyBinding {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Lock/Unlock',
       action: lockOrUnlockAction,
+    });
+
+    /******** enter path edit *******/
+    const enterPathEdit = () => {
+      if (
+        !editor.pathEditor.isActive() &&
+        editor.selectedElements.size() === 1
+      ) {
+        const graph = editor.selectedElements.getItems()[0];
+        if (graph instanceof Path) {
+          editor.pathEditor.active(graph);
+        }
+      }
+    };
+    editor.keybindingManager.register({
+      key: { keyCode: 'Enter' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'EnterPathEdit',
+      action: enterPathEdit,
     });
   }
 
