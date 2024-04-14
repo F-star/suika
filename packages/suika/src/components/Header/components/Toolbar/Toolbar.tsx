@@ -77,7 +77,7 @@ export const ToolBar = () => {
     },
     pathSelect: {
       name: 'pathSelect',
-      hotkey: 'X',
+      hotkey: 'V',
       intlId: 'tool.select',
       icon: <SelectOutlined />,
     },
