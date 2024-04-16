@@ -132,7 +132,7 @@ export class DrawPathTool implements ITool {
 
       // TODO: 应该改为判断是否选中了 path 的末尾 anchor
       // 如果是，则继续绘制。
-      if (pathEditor.getSelectedIndicesSize() === 0) {
+      if (pathEditor.selectedControl.getSize() === 0) {
         this.pathIdx = path.getPathItemCount();
       }
 
@@ -156,7 +156,7 @@ export class DrawPathTool implements ITool {
 
     const lastSegIdx = this.path!.getSegCount(this.pathIdx) - 1;
     const selectSegIdx = this.checkPathItemClosed() ? 0 : lastSegIdx;
-    pathEditor.setSelectedIndices([
+    pathEditor.selectedControl.setItems([
       {
         type: 'anchor',
         pathIdx: this.pathIdx,
@@ -206,7 +206,7 @@ export class DrawPathTool implements ITool {
   onEnd() {
     // TODO: 如果是 closed，结束当前 path 的绘制
     if (this.checkPathItemClosed()) {
-      this.editor.pathEditor.setSelectedIndices([]);
+      this.editor.pathEditor.selectedControl.setItems([]);
     }
     const path = this.path!;
     path.updateAttrs({ pathData: path.attrs.pathData });
@@ -295,7 +295,7 @@ export class DrawPathTool implements ITool {
   private updateControlHandlesWithPreviewHandles(point: IPoint) {
     const previewHandles: ControlHandle[] = [];
 
-    if (this.editor.pathEditor.getSelectedIndicesSize() > 0) {
+    if (this.editor.pathEditor.selectedControl.getSize() > 0) {
       const path = this.path;
       if (!path) return;
       const lastSeg = path.getLastSeg(this.pathIdx, {

@@ -27,9 +27,10 @@ export class DrawPathSelectionTool implements IBaseTool {
 
     if (this.editor.hostEventManager.isShiftPressing) {
       this.isShiftPressingWhenStart = true;
-      this.startSelectedIdxInfo = this.editor.pathEditor.getSelectedIndices();
+      this.startSelectedIdxInfo =
+        this.editor.pathEditor.selectedControl.getItems();
     } else {
-      this.editor.pathEditor.clearSelectedIndices();
+      this.editor.pathEditor.selectedControl.clear();
       this.editor.pathEditor.updateControlHandles();
     }
 
@@ -59,13 +60,13 @@ export class DrawPathSelectionTool implements IBaseTool {
       });
 
     if (this.isShiftPressingWhenStart) {
-      this.editor.pathEditor.setSelectedIndices([
+      this.editor.pathEditor.selectedControl.setItems([
         ...this.startSelectedIdxInfo,
         ...info,
       ]);
       this.editor.pathEditor.updateControlHandles();
     } else {
-      this.editor.pathEditor.setSelectedIndices(info);
+      this.editor.pathEditor.selectedControl.setItems(info);
       this.editor.pathEditor.updateControlHandles();
     }
 

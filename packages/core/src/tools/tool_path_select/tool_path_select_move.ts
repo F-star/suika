@@ -56,13 +56,13 @@ export class PathSelectMoveTool implements ITool {
 
       // 判断是否已经选中
       if (
-        pathEditor.containsSelectedIndex(
+        pathEditor.selectedControl.contains(
           hitAnchor.type,
           hitAnchor.pathIdx,
           hitAnchor.segIdx,
         )
       ) {
-        this.indiesInfo = pathEditor.getSelectedIndices();
+        this.indiesInfo = pathEditor.selectedControl.getItems();
       } else {
         this.indiesInfo = [hitAnchor];
       }
@@ -74,7 +74,7 @@ export class PathSelectMoveTool implements ITool {
             .getSeg(pathIdx, segIdx, { applyTransform: true })!.point,
       );
 
-      pathEditor.setSelectedIndices(this.indiesInfo);
+      pathEditor.selectedControl.setItems(this.indiesInfo);
       pathEditor.updateControlHandles();
       this.editor.render();
     }
