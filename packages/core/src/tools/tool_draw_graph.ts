@@ -164,8 +164,16 @@ export abstract class DrawGraphTool implements ITool {
 
     const { x: startX, y: startY } = this.startPoint;
 
-    const width = x - startX;
-    const height = y - startY;
+    let width = x - startX;
+    let height = y - startY;
+    if (width === 0) {
+      const sign = Math.sign(this.lastMousePoint.x - this.startPoint.x) || 1;
+      width = sign * 1;
+    }
+    if (height === 0) {
+      const sign = Math.sign(this.lastMousePoint.y - this.startPoint.y) || 1;
+      height = sign * 1;
+    }
 
     let rect = {
       x: startX,
