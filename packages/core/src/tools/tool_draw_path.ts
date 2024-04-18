@@ -120,6 +120,11 @@ export class DrawPathTool implements ITool {
       );
       this.editor.selectedElements.setItems([path]);
 
+      this.prevAttrs = cloneDeep({
+        transform: path.attrs.transform,
+        pathData: path.attrs.pathData,
+      });
+
       pathEditor.active(path);
     }
     // add new anchor
