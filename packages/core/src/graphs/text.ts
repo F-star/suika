@@ -40,6 +40,10 @@ export class TextGraph extends Graph<TextAttrs> {
     }
   }
 
+  override updateAttrs(partialAttrs: Partial<TextAttrs> & IGraphOpts) {
+    super.updateAttrs(partialAttrs);
+  }
+
   override draw(ctx: CanvasRenderingContext2D) {
     const { transform, fill, stroke, fontSize, content } = this.attrs;
     ctx.transform(...transform);
