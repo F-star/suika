@@ -108,7 +108,10 @@ export class SceneGraph {
     // 1. 找出视口下所有元素
     // 暂时都认为是矩形
     for (const graph of visibleGraphs) {
-      if (isBoxIntersect(graph.getBboxWithStroke(), viewportBoxInScene)) {
+      if (
+        isBoxIntersect(graph.getBboxWithStroke(), viewportBoxInScene) &&
+        !graph.noRender
+      ) {
         visibleGraphsInViewport.push(graph);
       }
     }

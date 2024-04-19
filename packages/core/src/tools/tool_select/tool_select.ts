@@ -3,8 +3,7 @@ import { type IPoint } from '@suika/geo';
 
 import { type ICursor, isRotationCursor } from '../../cursor_manager';
 import { type Editor } from '../../editor';
-import { type Graph, type Path } from '../../graphs';
-import { GraphType } from '../../type';
+import { type Graph, Path, TextGraph } from '../../graphs';
 import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectResizeTool } from './tool_select_resize';
@@ -60,8 +59,10 @@ export class SelectTool implements ITool {
     const topHitElement = editor.sceneGraph.getTopHitElement(point);
     if (!topHitElement) return;
 
-    if (topHitElement.type === GraphType.Path) {
-      editor.pathEditor.active(topHitElement as Path);
+    if (topHitElement instanceof Path) {
+      editor.pathEditor.active(topHitElement);
+    } else if (topHitElement instanceof TextGraph) {
+      editor.textEditor.active({ textGraph: topHitElement });
     }
   };
 

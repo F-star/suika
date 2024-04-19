@@ -120,7 +120,7 @@ export class ToolManager {
         startWithLeftMouse = false;
         if (
           e.button !== 0 || // is not left mouse
-          this.editor.textEditor.isEditing() || // is editing text mode
+          this.editor.textEditor.isActive() || // is editing text mode
           this.editor.hostEventManager.isSpacePressing // is dragging canvas mode
         ) {
           return;

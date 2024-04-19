@@ -37,6 +37,8 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   attrs: ATTRS;
   protected _cacheBboxWithStroke: Readonly<IBox> | null = null;
   protected _cacheBbox: Readonly<IBox> | null = null;
+  /** hide graph temporarily, it's possible that attrs.visible is true */
+  noRender = false;
 
   constructor(
     attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
