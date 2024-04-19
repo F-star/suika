@@ -178,9 +178,9 @@ export class ZoomManager {
    * adjust scroll value
    * if no set (cx, cy), scale by canvas center
    */
-  adjustScroll(prevZoom: number, center?: IPoint) {
+  private adjustScroll(prevZoom: number, center?: IPoint) {
     const viewportManager = this.editor.viewportManager;
-    const zoom = this.editor.zoomManager.getZoom();
+    const zoom = this.zoom;
 
     const { x: scrollX, y: scrollY } = viewportManager.getViewport();
 
