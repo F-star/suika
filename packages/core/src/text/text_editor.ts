@@ -19,6 +19,52 @@ export class TextEditor {
     this.bindEvent();
     editor.containerElement.appendChild(this.textarea);
   }
+
+  active(params: { textGraph?: TextGraph; pos?: IPoint }) {
+    const { textGraph, pos } = params;
+    if (textGraph) {
+      this.textGraph = textGraph;
+      const viewportPos = this.editor.sceneCoordsToViewport(
+        textGraph.getX(),
+        textGraph.getY(),
+      );
+      this.x = viewportPos.x;
+      this.y = viewportPos.y;
+    } else if (pos) {
+      this.x = pos.x;
+      this.y = pos.y;
+    } else {
+      console.error('invalid params', params);
+      return;
+    }
+
+    this.editor.controlHandleManager.enableTransformControl = false;
+
+    let content = '';
+    if (textGraph) {
+      textGraph.noRender = true;
+      this.textGraph = textGraph;
+      content = textGraph.attrs.content;
+    }
+
+    const zoom = this.editor.zoomManager.getZoom();
+    const fontSize = this.editor.setting.get('defaultFontSize') * zoom;
+    this.initTextarea(fontSize, content);
+  }
+
+  inactive() {
+    if (this.editor.controlHandleManager) {
+      this.editor.controlHandleManager.enableTransformControl = true;
+    }
+
+    this.textarea.style.display = 'none';
+    this.textarea.value = '';
+    if (this.textGraph) {
+      this.textGraph.noRender = false;
+      this.textGraph = null;
+    }
+  }
+
   private setStyle() {
     const styles = {
       background: 'transparent',
@@ -106,37 +152,6 @@ export class TextEditor {
     );
   }
 
-  active(params: { textGraph?: TextGraph; pos?: IPoint }) {
-    const { textGraph, pos } = params;
-    if (textGraph) {
-      this.textGraph = textGraph;
-      const viewportPos = this.editor.sceneCoordsToViewport(
-        textGraph.getX(),
-        textGraph.getY(),
-      );
-      this.x = viewportPos.x;
-      this.y = viewportPos.y;
-    } else if (pos) {
-      this.x = pos.x;
-      this.y = pos.y;
-    } else {
-      console.error('invalid params', params);
-      return;
-    }
-
-    let content = '';
-    if (textGraph) {
-      // TODO: hide resize control handle
-      textGraph.noRender = true;
-      this.textGraph = textGraph;
-      content = textGraph.attrs.content;
-    }
-
-    const zoom = this.editor.zoomManager.getZoom();
-    const fontSize = this.editor.setting.get('defaultFontSize') * zoom;
-    this.initTextarea(fontSize, content);
-  }
-
   private initTextarea(fontSize: number, content: string) {
     const textarea = this.textarea;
 
@@ -155,14 +170,6 @@ export class TextEditor {
     textarea.focus();
   }
 
-  inactive() {
-    this.textarea.style.display = 'none';
-    this.textarea.value = '';
-    if (this.textGraph) {
-      this.textGraph.noRender = false;
-      this.textGraph = null;
-    }
-  }
   isActive() {
     return this.textarea.style.display !== 'none';
   }

@@ -48,6 +48,7 @@ export class PathEditor {
     const editor = this.editor;
     editor.sceneGraph.showSelectedGraphsOutline = false;
     editor.sceneGraph.highlightLayersOnHover = false;
+    editor.controlHandleManager.enableTransformControl = false;
 
     this.unbindHotkeys();
     this.bindHotkeys();
@@ -81,6 +82,7 @@ export class PathEditor {
     const editor = this.editor;
     editor.sceneGraph.showSelectedGraphsOutline = true;
     editor.sceneGraph.highlightLayersOnHover = true;
+    editor.controlHandleManager.enableTransformControl = true;
 
     this.unbindHotkeys();
     editor.toolManager.setEnableHotKeyTools(this.prevToolKeys);

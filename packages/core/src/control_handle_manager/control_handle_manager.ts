@@ -36,11 +36,12 @@ const types = [
  * Control Point Handle
  */
 export class ControlHandleManager {
-  private transformHandlesVisible = false;
   private transformHandles: Map<ITransformHandleType, ControlHandle>;
 
   private customHandlesVisible = false;
   private customHandles: ControlHandle[] = [];
+  private selectedBoxRect: ITransformRect | null = null;
+  enableTransformControl = true;
 
   constructor(private editor: Editor) {
     const setting = editor.setting;
@@ -88,13 +89,7 @@ export class ControlHandleManager {
     this.editor.commandManager.off('change', this.onHoverItemChange);
   }
 
-  private updateTransformHandles(rect: ITransformRect | null) {
-    if (!rect || this.editor.pathEditor.isActive()) {
-      this.transformHandlesVisible = false;
-      return;
-    }
-    this.transformHandlesVisible = true;
-
+  private updateTransformHandles(rect: ITransformRect) {
     const zoom = this.editor.zoomManager.getZoom();
     const handleSize = this.editor.setting.get('handleSize');
     const handleStrokeWidth = this.editor.setting.get('handleStrokeWidth');
@@ -195,9 +190,12 @@ export class ControlHandleManager {
   }
 
   draw(rect: ITransformRect | null) {
-    this.updateTransformHandles(rect);
+    this.selectedBoxRect = rect;
+    if (rect) {
+      this.updateTransformHandles(rect);
+    }
     const handles: ControlHandle[] = [];
-    if (this.transformHandlesVisible) {
+    if (this.shouldRenderTransformControl()) {
       handles.push(...Array.from(this.transformHandles.values()));
     }
     if (this.customHandlesVisible) {
@@ -247,7 +245,7 @@ export class ControlHandleManager {
     cursor: ICursor;
   } | null {
     const handles: ControlHandle[] = [];
-    if (this.transformHandlesVisible) {
+    if (this.shouldRenderTransformControl()) {
       handles.push(...Array.from(this.transformHandles.values()));
     }
     if (this.customHandlesVisible) {
@@ -291,6 +289,10 @@ export class ControlHandleManager {
     }
 
     return null;
+  }
+
+  private shouldRenderTransformControl() {
+    return this.selectedBoxRect && this.enableTransformControl;
   }
 
   setCustomHandles(handles: ControlHandle[]) {
