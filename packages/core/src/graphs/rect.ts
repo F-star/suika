@@ -327,7 +327,7 @@ export class Rect extends Graph<RectAttrs> {
     tf[5] += offsetY;
     const matrixStr = tf.join(' ');
 
-    const svgHead = `<svg width="${container.width}" height="${container.height}" viewBox="0 0 ${container.width} ${container.height}" fill="none" xmlns="http://www.w3.org/2000/svg"><br>`;
+    const svgHead = `<svg width="${container.width}" height="${container.height}" viewBox="0 0 ${container.width} ${container.height}" fill="none" xmlns="http://www.w3.org/2000/svg">`;
     const content = `<rect width="${this.attrs.width}" height="${
       this.attrs.height
     }" transform="matrix(${matrixStr})" fill="#D9D9D9" stroke="black" stroke-width="${this.getStrokeWidth()}"></rect>`;
