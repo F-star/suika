@@ -35,13 +35,13 @@ The target output folder is `packages/suika/build`.
 
 ## Editor core design
 
-编辑器内核的类结构设计：
+[编辑器内核的类结构设计](https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap)
 
-https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap
+[编辑器功能清单](https://f5b8b9lm1y.feishu.cn/mindnotes/ORJabmf7qmYHxqnjtIBcOkhGnNf#mindmap)
 
 ## Chat
 
-建了个图形编辑器交流的 **微信群**。
+建了个图形编辑器交流的**微信群**。
 
 如果你是做图形编辑器开发或是感兴趣的，可以加我微信 frstars，备注 “图形群”，我拉你进群。
 
