@@ -29,7 +29,11 @@ export class ClipboardManager {
     const pasteHandler = (e: Event) => {
       const event = e as ClipboardEvent;
       const clipboardData = event.clipboardData;
-      if (!clipboardData) {
+      if (
+        !clipboardData ||
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
         return;
       }
       const pastedData = clipboardData.getData('Text');
@@ -104,6 +108,7 @@ export class ClipboardManager {
     if (
       !(
         pastedData &&
+        typeof pastedData === 'object' &&
         pastedData.appVersion.startsWith('suika-editor') &&
         pastedData.data
       )
