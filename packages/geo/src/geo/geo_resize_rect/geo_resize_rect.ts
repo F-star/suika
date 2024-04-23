@@ -164,6 +164,7 @@ export const resizeRect = (
   if (scaleFromCenter) {
     size = resizeOp.getSizeWhenScaleFromCenter(size.width, size.height);
   }
+
   if (keepRatio) {
     const ratio = rect.width / rect.height;
     const newRatio = Math.abs(size.width / size.height);
@@ -174,23 +175,22 @@ export const resizeRect = (
       size.width = Math.sign(size.width) * Math.abs(size.height) * ratio;
     }
   }
-  newRect.width = Math.abs(size.width);
-  newRect.height = Math.abs(size.height);
-  const scaleX = Math.sign(size.width) || 1;
-  const scaleY = Math.sign(size.height) || 1;
-  const scaleTransform = new Matrix().scale(scaleX, scaleY);
 
-  newRect.transform = newRect.transform.append(scaleTransform);
+  const scaleTf = new Matrix();
 
   if (options.noChangeWidthAndHeight) {
-    // FIXME: consider case when width or height is 0
-    newRect.transform.scale(
-      newRect.width / rect.width,
-      newRect.height / rect.height,
-    );
+    scaleTf.scale(size.width / rect.width, size.height / rect.height);
     newRect.width = rect.width;
     newRect.height = rect.height;
+  } else {
+    newRect.width = Math.abs(size.width);
+    newRect.height = Math.abs(size.height);
+    const scaleX = Math.sign(size.width) || 1;
+    const scaleY = Math.sign(size.height) || 1;
+    scaleTf.scale(scaleX, scaleY);
   }
+
+  newRect.transform = newRect.transform.append(scaleTf);
 
   const newGlobalOrigin = newRect.transform.apply(
     scaleFromCenter
@@ -202,7 +202,7 @@ export const resizeRect = (
     x: globalOrigin.x - newGlobalOrigin.x,
     y: globalOrigin.y - newGlobalOrigin.y,
   };
-  newRect.transform.translate(offset.x, offset.y);
+  newRect.transform.prepend(new Matrix().translate(offset.x, offset.y));
 
   return {
     width: newRect.width,
