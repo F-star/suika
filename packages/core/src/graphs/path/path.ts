@@ -1,4 +1,9 @@
-import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import {
+  calcCoverScale,
+  cloneDeep,
+  parseHexToRGBA,
+  parseRGBAStr,
+} from '@suika/common';
 import {
   addPoint,
   type IMatrixArr,
@@ -9,7 +14,7 @@ import {
   resizeRect,
 } from '@suika/geo';
 import { Bezier } from 'bezier-js';
-import { Matrix } from 'pixi.js';
+import { Assets, Container, Graphics, Matrix, Sprite } from 'pixi.js';
 
 import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
@@ -181,11 +186,122 @@ export class Path extends Graph<PathAttrs> {
     return pathData;
   }
 
+  override drawByPixi() {
+    if (!this.graphics) {
+      this.graphics = new Container();
+    }
+
+    const imgUrlSet = this.getImgUrlSet();
+
+    const _draw = () => {
+      const graphics = this.graphics;
+      if (!graphics) return;
+
+      // reset
+      graphics.removeChildren();
+      graphics.mask = null;
+
+      const attrs = this.attrs;
+      graphics.visible = attrs.visible ?? true;
+      graphics.setFromMatrix(new Matrix(...attrs.transform));
+
+      const fillContainer = new Container();
+      graphics.addChild(fillContainer);
+
+      const pathGraphics = new Graphics();
+      for (const pathItem of attrs.pathData) {
+        const first = pathItem.segs[0];
+        if (!first) continue;
+        pathGraphics.moveTo(first.point.x, first.point.y);
+
+        const segs = pathItem.segs;
+        for (let i = 1; i <= segs.length; i++) {
+          if (i === segs.length && !pathItem.closed) {
+            continue;
+          }
+          const currSeg = segs[i % segs.length];
+          const prevSeg = segs[i - 1];
+          const pointX = currSeg.point.x;
+          const pointY = currSeg.point.y;
+          const handle1 = Path.getHandleOut(prevSeg);
+          const handle2 = Path.getHandleIn(currSeg);
+          if (!handle1 && !handle2) {
+            pathGraphics.lineTo(pointX, pointY);
+          } else {
+            pathGraphics.bezierCurveTo(
+              handle1.x,
+              handle1.y,
+              handle2.x,
+              handle2.y,
+              pointX,
+              pointY,
+            );
+          }
+        }
+        if (pathItem.closed) {
+          pathGraphics.closePath();
+        }
+      }
+
+      // mask
+      if (imgUrlSet.size) {
+        const mask = pathGraphics.clone(true).fill();
+        fillContainer.addChild(mask);
+        fillContainer.mask = mask;
+      }
+
+      // fill
+      for (const paint of this.attrs.fill ?? []) {
+        if (paint.type === PaintType.Solid) {
+          const solidGraphics = pathGraphics.clone(true).fill(paint.attrs);
+          fillContainer.addChild(solidGraphics);
+        } else if (paint.type === PaintType.Image) {
+          const sprite = Sprite.from(paint.attrs.src!);
+
+          const img = sprite.texture.source;
+          const scale = calcCoverScale(
+            img.width,
+            img.height,
+            attrs.width,
+            attrs.height,
+          );
+          const sx = (img.width * scale) / 2 - attrs.width / 2;
+          const sy = (img.height * scale) / 2 - attrs.height / 2;
+
+          sprite.x = -sx;
+          sprite.y = -sy;
+          sprite.width = img.width * scale;
+          sprite.height = img.height * scale;
+
+          fillContainer.addChild(sprite);
+        }
+      }
+
+      // stroke
+      const strokeWidth = this.getStrokeWidth();
+      for (const paint of this.attrs.stroke ?? []) {
+        if (paint.type === PaintType.Solid) {
+          const solidGraphics = pathGraphics
+            .clone(true)
+            .stroke({ width: strokeWidth, color: paint.attrs });
+          graphics.addChild(solidGraphics);
+        }
+      }
+    };
+
+    if (imgUrlSet.size) {
+      Assets.load(Array.from(imgUrlSet)).then(_draw);
+    } else {
+      _draw();
+    }
+  }
+
   override draw(
     ctx: CanvasRenderingContext2D,
     imgManager?: ImgManager | undefined,
     smooth?: boolean | undefined,
   ) {
+    this.drawByPixi();
     this._realDraw(ctx, imgManager, smooth);
   }
 

@@ -5,6 +5,7 @@ import {
   type ITransformRect,
   rectToVertices,
 } from '@suika/geo';
+import { Graphics } from 'pixi.js';
 
 import { type Editor } from './editor';
 
@@ -13,11 +14,18 @@ interface Events {
 }
 
 export class SelectedBox {
+  private graphics: Graphics = new Graphics();
   private box: ITransformRect | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private _hover = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: Editor) {
+    this.bindEvent();
+  }
+
+  getGraphics() {
+    return this.graphics;
+  }
 
   isHover() {
     return this._hover;
@@ -27,7 +35,7 @@ export class SelectedBox {
     return this.box ? { ...this.box } : null;
   }
 
-  updateBbox() {
+  updateBox() {
     const selectedElements = this.editor.selectedElements;
 
     const count = selectedElements.size();
@@ -55,17 +63,33 @@ export class SelectedBox {
     return this.box;
   }
 
-  draw() {
+  private bindEvent() {
+    this.editor.selectedElements.on('itemsChange', this.updateBoxAndDraw);
+    this.editor.viewportManager.on('xOrYChange', this.updateBoxAndDraw);
+  }
+
+  private unbindEvent() {
+    this.editor.selectedElements.off('itemsChange', this.updateBoxAndDraw);
+    this.editor.viewportManager.off('xOrYChange', this.updateBoxAndDraw);
+  }
+
+  clear() {
+    this.graphics.clear();
+  }
+
+  visible(val: boolean) {
+    this.graphics.visible = val;
+  }
+
+  updateBoxAndDraw = () => {
+    this.updateBox();
+    this.graphics.clear();
+
+    // 绘制选中框
     const bbox = this.box;
     if (!bbox) {
       return;
     }
-
-    const ctx = this.editor.ctx;
-    const stroke = this.editor.setting.get('guideBBoxStroke');
-
-    ctx.save();
-    ctx.strokeStyle = stroke;
 
     const polygon = rectToVertices(
       {
@@ -76,17 +100,16 @@ export class SelectedBox {
       },
       bbox.transform,
     ).map((pt) => this.editor.sceneCoordsToViewport(pt.x, pt.y));
-
-    ctx.beginPath();
-    ctx.moveTo(polygon[0].x, polygon[0].y);
+    this.graphics.moveTo(polygon[0].x, polygon[0].y);
     for (let i = 1; i < polygon.length; i++) {
-      ctx.lineTo(polygon[i].x, polygon[i].y);
+      this.graphics.lineTo(polygon[i].x, polygon[i].y);
     }
-    ctx.closePath();
-    ctx.stroke();
-
-    ctx.restore();
-  }
+    this.graphics.closePath();
+    this.graphics.stroke({
+      color: this.editor.setting.get('selectedBoxStroke'),
+      width: this.editor.setting.get('selectedBoxStrokeWidth'),
+    });
+  };
 
   /** check if the point is in the selected box */
   hitTest(point: IPoint) {
@@ -120,5 +143,9 @@ export class SelectedBox {
 
   off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
+  }
+
+  destroy() {
+    this.unbindEvent();
   }
 }

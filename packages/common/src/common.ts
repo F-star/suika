@@ -154,6 +154,9 @@ export const getDevicePixelRatio = () => {
   return window.devicePixelRatio || 1;
 };
 
+/**
+ * fill image with "cover" strategy
+ */
 export const calcCoverScale = (
   w: number,
   h: number,

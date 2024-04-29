@@ -151,6 +151,7 @@ export class SelectResizeTool implements IBaseTool {
       this.resizeMultiGraphs(selectItems);
     }
 
+    this.editor.selectedBox.updateBoxAndDraw();
     this.editor.render();
   }
 

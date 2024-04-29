@@ -1,8 +1,7 @@
-import { parseRGBAStr } from '@suika/common';
-import { Matrix } from 'pixi.js';
+import { calcCoverScale } from '@suika/common';
+import { Assets, Container, Graphics, Matrix, Sprite } from 'pixi.js';
 
 import { DOUBLE_PI } from '../constant';
-import { type ImgManager } from '../Img_manager';
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
 import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
@@ -38,46 +37,163 @@ export class Ellipse extends Graph<EllipseAttrs> {
     );
   }
 
-  override draw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
-  ): void {
-    const attrs = this.attrs;
-    const cx = attrs.width / 2;
-    const cy = attrs.height / 2;
+  override draw(): // ctx: CanvasRenderingContext2D,
+  // imgManager?: ImgManager,
+  // smooth?: boolean,
+  void {
+    // const attrs = this.attrs;
+    // const cx = attrs.width / 2;
+    // const cy = attrs.height / 2;
 
-    ctx.transform(...attrs.transform);
+    // ctx.transform(...attrs.transform);
 
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
-    for (const paint of attrs.fill ?? []) {
-      if (paint.type === PaintType.Solid) {
-        ctx.fillStyle = parseRGBAStr(paint.attrs);
-        ctx.fill();
-      } else if (paint.type === PaintType.Image) {
-        if (imgManager) {
-          ctx.clip();
-          this.fillImage(ctx, paint, imgManager, smooth);
-        } else {
-          console.warn('ImgManager is not provided');
-        }
-      }
+    // ctx.beginPath();
+    // ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
+    // for (const paint of attrs.fill ?? []) {
+    //   if (paint.type === PaintType.Solid) {
+    //     ctx.fillStyle = parseRGBAStr(paint.attrs);
+    //     ctx.fill();
+    //   } else if (paint.type === PaintType.Image) {
+    //     if (imgManager) {
+    //       ctx.clip();
+    //       this.fillImage(ctx, paint, imgManager, smooth);
+    //     } else {
+    //       console.warn('ImgManager is not provided');
+    //     }
+    //   }
+    // }
+
+    // if (attrs.strokeWidth) {
+    //   ctx.lineWidth = attrs.strokeWidth;
+    //   for (const paint of attrs.stroke ?? []) {
+    //     if (paint.type === PaintType.Solid) {
+    //       ctx.strokeStyle = parseRGBAStr(paint.attrs);
+    //       ctx.stroke();
+    //     } else if (paint.type === PaintType.Image) {
+    //       // TODO:
+    //     }
+    //   }
+    // }
+
+    // ctx.closePath();
+
+    this.drawByPixi();
+  }
+
+  // override drawByPixi() {
+  //   if (!this.graphics) {
+  //     this.graphics = new Graphics();
+  //   }
+  //   const graphics = this.graphics as Graphics;
+
+  //   graphics.clear();
+
+  //   const attrs = this.attrs;
+  //   graphics.setFromMatrix(new Matrix(...attrs.transform));
+  //   const halfWidth = attrs.width / 2;
+  //   const halfHeight = attrs.height / 2;
+
+  //   for (const paint of this.attrs.fill ?? []) {
+  //     if (paint.type === PaintType.Solid) {
+  //       graphics.ellipse(halfWidth, halfHeight, halfWidth, halfHeight);
+  //       graphics.fill(paint.attrs);
+  //     }
+  //   }
+
+  //   const strokeWidth = this.getStrokeWidth();
+  //   for (const paint of this.attrs.stroke ?? []) {
+  //     if (paint.type === PaintType.Solid) {
+  //       graphics.ellipse(halfWidth, halfHeight, halfWidth, halfHeight);
+  //       graphics.stroke({ width: strokeWidth, color: paint.attrs });
+  //     }
+  //   }
+
+  //   this.graphics = graphics;
+  //   return graphics;
+  // }
+
+  /**
+   * TODO: 和 rect 的逻辑重复了，考虑抽一个公共方法
+   */
+  override drawByPixi() {
+    if (!this.graphics) {
+      this.graphics = new Container();
     }
 
-    if (attrs.strokeWidth) {
-      ctx.lineWidth = attrs.strokeWidth;
-      for (const paint of attrs.stroke ?? []) {
+    const _draw = () => {
+      const graphics = this.graphics;
+      if (!graphics) return;
+
+      // reset
+      graphics.removeChildren();
+      graphics.mask = null;
+
+      const attrs = this.attrs;
+      graphics.visible = attrs.visible ?? true;
+      graphics.setFromMatrix(new Matrix(...attrs.transform));
+      const halfWidth = attrs.width / 2;
+      const halfHeight = attrs.height / 2;
+
+      const fillContainer = new Container();
+      graphics.addChild(fillContainer);
+
+      // mask
+      if (imgUrlSet.size) {
+        const mask = new Graphics()
+          .ellipse(halfWidth, halfHeight, halfWidth, halfHeight)
+          .fill();
+        fillContainer.addChild(mask);
+        fillContainer.mask = mask;
+      }
+
+      // fill
+      for (const paint of this.attrs.fill ?? []) {
         if (paint.type === PaintType.Solid) {
-          ctx.strokeStyle = parseRGBAStr(paint.attrs);
-          ctx.stroke();
+          const solidGraphics = new Graphics()
+            .ellipse(halfWidth, halfHeight, halfWidth, halfHeight)
+            .fill(paint.attrs);
+          fillContainer.addChild(solidGraphics);
         } else if (paint.type === PaintType.Image) {
-          // TODO:
+          const sprite = Sprite.from(paint.attrs.src!);
+
+          const img = sprite.texture.source;
+          const scale = calcCoverScale(
+            img.width,
+            img.height,
+            attrs.width,
+            attrs.height,
+          );
+          const sx = (img.width * scale) / 2 - attrs.width / 2;
+          const sy = (img.height * scale) / 2 - attrs.height / 2;
+
+          sprite.x = -sx;
+          sprite.y = -sy;
+          sprite.width = img.width * scale;
+          sprite.height = img.height * scale;
+
+          fillContainer.addChild(sprite);
         }
       }
-    }
 
-    ctx.closePath();
+      // stroke
+      const strokeWidth = this.getStrokeWidth();
+      for (const paint of this.attrs.stroke ?? []) {
+        if (paint.type === PaintType.Solid) {
+          const solidGraphics = new Graphics()
+            .ellipse(halfWidth, halfHeight, halfWidth, halfHeight)
+            .stroke({ width: strokeWidth, color: paint.attrs });
+
+          graphics.addChild(solidGraphics);
+        }
+      }
+    };
+
+    const imgUrlSet = this.getImgUrlSet();
+    if (imgUrlSet.size) {
+      Assets.load(Array.from(imgUrlSet)).then(_draw);
+    } else {
+      _draw();
+    }
   }
 
   override drawOutline(

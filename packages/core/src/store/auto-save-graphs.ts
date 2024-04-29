@@ -3,7 +3,7 @@ import { debounce } from '@suika/common';
 import { type Editor } from '../editor';
 import { type IEditorPaperData } from '../type';
 
-const STORE_KEY = 'suika-paper';
+const STORE_KEY = 'suika-pixi-paper';
 
 export class AutoSaveGraphs {
   listener: () => void;

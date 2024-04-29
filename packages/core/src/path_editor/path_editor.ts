@@ -45,7 +45,10 @@ export class PathEditor {
     this.path = path;
 
     const editor = this.editor;
-    editor.sceneGraph.showSelectedGraphsOutline = false;
+    // editor.sceneGraph.showSelectedGraphsOutline = false;
+
+    editor.selectedBox.visible(false);
+
     editor.sceneGraph.highlightLayersOnHover = false;
     editor.controlHandleManager.enableTransformControl = false;
 
@@ -79,7 +82,9 @@ export class PathEditor {
     this.selectedControl.clear();
     this.path = null;
     const editor = this.editor;
-    editor.sceneGraph.showSelectedGraphsOutline = true;
+    // editor.sceneGraph.showSelectedGraphsOutline = true;
+    editor.selectedBox.visible(true);
+
     editor.sceneGraph.highlightLayersOnHover = true;
     editor.controlHandleManager.enableTransformControl = true;
 

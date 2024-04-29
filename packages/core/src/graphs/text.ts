@@ -1,4 +1,5 @@
 import { parseRGBAStr } from '@suika/common';
+import { Matrix, Text, TextStyle } from 'pixi.js';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
@@ -67,5 +68,47 @@ export class TextGraph extends Graph<TextAttrs> {
     }
 
     ctx.fillText(content, 0, 0);
+
+    this.drawByPixi();
+  }
+
+  override drawByPixi() {
+    if (!this.graphics) {
+      this.graphics = new Text();
+    }
+    const textGraphics = this.graphics as Text;
+
+    const parent = textGraphics.parent;
+    const scale = parent ? parent.localTransform.a ?? 1 : 1;
+
+    const attrs = this.attrs;
+    textGraphics.visible = attrs.visible ?? true;
+    const { x, y } = this.getPosition();
+    textGraphics.setFromMatrix(
+      new Matrix(...attrs.transform).prepend(
+        new Matrix()
+          .translate(-x, -y)
+          .scale(1 / scale, 1 / scale)
+          .translate(x, y),
+      ),
+    );
+
+    const style = new TextStyle({
+      // fontFamily: 'Arial',
+      fontSize: attrs.fontSize * scale,
+      // fill: { fill },
+      // stroke: { color: '#4a1850', width: 5, join: 'round' },
+      // dropShadow: {
+      //   color: '#000000',
+      //   blur: 4,
+      //   angle: Math.PI / 6,
+      //   distance: 6,
+      // },
+      // wordWrap: true,
+      // wordWrapWidth: 440,
+    });
+
+    textGraphics.text = attrs.content;
+    textGraphics.style = style;
   }
 }

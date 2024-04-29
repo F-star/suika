@@ -30,6 +30,8 @@ const Editor: FC = () => {
       });
       (window as any).editor = editor;
 
+      editor.init();
+
       const changeViewport = throttle(
         () => {
           editor.viewportManager.setViewport({

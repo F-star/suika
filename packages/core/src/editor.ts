@@ -9,6 +9,7 @@ import { ClipboardManager } from './clipboard';
 import { CommandManager } from './commands/command_manager';
 import { ControlHandleManager } from './control_handle_manager';
 import { CursorManger, type ICursor } from './cursor_manager';
+import Grid from './grid';
 import { GroupManager } from './group_manager';
 import { HostEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
@@ -20,7 +21,9 @@ import Ruler from './ruler';
 import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
 import SelectedElements from './selected_elements';
+import { Selection } from './selection';
 import { Setting } from './setting';
+import { StageManager } from './stage_manger';
 import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { TextEditor } from './text/text_editor';
 import { ToolManager } from './tools';
@@ -44,6 +47,10 @@ export class Editor {
 
   appVersion = 'suika-editor_0.0.1';
   paperId: string;
+
+  stageManager: StageManager;
+  selection: Selection;
+  grid: Grid;
 
   sceneGraph: SceneGraph;
   controlHandleManager: ControlHandleManager;
@@ -74,11 +81,15 @@ export class Editor {
   autoSaveGraphs: AutoSaveGraphs;
   perfMonitor: PerfMonitor;
 
+  async init() {
+    // ...
+  }
+
   constructor(options: IEditorOptions) {
     this.containerElement = options.containerElement;
     this.canvasElement = document.createElement('canvas');
     this.containerElement.appendChild(this.canvasElement);
-    this.ctx = this.canvasElement.getContext('2d')!;
+    this.ctx = document.createElement('canvas').getContext('2d')!;
 
     this.setting = new Setting();
     if (options.offsetX) {
@@ -102,14 +113,10 @@ export class Editor {
     this.imgManager = new ImgManager();
 
     this.selectedElements = new SelectedElements(this);
-    this.selectedBox = new SelectedBox(this);
     this.ruler = new Ruler(this);
     this.refLine = new RefLine(this);
     this.textEditor = new TextEditor(this);
     this.pathEditor = new PathEditor(this);
-
-    this.controlHandleManager = new ControlHandleManager(this);
-    this.controlHandleManager.bindEvents();
 
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();
@@ -125,6 +132,8 @@ export class Editor {
     this.imgManager.on('added', () => {
       this.render();
     });
+
+    this.stageManager = new StageManager(this);
 
     const data = this.autoSaveGraphs.load();
     if (data) {
@@ -142,6 +151,24 @@ export class Editor {
     });
 
     this.zoomManager.zoomToFit(1);
+
+    this.stageManager.init(this.canvasElement);
+
+    // grid
+    this.grid = new Grid(this);
+    this.stageManager.addView(this.grid.getGraphics());
+
+    // selectedBox
+    this.selectedBox = new SelectedBox(this);
+    this.stageManager.addView(this.selectedBox.getGraphics());
+
+    this.controlHandleManager = new ControlHandleManager(this);
+    this.stageManager.addView(this.controlHandleManager.getGraphics());
+    this.controlHandleManager.bindEvents();
+
+    // selection rect
+    this.selection = new Selection(this);
+    this.stageManager.addView(this.selection.getGraphics());
 
     this.perfMonitor = new PerfMonitor();
     if (options.showPerfMonitor) {
@@ -167,6 +194,7 @@ export class Editor {
   }
   destroy() {
     this.containerElement.removeChild(this.canvasElement);
+    this.stageManager.destroy();
     this.textEditor.destroy();
     this.keybindingManager.destroy();
     this.hostEventManager.destroy();
@@ -176,6 +204,7 @@ export class Editor {
     this.toolManager.destroy();
     this.perfMonitor.destroy();
     this.controlHandleManager.unbindEvents();
+    this.grid.destroy();
   }
   setCursor(cursor: ICursor) {
     this.cursorManager.setCursor(cursor);

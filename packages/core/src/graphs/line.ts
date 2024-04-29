@@ -1,4 +1,5 @@
 import { parseRGBAStr } from '@suika/common';
+import { Graphics, Matrix } from 'pixi.js';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
@@ -63,5 +64,27 @@ export class Line extends Graph<LineAttrs> {
     ctx.strokeStyle = stroke;
     ctx.stroke();
     ctx.closePath();
+  }
+
+  override drawByPixi() {
+    if (!this.graphics) {
+      this.graphics = new Graphics();
+    }
+    const graphics = this.graphics as Graphics;
+
+    graphics.clear();
+
+    const attrs = this.attrs;
+    graphics.visible = attrs.visible ?? true;
+
+    graphics.setFromMatrix(new Matrix(...attrs.transform));
+
+    const strokeWidth = this.getStrokeWidth();
+    for (const paint of this.attrs.stroke ?? []) {
+      if (paint.type === PaintType.Solid) {
+        graphics.moveTo(0, 0).lineTo(attrs.width, 0);
+        graphics.stroke({ width: strokeWidth, color: paint.attrs });
+      }
+    }
   }
 }

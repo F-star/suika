@@ -1,0 +1,49 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [feat/repalce-canvas2d-to-pixi]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # 安装依赖
+      - name: Install Dep
+        run: |
+          sudo apt-get install snapd
+          sudo snap install node --classic --channel=20
+          npm i -g pnpm@9.0.2
+          echo 'pnpm version:'
+          pnpm -v
+          pnpm install
+      # 构建 html
+      - name: build static files
+        # Treating warnings as errors because process.env.CI = true.
+        # 暂时不处理 eslint 的 warn，改成 false
+        run: pnpm run all:build
+
+      # 部署到自己的服务器
+      - name: deploy file to server
+        uses: wlixcc/SFTP-Deploy-Action@v1.0
+        with:
+          username: ${{ secrets.USERNAME }}
+          server: ${{ secrets.REMOTE_IP }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          local_path: './packages/suika/build/*'
+          remote_path: 'www/app/suika-pixi'

@@ -86,7 +86,9 @@ export const StrokeCard: FC = () => {
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
     });
 
     return newStrokes;
@@ -103,7 +105,9 @@ export const StrokeCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
     });
     pushToHistory('Add Stroke', selectItems, newStrokes, true);
     editor?.render();
@@ -117,7 +121,9 @@ export const StrokeCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
     });
     pushToHistory('Update Stroke', selectItems, newStrokes);
     editor.render();
@@ -186,7 +192,9 @@ export const StrokeCard: FC = () => {
     );
 
     selectedElements.forEach((item) => {
-      item.attrs.strokeWidth = newStrokeWidth;
+      item.updateAttrs({
+        strokeWidth: newStrokeWidth,
+      });
     });
     setStrokeWidth(newStrokeWidth);
 

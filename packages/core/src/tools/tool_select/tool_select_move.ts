@@ -65,6 +65,8 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = false;
     this.editor.sceneGraph.showSelectedGraphsOutline = false;
 
+    this.editor.selectedBox.clear();
+
     const { x, y } = this.editor.viewportCoordsToScene(
       this.dragPoint!.x,
       this.dragPoint!.y,
@@ -157,6 +159,9 @@ export class SelectMoveTool implements IBaseTool {
 
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = true;
     this.editor.sceneGraph.showSelectedGraphsOutline = true;
+
+    this.editor.selectedBox.updateBoxAndDraw();
+
     this.editor.refLine.clear();
     this.editor.render();
   }

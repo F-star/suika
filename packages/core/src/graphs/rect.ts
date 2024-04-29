@@ -1,6 +1,6 @@
-import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import { calcCoverScale, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import { boxToRect, type IPoint, isPointInRoundRect } from '@suika/geo';
-import { Matrix } from 'pixi.js';
+import { Assets, Container, Graphics, Matrix, Sprite } from 'pixi.js';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type ImgManager } from '../Img_manager';
@@ -105,12 +105,94 @@ export class Rect extends Graph<RectAttrs> {
     ctx.closePath();
   }
 
+  override drawByPixi() {
+    if (!this.graphics) {
+      this.graphics = new Container();
+    }
+
+    const imgUrlSet = this.getImgUrlSet();
+
+    const _draw = () => {
+      const graphics = this.graphics;
+      if (!graphics) return;
+
+      // reset
+      graphics.removeChildren();
+      graphics.mask = null;
+
+      const attrs = this.attrs;
+      graphics.visible = attrs.visible ?? true;
+      graphics.setFromMatrix(new Matrix(...attrs.transform));
+      const cornerRadius = this.attrs.cornerRadius ?? 0;
+
+      const fillContainer = new Container();
+      graphics.addChild(fillContainer);
+
+      // mask
+      if (imgUrlSet.size) {
+        const mask = new Graphics()
+          .roundRect(0, 0, attrs.width, attrs.height, cornerRadius)
+          .fill();
+        fillContainer.addChild(mask);
+        fillContainer.mask = mask;
+      }
+
+      // fill
+      for (const paint of this.attrs.fill ?? []) {
+        if (paint.type === PaintType.Solid) {
+          const solidGraphics = new Graphics()
+            .roundRect(0, 0, attrs.width, attrs.height, cornerRadius)
+            .fill(paint.attrs);
+          fillContainer.addChild(solidGraphics);
+        } else if (paint.type === PaintType.Image) {
+          const sprite = Sprite.from(paint.attrs.src!);
+
+          const img = sprite.texture.source;
+          const scale = calcCoverScale(
+            img.width,
+            img.height,
+            attrs.width,
+            attrs.height,
+          );
+          const sx = (img.width * scale) / 2 - attrs.width / 2;
+          const sy = (img.height * scale) / 2 - attrs.height / 2;
+
+          sprite.x = -sx;
+          sprite.y = -sy;
+          sprite.width = img.width * scale;
+          sprite.height = img.height * scale;
+
+          fillContainer.addChild(sprite);
+        }
+      }
+
+      // stroke
+      const strokeWidth = this.getStrokeWidth();
+      for (const paint of this.attrs.stroke ?? []) {
+        if (paint.type === PaintType.Solid) {
+          const solidGraphics = new Graphics()
+            .roundRect(0, 0, attrs.width, attrs.height, cornerRadius)
+            .stroke({ width: strokeWidth, color: paint.attrs });
+
+          graphics.addChild(solidGraphics);
+        }
+      }
+    };
+
+    if (imgUrlSet.size) {
+      Assets.load(Array.from(imgUrlSet)).then(_draw);
+    } else {
+      _draw();
+    }
+  }
+
   override draw(
     ctx: CanvasRenderingContext2D,
     imgManager?: ImgManager,
     smooth?: boolean,
   ) {
     this._realDraw(ctx, imgManager, smooth);
+    this.drawByPixi();
   }
 
   override drawOutline(

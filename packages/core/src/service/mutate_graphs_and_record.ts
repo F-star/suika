@@ -129,7 +129,9 @@ export const MutateGraphsAndRecord = {
       cornerRadius: el.attrs.cornerRadius || 0,
     }));
     rectGraphics.forEach((el) => {
-      el.attrs.cornerRadius = cornerRadius;
+      el.updateAttrs({
+        cornerRadius,
+      });
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -155,7 +157,9 @@ export const MutateGraphsAndRecord = {
     const newVisible = graphs.some((item) => !item.getVisible());
     const prevAttrs = graphs.map((el) => ({ visible: el.attrs.visible }));
     graphs.forEach((el) => {
-      el.attrs.visible = newVisible;
+      el.updateAttrs({
+        visible: newVisible,
+      });
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(

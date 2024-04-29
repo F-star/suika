@@ -4,44 +4,60 @@ import { type IBox, type IRect } from '@suika/geo';
 import { type Editor } from './editor';
 
 interface Events {
-  xOrYChange(x: number | undefined, y: number): void;
+  sizeChange(width: number, height: number): void;
+  xOrYChange(x: number, y: number): void;
 }
 
 export class ViewportManager {
-  private scrollX = 0;
-  private scrollY = 0;
+  private x = 0;
+  private y = 0;
+  // private width = 100;
+  // private height = 100;
   private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
   getViewport(): IRect {
     return {
-      x: this.scrollX,
-      y: this.scrollY,
+      x: this.x,
+      y: this.y,
+      // width: this.width,
       width: parseFloat(this.editor.canvasElement.style.width),
+      // height: this.height,
       height: parseFloat(this.editor.canvasElement.style.height),
     };
   }
   setViewport({ x, y, width, height }: Partial<IRect>) {
-    const prevX = this.scrollX;
-    const prevY = this.scrollY;
+    // const prevX = this.x;
+    // const prevY = this.y;
+    const prevViewport = this.getViewport();
     const dpr = getDevicePixelRatio();
+
+    x ??= prevViewport.x;
+    y ??= prevViewport.y;
+    width ??= prevViewport.width;
+    height ??= prevViewport.height;
     if (x !== undefined) {
-      this.scrollX = x;
+      this.x = x;
     }
     if (y !== undefined) {
-      this.scrollY = y;
+      this.y = y;
     }
     if (width !== undefined) {
+      // this.width = width;
       this.editor.canvasElement.width = width * dpr;
       this.editor.canvasElement.style.width = width + 'px';
     }
     if (height !== undefined) {
+      // this.height = height;
       this.editor.canvasElement.height = height * dpr;
       this.editor.canvasElement.style.height = height + 'px';
     }
 
-    if (prevX !== x || prevY !== y) {
-      this.eventEmitter.emit('xOrYChange', x as number, y as number);
+    if (prevViewport.width !== width || prevViewport.height !== height) {
+      this.eventEmitter.emit('sizeChange', width, height);
+    }
+    if (prevViewport.x !== x || prevViewport.y !== y) {
+      this.eventEmitter.emit('xOrYChange', x, y);
     }
   }
   getCenter() {
@@ -53,20 +69,10 @@ export class ViewportManager {
     };
   }
   translate(dx: number, dy: number) {
-    this.scrollX += dx;
-    this.scrollY += dy;
-    this.eventEmitter.emit('xOrYChange', this.scrollX, this.scrollY);
+    this.x += dx;
+    this.y += dy;
+    this.eventEmitter.emit('xOrYChange', this.x, this.y);
   }
-  // getBbox(): IRect {
-  //   const { x, y, width, height } = this.getViewport();
-  //   const zoom = this.editor.zoomManager.getZoom();
-  //   return {
-  //     x: x,
-  //     y: y,
-  //     width: width / zoom,
-  //     height: height / zoom,
-  //   };
-  // }
   getBbox(): IBox {
     const { x, y, width, height } = this.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
@@ -77,10 +83,11 @@ export class ViewportManager {
       maxY: y + height / zoom,
     };
   }
-  on(eventName: 'xOrYChange', handler: (x: number, y: number) => void) {
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'xOrYChange', handler: (x: number, y: number) => void) {
+
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
 }

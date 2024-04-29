@@ -27,7 +27,9 @@ export const FillCard: FC = () => {
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.attrs.fill = cloneDeep(newFills);
+      item.updateAttrs({
+        fill: cloneDeep(newFills),
+      });
     });
 
     return newFills;
@@ -44,7 +46,9 @@ export const FillCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.attrs.fill = cloneDeep(newFills);
+      item.updateAttrs({
+        fill: cloneDeep(newFills),
+      });
     });
     pushToHistory('Add Fill', selectItems, newFills);
     editor?.render();
@@ -58,7 +62,9 @@ export const FillCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.attrs.fill = cloneDeep(newFills);
+      item.updateAttrs({
+        fill: cloneDeep(newFills),
+      });
     });
     pushToHistory('Update Fill', selectItems, newFills);
     editor.render();

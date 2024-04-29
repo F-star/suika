@@ -24,14 +24,15 @@ import {
   resizeLine,
   resizeRect,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
+import { type Container, Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
-import { DEFAULT_IMAGE, type PaintImage } from '../../paint';
+import { DEFAULT_IMAGE, type PaintImage, PaintType } from '../../paint';
 import { GraphType, type IObject, type Optional } from '../../type';
 import { drawRoundRectPath } from '../../utils';
+import { type RectAttrs } from '../rect';
 import { type GraphAttrs, type IGraphOpts } from './graph_attrs';
 
 export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
@@ -83,7 +84,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     );
   }
   updateAttrs(
-    partialAttrs: Partial<GraphAttrs> & IGraphOpts,
+    partialAttrs: Partial<RectAttrs> & IGraphOpts,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _options?: { finishRecomputed?: boolean },
   ) {
@@ -110,6 +111,8 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       (this.attrs as any)[key] = partialAttrs[key as keyof typeof partialAttrs];
     }
+
+    this.drawByPixi();
   }
 
   getStrokeWidth() {
@@ -350,6 +353,17 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
     this.updateAttrs(rect, { finishRecomputed: true });
   }
+
+  protected graphics: Container | null = null;
+
+  getGraphics() {
+    return this.graphics;
+  }
+
+  drawByPixi() {
+    // noop
+  }
+
   draw(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _ctx: CanvasRenderingContext2D,
@@ -553,5 +567,22 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
         uiType: 'number',
       },
     ];
+  }
+
+  protected getImgUrlSet() {
+    const imgUrlSet = new Set<string>();
+    const paints = this.attrs.fill ?? [];
+    if (this.attrs.stroke) {
+      paints.concat(this.attrs.stroke);
+    }
+
+    for (const paint of paints) {
+      if (paint.type === PaintType.Image) {
+        if (paint.attrs.src) {
+          imgUrlSet.add(paint.attrs.src);
+        }
+      }
+    }
+    return imgUrlSet;
   }
 }

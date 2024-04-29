@@ -28,7 +28,9 @@ export class Setting {
       attrs: { r: 0, g: 0, b: 0, a: 0.2 },
     } as IPaint,
 
-    guideBBoxStroke: '#1592fe',
+    selectedBoxStroke: '#1592fe',
+    selectedBoxStrokeWidth: 1.2,
+
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
     selectionMode: 'intersect' as 'intersect' | 'contain',
@@ -85,7 +87,7 @@ export class Setting {
     enablePixelGrid: true,
     snapToGrid: true, // 是否吸附到网格
     minPixelGridZoom: 8, // draw pixel grid When zoom reach this value
-    pixelGridLineColor: '#cccccc55', // pixel grid line color
+    pixelGridLineColor: '#cccccc55', // pixel grid line color // TODO: FIXME: 换成 f2f2f2，然后使用 Plus darker 滤镜
 
     gridViewX: 1,
     gridViewY: 1,

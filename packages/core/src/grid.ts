@@ -1,4 +1,9 @@
-import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
+import {
+  getClosestTimesVal,
+  getDevicePixelRatio,
+  nearestPixelVal,
+} from '@suika/common';
+import { Container, Graphics } from 'pixi.js';
 
 import { type Editor } from './editor';
 
@@ -6,9 +11,30 @@ import { type Editor } from './editor';
  * draw grid
  */
 class Grid {
-  constructor(private editor: Editor) {}
-  draw() {
-    const ctx = this.editor.ctx;
+  private gridGraphics = new Container();
+  constructor(private editor: Editor) {
+    this.bindEvent();
+  }
+
+  getGraphics() {
+    return this.gridGraphics;
+  }
+
+  draw = () => {
+    const gridView = this.gridGraphics;
+    gridView.removeChildren();
+
+    const zoom = this.editor.zoomManager.getZoom();
+    const setting = this.editor.setting;
+
+    if (
+      !(
+        setting.get('enablePixelGrid') &&
+        zoom >= this.editor.setting.get('minPixelGridZoom')
+      )
+    ) {
+      return;
+    }
 
     const {
       x: offsetX,
@@ -16,8 +42,6 @@ class Grid {
       width,
       height,
     } = this.editor.viewportManager.getViewport();
-    const zoom = this.editor.zoomManager.getZoom();
-    const setting = this.editor.setting;
     const stepX = this.editor.setting.get('gridViewX');
     const stepY = this.editor.setting.get('gridViewY');
 
@@ -25,14 +49,17 @@ class Grid {
     let startXInScene = getClosestTimesVal(offsetX, stepX);
     const endXInScene = getClosestTimesVal(offsetX + width / zoom, stepX);
 
+    const strokeColor = setting.get('pixelGridLineColor');
+    const strokeWidth = 1 / getDevicePixelRatio();
+
     while (startXInScene <= endXInScene) {
-      ctx.strokeStyle = setting.get('pixelGridLineColor');
       const x = nearestPixelVal((startXInScene - offsetX) * zoom);
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-      ctx.closePath();
+      const line = new Graphics().moveTo(x, 0).lineTo(x, height).stroke({
+        color: strokeColor,
+        width: strokeWidth,
+      });
+      gridView.addChild(line);
+
       startXInScene += stepX;
     }
 
@@ -41,15 +68,30 @@ class Grid {
     const endYInScene = getClosestTimesVal(offsetY + height / zoom, stepY);
 
     while (startYInScene <= endYInScene) {
-      ctx.strokeStyle = setting.get('pixelGridLineColor');
       const y = nearestPixelVal((startYInScene - offsetY) * zoom);
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-      ctx.closePath();
+      const line = new Graphics().moveTo(0, y).lineTo(width, y).stroke({
+        color: strokeColor,
+        width: strokeWidth,
+      });
+      gridView.addChild(line);
+
       startYInScene += stepY;
     }
+  };
+
+  destroy() {
+    this.unbindEvent();
+  }
+
+  private bindEvent() {
+    this.editor.zoomManager.on('zoomChange', this.draw);
+    this.editor.viewportManager.on('xOrYChange', this.draw);
+    this.editor.viewportManager.on('sizeChange', this.draw);
+  }
+  private unbindEvent() {
+    this.editor.zoomManager.off('zoomChange', this.draw);
+    this.editor.viewportManager.on('xOrYChange', this.draw);
+    this.editor.viewportManager.on('sizeChange', this.draw);
   }
 }
 

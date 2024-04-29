@@ -127,6 +127,8 @@ export class SelectRotationTool implements IBaseTool {
     } else {
       throw new Error('no selected elements, please report issue');
     }
+
+    this.editor.selectedBox.updateBoxAndDraw();
     this.editor.render();
   }
   onEnd() {

@@ -33,15 +33,20 @@ export class DrawSelection implements IBaseTool {
     this.lastPoint = this.editor.viewportCoordsToScene(pos.x, pos.y);
 
     this.editor.render();
-    this.editor.sceneGraph.setSelection(this.lastPoint);
+    // this.editor.sceneGraph.setSelection(this.lastPoint);
+    this.editor.selection.setRect({
+      ...this.lastPoint,
+      width: 0,
+      height: 0,
+    });
   }
   onDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
 
-    const box = getRectByTwoPoint(this.lastPoint, point);
-    this.editor.sceneGraph.setSelection(box);
+    const rect = getRectByTwoPoint(this.lastPoint, point);
+    this.editor.selection.setRect(rect);
 
-    const graphsInSelection = this.editor.sceneGraph.getElementsInSelection();
+    const graphsInSelection = this.editor.selection.getElementsInSelection();
 
     if (this.isShiftPressingWhenStart) {
       this.editor.selectedElements.setItems(this.startSelectedGraphs);
@@ -58,7 +63,8 @@ export class DrawSelection implements IBaseTool {
   afterEnd() {
     this.isShiftPressingWhenStart = false;
     this.startSelectedGraphs = [];
-    this.editor.sceneGraph.selection = null;
+    // this.editor.sceneGraph.selection = null;
+    this.editor.selection.clear();
     this.editor.render();
   }
 }

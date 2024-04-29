@@ -20,8 +20,6 @@
     "core:dev": "pnpm -F @suika/core dev",
     "icons:dev": "pnpm -F @suika/icons dev",
     "components:dev": "pnpm -F @suika/components dev",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "prepare": "husky install",
     "eslint:check": "eslint packages"
   },
@@ -46,7 +44,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "pixi.js": "^8.0.2",
+    "pixi.js": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

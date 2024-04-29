@@ -7,7 +7,7 @@ import {
   rectToMidPoints,
   rectToVertices,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
+import { Container, Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
@@ -36,6 +36,7 @@ const types = [
  * Control Point Handle
  */
 export class ControlHandleManager {
+  private container = new Container();
   private transformHandles: Map<ITransformHandleType, ControlHandle>;
 
   private customHandlesVisible = false;
@@ -52,6 +53,12 @@ export class ControlHandleManager {
       strokeWidth: setting.get('handleStrokeWidth'),
     });
   }
+
+  getGraphics() {
+    return this.container;
+  }
+
+  // 绘制时机。selected 有东西。
 
   private onHoverItemChange = () => {
     if (!this.editor.pathEditor.isActive()) {
@@ -189,7 +196,13 @@ export class ControlHandleManager {
     s.rotation = heightRotate;
   }
 
+  clear() {
+    this.container.removeChildren();
+  }
+
   draw(rect: ITransformRect | null) {
+    this.container.removeChildren();
+
     this.selectedBoxRect = rect;
     if (rect) {
       this.updateTransformHandles(rect);
@@ -204,6 +217,7 @@ export class ControlHandleManager {
 
     const ctx = this.editor.ctx;
     const rotate = rect ? getTransformAngle(rect.transform) : 0;
+
     handles.forEach((handle) => {
       const graph = handle.graph;
       if (graph.type === GraphType.Path) {
@@ -234,9 +248,10 @@ export class ControlHandleManager {
       if (!graph.getVisible()) {
         return;
       }
-      ctx.save();
+      // ctx.save();
       graph.draw(ctx);
-      ctx.restore();
+      this.container.addChild(graph.getGraphics()!);
+      // ctx.restore();
     });
   }
 

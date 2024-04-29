@@ -138,6 +138,7 @@ export const ZoomActions: FC = () => {
               if (editor) {
                 const enablePixelGrid = editor.setting.get('enablePixelGrid');
                 editor.setting.set('enablePixelGrid', !enablePixelGrid);
+                editor.grid.draw();
                 editor.render();
                 setPopoverVisible(false);
               }

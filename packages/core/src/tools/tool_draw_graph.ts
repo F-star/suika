@@ -219,10 +219,10 @@ export abstract class DrawGraphTool implements ITool {
 
     if (this.drawingGraph) {
       this.updateGraph(rect);
+      this.editor.selectedBox.updateBoxAndDraw();
     } else {
       const element = this.createGraph(rect)!;
       sceneGraph.addItems([element]);
-
       this.drawingGraph = element;
     }
     this.editor.selectedElements.setItems([this.drawingGraph]);

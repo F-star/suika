@@ -29,6 +29,18 @@ export class RemoveGraphsCmd implements ICommand {
         nextElements.push(element);
       }
     }
+
+    console.log('removedIndexes', this.removedIndexes);
+    for (let i = this.removedIndexes.length - 1; i >= 0; i--) {
+      const index = this.removedIndexes[i];
+      const graphics = elements[index].getGraphics();
+      if (graphics) {
+        graphics.removeFromParent();
+      } else {
+        console.warn('graphics is empty');
+      }
+    }
+
     sceneGraph.children = nextElements;
 
     this.editor.selectedElements.clear();
@@ -45,6 +57,7 @@ export class RemoveGraphsCmd implements ICommand {
     const nextElements: Graph[] = new Array(
       elements.length + removedIndexes.length,
     );
+    const parent = this.editor.stageManager.getScene();
 
     let i = 0; // nextElements 的指针
     let j = 0; // elements
@@ -52,6 +65,13 @@ export class RemoveGraphsCmd implements ICommand {
     while (i < nextElements.length) {
       if (i === removedIndexes[k]) {
         nextElements[i] = removedElements[k];
+        const graphics = removedElements[k].getGraphics();
+        if (graphics) {
+          parent.addChildAt(graphics, i);
+        } else {
+          console.warn('graphics is empty');
+        }
+
         k++;
       } else {
         nextElements[i] = elements[j];

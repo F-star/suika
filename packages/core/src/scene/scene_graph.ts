@@ -4,7 +4,7 @@ import {
   forEach,
   getDevicePixelRatio,
 } from '@suika/common';
-import { type IPoint, type IRect, isBoxIntersect, rectToBox } from '@suika/geo';
+import { type IPoint, isBoxIntersect } from '@suika/geo';
 
 import { type Editor } from '../editor';
 import {
@@ -16,9 +16,7 @@ import {
   Rect,
   TextGraph,
 } from '../graphs';
-import Grid from '../grid';
 import { GraphType, type IEditorPaperData, type IObject } from '../type';
-import { rafThrottle } from '../utils';
 
 const graphCtorMap = {
   [GraphType.Graph]: Graph,
@@ -35,27 +33,28 @@ interface Events {
 
 export class SceneGraph {
   children: Graph[] = [];
-  selection: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } | null = null;
+
   private eventEmitter = new EventEmitter<Events>();
-  private grid: Grid;
   showBoxAndHandleWhenSelected = true;
   showSelectedGraphsOutline = true;
   highlightLayersOnHover = true;
 
-  constructor(private editor: Editor) {
-    this.grid = new Grid(editor);
-  }
+  constructor(private editor: Editor) {}
 
-  addItems(element: Graph[], idx?: number) {
+  addItems(items: Graph[], idx?: number) {
     if (idx === undefined) {
-      this.children.push(...element);
+      this.children.push(...items);
+
+      for (const item of items) {
+        item.drawByPixi();
+        const graphics = item.getGraphics();
+        if (graphics) {
+          this.editor.stageManager.addItems([graphics]);
+        }
+      }
     } else {
-      this.children.splice(idx, 0, ...element);
+      this.children.splice(idx, 0, ...items);
+      // TODO:
     }
   }
 
@@ -90,7 +89,17 @@ export class SceneGraph {
     }
   }
   // 全局重渲染
-  render = rafThrottle(() => {
+
+  render = () => {
+    // noop
+    this.eventEmitter.emit('render');
+  };
+
+  render2 = () => {
+    // const flag = true;
+    // if (flag) {
+    //   return;
+    // }
     // 获取视口区域
     const {
       viewportManager,
@@ -134,15 +143,15 @@ export class SceneGraph {
     ctx.scale(dpr * zoom, dpr * zoom);
     ctx.translate(dx, dy);
 
-    const imgManager = this.editor.imgManager;
-    for (let i = 0, len = visibleGraphsInViewport.length; i < len; i++) {
-      ctx.save();
-      const element = visibleGraphsInViewport[i];
-      // 抗锯齿
-      const smooth = zoom <= 1;
-      element.draw(ctx, imgManager, smooth);
-      ctx.restore();
-    }
+    // const imgManager = this.editor.imgManager;
+    // for (let i = 0, len = visibleGraphsInViewport.length; i < len; i++) {
+    //   ctx.save();
+    //   const element = visibleGraphsInViewport[i];
+    //   // 抗锯齿
+    //   const smooth = zoom <= 1;
+    //   element.draw(ctx, imgManager, smooth);
+    //   ctx.restore();
+    // }
 
     /********** draw guide line *********/
     ctx.save();
@@ -150,12 +159,12 @@ export class SceneGraph {
     ctx.scale(dpr, dpr);
 
     /** draw pixel grid */
-    if (
-      setting.get('enablePixelGrid') &&
-      zoom >= this.editor.setting.get('minPixelGridZoom')
-    ) {
-      this.grid.draw();
-    }
+    // if (
+    //   setting.get('enablePixelGrid') &&
+    //   zoom >= this.editor.setting.get('minPixelGridZoom')
+    // ) {
+    //   this.grid.draw();
+    // }
 
     /** draw hover graph outline and its control handle */
     if (this.highlightLayersOnHover && setting.get('highlightLayersOnHover')) {
@@ -169,59 +178,61 @@ export class SceneGraph {
       }
     }
 
-    const selectedTransformBox = this.editor.selectedBox.updateBbox();
+    // const selectedTransformBox = this.editor.selectedBox.updateBox();
 
     /** draw selected elements outline */
     if (this.showSelectedGraphsOutline) {
-      this.drawGraphsOutline(
-        this.editor.selectedElements
-          .getItems()
-          .filter((item) => item.getVisible()),
-        setting.get('selectedOutlineStrokeWidth'),
-        this.editor.setting.get('hoverOutlineStroke'),
-      );
-      this.editor.selectedBox.draw();
+      // this.drawGraphsOutline(
+      //   this.editor.selectedElements
+      //     .getItems()
+      //     .filter((item) => item.getVisible()),
+      //   setting.get('selectedOutlineStrokeWidth'),
+      //   this.editor.setting.get('hoverOutlineStroke'),
+      // );
+      // this.editor.selectedBox.updateBoxAndDraw();
     }
 
     // draw path editor path outline
-    if (this.editor.pathEditor.isActive()) {
-      const path = this.editor.pathEditor.getPath();
-      if (path) {
-        this.drawGraphsOutline(
-          [path],
-          setting.get('selectedOutlineStrokeWidth'),
-          this.editor.setting.get('pathLineStroke'),
-        );
-      }
-    }
+    // if (this.editor.pathEditor.isActive()) {
+    //   const path = this.editor.pathEditor.getPath();
+    //   if (path) {
+    //     this.drawGraphsOutline(
+    //       [path],
+    //       setting.get('selectedOutlineStrokeWidth'),
+    //       this.editor.setting.get('pathLineStroke'),
+    //     );
+    //   }
+    // }
 
     /** draw transform handle */
-    if (this.showBoxAndHandleWhenSelected) {
-      this.editor.controlHandleManager.draw(selectedTransformBox);
-    }
+    // if (this.showBoxAndHandleWhenSelected) {
+    // this.editor.controlHandleManager.draw(
+    //   this.showBoxAndHandleWhenSelected ? selectedTransformBox : null,
+    // );
+    // }
 
     /** draw selection */
-    if (this.selection) {
-      ctx.save();
-      ctx.strokeStyle = setting.get('selectionStroke');
-      ctx.fillStyle = setting.get('selectionFill');
-      const { x, y, width, height } = this.selection;
+    // if (this.selection) {
+    //   ctx.save();
+    //   ctx.strokeStyle = setting.get('selectionStroke');
+    //   ctx.fillStyle = setting.get('selectionFill');
+    //   const { x, y, width, height } = this.selection;
 
-      const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(x, y);
+    //   const { x: xInViewport, y: yInViewport } =
+    //     this.editor.sceneCoordsToViewport(x, y);
 
-      const widthInViewport = width * zoom;
-      const heightInViewport = height * zoom;
+    //   const widthInViewport = width * zoom;
+    //   const heightInViewport = height * zoom;
 
-      ctx.fillRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
-      ctx.strokeRect(
-        xInViewport,
-        yInViewport,
-        widthInViewport,
-        heightInViewport,
-      );
-      ctx.restore();
-    }
+    //   ctx.fillRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
+    //   ctx.strokeRect(
+    //     xInViewport,
+    //     yInViewport,
+    //     widthInViewport,
+    //     heightInViewport,
+    //   );
+    //   ctx.restore();
+    // }
 
     this.editor.refLine.drawRefLine(ctx);
 
@@ -233,7 +244,7 @@ export class SceneGraph {
     ctx.restore();
 
     this.eventEmitter.emit('render');
-  });
+  };
 
   private drawGraphsOutline(
     graphs: Graph[],
@@ -272,7 +283,7 @@ export class SceneGraph {
   //   const zoom = this.editor.zoomManager.getZoom();
   //   const ctx = this.editor.ctx;
   //   ctx.save();
-  //   ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
+  //   ctx.strokeStyle = this.editor.setting.get('selectedBoxStroke');
   //   if (options?.strokeWidth) {
   //     ctx.lineWidth = options.strokeWidth;
   //   }
@@ -307,7 +318,7 @@ export class SceneGraph {
   //   const zoom = this.editor.zoomManager.getZoom();
   //   const ctx = this.editor.ctx;
 
-  //   const stroke = this.editor.setting.get('guideBBoxStroke');
+  //   const stroke = this.editor.setting.get('selectedBoxStroke');
 
   //   ctx.save();
   //   ctx.strokeStyle = stroke;
@@ -351,42 +362,43 @@ export class SceneGraph {
     }
     return topHitElement;
   }
-  setSelection(partialRect: Partial<IRect>) {
-    this.selection = Object.assign({}, this.selection, partialRect);
-  }
+  // setSelection(partialRect: Partial<IRect>) {
+  //   this.selection = Object.assign({}, this.selection, partialRect);
+  // }
   /**
    * get elements in selection
    *
    * reference: https://mp.weixin.qq.com/s/u0PUOeTryZ11eM2P2Kxwsg
    */
-  getElementsInSelection() {
-    const selection = this.selection;
-    if (selection === null) {
-      console.warn('selection 为 null，请确认在正确的时机调用当前方法');
-      return [];
-    }
+  // getElementsInSelection() {
+  //   const selection = this.selection;
+  //   if (selection === null) {
+  //     console.warn('selection 为 null，请确认在正确的时机调用当前方法');
+  //     return [];
+  //   }
 
-    const selectionMode = this.editor.setting.get('selectionMode');
-    const elements = this.getVisibleItems();
-    const containedElements: Graph[] = [];
-    // TODO: optimize, use r-tree to reduce time complexity
-    const selectionBox = rectToBox(selection);
-    for (const el of elements) {
-      if (el.getLock()) {
-        continue;
-      }
-      let isSelected = false;
-      if (selectionMode === 'contain') {
-        isSelected = el.containWithBox(selectionBox);
-      } else {
-        isSelected = el.intersectWithBox(selectionBox);
-      }
-      if (isSelected) {
-        containedElements.push(el);
-      }
-    }
-    return containedElements;
-  }
+  //   const selectionMode = this.editor.setting.get('selectionMode');
+  //   const elements = this.getVisibleItems();
+  //   const containedElements: Graph[] = [];
+  //   // TODO: optimize, use r-tree to reduce time complexity
+  //   const selectionBox = rectToBox(selection);
+  //   for (const el of elements) {
+  //     if (el.getLock()) {
+  //       continue;
+  //     }
+  //     let isSelected = false;
+  //     if (selectionMode === 'contain') {
+  //       isSelected = el.containWithBox(selectionBox);
+  //     } else {
+  //       isSelected = el.intersectWithBox(selectionBox);
+  //     }
+  //     if (isSelected) {
+  //       containedElements.push(el);
+  //     }
+  //   }
+  //   return containedElements;
+  //   // return [];
+  // }
 
   /**
    * get tree data with simple info (for layer panel)
@@ -464,7 +476,8 @@ export class SceneGraph {
       newChildren.push(new Ctor(attrs as any));
     }
 
-    this.children.push(...newChildren);
+    // this.children.push(...newChildren);
+    this.addItems(newChildren);
     return newChildren;
   }
 
