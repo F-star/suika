@@ -77,7 +77,7 @@ export class PathEditor {
       this.removePathIfEmpty();
     }
 
-    this.selectedControl.setItems([]);
+    this.selectedControl.clear();
     this.path = null;
     const editor = this.editor;
     editor.sceneGraph.showSelectedGraphsOutline = true;
@@ -131,7 +131,7 @@ export class PathEditor {
       actionName: 'Path Finish',
       action: () => {
         if (this.selectedControl.getSize() > 0) {
-          this.selectedControl.setItems([]);
+          this.selectedControl.clear();
           this.updateControlHandles();
           this.editor.render();
         } else {

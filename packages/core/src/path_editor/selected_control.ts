@@ -41,26 +41,29 @@ export class SelectedControl {
         segIdxSet = new Set<number>();
         curveMap.set(pathIdx, segIdxSet);
       }
-
       segIdxSet.add(segIdx);
 
+      const leftSegIdx = segIdx - 1;
+      const rightSegIdx = segIdx + 1;
       if (type === 'anchor') {
-        const leftSegIdx = segIdx - 1;
-        if (leftSegIdx < 0 && closed) {
-          segIdxSet.add(segCount - 1);
-        } else if (leftSegIdx >= 0 && !closed) {
+        if (leftSegIdx >= 0) {
           segIdxSet.add(leftSegIdx);
+        } else if (closed) {
+          segIdxSet.add(segCount - 1);
         }
-        if (segIdx + 1 < segCount) {
-          segIdxSet.add(segIdx + 1);
+
+        if (rightSegIdx < segCount) {
+          segIdxSet.add(rightSegIdx);
+        } else if (closed) {
+          segIdxSet.add(0);
         }
       } else if (type === 'in') {
-        if (segIdx - 1 >= 0) {
-          segIdxSet.add(segIdx - 1);
+        if (leftSegIdx >= 0) {
+          segIdxSet.add(leftSegIdx);
         }
       } else if (type === 'out' || type === 'curve') {
-        if (segIdx + 1 < segCount) {
-          segIdxSet.add(segIdx + 1);
+        if (rightSegIdx < segCount) {
+          segIdxSet.add(rightSegIdx);
         }
       }
     }
