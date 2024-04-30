@@ -211,7 +211,7 @@ export class DrawPathTool implements ITool {
   onEnd() {
     // TODO: 如果是 closed，结束当前 path 的绘制
     if (this.checkPathItemClosed()) {
-      this.editor.pathEditor.selectedControl.setItems([]);
+      this.editor.pathEditor.selectedControl.clear();
     }
     const path = this.path!;
     path.updateAttrs({ pathData: path.attrs.pathData });
