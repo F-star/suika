@@ -75,23 +75,23 @@ export class PathSelectTool implements ITool {
     // noop
   }
 
-  afterEnd(e: PointerEvent) {
+  afterEnd(e: PointerEvent, isDragHappened: boolean) {
     if (!this.editor.hostEventManager.isDraggingCanvasBySpace) {
       this.editor.setCursor('default');
     }
 
-    this.currStrategy?.afterEnd(e);
+    this.currStrategy?.afterEnd(e, isDragHappened);
     this.currStrategy = null;
   }
 
   onCommandChange() {
-    this.editor.pathEditor.updateControlHandles();
+    this.editor.pathEditor.drawControlHandles();
   }
   onViewportXOrYChange() {
     if (this.editor.hostEventManager.isSpacePressing) {
-      this.editor.pathEditor.updateControlHandles();
+      this.editor.pathEditor.drawControlHandles();
     } else {
-      this.editor.pathEditor.updateControlHandles();
+      this.editor.pathEditor.drawControlHandles();
     }
     this.editor.render();
   }

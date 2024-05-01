@@ -177,7 +177,7 @@ export class ToolManager {
         this.editor.canvasDragger.enableDragBySpace();
         isPressing = false;
         this.currentTool.onEnd(e, this._isDragging);
-        this.currentTool.afterEnd(e);
+        this.currentTool.afterEnd(e, this._isDragging);
       }
 
       this._isDragging = false;

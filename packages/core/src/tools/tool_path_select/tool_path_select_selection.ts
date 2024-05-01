@@ -13,7 +13,7 @@ import { type IBaseTool } from '../type';
 export class DrawPathSelectionTool implements IBaseTool {
   private lastPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
-  private startSelectedIdxInfo: ISelectedIdxInfo[] = [];
+  private startSelectedControls: ISelectedIdxInfo[] = [];
 
   constructor(private editor: Editor) {}
   onActive() {
@@ -24,20 +24,26 @@ export class DrawPathSelectionTool implements IBaseTool {
   }
   onStart() {
     this.isShiftPressingWhenStart = false;
-
-    if (this.editor.hostEventManager.isShiftPressing) {
+    const editor = this.editor;
+    const pathEditor = editor.pathEditor;
+    if (editor.hostEventManager.isShiftPressing) {
       this.isShiftPressingWhenStart = true;
-      this.startSelectedIdxInfo =
-        this.editor.pathEditor.selectedControl.getItems();
+      this.startSelectedControls =
+        editor.pathEditor.selectedControl.getSelectedControls();
     } else {
-      this.editor.pathEditor.selectedControl.clear();
-      this.editor.pathEditor.updateControlHandles();
+      this.startSelectedControls =
+        pathEditor.selectedControl.getSelectedControls();
+      // 保持上一次绘制的控制点继续渲染（这样才能让用户选中 in 和 out）
+      pathEditor.selectedControl.setNormalControls(
+        pathEditor.selectedControl.getSelectedControls(),
+      );
+      pathEditor.drawControlHandles();
     }
 
-    this.lastPoint = this.editor.toolManager.getCurrPoint();
+    this.lastPoint = editor.toolManager.getCurrPoint();
 
-    this.editor.render();
-    this.editor.sceneGraph.setSelection(this.lastPoint);
+    editor.render();
+    editor.sceneGraph.setSelection(this.lastPoint);
   }
   onDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
@@ -49,7 +55,12 @@ export class DrawPathSelectionTool implements IBaseTool {
       this.editor.controlHandleManager.getCustomHandlesIntersectedWithRect(box);
 
     const info: ISelectedIdxInfo[] = controls
-      .filter((control) => control.type.startsWith('anchor-'))
+      .filter(
+        (control) =>
+          control.type.startsWith('anchor-') ||
+          control.type.startsWith('in-') ||
+          control.type.startsWith('out-'),
+      )
       .map((control) => {
         const strs = control.type.split('-');
         return {
@@ -61,13 +72,13 @@ export class DrawPathSelectionTool implements IBaseTool {
 
     if (this.isShiftPressingWhenStart) {
       this.editor.pathEditor.selectedControl.setItems([
-        ...this.startSelectedIdxInfo,
+        ...this.startSelectedControls,
         ...info,
       ]);
-      this.editor.pathEditor.updateControlHandles();
+      this.editor.pathEditor.drawControlHandles();
     } else {
       this.editor.pathEditor.selectedControl.setItems(info);
-      this.editor.pathEditor.updateControlHandles();
+      this.editor.pathEditor.drawControlHandles();
     }
 
     this.editor.render();
@@ -75,9 +86,16 @@ export class DrawPathSelectionTool implements IBaseTool {
   onEnd() {
     // noop
   }
-  afterEnd() {
+  afterEnd(_event: PointerEvent, isDragHappened: boolean) {
     this.isShiftPressingWhenStart = false;
-    this.startSelectedIdxInfo = [];
+    this.startSelectedControls = [];
+
+    this.editor.pathEditor.selectedControl.setNormalControls([]);
+    if (!isDragHappened) {
+      this.editor.pathEditor.selectedControl.clear();
+    }
+    this.editor.pathEditor.drawControlHandles();
+
     this.editor.sceneGraph.selection = null;
     this.editor.render();
   }
