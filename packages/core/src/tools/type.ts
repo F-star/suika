@@ -22,7 +22,7 @@ export interface IBaseTool {
    */
   onEnd: (event: PointerEvent, isDragHappened: boolean) => void;
   /** init state when finish a drag loop */
-  afterEnd: (event: PointerEvent) => void;
+  afterEnd: (event: PointerEvent, isDragHappened: boolean) => void;
   onCommandChange?: () => void;
   /** space key toggle */
   onSpaceToggle?: (isSpacePressing: boolean) => void;

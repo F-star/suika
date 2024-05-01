@@ -4,12 +4,8 @@ import { type IMatrixArr, type IPoint } from '@suika/geo';
 import { SetGraphsAttrsCmd } from '../../commands';
 import { type ICursor } from '../../cursor_manager';
 import { type Editor } from '../../editor';
-import { type IPathItem } from '../../graphs';
-import {
-  type ISelectedIdxInfo,
-  PathEditor,
-  type SelectedIdexType,
-} from '../../path_editor';
+import { type IPathItem, type ISegment } from '../../graphs';
+import { type ISelectedIdxInfo, PathEditor } from '../../path_editor';
 import { type ITool } from '../type';
 
 const TYPE = 'pathSelect';
@@ -24,8 +20,8 @@ export class PathSelectMoveTool implements ITool {
   private startPoint: IPoint | null = null;
   private prevAttrs: { transform: IMatrixArr; pathData: IPathItem[] } | null =
     null;
-  private indiesInfo: Readonly<ISelectedIdxInfo>[] = [];
-  private anchorPoints: Readonly<IPoint>[] = [];
+  private selectedControls: Readonly<ISelectedIdxInfo>[] = [];
+  private startSegs: Readonly<ISegment>[] = [];
 
   constructor(private editor: Editor) {}
   onActive() {
@@ -42,42 +38,36 @@ export class PathSelectMoveTool implements ITool {
       this.editor.controlHandleManager.getHandleInfoByPoint(startPoint);
     if (!control) return;
 
-    const selectedInfo = control.handleName.split('-');
-    const type = selectedInfo[0] as SelectedIdexType;
+    const path = pathEditor.getPath()!;
+    this.prevAttrs = cloneDeep({
+      transform: path.attrs.transform,
+      pathData: path.attrs.pathData,
+    });
 
-    if (type === 'anchor') {
-      const path = pathEditor.getPath()!;
-      this.prevAttrs = cloneDeep({
-        transform: path.attrs.transform,
-        pathData: path.attrs.pathData,
-      });
+    const hitAnchor = PathEditor.parseSelectedInfoStr(control.handleName)!;
 
-      const hitAnchor = PathEditor.parseSelectedIndex(control.handleName)!;
-
-      // 判断是否已经选中
-      if (
-        pathEditor.selectedControl.contains(
-          hitAnchor.type,
-          hitAnchor.pathIdx,
-          hitAnchor.segIdx,
-        )
-      ) {
-        this.indiesInfo = pathEditor.selectedControl.getItems();
-      } else {
-        this.indiesInfo = [hitAnchor];
-      }
-
-      this.anchorPoints = this.indiesInfo.map(
-        ({ pathIdx, segIdx }) =>
-          pathEditor
-            .getPath()!
-            .getSeg(pathIdx, segIdx, { applyTransform: true })!.point,
-      );
-
-      pathEditor.selectedControl.setItems(this.indiesInfo);
-      pathEditor.updateControlHandles();
-      this.editor.render();
+    if (
+      pathEditor.selectedControl.contains(
+        hitAnchor.type,
+        hitAnchor.pathIdx,
+        hitAnchor.segIdx,
+      )
+    ) {
+      this.selectedControls = pathEditor.selectedControl.getSelectedControls();
+    } else {
+      this.selectedControls = [hitAnchor];
     }
+
+    this.startSegs = this.selectedControls.map(
+      ({ pathIdx, segIdx }) =>
+        pathEditor
+          .getPath()!
+          .getSeg(pathIdx, segIdx, { applyTransform: true })!,
+    );
+
+    pathEditor.selectedControl.setItems(this.selectedControls);
+    pathEditor.drawControlHandles();
+    this.editor.render();
   }
   onDrag(e: PointerEvent) {
     if (!this.startPoint) {
@@ -89,17 +79,43 @@ export class PathSelectMoveTool implements ITool {
     const dy = point.y - this.startPoint.y;
 
     const path = this.editor.pathEditor.getPath()!;
-    for (let i = 0; i < this.indiesInfo.length; i++) {
-      const { pathIdx, segIdx } = this.indiesInfo[i];
+    for (let i = 0; i < this.selectedControls.length; i++) {
+      const { type, pathIdx, segIdx } = this.selectedControls[i];
       const seg = path.getSeg(pathIdx, segIdx);
       if (seg) {
-        path.setSeg(pathIdx, segIdx, {
-          point: {
-            x: this.anchorPoints[i].x + dx,
-            y: this.anchorPoints[i].y + dy,
-          },
-        });
-        this.editor.pathEditor.updateControlHandles();
+        const startSeg = this.startSegs[i];
+        if (type === 'anchor') {
+          path.setSeg(pathIdx, segIdx, {
+            point: {
+              x: startSeg.point.x + dx,
+              y: startSeg.point.y + dy,
+            },
+          });
+        } else if (
+          // 如果某个 in/out 和它们对应的 anchor 也存在，忽略这个 in/out
+          this.editor.pathEditor.selectedControl.contains(
+            'anchor',
+            pathIdx,
+            segIdx,
+          )
+        ) {
+          continue;
+        } else if (type === 'in') {
+          path.setSeg(pathIdx, segIdx, {
+            in: {
+              x: startSeg.in.x + dx,
+              y: startSeg.in.y + dy,
+            },
+          });
+        } else if (type === 'out') {
+          path.setSeg(pathIdx, segIdx, {
+            out: {
+              x: startSeg.out.x + dx,
+              y: startSeg.out.y + dy,
+            },
+          });
+        }
+        this.editor.pathEditor.drawControlHandles();
         this.editor.render();
       }
     }
@@ -123,11 +139,11 @@ export class PathSelectMoveTool implements ITool {
   afterEnd() {
     this.startPoint = null;
     this.prevAttrs = null;
-    this.indiesInfo = [];
-    this.anchorPoints = [];
+    this.selectedControls = [];
+    this.startSegs = [];
   }
 
   onCommandChange() {
-    this.editor.pathEditor.updateControlHandles();
+    this.editor.pathEditor.drawControlHandles();
   }
 }

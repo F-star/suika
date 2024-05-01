@@ -219,12 +219,12 @@ export class SelectTool implements ITool {
       throw new Error('没有根据判断选择策略，代码有问题');
     }
   }
-  afterEnd(e: PointerEvent) {
+  afterEnd(e: PointerEvent, isDragHappened: boolean) {
     if (!this.editor.hostEventManager.isDraggingCanvasBySpace) {
       this.editor.setCursor('default');
     }
     this.graphShouldRemovedFromSelectedIfNotMoved = null;
-    this.currStrategy?.afterEnd(e);
+    this.currStrategy?.afterEnd(e, isDragHappened);
     this.currStrategy = null;
 
     const point = this.editor.getSceneCursorXY(e);

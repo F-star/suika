@@ -1,4 +1,4 @@
-import { EventEmitter, throttle } from '@suika/common';
+import { EventEmitter } from '@suika/common';
 
 import { RemoveGraphsCmd } from '../commands';
 import { type ControlHandle } from '../control_handle_manager';
@@ -17,7 +17,6 @@ export class PathEditor {
   private _active = false;
   private path: Path | null = null;
   private eventTokens: number[] = [];
-  // private selectedIndices: ISelectedIdxInfo[] = [];
   private prevToolKeys: string[] = [];
   private eventEmitter = new EventEmitter<Events>();
 
@@ -64,7 +63,7 @@ export class PathEditor {
     }
 
     editor.selectedElements.on('itemsChange', this.onSelectedChange);
-    editor.pathEditor.updateControlHandles();
+    editor.pathEditor.drawControlHandles();
     this.eventEmitter.emit('toggle', true);
   }
   inactive(source?: 'undo') {
@@ -130,9 +129,9 @@ export class PathEditor {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Path Finish',
       action: () => {
-        if (this.selectedControl.getSize() > 0) {
+        if (this.selectedControl.getSelectedControlsSize() > 0) {
           this.selectedControl.clear();
-          this.updateControlHandles();
+          this.drawControlHandles();
           this.editor.render();
         } else {
           this.inactive();
@@ -164,8 +163,10 @@ export class PathEditor {
    * parse selected index from string
    * e.g. 'anchor-0-1' -> { type: 'anchor', pathIdx: 0, segIdx: 1 }
    */
-  static parseSelectedIndex(selectedIndex: string): ISelectedIdxInfo | null {
-    const selectedInfo = selectedIndex.split('-');
+  static parseSelectedInfoStr(
+    selectedInfoStr: string,
+  ): ISelectedIdxInfo | null {
+    const selectedInfo = selectedInfoStr.split('-');
     if (selectedInfo.length !== 3) return null;
     return {
       type: selectedInfo[0] as SelectedIdexType,
@@ -181,15 +182,7 @@ export class PathEditor {
     this.eventEmitter.off(eventName, handler);
   }
 
-  updateControlHandles = throttle(
-    (addedControlHandles: ControlHandle[] = []) => {
-      const path = this.path!;
-      addedControlHandles = this.selectedControl
-        .getControls(path)
-        .concat(addedControlHandles);
-
-      this.editor.controlHandleManager.setCustomHandles(addedControlHandles);
-      this.editor.controlHandleManager.showCustomHandles();
-    },
-  );
+  drawControlHandles(addedControlHandles: ControlHandle[] = []) {
+    this.selectedControl.drawControlHandles(addedControlHandles);
+  }
 }

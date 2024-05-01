@@ -1,4 +1,4 @@
-import { cloneDeep, parseHexToRGBA } from '@suika/common';
+import { cloneDeep, parseHexToRGBA, throttle } from '@suika/common';
 import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
@@ -11,7 +11,10 @@ import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
  * Path Selected Control Handler Manager
  */
 export class SelectedControl {
-  private selectedIndices: ISelectedIdxInfo[] = [];
+  /** 没有被选中，但要绘制的 anchor/in/out 控制点 */
+  private normalControls: ISelectedIdxInfo[] = [];
+  /** 需要高亮的控制点 */
+  private selectedControls: ISelectedIdxInfo[] = [];
 
   constructor(private editor: Editor) {}
 
@@ -20,9 +23,9 @@ export class SelectedControl {
     if (!path) {
       return curveMap;
     }
-    const selectedIndices = this.selectedIndices;
+    const selectedControls = [...this.selectedControls, ...this.normalControls];
 
-    for (const selectedIndex of selectedIndices) {
+    for (const selectedIndex of selectedControls) {
       const { type, pathIdx, segIdx } = selectedIndex;
 
       // invalid index
@@ -74,11 +77,12 @@ export class SelectedControl {
   /**
    * get anchor and control handles
    */
-  public getControls(path: Path | null): ControlHandle[] {
+  public generateControls(path: Path | null): ControlHandle[] {
     if (!path) {
       return [];
     }
     const QUARTER_PI = Math.PI / 4;
+    // TODO: move to setting.ts
     const padding = 4;
     const handleInOutSize = 4;
     const handleStroke = this.editor.setting.get('handleStroke');
@@ -103,6 +107,7 @@ export class SelectedControl {
         let anchorFill = '#fff';
         let anchorStroke = handleStroke;
         if (this.contains('anchor', i, j)) {
+          // TODO: move to setting.ts
           anchorSize = 8;
           anchorFill = handleStroke;
           anchorStroke = '#fff';
@@ -156,6 +161,10 @@ export class SelectedControl {
             continue;
           }
 
+          const isSelected =
+            (handleIdx === 0 && this.contains('in', i, j)) ||
+            (handleIdx === 1 && this.contains('out', i, j));
+
           const rect = getRotatedRectByTwoPoint(anchor, handle);
           const handleLine = new ControlHandle({
             cx: rect.x + rect.width / 2,
@@ -170,7 +179,9 @@ export class SelectedControl {
                 stroke: [
                   {
                     type: PaintType.Solid,
-                    attrs: pathLineStroke,
+                    attrs: isSelected
+                      ? parseHexToRGBA(handleStroke)!
+                      : pathLineStroke,
                   },
                 ],
                 strokeWidth: 1,
@@ -181,6 +192,7 @@ export class SelectedControl {
             getCursor: () => 'default',
           });
 
+          const size = isSelected ? 6.5 : handleInOutSize;
           const handlePoint = new ControlHandle({
             cx: handle.x,
             cy: handle.y,
@@ -189,23 +201,26 @@ export class SelectedControl {
             graph: new Rect(
               {
                 objectName: 'pathHandle',
-                width: handleInOutSize,
-                height: handleInOutSize,
+                width: size,
+                height: size,
                 fill: [
                   {
                     type: PaintType.Solid,
-                    attrs: parseHexToRGBA('#fff')!,
+                    attrs: parseHexToRGBA(isSelected ? handleStroke : '#fff')!,
                   },
                 ],
                 stroke: [
                   {
                     type: PaintType.Solid,
-                    attrs: parseHexToRGBA(handleStroke)!,
+                    attrs: parseHexToRGBA(isSelected ? '#fff' : handleStroke)!,
                   },
                 ],
-                strokeWidth: 1,
+                strokeWidth: isSelected ? 1.5 : 1,
               },
-              handle,
+              this.editor.sceneCoordsToViewport(
+                handle.x + size / 2,
+                handle.y + size / 2,
+              ),
             ),
             padding,
             getCursor: () => 'default',
@@ -220,7 +235,7 @@ export class SelectedControl {
   }
 
   contains(type: SelectedIdexType, pathIdx: number, segIdx: number) {
-    return this.selectedIndices.some(
+    return this.selectedControls.some(
       (item) =>
         item.type === type &&
         item.pathIdx === pathIdx &&
@@ -228,17 +243,34 @@ export class SelectedControl {
     );
   }
 
-  getSize() {
-    return this.selectedIndices.length;
+  getSelectedControlsSize() {
+    return this.selectedControls.length;
   }
-  getItems() {
-    return cloneDeep(this.selectedIndices);
+  getSelectedControls() {
+    return cloneDeep(this.selectedControls);
   }
   setItems(items: ISelectedIdxInfo[]) {
     // TODO: solve duplicate indices
-    this.selectedIndices = items;
+    this.selectedControls = items;
   }
   clear() {
-    this.selectedIndices = [];
+    this.selectedControls = [];
   }
+
+  setNormalControls(items: ISelectedIdxInfo[]) {
+    this.normalControls = items;
+  }
+  getNormalControls() {
+    // TODO: solve duplicate indices
+    return cloneDeep(this.normalControls);
+  }
+
+  drawControlHandles = throttle((addedControlHandles: ControlHandle[] = []) => {
+    const path = this.editor.pathEditor.getPath()!;
+    addedControlHandles =
+      this.generateControls(path).concat(addedControlHandles);
+
+    this.editor.controlHandleManager.setCustomHandles(addedControlHandles);
+    this.editor.controlHandleManager.showCustomHandles();
+  });
 }

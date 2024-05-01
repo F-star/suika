@@ -39,20 +39,20 @@ export class DrawPathTool implements ITool {
   onInactive() {
     this.editor.commandManager.batchCommandEnd();
 
-    this.editor.pathEditor.updateControlHandles();
+    this.editor.pathEditor.drawControlHandles();
     this.editor.render();
   }
 
   onMoveExcludeDrag(_e: PointerEvent, isOutsideCanvas: boolean) {
     const editor = this.editor;
     if (isOutsideCanvas) {
-      editor.pathEditor.updateControlHandles();
+      editor.pathEditor.drawControlHandles();
       editor.render();
       return;
     }
 
     if (this.editor.canvasDragger.isActive()) {
-      editor.pathEditor.updateControlHandles();
+      editor.pathEditor.drawControlHandles();
     } else {
       const snapPoint = this.checkCursorPtInStartAnchor();
       if (snapPoint) {
@@ -137,7 +137,7 @@ export class DrawPathTool implements ITool {
 
       // TODO: 应该改为判断是否选中了 path 的末尾 anchor
       // 如果是，则继续绘制。
-      if (pathEditor.selectedControl.getSize() === 0) {
+      if (pathEditor.selectedControl.getSelectedControlsSize() === 0) {
         this.pathIdx = path.getPathItemCount();
       }
 
@@ -169,7 +169,7 @@ export class DrawPathTool implements ITool {
       },
     ]);
 
-    pathEditor.updateControlHandles();
+    pathEditor.drawControlHandles();
     this.editor.render();
   }
 
@@ -200,7 +200,7 @@ export class DrawPathTool implements ITool {
       inAndOut,
     );
 
-    this.editor.pathEditor.updateControlHandles();
+    this.editor.pathEditor.drawControlHandles();
     this.editor.render();
   }
 
@@ -241,7 +241,7 @@ export class DrawPathTool implements ITool {
 
   onCanvasDragActiveChange(active: boolean) {
     if (active) {
-      this.editor.pathEditor.updateControlHandles();
+      this.editor.pathEditor.drawControlHandles();
     } else {
       this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
     }
@@ -290,7 +290,7 @@ export class DrawPathTool implements ITool {
 
   onViewportXOrYChange() {
     if (this.editor.canvasDragger.isActive()) {
-      this.editor.pathEditor.updateControlHandles();
+      this.editor.pathEditor.drawControlHandles();
     } else {
       this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
     }
@@ -300,7 +300,7 @@ export class DrawPathTool implements ITool {
   private updateControlHandlesWithPreviewHandles(point: IPoint) {
     const previewHandles: ControlHandle[] = [];
 
-    if (this.editor.pathEditor.selectedControl.getSize() > 0) {
+    if (this.editor.pathEditor.selectedControl.getSelectedControlsSize() > 0) {
       const path = this.path;
       if (!path) return;
       const lastSeg = path.getLastSeg(this.pathIdx, {
@@ -386,7 +386,7 @@ export class DrawPathTool implements ITool {
     });
     previewHandles.push(previewPoint);
 
-    this.editor.pathEditor.updateControlHandles(previewHandles);
+    this.editor.pathEditor.drawControlHandles(previewHandles);
     this.editor.render();
   }
 }

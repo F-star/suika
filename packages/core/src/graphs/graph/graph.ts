@@ -296,11 +296,6 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     isShiftPressing = false,
     isAltPressing = false,
   ) {
-    // TODO: FIXME: refactor getResizedLine
-    // const rect =
-    //   this.attrs.height === 0
-    //     ? getResizedLine(type, newPos, oldBox, isShiftPressing, isAltPressing)
-    //     : getResizedRect(type, newPos, oldBox, isShiftPressing, isAltPressing);
     const rect =
       this.attrs.height === 0
         ? resizeLine(type, newPos, oldBox, {
