@@ -37,6 +37,7 @@ export class CursorManger {
     'move',
     'pen',
     'pen-close',
+    'crosshair',
   ]);
 
   constructor(private editor: Editor) {
