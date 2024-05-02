@@ -256,6 +256,7 @@ export class Rect extends Graph<RectAttrs> {
     oldBox: RectAttrs,
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
+    flipWhenResize?: boolean,
   ) {
     if (type.endsWith('CornerRadius')) {
       const attrs = this.attrs;
@@ -308,6 +309,7 @@ export class Rect extends Graph<RectAttrs> {
         oldBox,
         keepRatio,
         scaleFromCenter,
+        flipWhenResize,
       );
     }
   }

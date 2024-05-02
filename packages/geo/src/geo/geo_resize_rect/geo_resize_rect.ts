@@ -130,22 +130,23 @@ export const resizeRect = (
   type: string,
   newGlobalPt: IPoint,
   rect: ITransformRect,
-  options: {
+  options?: {
     keepRatio?: boolean;
     scaleFromCenter?: boolean;
     noChangeWidthAndHeight?: boolean;
-  } = {
-    keepRatio: false,
-    scaleFromCenter: false,
-    noChangeWidthAndHeight: false,
+    flip?: boolean;
   },
 ): ITransformRect => {
   const resizeOp = resizeOps[type];
   if (!resizeOp) {
     throw new Error(`resize type ${type} is invalid`);
   }
-  const { keepRatio, scaleFromCenter } = options;
-
+  const {
+    keepRatio,
+    scaleFromCenter,
+    noChangeWidthAndHeight,
+    flip = true,
+  } = options ?? {};
   const transform = new Matrix(...rect.transform);
   const newRect = {
     width: 0,
@@ -177,16 +178,16 @@ export const resizeRect = (
   }
 
   const scaleTf = new Matrix();
+  const scaleX = Math.sign(size.width) || 1;
+  const scaleY = Math.sign(size.height) || 1;
 
-  if (options.noChangeWidthAndHeight) {
+  if (noChangeWidthAndHeight) {
     scaleTf.scale(size.width / rect.width, size.height / rect.height);
     newRect.width = rect.width;
     newRect.height = rect.height;
   } else {
     newRect.width = Math.abs(size.width);
     newRect.height = Math.abs(size.height);
-    const scaleX = Math.sign(size.width) || 1;
-    const scaleY = Math.sign(size.height) || 1;
     scaleTf.scale(scaleX, scaleY);
   }
 
@@ -204,6 +205,14 @@ export const resizeRect = (
     y: globalOrigin.y - newGlobalOrigin.y,
   };
   newRect.transform.prepend(new Matrix().translate(offset.x, offset.y));
+
+  if (!flip) {
+    const flipFixedTf = new Matrix()
+      .translate(-newRect.width / 2, -newRect.height / 2)
+      .scale(scaleX, scaleY)
+      .translate(newRect.width / 2, newRect.height / 2);
+    newRect.transform.append(flipFixedTf);
+  }
 
   return {
     width: newRect.width,

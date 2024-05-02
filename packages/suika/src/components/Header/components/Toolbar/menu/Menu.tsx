@@ -62,6 +62,11 @@ export const Menu: FC = () => {
           check: editorSetting.highlightLayersOnHover,
           label: t({ id: 'highlightLayersOnHover' }),
         },
+        {
+          key: 'flipObjectsWhileResizing',
+          check: editorSetting.flipObjectsWhileResizing,
+          label: t({ id: 'flipObjectsWhileResizing' }),
+        },
       ],
     },
   ];
@@ -81,6 +86,7 @@ export const Menu: FC = () => {
       case 'keepToolSelectedAfterUse':
       case 'invertZoomDirection':
       case 'highlightLayersOnHover':
+      case 'flipObjectsWhileResizing':
         editor.setting.toggle(key);
         preventClose = true;
         break;

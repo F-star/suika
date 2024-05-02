@@ -134,12 +134,14 @@ export class Path extends Graph<PathAttrs> {
     type: string,
     newPos: IPoint,
     oldTransformRect: ITransformRect,
-    keepRatio = false,
-    scaleFromCenter = false,
+    keepRatio?: boolean,
+    scaleFromCenter?: boolean,
+    flipWhenResize?: boolean,
   ) {
     const rect = resizeRect(type, newPos, oldTransformRect, {
       keepRatio,
       scaleFromCenter,
+      flip: flipWhenResize,
     });
 
     const newPathData = this.recomputedPathData(rect.width, rect.height);

@@ -295,16 +295,19 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     oldBox: ITransformRect,
     isShiftPressing = false,
     isAltPressing = false,
+    flipWhenResize?: boolean,
   ) {
     const rect =
       this.attrs.height === 0
         ? resizeLine(type, newPos, oldBox, {
             keepPolarSnap: isShiftPressing,
             scaleFromCenter: isAltPressing,
+            // flip: flipWhenResize,  // TODO:
           })
         : resizeRect(type, newPos, oldBox, {
             keepRatio: isShiftPressing,
             scaleFromCenter: isAltPressing,
+            flip: flipWhenResize,
           });
 
     this.updateAttrs(rect);

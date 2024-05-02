@@ -114,6 +114,8 @@ export class Setting {
 
     /**** angle ****/
     angleBase: { x: 0, y: -1 }, // no use now
+
+    flipObjectsWhileResizing: true,
   };
   toggle<K extends BooleanKeys<Setting['value']>>(key: K) {
     const value = this.value[key];

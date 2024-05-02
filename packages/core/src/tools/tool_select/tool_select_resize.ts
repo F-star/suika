@@ -84,6 +84,7 @@ export class SelectResizeTool implements IBaseTool {
         this.startGraphsAttrs[0],
         this.editor.hostEventManager.isShiftPressing,
         this.editor.hostEventManager.isAltPressing,
+        this.editor.setting.get('flipObjectsWhileResizing'),
       );
 
       const controlHandleManager = this.editor.controlHandleManager;
@@ -135,6 +136,7 @@ export class SelectResizeTool implements IBaseTool {
         keepRatio: this.editor.hostEventManager.isShiftPressing,
         scaleFromCenter: this.editor.hostEventManager.isAltPressing,
         noChangeWidthAndHeight: true,
+        flip: this.editor.setting.get('flipObjectsWhileResizing'),
       },
     );
 

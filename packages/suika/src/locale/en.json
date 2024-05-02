@@ -51,6 +51,7 @@
   "keepToolSelectedAfterUse": "Keep tool selected after use",
   "invertZoomDirection": "Invert zoom direction",
   "highlightLayersOnHover": "Highlight layers on hover",
+  "flipObjectsWhileResizing": "Flip objects while resizing",
 
   "done": "Done"
 }
