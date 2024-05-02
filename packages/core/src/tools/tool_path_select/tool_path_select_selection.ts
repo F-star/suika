@@ -1,10 +1,8 @@
+import { isEqual } from '@suika/common';
 import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../../editor';
-import {
-  type ISelectedIdxInfo,
-  type SelectedIdexType,
-} from '../../path_editor';
+import { type ISelectedIdxInfo, PathEditor } from '../../path_editor';
 import { type IBaseTool } from '../type';
 
 /**
@@ -14,6 +12,7 @@ export class DrawPathSelectionTool implements IBaseTool {
   private lastPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
   private startSelectedControls: ISelectedIdxInfo[] = [];
+  segControlsNeedDrawInStart: { pathIdx: number; segIdx: number }[] = [];
 
   constructor(private editor: Editor) {}
   onActive() {
@@ -26,6 +25,10 @@ export class DrawPathSelectionTool implements IBaseTool {
     this.isShiftPressingWhenStart = false;
     const editor = this.editor;
     const pathEditor = editor.pathEditor;
+
+    this.segControlsNeedDrawInStart =
+      this.editor.pathEditor.selectedControl.getSegControlsNeedDraw();
+
     if (editor.hostEventManager.isShiftPressing) {
       this.isShiftPressingWhenStart = true;
       this.startSelectedControls =
@@ -54,21 +57,24 @@ export class DrawPathSelectionTool implements IBaseTool {
     const controls =
       this.editor.controlHandleManager.getCustomHandlesIntersectedWithRect(box);
 
-    const info: ISelectedIdxInfo[] = controls
-      .filter(
-        (control) =>
-          control.type.startsWith('anchor-') ||
-          control.type.startsWith('in-') ||
-          control.type.startsWith('out-'),
-      )
+    const info = controls
       .map((control) => {
-        const strs = control.type.split('-');
-        return {
-          type: strs[0] as SelectedIdexType,
-          pathIdx: parseInt(strs[1]),
-          segIdx: parseInt(strs[2]),
-        };
-      });
+        return PathEditor.parseSelectedInfoStr(control.type);
+      })
+      .filter((info) => {
+        if (!info) return false;
+        const type = info.type;
+        if (type === 'anchor') return true;
+        if (type === 'in' || type === 'out') {
+          return this.segControlsNeedDrawInStart.some((item) =>
+            isEqual(item, {
+              pathIdx: info.pathIdx,
+              segIdx: info.segIdx,
+            }),
+          );
+        }
+        return false;
+      }) as ISelectedIdxInfo[];
 
     if (this.isShiftPressingWhenStart) {
       this.editor.pathEditor.selectedControl.setItems([

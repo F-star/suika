@@ -15,18 +15,31 @@ export class SelectedControl {
   private normalControls: ISelectedIdxInfo[] = [];
   /** 需要高亮的控制点 */
   private selectedControls: ISelectedIdxInfo[] = [];
+  /** 需要绘制控制点的 segment */
+  private segControlsNeedDraw: { pathIdx: number; segIdx: number }[] = [];
 
   constructor(private editor: Editor) {}
 
-  private getItemsNeedDraw(path: Path | null): Map<number, Set<number>> {
-    const curveMap = new Map<number, Set<number>>();
-    if (!path) {
-      return curveMap;
-    }
-    const selectedControls = [...this.selectedControls, ...this.normalControls];
+  getSegControlsNeedDraw() {
+    return this.segControlsNeedDraw;
+  }
 
-    for (const selectedIndex of selectedControls) {
-      const { type, pathIdx, segIdx } = selectedIndex;
+  private getItemsNeedDraw() {
+    const path = this.editor.pathEditor.getPath();
+    const segControlsNeedDrawMap = new Map<number, Set<number>>();
+    const segControlsNeedDraw: { pathIdx: number; segIdx: number }[] = [];
+
+    if (!path) {
+      console.warn('path is no exist');
+      return {
+        segControlsNeedDrawMap,
+        segControlsNeedDraw,
+      };
+    }
+    const controls = [...this.selectedControls, ...this.normalControls];
+
+    for (const control of controls) {
+      const { type, pathIdx, segIdx } = control;
 
       // invalid index
       if (pathIdx < 0 || pathIdx >= path.attrs.pathData.length) {
@@ -39,46 +52,58 @@ export class SelectedControl {
         continue;
       }
 
-      let segIdxSet = curveMap.get(pathIdx);
+      let segIdxSet = segControlsNeedDrawMap.get(pathIdx);
       if (!segIdxSet) {
         segIdxSet = new Set<number>();
-        curveMap.set(pathIdx, segIdxSet);
+        segControlsNeedDrawMap.set(pathIdx, segIdxSet);
       }
       segIdxSet.add(segIdx);
+      segControlsNeedDraw.push({ pathIdx, segIdx });
 
       const leftSegIdx = segIdx - 1;
       const rightSegIdx = segIdx + 1;
       if (type === 'anchor') {
         if (leftSegIdx >= 0) {
           segIdxSet.add(leftSegIdx);
+          segControlsNeedDraw.push({ pathIdx, segIdx: leftSegIdx });
         } else if (closed) {
           segIdxSet.add(segCount - 1);
+          segControlsNeedDraw.push({ pathIdx, segIdx: segCount - 1 });
         }
 
         if (rightSegIdx < segCount) {
           segIdxSet.add(rightSegIdx);
+          segControlsNeedDraw.push({ pathIdx, segIdx: rightSegIdx });
         } else if (closed) {
           segIdxSet.add(0);
+          segControlsNeedDraw.push({ pathIdx, segIdx: 0 });
         }
       } else if (type === 'in') {
         if (leftSegIdx >= 0) {
           segIdxSet.add(leftSegIdx);
+          segControlsNeedDraw.push({ pathIdx, segIdx: leftSegIdx });
         }
       } else if (type === 'out' || type === 'curve') {
         if (rightSegIdx < segCount) {
           segIdxSet.add(rightSegIdx);
+          segControlsNeedDraw.push({ pathIdx, segIdx: rightSegIdx });
         }
       }
     }
 
-    return curveMap;
+    return {
+      segControlsNeedDrawMap,
+      segControlsNeedDraw,
+    };
   }
 
   /**
    * get anchor and control handles
    */
-  public generateControls(path: Path | null): ControlHandle[] {
+  public generateControls(): ControlHandle[] {
+    const path = this.editor.pathEditor.getPath();
     if (!path) {
+      console.warn('path is not exist');
       return [];
     }
     const QUARTER_PI = Math.PI / 4;
@@ -89,7 +114,11 @@ export class SelectedControl {
     const zoom = this.editor.zoomManager.getZoom();
     const pathData = path.attrs.pathData;
 
-    const handleIndiesNeedDraw = this.getItemsNeedDraw(path);
+    const { segControlsNeedDrawMap, segControlsNeedDraw } =
+      this.getItemsNeedDraw();
+
+    // side effect
+    this.segControlsNeedDraw = segControlsNeedDraw;
 
     const anchors: ControlHandle[] = [];
     const handleLinesAndPoints: ControlHandle[] = [];
@@ -146,7 +175,7 @@ export class SelectedControl {
         anchors.push(anchorControlHandle);
 
         // 2. draw handleIn, handleOut, handleInLine and handleOutLine
-        const segIdxSet = handleIndiesNeedDraw.get(i);
+        const segIdxSet = segControlsNeedDrawMap.get(i);
         if (!segIdxSet || !segIdxSet.has(j)) {
           continue;
         }
@@ -266,9 +295,7 @@ export class SelectedControl {
   }
 
   drawControlHandles = throttle((addedControlHandles: ControlHandle[] = []) => {
-    const path = this.editor.pathEditor.getPath()!;
-    addedControlHandles =
-      this.generateControls(path).concat(addedControlHandles);
+    addedControlHandles = this.generateControls().concat(addedControlHandles);
 
     this.editor.controlHandleManager.setCustomHandles(addedControlHandles);
     this.editor.controlHandleManager.showCustomHandles();
