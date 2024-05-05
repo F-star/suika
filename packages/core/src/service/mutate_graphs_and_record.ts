@@ -1,6 +1,7 @@
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
-import { type Graph } from '../graphs';
+import { type Graph, type Rect } from '../graphs';
+import { GraphType } from '../type';
 
 /**
  * mutate elements and record to history
@@ -120,16 +121,20 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    const prevAttrs = elements.map((el) => ({
+    const rectGraphics = elements.filter(
+      (el) => el.type === GraphType.Rect,
+    ) as Rect[];
+
+    const prevAttrs = rectGraphics.map((el) => ({
       cornerRadius: el.attrs.cornerRadius || 0,
     }));
-    elements.forEach((el) => {
+    rectGraphics.forEach((el) => {
       el.attrs.cornerRadius = cornerRadius;
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'update Corner Radius',
-        elements,
+        rectGraphics,
         { cornerRadius },
         prevAttrs,
       ),
