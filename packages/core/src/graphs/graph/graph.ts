@@ -288,27 +288,59 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return isBoxContain(box, bbox) || isBoxContain(bbox, box);
   }
 
-  updateByControlHandle(
+  /**
+   * calculate new attributes by control handle
+   */
+  calcNewAttrsByControlHandle(
     /** 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w' */
     type: string,
     newPos: IPoint,
-    oldBox: ITransformRect,
+    oldRect: ITransformRect,
     isShiftPressing = false,
     isAltPressing = false,
     flipWhenResize?: boolean,
-  ) {
+  ): Partial<ATTRS> {
     const rect =
       this.attrs.height === 0
-        ? resizeLine(type, newPos, oldBox, {
+        ? resizeLine(type, newPos, oldRect, {
             keepPolarSnap: isShiftPressing,
             scaleFromCenter: isAltPressing,
-            // flip: flipWhenResize,  // TODO:
           })
-        : resizeRect(type, newPos, oldBox, {
+        : resizeRect(type, newPos, oldRect, {
             keepRatio: isShiftPressing,
             scaleFromCenter: isAltPressing,
             flip: flipWhenResize,
           });
+    return rect as Partial<ATTRS>;
+  }
+
+  /**
+   * update attributes by control handle
+   * @param type
+   * @param newPos
+   * @param oldRect
+   * @param isShiftPressing
+   * @param isAltPressing
+   * @param flipWhenResize
+   * @returns if width or height is zero, return true; otherwise return undefined
+   */
+  updateByControlHandle(
+    /** 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w' */
+    type: string,
+    newPos: IPoint,
+    oldRect: ITransformRect,
+    isShiftPressing = false,
+    isAltPressing = false,
+    flipWhenResize?: boolean,
+  ) {
+    const rect = this.calcNewAttrsByControlHandle(
+      type,
+      newPos,
+      oldRect,
+      isShiftPressing,
+      isAltPressing,
+      flipWhenResize,
+    );
 
     this.updateAttrs(rect);
   }

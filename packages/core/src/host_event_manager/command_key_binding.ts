@@ -175,10 +175,7 @@ export class CommandKeyBinding {
 
     // snap to grid
     const snapToGridAction = () => {
-      editor.setting.set(
-        'snapToPixelGrid',
-        !editor.setting.get('snapToPixelGrid'),
-      );
+      editor.setting.set('snapToGrid', !editor.setting.get('snapToGrid'));
       editor.render();
     };
     editor.keybindingManager.register({

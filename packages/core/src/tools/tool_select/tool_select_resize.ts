@@ -1,4 +1,4 @@
-import { arrMap, noop } from '@suika/common';
+import { arrMap, isEqual, noop } from '@suika/common';
 import {
   type IMatrixArr,
   type IPoint,
@@ -12,6 +12,7 @@ import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
 import { type Graph, type GraphAttrs } from '../../graphs';
+import { SnapHelper } from '../../snap';
 import { type IBaseTool } from '../type';
 
 /**
@@ -23,6 +24,7 @@ export class SelectResizeTool implements IBaseTool {
   private startSelectBbox: IRect | null = null;
   private startGraphsAttrs: GraphAttrs[] = [];
   private lastPoint: IPoint | null = null;
+  private prevLastPoint: IPoint | null = null;
   private unbind = noop;
 
   constructor(private editor: Editor) {}
@@ -70,7 +72,27 @@ export class SelectResizeTool implements IBaseTool {
     this.editor.commandManager.disableRedoUndo();
     this.editor.hostEventManager.disableDelete();
 
+    const enableGripSnap =
+      this.editor.setting.get('snapToGrid') &&
+      (['nw', 'ne', 'se', 'sw'].includes(this.handleName) ||
+        (['n', 'e', 's', 'w'].includes(this.handleName) &&
+          this.editor.selectedElements.size() > 1) ||
+        this.editor.selectedElements.getItems()[0].getRotate() % Math.PI === 0);
+
     this.lastPoint = this.editor.getSceneCursorXY(e);
+    if (enableGripSnap) {
+      this.lastPoint = SnapHelper.getSnapPtBySetting(
+        this.lastPoint,
+        this.editor.setting,
+      );
+    }
+
+    const prevLastPoint = this.prevLastPoint;
+    this.prevLastPoint = this.lastPoint;
+    if (isEqual(prevLastPoint, this.lastPoint)) {
+      return;
+    }
+
     this.resize();
   }
   private resize() {
@@ -78,7 +100,7 @@ export class SelectResizeTool implements IBaseTool {
 
     const selectItems = this.editor.selectedElements.getItems();
     if (selectItems.length === 1) {
-      selectItems[0].updateByControlHandle(
+      const newAttrs = selectItems[0].calcNewAttrsByControlHandle(
         this.handleName,
         this.lastPoint,
         this.startGraphsAttrs[0],
@@ -86,6 +108,17 @@ export class SelectResizeTool implements IBaseTool {
         this.editor.hostEventManager.isAltPressing,
         this.editor.setting.get('flipObjectsWhileResizing'),
       );
+
+      if (
+        newAttrs.width === 0 ||
+        newAttrs.height === 0 ||
+        (newAttrs.transform &&
+          (newAttrs.transform[0] === 0 || newAttrs.transform[3]) === 0)
+      ) {
+        return;
+      }
+
+      selectItems[0].updateAttrs(newAttrs);
 
       const controlHandleManager = this.editor.controlHandleManager;
       // update custom control handles
@@ -139,6 +172,14 @@ export class SelectResizeTool implements IBaseTool {
         flip: this.editor.setting.get('flipObjectsWhileResizing'),
       },
     );
+    if (
+      transformRect.width === 0 ||
+      transformRect.height === 0 ||
+      transformRect.transform[0] === 0 ||
+      transformRect.transform[3] === 0
+    ) {
+      return;
+    }
 
     const scaleTf = new Matrix(...transformRect.transform).append(
       new Matrix(...startTransform).invert(),

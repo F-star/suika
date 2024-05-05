@@ -129,7 +129,7 @@ export class Path extends Graph<PathAttrs> {
     super.updateAttrs(partialAttrs);
   }
 
-  override updateByControlHandle(
+  override calcNewAttrsByControlHandle(
     /** 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w' */
     type: string,
     newPos: IPoint,
@@ -143,10 +143,10 @@ export class Path extends Graph<PathAttrs> {
       scaleFromCenter,
       flip: flipWhenResize,
     });
-
+    const newAttrs: Partial<PathAttrs> = rect;
     const newPathData = this.recomputedPathData(rect.width, rect.height);
-    this.attrs.pathData = newPathData;
-    super.updateAttrs(rect);
+    newAttrs.pathData = newPathData;
+    return newAttrs;
   }
 
   private recomputedPathData(width: number, height: number) {
