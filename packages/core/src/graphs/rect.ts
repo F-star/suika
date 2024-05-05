@@ -250,7 +250,7 @@ export class Rect extends Graph<RectAttrs> {
     return handles;
   }
 
-  override updateByControlHandle(
+  override calcNewAttrsByControlHandle(
     type: string,
     newPos: IPoint,
     oldBox: RectAttrs,
@@ -258,6 +258,7 @@ export class Rect extends Graph<RectAttrs> {
     scaleFromCenter?: boolean,
     flipWhenResize?: boolean,
   ) {
+    const newAttrs = {} as Partial<RectAttrs>;
     if (type.endsWith('CornerRadius')) {
       const attrs = this.attrs;
       const tf = new Matrix(...attrs.transform);
@@ -298,20 +299,24 @@ export class Rect extends Graph<RectAttrs> {
         }
       }
       const dist = (a.x * b.x + a.y * b.y) / Math.sqrt(a.x * a.x + a.y * a.y);
-      this.attrs.cornerRadius = Math.min(
+      newAttrs.cornerRadius = Math.min(
         this.getMaxCornerRadius(),
         Math.round(Math.max(dist, 0) * Math.cos(Math.PI / 4)),
       );
     } else {
-      super.updateByControlHandle(
-        type,
-        newPos,
-        oldBox,
-        keepRatio,
-        scaleFromCenter,
-        flipWhenResize,
+      Object.assign(
+        newAttrs,
+        super.calcNewAttrsByControlHandle(
+          type,
+          newPos,
+          oldBox,
+          keepRatio,
+          scaleFromCenter,
+          flipWhenResize,
+        ),
       );
     }
+    return newAttrs;
   }
 
   /**

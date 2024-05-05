@@ -83,9 +83,14 @@ export class Setting {
 
     /**** pixel grid ****/
     enablePixelGrid: true,
-    snapToPixelGrid: true, // 是否吸附到像素网格
+    snapToGrid: true, // 是否吸附到网格
     minPixelGridZoom: 8, // draw pixel grid When zoom reach this value
     pixelGridLineColor: '#cccccc55', // pixel grid line color
+
+    gridViewX: 1,
+    gridViewY: 1,
+    gridSnapX: 1,
+    gridSnapY: 1,
 
     dragBlockStep: 4, // drag handler will not happen if move distance less this value
 

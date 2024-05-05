@@ -281,7 +281,7 @@ export class DrawPathTool implements ITool {
   /** get corrected cursor point */
   private getCorrectedPoint() {
     const point = this.editor.toolManager.getCurrPoint();
-    if (this.editor.setting.get('snapToPixelGrid')) {
+    if (this.editor.setting.get('snapToGrid')) {
       point.x = getClosestTimesVal(point.x, 0.5);
       point.y = getClosestTimesVal(point.y, 0.5);
     }

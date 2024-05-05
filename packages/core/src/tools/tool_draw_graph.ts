@@ -5,6 +5,7 @@ import { AddGraphCmd } from '../commands/add_graphs';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
 import { type Graph } from '../graphs';
+import { SnapHelper } from '../snap';
 import { type ITool } from './type';
 
 /**
@@ -68,7 +69,7 @@ export abstract class DrawGraphTool implements ITool {
         this.lastDragPoint = editor.viewportCoordsToScene(
           this.lastDragPointInViewport.x,
           this.lastDragPointInViewport.y,
-          this.editor.setting.get('snapToPixelGrid'),
+          this.editor.setting.get('snapToGrid'),
         );
         this.updateRect();
       }
@@ -90,9 +91,9 @@ export abstract class DrawGraphTool implements ITool {
   }
 
   onStart(e: PointerEvent) {
-    this.startPoint = this.editor.getSceneCursorXY(
-      e,
-      this.editor.setting.get('snapToPixelGrid'),
+    this.startPoint = SnapHelper.getSnapPtBySetting(
+      this.editor.getSceneCursorXY(e),
+      this.editor.setting,
     );
     this.drawingGraph = null;
     this.isDragging = false;
@@ -108,9 +109,10 @@ export abstract class DrawGraphTool implements ITool {
     }
     this.isDragging = true;
     this.lastDragPointInViewport = this.editor.getCursorXY(e);
-    this.lastDragPoint = this.lastMousePoint = this.editor.getSceneCursorXY(
-      e,
-      this.editor.setting.get('snapToPixelGrid'),
+
+    this.lastDragPoint = this.lastMousePoint = SnapHelper.getSnapPtBySetting(
+      this.editor.getSceneCursorXY(e),
+      this.editor.setting,
     );
     this.updateRect();
   }
@@ -167,11 +169,15 @@ export abstract class DrawGraphTool implements ITool {
     let width = x - startX;
     let height = y - startY;
     if (width === 0) {
-      const sign = Math.sign(this.lastMousePoint.x - this.startPoint.x) || 1;
+      const sign =
+        Math.sign(this.lastMousePoint.x - this.startPoint.x) ||
+        this.editor.setting.get('gridSnapX');
       width = sign * 1;
     }
     if (height === 0) {
-      const sign = Math.sign(this.lastMousePoint.y - this.startPoint.y) || 1;
+      const sign =
+        Math.sign(this.lastMousePoint.y - this.startPoint.y) ||
+        this.editor.setting.get('gridSnapY');
       height = sign * 1;
     }
 
@@ -227,9 +233,9 @@ export abstract class DrawGraphTool implements ITool {
       return;
     }
 
-    const endPoint = this.editor.getSceneCursorXY(
-      e,
-      this.editor.setting.get('snapToPixelGrid'),
+    const endPoint = SnapHelper.getSnapPtBySetting(
+      this.editor.getSceneCursorXY(e),
+      this.editor.setting,
     );
 
     if (this.drawingGraph === null) {

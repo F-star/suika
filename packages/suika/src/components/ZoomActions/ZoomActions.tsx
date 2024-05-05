@@ -146,12 +146,12 @@ export const ZoomActions: FC = () => {
             <FormattedMessage id="setting.grid.pixelGrid" />
           </ActionItem>
           <ActionItem
-            check={setting.snapToPixelGrid}
+            check={setting.snapToGrid}
             suffix={isWindows ? "Ctrl+Shift+'" : "⌘⇧'"}
             onClick={() => {
               if (editor) {
-                const snapToPixelGrid = editor.setting.get('snapToPixelGrid');
-                editor.setting.set('snapToPixelGrid', !snapToPixelGrid);
+                const snapToGrid = editor.setting.get('snapToGrid');
+                editor.setting.set('snapToGrid', !snapToGrid);
                 editor.render();
                 setPopoverVisible(false);
               }

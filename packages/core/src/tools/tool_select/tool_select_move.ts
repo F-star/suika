@@ -70,8 +70,8 @@ export class SelectMoveTool implements IBaseTool {
       this.dragPoint!.y,
     );
 
-    let dx = (this.dx = x - this.startPoint.x);
-    let dy = (this.dy = y - this.startPoint.y);
+    let dx = x - this.startPoint.x;
+    let dy = y - this.startPoint.y;
 
     if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(dx) > Math.abs(dy)) {
@@ -82,7 +82,7 @@ export class SelectMoveTool implements IBaseTool {
     }
 
     // in the moving phase, AABBox's x and y should round to be integer (snap to pixel grid)
-    if (this.editor.setting.get('snapToPixelGrid')) {
+    if (this.editor.setting.get('snapToGrid')) {
       // if dx == 0, we thing it is in vertical moving.
       if (dx !== 0)
         dx = Math.round(this.prevBBoxPos.x + dx) - this.prevBBoxPos.x;
@@ -90,6 +90,8 @@ export class SelectMoveTool implements IBaseTool {
       if (dy !== 0)
         dy = Math.round(this.prevBBoxPos.y + dy) - this.prevBBoxPos.y;
     }
+    this.dx = dx;
+    this.dy = dy;
 
     const selectedElements = this.editor.selectedElements.getItems({
       excludeLocked: true,

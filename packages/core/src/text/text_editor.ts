@@ -127,7 +127,7 @@ export class TextEditor {
     const sceneXY = this.editor.viewportCoordsToScene(
       this.x,
       this.y,
-      this.editor.setting.get('snapToPixelGrid'),
+      this.editor.setting.get('snapToGrid'),
     );
     const text = new TextGraph(
       {
