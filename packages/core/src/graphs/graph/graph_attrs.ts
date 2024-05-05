@@ -20,7 +20,6 @@ export interface GraphAttrs {
   stroke?: IPaint[];
   strokeWidth?: number;
 
-  cornerRadius?: number;
   visible?: boolean;
   lock?: boolean;
 }

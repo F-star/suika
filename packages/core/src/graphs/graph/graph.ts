@@ -18,6 +18,8 @@ import {
   isPointInRect,
   isRectIntersect,
   type ITransformRect,
+  normalizeRadian,
+  rad2Deg,
   rectToVertices,
   resizeLine,
   resizeRect,
@@ -213,7 +215,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     };
   }
 
-  getTransformSize() {
+  getTransformedSize() {
     return getTransformedSize(this.attrs);
   }
 
@@ -481,6 +483,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   getRotate() {
     return getTransformAngle(this.attrs.transform);
   }
+
+  getRotateDegree() {
+    return rad2Deg(normalizeRadian(this.getRotate()));
+  }
+
   setRotate(newRotate: number, center?: IPoint) {
     const rotate = this.getRotate();
     const delta = newRotate - rotate;
@@ -510,5 +517,41 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     this.updateAttrs({
       transform: [newTf.a, newTf.b, newTf.c, newTf.d, newTf.tx, newTf.ty],
     });
+  }
+
+  getInfoPanelAttrs() {
+    const size = this.getTransformedSize();
+    return [
+      {
+        label: 'X',
+        key: 'x',
+        value: this.getX(),
+        uiType: 'number',
+      },
+      {
+        label: 'Y',
+        key: 'y',
+        value: this.getY(),
+        uiType: 'number',
+      },
+      {
+        label: 'W',
+        key: 'width',
+        value: size.width,
+        uiType: 'number',
+      },
+      {
+        label: 'H',
+        key: 'height',
+        value: size.height,
+        uiType: 'number',
+      },
+      {
+        label: 'R',
+        key: 'rotation',
+        value: this.getRotateDegree(),
+        uiType: 'number',
+      },
+    ];
   }
 }

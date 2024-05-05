@@ -1,8 +1,8 @@
 import './style.scss';
 
 import { remainDecimal } from '@suika/common';
-import { GraphType, MutateGraphsAndRecord } from '@suika/core';
-import { deg2Rad, normalizeRadian, rad2Deg } from '@suika/geo';
+import { MutateGraphsAndRecord } from '@suika/core';
+import { deg2Rad, normalizeRadian } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -19,101 +19,42 @@ const isEqual = (a: number | string, b: number) => {
   return Math.abs(a - b) < 0.00000001;
 };
 
+interface IAttr {
+  label: string;
+  key: string;
+  value: number | string;
+  uiType: string;
+}
+
 export const ElementsInfoCards: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
   const MIXED = intl.formatMessage({ id: 'mixed' });
-
-  // graph type string
-  const [graphType, setGraphType] = useState<GraphType | typeof MIXED>(MIXED);
-  const [rotatedX, setRotatedX] = useState<number | typeof MIXED>(MIXED);
-  const [rotatedY, setRotatedY] = useState<number | typeof MIXED>(MIXED);
-  const [width, setWidth] = useState<number | typeof MIXED>(MIXED);
-  const [height, setHeight] = useState<number | typeof MIXED>(MIXED);
-  const [rotation, setRotation] = useState<number | typeof MIXED>(MIXED);
-  const [cornerRadius, setCornerRadius] = useState<number | typeof MIXED>(
-    MIXED,
-  );
+  const [attrs, setAttrs] = useState<IAttr[]>([]);
 
   useEffect(() => {
     if (editor) {
       const updateInfo = () => {
         const items = editor.selectedElements.getItems();
-        if (items.length > 0) {
-          let {
-            x: newRotatedX,
-            y: newRotatedY,
-          }: {
-            x: number | typeof MIXED;
-            y: number | typeof MIXED;
-          } = items[0].getPosition();
-          let newGraphType: GraphType | typeof MIXED = items[0].type;
-
-          const size = items[0].getTransformSize();
-          let newWidth: number | typeof MIXED = size.width;
-          let newHeight: number | typeof MIXED = size.height;
-
-          let newRotation: number | typeof MIXED = items[0].getRotate();
-          let newCornerRadius: number | typeof MIXED =
-            items[0].attrs.cornerRadius || 0;
-
-          for (const element of items) {
-            if (element.type !== newGraphType) {
-              newGraphType = MIXED;
-            }
-            const { x: currentRotatedX, y: currentRotatedY } =
-              element.getPosition();
-            if (!isEqual(newRotatedX, currentRotatedX)) {
-              newRotatedX = MIXED;
-            }
-            if (!isEqual(newRotatedY, currentRotatedY)) {
-              newRotatedY = MIXED;
-            }
-            const size = element.getTransformSize();
-            if (!isEqual(newWidth, size.width)) {
-              newWidth = MIXED;
-            }
-            if (!isEqual(newHeight, size.height)) {
-              newHeight = MIXED;
-            }
-            if (!isEqual(newRotation, element.getRotate())) {
-              newRotation = MIXED;
-            }
-            if (!isEqual(newCornerRadius, element.attrs.cornerRadius || 0)) {
-              newCornerRadius = MIXED;
+        // TODO: 设置顺序
+        const map = new Map<string, IAttr>();
+        for (const el of items) {
+          const attrs = el.getInfoPanelAttrs();
+          for (const attr of attrs) {
+            attr.value = remainDecimal(attr.value, 2);
+            const label = attr.label;
+            if (!map.has(label)) {
+              map.set(label, attr);
+            } else {
+              const valInMap = map.get(label)!.value;
+              if (valInMap !== attr.value) {
+                map.get(label)!.value = MIXED;
+              }
             }
           }
-
-          setGraphType(newGraphType);
-          setRotatedX(
-            newRotatedX === MIXED
-              ? newRotatedX
-              : remainDecimal(newRotatedX as number),
-          );
-          setRotatedY(
-            newRotatedY === MIXED
-              ? newRotatedY
-              : remainDecimal(newRotatedY as number),
-          );
-          setWidth(
-            newWidth === MIXED ? newWidth : remainDecimal(newWidth as number),
-          );
-          setHeight(
-            newHeight === MIXED
-              ? newHeight
-              : remainDecimal(newHeight as number),
-          );
-          setRotation(
-            newRotation === MIXED
-              ? newRotation
-              : remainDecimal(rad2Deg(normalizeRadian(newRotation as number))),
-          );
-          setCornerRadius(
-            newCornerRadius === MIXED
-              ? newCornerRadius
-              : remainDecimal(newCornerRadius as number),
-          );
         }
+
+        setAttrs(Array.from(map.values()));
       };
 
       updateInfo(); // init
@@ -126,115 +67,73 @@ export const ElementsInfoCards: FC = () => {
     }
   }, [editor, MIXED]);
 
-  // attributes x, y, width, height, rotation, cornerRadius
-  const attrs = [
-    {
-      label: 'X',
-      value: rotatedX,
-      onBlur: (newRotatedX: number) => {
-        if (editor) {
-          const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setX(editor, elements, newRotatedX);
-          editor.render();
-        }
-      },
-    },
-    {
-      label: 'Y',
-      value: rotatedY,
-      onBlur: (newRotatedY: number) => {
-        if (editor) {
-          const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setY(editor, elements, newRotatedY);
-          editor.render();
-        }
-      },
-    },
-    {
-      label: 'W',
-      min: 1,
-      value: width,
-      onBlur: (newWidth: number) => {
-        if (editor) {
-          const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setWidth(editor, elements, newWidth);
-          editor.render();
-        }
-      },
-    },
-    {
-      label: 'H',
-      min: 1,
-      value: height,
-      onBlur: (newHeight: number) => {
-        if (editor) {
-          const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setHeight(editor, elements, newHeight);
-          editor.render();
-        }
-      },
-    },
-    {
-      label: 'R',
-      value: rotation,
-      suffixValue: '°',
-      onBlur: (newRotation: number) => {
-        if (editor) {
-          newRotation = normalizeRadian(deg2Rad(newRotation));
-          const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setRotation(editor, elements, newRotation);
-          editor.render();
-        }
-      },
-    },
-    {
-      label: 'C',
-      min: 0,
-      value: cornerRadius,
-      visible: () => {
-        return graphType === GraphType.Rect;
-      },
-      onBlur: (newCornerRadius: number) => {
-        if (editor) {
-          const elements = editor.selectedElements.getItems();
-          MutateGraphsAndRecord.setCornerRadius(
-            editor,
-            elements,
-            newCornerRadius,
-          );
-          editor.render();
-        }
-      },
-    },
-  ];
+  const execCommand = (key: string, newVal: number) => {
+    console.log({ key, newVal });
+    if (editor) {
+      const elements = editor.selectedElements.getItems();
+      if (key === 'x') {
+        MutateGraphsAndRecord.setX(editor, elements, newVal);
+      } else if (key === 'y') {
+        MutateGraphsAndRecord.setY(editor, elements, newVal);
+      } else if (key === 'width') {
+        MutateGraphsAndRecord.setWidth(editor, elements, newVal);
+      } else if (key === 'height') {
+        MutateGraphsAndRecord.setHeight(editor, elements, newVal);
+      } else if (key === 'rotation') {
+        MutateGraphsAndRecord.setRotation(
+          editor,
+          elements,
+          normalizeRadian(deg2Rad(newVal)),
+        );
+      } else if (key === 'cornerRadius') {
+        // 特定图形特有属性要做特殊处理。。。遍历图形时需要判断当前图形是否支持某个属性
+        MutateGraphsAndRecord.setCornerRadius(editor, elements, newVal);
+      }
+
+      editor.render();
+    }
+  };
 
   return (
     <BaseCard>
       <div className="element-info-attrs-row">
         {attrs.slice(0, 2).map((item) => (
-          <AttrInput {...item} key={item.label} />
+          <NumAttrInput
+            {...item}
+            key={item.key}
+            onBlur={(newVal) => {
+              execCommand(item.key, newVal);
+            }}
+          />
         ))}
       </div>
       <div className="element-info-attrs-row">
         {attrs.slice(2, 4).map((item) => (
-          <AttrInput {...item} key={item.label} />
+          <NumAttrInput
+            {...item}
+            key={item.key}
+            onBlur={(newVal) => {
+              execCommand(item.key, newVal);
+            }}
+          />
         ))}
       </div>
       <div className="element-info-attrs-row">
-        {attrs
-          .slice(4, 6)
-          .filter((item) => {
-            return item.visible ? item.visible() : true;
-          })
-          .map((item) => (
-            <AttrInput {...item} key={item.label} />
-          ))}
+        {attrs.slice(4, 6).map((item) => (
+          <NumAttrInput
+            {...item}
+            key={item.key}
+            onBlur={(newVal) => {
+              execCommand(item.key, newVal);
+            }}
+          />
+        ))}
       </div>
     </BaseCard>
   );
 };
 
-const AttrInput: FC<{
+const NumAttrInput: FC<{
   label: string;
   min?: number;
   value: string | number;

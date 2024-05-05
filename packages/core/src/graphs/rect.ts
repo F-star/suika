@@ -319,6 +319,18 @@ export class Rect extends Graph<RectAttrs> {
     return newAttrs;
   }
 
+  override getInfoPanelAttrs() {
+    return [
+      ...super.getInfoPanelAttrs(),
+      {
+        label: 'C',
+        key: 'cornerRadius',
+        value: this.attrs.cornerRadius ?? 0,
+        uiType: 'number',
+      },
+    ];
+  }
+
   /**
    * parse to svg string
    * for debug
