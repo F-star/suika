@@ -5,6 +5,7 @@ import {
   type IPoint,
   type IRect,
   type ITransformRect,
+  resizeLine,
   resizeRect,
 } from '@suika/geo';
 import { Bezier } from 'bezier-js';
@@ -103,7 +104,15 @@ export class Path extends Graph<PathAttrs> {
    * update attributes
    * TODO: optimize
    */
-  override updateAttrs(partialAttrs: Partial<PathAttrs>) {
+  override updateAttrs(
+    partialAttrs: Partial<PathAttrs>,
+    opts?: { finishRecomputed?: boolean },
+  ) {
+    if (opts?.finishRecomputed) {
+      super.updateAttrs(partialAttrs);
+      return;
+    }
+
     partialAttrs = cloneDeep(partialAttrs);
     this.checkAndFixUpdatedAttrs(partialAttrs);
 
@@ -133,16 +142,22 @@ export class Path extends Graph<PathAttrs> {
     /** 'se' | 'ne' | 'nw' | 'sw' | 'n' | 'e' | 's' | 'w' */
     type: string,
     newPos: IPoint,
-    oldTransformRect: ITransformRect,
+    oldRect: ITransformRect,
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
     flipWhenResize?: boolean,
   ) {
-    const rect = resizeRect(type, newPos, oldTransformRect, {
-      keepRatio,
-      scaleFromCenter,
-      flip: flipWhenResize,
-    });
+    const rect =
+      this.attrs.height === 0
+        ? resizeLine(type, newPos, oldRect, {
+            keepPolarSnap: keepRatio,
+            scaleFromCenter: scaleFromCenter,
+          })
+        : resizeRect(type, newPos, oldRect, {
+            keepRatio: keepRatio,
+            scaleFromCenter: scaleFromCenter,
+            flip: flipWhenResize,
+          });
     const newAttrs: Partial<PathAttrs> = rect;
     const newPathData = this.recomputedPathData(rect.width, rect.height);
     newAttrs.pathData = newPathData;
@@ -150,8 +165,8 @@ export class Path extends Graph<PathAttrs> {
   }
 
   private recomputedPathData(width: number, height: number) {
-    const scaleX = width / this.attrs.width;
-    const scaleY = height / this.attrs.height;
+    const scaleX = width / (this.attrs.width || 1);
+    const scaleY = height / (this.attrs.height || 1);
 
     const pathData = this.attrs.pathData;
     for (const pathItem of this.attrs.pathData) {

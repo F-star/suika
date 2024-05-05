@@ -1,5 +1,5 @@
 import { noop } from '@suika/common';
-import { type IPoint, type IRect, normalizeRect } from '@suika/geo';
+import { type IPoint, type IRect, type ISize, normalizeRect } from '@suika/geo';
 
 import { AddGraphCmd } from '../commands/add_graphs';
 import { type ICursor } from '../cursor_manager';
@@ -168,17 +168,18 @@ export abstract class DrawGraphTool implements ITool {
 
     let width = x - startX;
     let height = y - startY;
-    if (width === 0) {
-      const sign =
-        Math.sign(this.lastMousePoint.x - this.startPoint.x) ||
-        this.editor.setting.get('gridSnapX');
-      width = sign * 1;
-    }
-    if (height === 0) {
-      const sign =
-        Math.sign(this.lastMousePoint.y - this.startPoint.y) ||
-        this.editor.setting.get('gridSnapY');
-      height = sign * 1;
+
+    if (width === 0 || height === 0) {
+      const size = this.solveWidthOrHeightIsZero(
+        { width, height },
+        {
+          x: this.lastMousePoint.x - this.startPoint.x,
+
+          y: this.lastMousePoint.y - this.startPoint.y,
+        },
+      );
+      width = size.width;
+      height = size.height;
     }
 
     let rect = {
@@ -226,6 +227,19 @@ export abstract class DrawGraphTool implements ITool {
     }
     this.editor.selectedElements.setItems([this.drawingGraph]);
     sceneGraph.render();
+  }
+
+  protected solveWidthOrHeightIsZero(size: ISize, delta: IPoint): ISize {
+    const newSize = { width: size.width, height: size.height };
+    if (size.width === 0) {
+      const sign = Math.sign(delta.x) || 1;
+      newSize.width = sign * this.editor.setting.get('gridSnapX');
+    }
+    if (size.height === 0) {
+      const sign = Math.sign(delta.y) || 1;
+      newSize.height = sign * this.editor.setting.get('gridSnapY');
+    }
+    return newSize;
   }
 
   onEnd(e: PointerEvent) {

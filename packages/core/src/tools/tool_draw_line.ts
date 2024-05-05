@@ -1,5 +1,11 @@
 import { cloneDeep } from '@suika/common';
-import { getSweepAngle, type IMatrixArr, type IRect } from '@suika/geo';
+import {
+  getSweepAngle,
+  type IMatrixArr,
+  type IPoint,
+  type IRect,
+  type ISize,
+} from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../constant';
@@ -45,6 +51,18 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
   protected override updateGraph(rect: IRect) {
     const attrs = this.calcAttrs(rect);
     this.drawingGraph!.updateAttrs(attrs);
+  }
+
+  protected override solveWidthOrHeightIsZero(
+    size: ISize,
+    delta: IPoint,
+  ): ISize {
+    const newSize = { width: size.width, height: size.height };
+    if (size.width === 0) {
+      const sign = Math.sign(delta.x) || 1;
+      newSize.width = sign * this.editor.setting.get('gridSnapX');
+    }
+    return newSize;
   }
 
   private calcAttrs({ x, y, width, height }: IRect) {

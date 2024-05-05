@@ -110,16 +110,28 @@ export class SelectResizeTool implements IBaseTool {
         this.editor.setting.get('flipObjectsWhileResizing'),
       );
 
+      // width and height both zero
       if (
-        newAttrs.width === 0 ||
-        newAttrs.height === 0 ||
-        (newAttrs.transform &&
-          (newAttrs.transform[0] === 0 || newAttrs.transform[3]) === 0)
+        (newAttrs.width === 0 || newAttrs?.transform?.[0] === 0) &&
+        (newAttrs.height === 0 || newAttrs?.transform?.[3] === 0)
       ) {
         return;
       }
 
-      selectItems[0].updateAttrs(newAttrs);
+      const isLineLikeGraph =
+        this.startGraphsAttrs[0].width === 0 ||
+        this.startGraphsAttrs[0].height === 0;
+      if (
+        !isLineLikeGraph &&
+        (newAttrs.width === 0 ||
+          newAttrs.height === 0 ||
+          (newAttrs.transform &&
+            (newAttrs.transform[0] === 0 || newAttrs.transform[3]) === 0))
+      ) {
+        return;
+      }
+
+      selectItems[0].updateAttrs(newAttrs, { finishRecomputed: true });
 
       const controlHandleManager = this.editor.controlHandleManager;
       // update custom control handles

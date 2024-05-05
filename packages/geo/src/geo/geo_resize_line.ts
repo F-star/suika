@@ -18,8 +18,8 @@ export const resizeLine = (
   rect: ITransformRect,
   options: {
     /** keep rotation in 0 45 90 ... */
-    keepPolarSnap: boolean;
-    scaleFromCenter: boolean;
+    keepPolarSnap?: boolean;
+    scaleFromCenter?: boolean;
   } = {
     keepPolarSnap: false,
     scaleFromCenter: false,

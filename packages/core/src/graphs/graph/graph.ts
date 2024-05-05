@@ -80,7 +80,11 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       attrs.transform !== undefined
     );
   }
-  updateAttrs(partialAttrs: Partial<GraphAttrs> & IGraphOpts) {
+  updateAttrs(
+    partialAttrs: Partial<GraphAttrs> & IGraphOpts,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options?: { finishRecomputed?: boolean },
+  ) {
     // TODO: 提示，x、y、rotation 不能和 transform 同时存在，否则效果不可预测
     // 目前是后者会覆盖前者
     if (this.shouldUpdateBbox(partialAttrs)) {
@@ -342,7 +346,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       flipWhenResize,
     );
 
-    this.updateAttrs(rect);
+    this.updateAttrs(rect, { finishRecomputed: true });
   }
   draw(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
