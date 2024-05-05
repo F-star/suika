@@ -9,6 +9,7 @@ import {
 import { Matrix } from 'pixi.js';
 
 import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
+import { HALF_PI } from '../../constant';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
 import { type Graph, type GraphAttrs } from '../../graphs';
@@ -77,7 +78,7 @@ export class SelectResizeTool implements IBaseTool {
       (['nw', 'ne', 'se', 'sw'].includes(this.handleName) ||
         (['n', 'e', 's', 'w'].includes(this.handleName) &&
           this.editor.selectedElements.size() > 1) ||
-        this.editor.selectedElements.getItems()[0].getRotate() % Math.PI === 0);
+        this.editor.selectedElements.getItems()[0].getRotate() % HALF_PI === 0);
 
     this.lastPoint = this.editor.getSceneCursorXY(e);
     if (enableGripSnap) {
