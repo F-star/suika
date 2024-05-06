@@ -257,7 +257,7 @@ export class Rect extends Graph<RectAttrs> {
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
     flipWhenResize?: boolean,
-  ) {
+  ): Partial<RectAttrs> {
     const newAttrs = {} as Partial<RectAttrs>;
     if (type.endsWith('CornerRadius')) {
       const attrs = this.attrs;

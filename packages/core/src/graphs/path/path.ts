@@ -146,7 +146,7 @@ export class Path extends Graph<PathAttrs> {
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
     flipWhenResize?: boolean,
-  ) {
+  ): Partial<PathAttrs> {
     const rect =
       this.attrs.height === 0
         ? resizeLine(type, newPos, oldRect, {
@@ -160,8 +160,7 @@ export class Path extends Graph<PathAttrs> {
           });
     const newAttrs: Partial<PathAttrs> = rect;
     const newPathData = this.recomputedPathData(rect.width, rect.height);
-    newAttrs.pathData = newPathData;
-    return newAttrs;
+    return { ...newAttrs, pathData: newPathData };
   }
 
   private recomputedPathData(width: number, height: number) {
