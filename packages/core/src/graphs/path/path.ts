@@ -167,8 +167,8 @@ export class Path extends Graph<PathAttrs> {
     const scaleX = width / (this.attrs.width || 1);
     const scaleY = height / (this.attrs.height || 1);
 
-    const pathData = this.attrs.pathData;
-    for (const pathItem of this.attrs.pathData) {
+    const pathData = cloneDeep(this.attrs.pathData);
+    for (const pathItem of pathData) {
       for (const seg of pathItem.segs) {
         seg.point.x *= scaleX;
         seg.point.y *= scaleY;
