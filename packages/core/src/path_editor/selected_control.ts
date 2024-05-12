@@ -3,7 +3,8 @@ import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type Editor } from '../editor';
-import { Ellipse, Line, Path, Rect } from '../graphs';
+import { Ellipse, Line, Path } from '../graphs';
+import { RegularPolygon } from '../graphs/regular_polygon';
 import { PaintType } from '../paint';
 import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
 
@@ -106,10 +107,9 @@ export class SelectedControl {
       console.warn('path is not exist');
       return [];
     }
-    const QUARTER_PI = Math.PI / 4;
     // TODO: move to setting.ts
     const padding = 4;
-    const handleInOutSize = 4;
+    const handleInOutSize = 6;
     const handleStroke = this.editor.setting.get('handleStroke');
     const zoom = this.editor.zoomManager.getZoom();
     const pathData = path.attrs.pathData;
@@ -221,13 +221,12 @@ export class SelectedControl {
             getCursor: () => 'default',
           });
 
-          const size = isSelected ? 6.5 : handleInOutSize;
+          const size = isSelected ? 8.5 : handleInOutSize;
           const handlePoint = new ControlHandle({
             cx: handle.x,
             cy: handle.y,
-            rotation: QUARTER_PI,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
-            graph: new Rect(
+            graph: new RegularPolygon(
               {
                 objectName: 'pathHandle',
                 width: size,
@@ -245,6 +244,7 @@ export class SelectedControl {
                   },
                 ],
                 strokeWidth: isSelected ? 1.5 : 1,
+                count: 4,
               },
               this.editor.sceneCoordsToViewport(
                 handle.x + size / 2,
