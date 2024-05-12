@@ -550,6 +550,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
         label: 'R',
         key: 'rotation',
         value: this.getRotateDegree(),
+        suffixValue: '°',
         uiType: 'number',
       },
     ];

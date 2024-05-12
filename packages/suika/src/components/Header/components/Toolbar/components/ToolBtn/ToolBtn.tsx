@@ -27,7 +27,8 @@ export const ToolBtn: FC<IToolBtn> = ({
     >
       {children}
       <div className="tooltip">
-        {tooltipContent} <span className="tool-hotkey">{hotkey}</span>
+        {tooltipContent}
+        {hotkey && <span className="tool-hotkey">{hotkey}</span>}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
 import { type Graph, type Rect } from '../graphs';
+import { type RegularPolygon } from '../graphs/regular_polygon';
 import { GraphType } from '../type';
 
 /**
@@ -136,6 +137,33 @@ export const MutateGraphsAndRecord = {
         'update Corner Radius',
         rectGraphics,
         { cornerRadius },
+        prevAttrs,
+      ),
+    );
+  },
+
+  setCount(editor: Editor, elements: Graph[], count: number) {
+    if (elements.length === 0) {
+      return;
+    }
+
+    const rectGraphics = elements.filter(
+      (el) => el.type === GraphType.RegularPolygon,
+    ) as RegularPolygon[];
+
+    const prevAttrs = rectGraphics.map((el) => ({
+      count: el.attrs.count,
+    }));
+    rectGraphics.forEach((el) => {
+      el.updateAttrs({
+        count,
+      });
+    });
+    editor.commandManager.pushCommand(
+      new SetGraphsAttrsCmd(
+        'update Count',
+        rectGraphics,
+        { count: count },
         prevAttrs,
       ),
     );

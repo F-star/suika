@@ -12,6 +12,7 @@
   "tool.ellipse": "圆",
   "tool.pen": "钢笔",
   "tool.line": "直线",
+  "tool.polygon": "多边形",
   "tool.text": "文字",
   "tool.hand": "拖拽画布",
   "command.copy": "复制",

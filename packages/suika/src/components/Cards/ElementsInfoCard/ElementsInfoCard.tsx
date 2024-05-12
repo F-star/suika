@@ -68,7 +68,6 @@ export const ElementsInfoCards: FC = () => {
   }, [editor, MIXED]);
 
   const execCommand = (key: string, newVal: number) => {
-    console.log({ key, newVal });
     if (editor) {
       const elements = editor.selectedElements.getItems();
       if (key === 'x') {
@@ -88,8 +87,10 @@ export const ElementsInfoCards: FC = () => {
       } else if (key === 'cornerRadius') {
         // 特定图形特有属性要做特殊处理。。。遍历图形时需要判断当前图形是否支持某个属性
         MutateGraphsAndRecord.setCornerRadius(editor, elements, newVal);
+      } else if (key === 'count') {
+        /// count must to ben integer
+        MutateGraphsAndRecord.setCount(editor, elements, Math.round(newVal));
       }
-
       editor.render();
     }
   };
@@ -129,6 +130,19 @@ export const ElementsInfoCards: FC = () => {
           />
         ))}
       </div>
+      {attrs.length > 6 && (
+        <div className="element-info-attrs-row">
+          {attrs.slice(6, 8).map((item) => (
+            <NumAttrInput
+              {...item}
+              key={item.key}
+              onBlur={(newVal) => {
+                execCommand(item.key, newVal);
+              }}
+            />
+          ))}
+        </div>
+      )}
     </BaseCard>
   );
 };
@@ -136,6 +150,7 @@ export const ElementsInfoCards: FC = () => {
 const NumAttrInput: FC<{
   label: string;
   min?: number;
+  max?: number;
   value: string | number;
   onBlur: (newValue: number) => void;
   suffixValue?: string;
@@ -145,6 +160,7 @@ const NumAttrInput: FC<{
       prefix={<span className="suika-info-attrs-label">{props.label}</span>}
       value={props.value}
       min={props.min}
+      max={props.max}
       onBlur={props.onBlur}
       suffixValue={props.suffixValue}
     />
