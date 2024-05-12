@@ -12,6 +12,7 @@
   "tool.ellipse": "Ellipse",
   "tool.pen": "Pen",
   "tool.line": "Line",
+  "tool.polygon": "Polygon",
   "tool.text": "Text",
   "tool.hand": "Hand",
   "command.copy": "Copy",

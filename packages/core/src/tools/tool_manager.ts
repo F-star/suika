@@ -7,6 +7,7 @@ import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawLineTool } from './tool_draw_line';
 import { DrawPathTool } from './tool_draw_path';
 import { DrawRectTool } from './tool_draw_rect';
+import { DrawRegularPolygon } from './tool_draw_regular_polygon';
 import { DrawTextTool } from './tool_draw_text';
 import { PathSelectTool } from './tool_path_select/tool_path_select';
 import { SelectTool } from './tool_select';
@@ -45,6 +46,7 @@ export class ToolManager {
     this.registerToolCtor(DragCanvasTool);
     this.registerToolCtor(PathSelectTool);
     this.registerToolCtor(DrawPathTool);
+    this.registerToolCtor(DrawRegularPolygon);
 
     this.setEnableHotKeyTools([
       SelectTool.type,
@@ -52,6 +54,7 @@ export class ToolManager {
       DrawEllipseTool.type,
       DrawPathTool.type,
       DrawLineTool.type,
+      DrawRegularPolygon.type,
       DrawTextTool.type,
       DragCanvasTool.type,
     ]);
@@ -76,7 +79,6 @@ export class ToolManager {
 
   private registerToolCtor(toolCtor: IToolClassConstructor) {
     const type = toolCtor.type;
-    const hotkey = toolCtor.hotkey;
     if (this.toolCtorMap.has(type)) {
       console.warn(`tool "${type}" had exit, replace it!`);
     }
@@ -84,21 +86,27 @@ export class ToolManager {
     this.toolCtorMap.set(type, toolCtor);
 
     // select and pathSelect tool has same hotkey
-    if (this.hotkeySet.has(hotkey)) {
-      console.log(`register same hotkey: "${hotkey}"`);
-    }
-    this.hotkeySet.add(hotkey);
+    const hotkey = toolCtor.hotkey;
 
-    const keyCode = `Key${toolCtor.hotkey.toUpperCase()}`;
-    const token = this.editor.keybindingManager.register({
-      key: { keyCode: keyCode },
-      actionName: type,
-      when: () => this.enableToolTypes.includes(type),
-      action: () => {
-        this.setActiveTool(type);
-      },
-    });
-    this.keyBindingToken.push(token);
+    if (!hotkey) {
+      console.log(`${type} has no hotkey`);
+    } else {
+      if (this.hotkeySet.has(hotkey)) {
+        console.log(`register same hotkey: "${hotkey}"`);
+      }
+      this.hotkeySet.add(hotkey);
+
+      const keyCode = `Key${toolCtor.hotkey.toUpperCase()}`;
+      const token = this.editor.keybindingManager.register({
+        key: { keyCode: keyCode },
+        actionName: type,
+        when: () => this.enableToolTypes.includes(type),
+        action: () => {
+          this.setActiveTool(type);
+        },
+      });
+      this.keyBindingToken.push(token);
+    }
   }
   getActiveToolName() {
     return this.currentTool?.type;

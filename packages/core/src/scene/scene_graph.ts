@@ -16,6 +16,7 @@ import {
   Rect,
   TextGraph,
 } from '../graphs';
+import { RegularPolygon } from '../graphs/regular_polygon';
 import Grid from '../grid';
 import { GraphType, type IEditorPaperData, type IObject } from '../type';
 import { rafThrottle } from '../utils';
@@ -27,6 +28,7 @@ const graphCtorMap = {
   [GraphType.Line]: Line,
   [GraphType.Text]: TextGraph,
   [GraphType.Path]: Path,
+  [GraphType.RegularPolygon]: RegularPolygon,
 };
 
 interface Events {
@@ -260,76 +262,6 @@ export class SceneGraph {
     }
     ctx.restore();
   }
-
-  // private drawGraphsBbox(
-  //   bBoxes: IRectWithRotation[],
-  //   options?: { strokeWidth?: number; stroke?: string },
-  // ) {
-  //   if (bBoxes.length === 0) {
-  //     return;
-  //   }
-  //
-  //   const zoom = this.editor.zoomManager.getZoom();
-  //   const ctx = this.editor.ctx;
-  //   ctx.save();
-  //   ctx.strokeStyle = this.editor.setting.get('guideBBoxStroke');
-  //   if (options?.strokeWidth) {
-  //     ctx.lineWidth = options.strokeWidth;
-  //   }
-  //   if (options?.stroke) {
-  //     ctx.strokeStyle = options.stroke;
-  //   }
-  //
-  //   for (let i = 0, len = bBoxes.length; i < len; i++) {
-  //     ctx.save();
-  //     const bBox = bBoxes[i];
-  //     if (bBox.rotation) {
-  //       const [cx, cy] = getRectCenterPoint(bBox);
-  //       const { x: cxInViewport, y: cyInViewport } =
-  //         this.editor.sceneCoordsToViewport(cx, cy);
-  //       rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
-  //     }
-  //     const { x: xInViewport, y: yInViewport } =
-  //       this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
-  //     ctx.strokeRect(
-  //       xInViewport,
-  //       yInViewport,
-  //       bBox.width * zoom,
-  //       bBox.height * zoom,
-  //     );
-  //     ctx.restore();
-  //   }
-  //   ctx.restore();
-  // }
-
-  /** draw the mixed bounding box of selected elements */
-  // private drawSelectedBox(bBox: IRectWithRotation) {
-  //   const zoom = this.editor.zoomManager.getZoom();
-  //   const ctx = this.editor.ctx;
-
-  //   const stroke = this.editor.setting.get('guideBBoxStroke');
-
-  //   ctx.save();
-  //   ctx.strokeStyle = stroke;
-  //   const { x: xInViewport, y: yInViewport } =
-  //     this.editor.sceneCoordsToViewport(bBox.x, bBox.y);
-
-  //   if (bBox.rotation) {
-  //     const [cx, cy] = getRectCenterPoint(bBox);
-  //     const { x: cxInViewport, y: cyInViewport } =
-  //       this.editor.sceneCoordsToViewport(cx, cy);
-  //     rotateInCanvas(ctx, bBox.rotation, cxInViewport, cyInViewport);
-  //   }
-
-  //   ctx.strokeRect(
-  //     xInViewport,
-  //     yInViewport,
-  //     bBox.width * zoom,
-  //     bBox.height * zoom,
-  //   );
-
-  //   ctx.restore();
-  // }
 
   getTopHitElement(point: IPoint): Graph | null {
     const padding =

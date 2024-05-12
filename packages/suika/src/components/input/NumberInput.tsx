@@ -10,6 +10,7 @@ const isNumberStr = (str: string) => {
 interface INumberInputProps {
   value: string | number;
   min?: number;
+  max?: number;
   onBlur: (newValue: number) => void;
   prefix?: React.ReactNode;
   /** suffix string after input value, such like ° => 12.34° */
@@ -19,6 +20,7 @@ interface INumberInputProps {
 const NumberInput: FC<INumberInputProps> = ({
   value,
   min = -Infinity,
+  max = Infinity,
   onBlur,
   prefix,
   suffixValue = '',
@@ -43,6 +45,7 @@ const NumberInput: FC<INumberInputProps> = ({
         let num = parseToNumber(str);
         if (!Number.isNaN(num) && num !== value) {
           num = Math.max(min, num);
+          num = Math.min(max, num);
           return String(num);
         } else {
           return false;

@@ -6,6 +6,7 @@ import {
   HandOutlined,
   LineOutlined,
   PenOutlined,
+  PolygonOutlined,
   RectOutlined,
   SelectOutlined,
   TextFilled,
@@ -92,6 +93,12 @@ export const ToolBar = () => {
       hotkey: 'L',
       intlId: 'tool.line',
       icon: <LineOutlined />,
+    },
+    drawRegularPolygon: {
+      name: 'drawRegularPolygon',
+      hotkey: '',
+      intlId: 'tool.polygon',
+      icon: <PolygonOutlined />,
     },
     drawText: {
       name: 'drawText',

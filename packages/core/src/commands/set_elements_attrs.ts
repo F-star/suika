@@ -21,6 +21,7 @@ export type ISetElementsAttrsType = Partial<{
   transform: IMatrixArr;
   pathData: IPathItem[];
   content: string;
+  count: number;
 }>;
 
 export class SetGraphsAttrsCmd implements ICommand {
