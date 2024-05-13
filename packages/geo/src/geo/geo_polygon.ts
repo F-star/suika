@@ -1,6 +1,7 @@
 import { Matrix } from 'pixi.js';
 
 import { type IPoint, type ISize } from '../type';
+import { lerp } from './geo_point';
 
 export const getRegularPolygon = (size: ISize, count: number): IPoint[] => {
   const cx = size.width / 2;
@@ -24,7 +25,7 @@ export const getRegularPolygon = (size: ISize, count: number): IPoint[] => {
   const t = size.width / size.height;
   for (let i = 1; i < count; i++) {
     const pt = points[i];
-    pt.x = cx + (pt.x - cx) * t;
+    pt.x = lerp(cx, pt.x, t);
   }
 
   return points;
@@ -54,4 +55,23 @@ export const isPointInConvexPolygon = (polygon: IPoint[], point: IPoint) => {
     }
   }
   return true;
+};
+
+// TODO: 射线法
+export const isPointInPolygon = (polygon: IPoint[], point: IPoint) => {
+  /**
+   * 点向右侧射出
+   */
+  // const count = 0;
+  for (let i = 0; i < polygon.length; i++) {
+    const start = polygon[i];
+    const end = polygon[(i + 1) % polygon.length];
+
+    if (start.x < point.x && end.x < point.x) {
+      continue;
+    }
+    // if (start.y >)
+  }
+
+  return false;
 };

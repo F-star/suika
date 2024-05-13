@@ -17,6 +17,7 @@ import {
   TextGraph,
 } from '../graphs';
 import { RegularPolygon } from '../graphs/regular_polygon';
+import { Star } from '../graphs/star';
 import Grid from '../grid';
 import { GraphType, type IEditorPaperData, type IObject } from '../type';
 import { rafThrottle } from '../utils';
@@ -29,6 +30,7 @@ const graphCtorMap = {
   [GraphType.Text]: TextGraph,
   [GraphType.Path]: Path,
   [GraphType.RegularPolygon]: RegularPolygon,
+  [GraphType.Star]: Star,
 };
 
 interface Events {

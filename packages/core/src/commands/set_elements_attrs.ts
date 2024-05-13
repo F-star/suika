@@ -22,6 +22,7 @@ export type ISetElementsAttrsType = Partial<{
   pathData: IPathItem[];
   content: string;
   count: number;
+  starInnerScale: number;
 }>;
 
 export class SetGraphsAttrsCmd implements ICommand {

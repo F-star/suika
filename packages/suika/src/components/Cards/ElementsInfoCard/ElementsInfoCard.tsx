@@ -90,6 +90,8 @@ export const ElementsInfoCards: FC = () => {
       } else if (key === 'count') {
         /// count must to ben integer
         MutateGraphsAndRecord.setCount(editor, elements, Math.round(newVal));
+      } else if (key === 'starInnerScale') {
+        MutateGraphsAndRecord.setStarInnerScale(editor, elements, newVal);
       }
       editor.render();
     }

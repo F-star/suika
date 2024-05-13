@@ -28,6 +28,8 @@ export class Setting {
       attrs: { r: 0, g: 0, b: 0, a: 0.2 },
     } as IPaint,
 
+    defaultStarInnerScale: 0.3819660246372223,
+
     guideBBoxStroke: '#1592fe',
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
