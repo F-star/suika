@@ -9,6 +9,7 @@ import {
   PolygonOutlined,
   RectOutlined,
   SelectOutlined,
+  StarOutlined,
   TextFilled,
 } from '@suika/icons';
 import classNames from 'classnames';
@@ -99,6 +100,12 @@ export const ToolBar = () => {
       hotkey: '',
       intlId: 'tool.polygon',
       icon: <PolygonOutlined />,
+    },
+    drawStar: {
+      name: 'drawStar',
+      hotkey: '',
+      intlId: 'tool.star',
+      icon: <StarOutlined />,
     },
     drawText: {
       name: 'drawText',

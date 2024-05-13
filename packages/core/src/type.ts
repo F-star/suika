@@ -23,6 +23,7 @@ export enum GraphType {
   Line = 'Line',
   Path = 'Path',
   RegularPolygon = 'RegularPolygon',
+  Star = 'Star',
   // Group = 'Group',
 }
 

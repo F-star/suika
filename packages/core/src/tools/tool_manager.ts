@@ -8,6 +8,7 @@ import { DrawLineTool } from './tool_draw_line';
 import { DrawPathTool } from './tool_draw_path';
 import { DrawRectTool } from './tool_draw_rect';
 import { DrawRegularPolygon } from './tool_draw_regular_polygon';
+import { DrawStar } from './tool_draw_star';
 import { DrawTextTool } from './tool_draw_text';
 import { PathSelectTool } from './tool_path_select/tool_path_select';
 import { SelectTool } from './tool_select';
@@ -47,6 +48,7 @@ export class ToolManager {
     this.registerToolCtor(PathSelectTool);
     this.registerToolCtor(DrawPathTool);
     this.registerToolCtor(DrawRegularPolygon);
+    this.registerToolCtor(DrawStar);
 
     this.setEnableHotKeyTools([
       SelectTool.type,
@@ -55,6 +57,7 @@ export class ToolManager {
       DrawPathTool.type,
       DrawLineTool.type,
       DrawRegularPolygon.type,
+      DrawStar.type,
       DrawTextTool.type,
       DragCanvasTool.type,
     ]);

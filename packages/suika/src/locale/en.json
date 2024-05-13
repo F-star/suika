@@ -13,6 +13,7 @@
   "tool.pen": "Pen",
   "tool.line": "Line",
   "tool.polygon": "Polygon",
+  "tool.star": "Star",
   "tool.text": "Text",
   "tool.hand": "Hand",
   "command.copy": "Copy",

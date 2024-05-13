@@ -5,4 +5,5 @@ export * from './menu-outlined';
 export * from './polygon-outlined';
 export * from './rect-outlined';
 export * from './select-outlined';
+export * from './star-outlined';
 export * from './text-filled';

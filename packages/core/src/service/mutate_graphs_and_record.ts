@@ -2,6 +2,7 @@ import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
 import { type Graph, type Rect } from '../graphs';
 import { type RegularPolygon } from '../graphs/regular_polygon';
+import { type Star } from '../graphs/star';
 import { GraphType } from '../type';
 
 /**
@@ -148,7 +149,8 @@ export const MutateGraphsAndRecord = {
     }
 
     const rectGraphics = elements.filter(
-      (el) => el.type === GraphType.RegularPolygon,
+      (el) =>
+        el.type === GraphType.RegularPolygon || el.type === GraphType.Star,
     ) as RegularPolygon[];
 
     const prevAttrs = rectGraphics.map((el) => ({
@@ -164,6 +166,33 @@ export const MutateGraphsAndRecord = {
         'update Count',
         rectGraphics,
         { count: count },
+        prevAttrs,
+      ),
+    );
+  },
+
+  setStarInnerScale(editor: Editor, elements: Graph[], val: number) {
+    if (elements.length === 0) {
+      return;
+    }
+
+    const rectGraphics = elements.filter(
+      (el) => el.type === GraphType.Star,
+    ) as Star[];
+
+    const prevAttrs = rectGraphics.map((el) => ({
+      starInnerScale: el.attrs.starInnerScale,
+    }));
+    rectGraphics.forEach((el) => {
+      el.updateAttrs({
+        starInnerScale: val,
+      });
+    });
+    editor.commandManager.pushCommand(
+      new SetGraphsAttrsCmd(
+        'update Star InnerScale',
+        rectGraphics,
+        { count: val },
         prevAttrs,
       ),
     );
