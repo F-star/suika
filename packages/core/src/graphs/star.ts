@@ -133,7 +133,7 @@ export class Star extends Graph<StarAttrs> {
         label: 'T',
         key: 'starInnerScale',
         value: this.attrs.starInnerScale,
-        min: 0,
+        min: 0.0010000000474974513,
         max: 1,
         uiType: 'number',
       },
