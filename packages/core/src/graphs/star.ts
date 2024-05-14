@@ -1,6 +1,6 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { getStar } from '@suika/geo';
-import { type Optional } from 'pixi.js';
+import { getStar, isPointInPolygon } from '@suika/geo';
+import { Matrix, type Optional } from 'pixi.js';
 
 import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
@@ -147,13 +147,13 @@ export class Star extends Graph<StarAttrs> {
     super.updateAttrs(partialAttrs, options);
   }
 
-  // override hitTest(x: number, y: number, _padding?: number) {
-  //   // TODO: solve padding
-  //   const tf = new Matrix(...this.attrs.transform);
-  //   const point = tf.applyInverse({ x, y });
-  //   return isPointInConvexPolygon(
-  //     getStar(this.getSize(), this.attrs.count),
-  //     point,
-  //   );
-  // }
+  override hitTest(x: number, y: number, _padding?: number) {
+    // TODO: solve padding
+    const tf = new Matrix(...this.attrs.transform);
+    const point = tf.applyInverse({ x, y });
+    return isPointInPolygon(
+      getStar(this.getSize(), this.attrs.count, this.attrs.starInnerScale),
+      point,
+    );
+  }
 }

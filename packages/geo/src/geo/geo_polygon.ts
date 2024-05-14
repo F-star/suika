@@ -57,21 +57,36 @@ export const isPointInConvexPolygon = (polygon: IPoint[], point: IPoint) => {
   return true;
 };
 
-// TODO: 射线法
-export const isPointInPolygon = (polygon: IPoint[], point: IPoint) => {
-  /**
-   * 点向右侧射出
-   */
-  // const count = 0;
+export const isPointInPolygon = (polygon: IPoint[], pt: IPoint): boolean => {
+  let count = 0;
   for (let i = 0; i < polygon.length; i++) {
-    const start = polygon[i];
-    const end = polygon[(i + 1) % polygon.length];
+    let a = polygon[i];
+    let b = polygon[(i + 1) % polygon.length];
 
-    if (start.x < point.x && end.x < point.x) {
-      continue;
+    if (a.y > b.y) {
+      [a, b] = [b, a];
     }
-    // if (start.y >)
+
+    if (a.y <= pt.y && b.y > pt.y) {
+      const crossProduct = cp(a, b, pt);
+      if (crossProduct === 0) {
+        return true;
+      } else if (crossProduct > 0) {
+        count++;
+      }
+    }
   }
 
-  return false;
+  return count % 2 === 1;
+};
+
+/**
+ * cross product of "p1->p2" and "p1->p3"
+ */
+const cp = (p1: IPoint, p2: IPoint, p3: IPoint): number => {
+  const x1 = p2.x - p1.x;
+  const y1 = p2.y - p1.y;
+  const x2 = p3.x - p1.x;
+  const y2 = p3.y - p1.y;
+  return x1 * y2 - x2 * y1;
 };
