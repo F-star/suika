@@ -3,6 +3,7 @@ import { arrMap, noop, omit } from '@suika/common';
 import { AddGraphCmd } from './commands/add_graphs';
 import { type Editor } from './editor';
 import { Graph } from './graphs';
+import { toSVG } from './to_svg';
 import { type IEditorPaperData } from './type';
 
 /**
@@ -63,6 +64,17 @@ export class ClipboardManager {
     // TODO: write to blob data
     navigator.clipboard.writeText(snapshot).then(() => {
       console.log('copied');
+    });
+  }
+
+  copyAsSVG() {
+    const graphs = this.editor.selectedElements.getItems();
+    if (graphs.length === 0) {
+      return;
+    }
+    const svgStr = toSVG(graphs);
+    navigator.clipboard.writeText(svgStr).then(() => {
+      console.log('SVG copied');
     });
   }
 

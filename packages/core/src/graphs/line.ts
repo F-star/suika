@@ -1,4 +1,5 @@
 import { parseRGBAStr } from '@suika/common';
+import { type IPoint } from '@suika/geo';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
@@ -63,5 +64,26 @@ export class Line extends Graph<LineAttrs> {
     ctx.strokeStyle = stroke;
     ctx.stroke();
     ctx.closePath();
+  }
+
+  protected override getSVGTagHead(offset?: IPoint) {
+    const tf = [...this.attrs.transform];
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+
+    const size = this.getTransformedSize();
+
+    return `<line x1="0" y1="0" x2="${size.width}" y2="${
+      size.height
+    }" transform="matrix(${tf.join(' ')})"`;
+  }
+
+  protected override getFillAndStrokesToSVG() {
+    return {
+      fillPaints: [],
+      strokePaints: this.attrs.stroke ?? [],
+    };
   }
 }

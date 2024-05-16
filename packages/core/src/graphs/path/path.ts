@@ -436,4 +436,45 @@ export class Path extends Graph<PathAttrs> {
     }
     return pathItem.segs.length;
   }
+
+  override getSVGTagHead(offset?: IPoint) {
+    const tf = [...this.attrs.transform];
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+
+    let d = '';
+
+    // TODO: optimize, it's duplicated with _realDraw method
+    for (const pathItem of this.attrs.pathData) {
+      const firstSeg = pathItem.segs[0];
+      if (!firstSeg) continue;
+
+      d += `M${firstSeg.point.x} ${firstSeg.point.y}`;
+
+      const segs = pathItem.segs;
+      for (let i = 1; i <= segs.length; i++) {
+        if (i === segs.length && !pathItem.closed) {
+          continue;
+        }
+        const currSeg = segs[i % segs.length];
+        const prevSeg = segs[i - 1];
+        const pointX = currSeg.point.x;
+        const pointY = currSeg.point.y;
+        const handle1 = Path.getHandleOut(prevSeg);
+        const handle2 = Path.getHandleIn(currSeg);
+        if (!handle1 && !handle2) {
+          d += `L${pointX} ${pointY}`;
+        } else {
+          d += `C${handle1.x} ${handle1.y} ${handle2.x} ${handle2.y} ${pointX} ${pointY}`;
+        }
+      }
+      if (pathItem.closed) {
+        d += 'Z';
+      }
+    }
+
+    return `<path d="${d}" transform="matrix(${tf.join(' ')})"`;
+  }
 }

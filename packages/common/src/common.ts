@@ -213,3 +213,16 @@ export const getClosestValInSortedArr = (
 export const isWindows =
   navigator.platform.toLowerCase().includes('win') ||
   navigator.userAgent.includes('Windows');
+
+export const escapeHtml = (str: string) => {
+  if (typeof str == 'string') {
+    return str.replace(/<|&|>/g, (matches) => {
+      return {
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+      }[matches]!;
+    });
+  }
+  return '';
+};

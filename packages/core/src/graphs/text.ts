@@ -1,4 +1,5 @@
-import { parseRGBAStr } from '@suika/common';
+import { escapeHtml, parseRGBAStr } from '@suika/common';
+import { type IPoint } from '@suika/geo';
 
 import { PaintType } from '../paint';
 import { GraphType, type Optional } from '../type';
@@ -67,5 +68,20 @@ export class TextGraph extends Graph<TextAttrs> {
     }
 
     ctx.fillText(content, 0, 0);
+  }
+
+  protected override getSVGTagHead(offset?: IPoint) {
+    const tf = [...this.attrs.transform];
+    tf[5] += this.attrs.fontSize;
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+    return `<text x="0" y="0" transform="matrix(${tf.join(' ')})"`;
+  }
+
+  protected override getSVGTagTail(): string {
+    const content = escapeHtml(this.attrs.content);
+    return `>${content}</text>`;
   }
 }

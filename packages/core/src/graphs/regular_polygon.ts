@@ -1,5 +1,9 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { getRegularPolygon, isPointInConvexPolygon } from '@suika/geo';
+import {
+  getRegularPolygon,
+  type IPoint,
+  isPointInConvexPolygon,
+} from '@suika/geo';
 import { Matrix, type Optional } from 'pixi.js';
 
 import { type ImgManager } from '../Img_manager';
@@ -146,5 +150,19 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
       getRegularPolygon(this.getSize(), this.attrs.count),
       point,
     );
+  }
+
+  override getSVGTagHead(offset?: IPoint) {
+    const tf = [...this.attrs.transform];
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+
+    const points = getRegularPolygon(this.getSize(), this.attrs.count);
+
+    return `<polygon points="${points
+      .map((p) => `${p.x},${p.y}`)
+      .join(' ')}" transform="matrix(${tf.join(' ')})"`;
   }
 }

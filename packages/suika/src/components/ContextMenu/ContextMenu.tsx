@@ -65,17 +65,29 @@ export const ContextMenu: FC = () => {
     return (
       <>
         {showCopy && (
-          <ContextMenuItem
-            suffix={isWindows ? 'Ctrl+C' : '⌘C'}
-            onClick={() => {
-              setVisible(false);
-              if (editor) {
-                editor.clipboard.copy();
-              }
-            }}
-          >
-            <FormattedMessage id="command.copy" />
-          </ContextMenuItem>
+          <>
+            <ContextMenuItem
+              suffix={isWindows ? 'Ctrl+C' : '⌘C'}
+              onClick={() => {
+                setVisible(false);
+                if (editor) {
+                  editor.clipboard.copy();
+                }
+              }}
+            >
+              <FormattedMessage id="command.copy" />
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => {
+                setVisible(false);
+                if (editor) {
+                  editor.clipboard.copyAsSVG();
+                }
+              }}
+            >
+              <FormattedMessage id="command.copyAsSVG" />
+            </ContextMenuItem>
+          </>
         )}
         <ContextMenuItem
           onClick={() => {
