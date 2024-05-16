@@ -1,5 +1,5 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { getStar, isPointInPolygon } from '@suika/geo';
+import { getStar, type IPoint, isPointInPolygon } from '@suika/geo';
 import { Matrix, type Optional } from 'pixi.js';
 
 import { type ImgManager } from '../Img_manager';
@@ -155,5 +155,23 @@ export class Star extends Graph<StarAttrs> {
       getStar(this.getSize(), this.attrs.count, this.attrs.starInnerScale),
       point,
     );
+  }
+
+  protected override getSVGTagHead(offset?: IPoint) {
+    const tf = [...this.attrs.transform];
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+
+    const points = getStar(
+      this.getSize(),
+      this.attrs.count,
+      this.attrs.starInnerScale,
+    );
+
+    return `<polygon points="${points
+      .map((p) => `${p.x},${p.y}`)
+      .join(' ')}" transform="matrix(${tf.join(' ')})"`;
   }
 }

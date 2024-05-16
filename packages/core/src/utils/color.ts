@@ -46,12 +46,6 @@ export const normalizeHex = (hex: string) => {
   return hex.padEnd(6, hex);
 };
 
-export const parseRGBToHex = (rgb: { r: number; g: number; b: number }) => {
-  const { r, g, b } = rgb;
-  const hex = (r << 16) | (g << 8) | b;
-  return hex.toString(16).toUpperCase().padStart(6, '0');
-};
-
 export const parseHexToRGB = (hex: string): IRGB | null => {
   hex = normalizeHex(hex);
   if (!hex) {

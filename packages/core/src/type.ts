@@ -63,3 +63,10 @@ export interface IHorizontalLine {
 export type BooleanKeys<T> = {
   [K in keyof T]: T[K] extends boolean ? K : never;
 }[keyof T];
+
+export interface IFillStrokeSVGAttrs {
+  fill?: string;
+  'fill-opacity'?: number;
+  stroke?: string;
+  'stroke-opacity'?: number;
+}

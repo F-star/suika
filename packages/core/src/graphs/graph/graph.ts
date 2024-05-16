@@ -4,6 +4,7 @@ import {
   genId,
   objectNameGenerator,
   omit,
+  parseRGBToHex,
 } from '@suika/common';
 import {
   boxToRect,
@@ -29,8 +30,13 @@ import { Matrix } from 'pixi.js';
 import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
-import { DEFAULT_IMAGE, type PaintImage } from '../../paint';
-import { GraphType, type IObject, type Optional } from '../../type';
+import { DEFAULT_IMAGE, type PaintImage, PaintType } from '../../paint';
+import {
+  GraphType,
+  type IFillStrokeSVGAttrs,
+  type IObject,
+  type Optional,
+} from '../../type';
 import { drawRoundRectPath } from '../../utils';
 import { type GraphAttrs, type IGraphOpts } from './graph_attrs';
 
@@ -79,7 +85,8 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       attrs.y !== undefined ||
       attrs.width !== undefined ||
       attrs.height !== undefined ||
-      attrs.transform !== undefined
+      attrs.transform !== undefined ||
+      'strokeWidth' in attrs
     );
   }
   updateAttrs(
@@ -93,6 +100,14 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       this._cacheBbox = null;
       this._cacheBboxWithStroke = null;
     }
+
+    if (
+      'strokeWidth' in partialAttrs &&
+      partialAttrs.strokeWidth === undefined
+    ) {
+      delete this.attrs.strokeWidth;
+    }
+
     if (!partialAttrs.transform) {
       if (partialAttrs.x !== undefined) {
         this.attrs.transform[4] = partialAttrs.x;
@@ -554,5 +569,109 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
         uiType: 'number',
       },
     ];
+  }
+
+  toSVGSegment(offset?: IPoint) {
+    const tagHead = this.getSVGTagHead(offset);
+    if (!tagHead) {
+      console.warn(
+        `please implement getSVGTagHead method of "${this.type}" type`,
+      );
+      return '';
+    }
+
+    // TODO: precision config
+    const fillAndStrokeAttrs: IFillStrokeSVGAttrs[] = [];
+
+    const { fillPaints, strokePaints } = this.getFillAndStrokesToSVG();
+    // TODO: do not to SVG if paints is empty
+    if (fillPaints.length <= 1 && strokePaints.length <= 1) {
+      const fillPaint = fillPaints[0];
+      if (fillPaint) {
+        const rect: IFillStrokeSVGAttrs = {};
+        if (fillPaint.type === PaintType.Solid) {
+          rect.fill = '#' + parseRGBToHex(fillPaint.attrs);
+          const opacity = fillPaint.attrs.a;
+          if (opacity !== 1) {
+            rect['fill-opacity'] = opacity;
+          }
+        }
+        fillAndStrokeAttrs.push(rect);
+        // TODO: solve image
+      }
+      const strokePaint = strokePaints[0];
+      if (strokePaint) {
+        const rect: IFillStrokeSVGAttrs = {};
+        if (strokePaint.type === PaintType.Solid) {
+          rect.stroke = '#' + parseRGBToHex(strokePaint.attrs);
+          const opacity = strokePaint.attrs.a;
+          if (opacity !== 1) {
+            rect['stroke-opacity'] = opacity;
+          }
+        }
+        fillAndStrokeAttrs.push(rect);
+      }
+    } else {
+      for (const fillPaint of fillPaints) {
+        if (fillPaint) {
+          if (fillPaint.type === PaintType.Solid) {
+            const rect: IFillStrokeSVGAttrs = {
+              fill: '#' + parseRGBToHex(fillPaint.attrs),
+            };
+            const opacity = fillPaint.attrs.a;
+            if (opacity !== 1) {
+              rect['fill-opacity'] = opacity;
+            }
+            fillAndStrokeAttrs.push(rect);
+          }
+        }
+      }
+      for (const strokePaint of strokePaints) {
+        if (strokePaint) {
+          if (strokePaint.type === PaintType.Solid) {
+            const rect: IFillStrokeSVGAttrs = {
+              stroke: '#' + parseRGBToHex(strokePaint.attrs),
+            };
+            const opacity = strokePaint.attrs.a;
+            if (opacity !== 1) {
+              rect['stroke-opacity'] = opacity;
+            }
+            fillAndStrokeAttrs.push(rect);
+          }
+        }
+      }
+    }
+
+    const strokeWidth = this.attrs.strokeWidth ?? 0;
+    const strokeWidthStr =
+      strokeWidth > 1 ? ` stroke-width="${strokeWidth}"` : '';
+
+    let content = '';
+    const tagTail = this.getSVGTagTail();
+    for (const attrs of fillAndStrokeAttrs) {
+      let fillAndStrokeStr = '';
+      let key: keyof typeof attrs;
+      for (key in attrs) {
+        fillAndStrokeStr += ` ${key}="${attrs[key]}"`;
+      }
+      content += tagHead + fillAndStrokeStr + strokeWidthStr + tagTail;
+    }
+
+    return content;
+  }
+
+  protected getSVGTagHead(_offset?: IPoint) {
+    return '';
+  }
+
+  protected getSVGTagTail() {
+    return '/>\n';
+  }
+
+  protected getFillAndStrokesToSVG() {
+    return {
+      fillPaints: this.attrs.fill ?? [],
+      strokePaints: this.attrs.stroke ?? [],
+    };
   }
 }

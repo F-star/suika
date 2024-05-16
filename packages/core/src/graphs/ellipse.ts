@@ -1,4 +1,5 @@
 import { parseRGBAStr } from '@suika/common';
+import { type IPoint } from '@suika/geo';
 import { Matrix } from 'pixi.js';
 
 import { DOUBLE_PI } from '../constant';
@@ -97,5 +98,26 @@ export class Ellipse extends Graph<EllipseAttrs> {
     ctx.ellipse(cx, cy, width / 2, height / 2, 0, 0, DOUBLE_PI);
     ctx.stroke();
     ctx.closePath();
+  }
+
+  override getSVGTagHead(offset?: IPoint) {
+    const tf = [...this.attrs.transform];
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+
+    const cx = this.attrs.width / 2;
+    const cy = this.attrs.height / 2;
+
+    if (this.attrs.width === this.attrs.height) {
+      return `<circle cx="${cx}" cy="${cy}" r="${cx}" transform="matrix(${tf.join(
+        ' ',
+      )})"`;
+    } else {
+      return `<ellipse cx="${cx}" cy="${cy}" rx="${cx}" ry="${cy}" transform="matrix(${tf.join(
+        ' ',
+      )})"`;
+    }
   }
 }
