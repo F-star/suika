@@ -34,11 +34,11 @@ export class SelectedBox {
     if (count > 0) {
       if (count === 1) {
         const selectedGraph = selectedElements.getItems()[0];
-        const rect = selectedGraph.getSize();
+        const rect = selectedGraph.getBbox();
         this.box = {
-          width: rect.width,
-          height: rect.height,
-          transform: selectedGraph.attrs.transform!,
+          width: Math.abs(rect.maxX - rect.minX),
+          height: Math.abs(rect.maxY - rect.minY),
+          transform: [1, 0, 0, 1, rect.minX, rect.minY],
         };
       } else {
         const rect = selectedElements.getBbox()!;

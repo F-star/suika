@@ -8,6 +8,7 @@ import {
 } from '@suika/common';
 import {
   boxToRect,
+  getRectByTwoPoint,
   getTransformAngle,
   getTransformedSize,
   type IBox,
@@ -165,7 +166,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
    * AABB (axis-aligned bounding box), without considering strokeWidth)
    * Consider rotation (orthogonal bounding box after rotation)
    */
-  private _calcBbox(padding?: number): Readonly<IBox> {
+  protected _calcBbox(padding?: number): Readonly<IBox> {
     let x = 0;
     let y = 0;
     let width = this.attrs.width;
@@ -209,11 +210,17 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   getBboxVerts(): IPoint[] {
+    const { minX, minY, maxX, maxY } = this.getBbox();
+    const { width, height } = getRectByTwoPoint(
+      { x: minX, y: maxY },
+      { x: maxX, y: minY },
+    );
+
     const rect = {
       x: 0,
       y: 0,
-      width: this.attrs.width,
-      height: this.attrs.height,
+      width,
+      height,
     };
     return rectToVertices(rect, this.attrs.transform);
   }
@@ -243,7 +250,9 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   getTransformedSize() {
-    return getTransformedSize(this.attrs);
+    // 放弃使用W、H，使用bbox的W、H
+    const rect = boxToRect(this.getBbox());
+    return getTransformedSize({ ...rect, transform: this.attrs.transform });
   }
 
   getCenter(): IPoint {

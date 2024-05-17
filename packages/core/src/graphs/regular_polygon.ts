@@ -152,6 +152,11 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
     ];
   }
 
+  override shouldUpdateBbox(attrs: Partial<RegularPolygonAttrs> & IGraphOpts) {
+    // TODO: if x, y, width, height value no change, bbox should not be updated
+    return attrs.count !== undefined || super.shouldUpdateBbox(attrs);
+  }
+
   override updateAttrs(
     partialAttrs: Partial<RegularPolygonAttrs> & IGraphOpts,
     options?: { finishRecomputed?: boolean },
@@ -178,5 +183,34 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
     return `<polygon points="${points
       .map((p) => `${p.x},${p.y}`)
       .join(' ')}" transform="matrix(${tf.join(' ')})"`;
+  }
+
+  protected override _calcBbox() {
+    const tf = new Matrix(...this.attrs.transform);
+    const vertices = getRegularPolygon(this.getSize(), this.attrs.count).map(
+      (item) => {
+        const pos = tf.apply(item);
+        return { x: pos.x, y: pos.y };
+      },
+    );
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const vertex of vertices) {
+      minX = Math.min(minX, vertex.x);
+      minY = Math.min(minY, vertex.y);
+      maxX = Math.max(maxX, vertex.x);
+      maxY = Math.max(maxY, vertex.y);
+    }
+
+    return {
+      minX,
+      minY,
+      maxX,
+      maxY,
+    };
   }
 }

@@ -1,3 +1,5 @@
+import { boxToRect } from '@suika/geo';
+
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
 import { type Graph, type Rect } from '../graphs';
@@ -61,7 +63,9 @@ export const MutateGraphsAndRecord = {
       width: el.attrs.width,
     }));
     graphs.forEach((graph) => {
-      graph.updateAttrs({ width });
+      // 因为改成bbox的宽，所以要这里的Width指的是bbox的宽，需要装换一下才是attrs的width
+      const proportion = graph.attrs.width / boxToRect(graph.getBbox()).width;
+      graph.updateAttrs({ width: width * proportion });
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -83,8 +87,10 @@ export const MutateGraphsAndRecord = {
       height: el.attrs.height,
     }));
     graphs.forEach((graph) => {
+      // 因为改成bbox的高，所以要这里的Height指的是bbox的高，需要装换一下才是attrs的height
+      const proportion = graph.attrs.height / boxToRect(graph.getBbox()).height;
       graph.updateAttrs({
-        height,
+        height: height * proportion,
       });
     });
     editor.commandManager.pushCommand(
