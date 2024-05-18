@@ -1,5 +1,11 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { getStar, type IPoint, isPointInPolygon } from '@suika/geo';
+import {
+  getPointsBbox,
+  getStar,
+  type IBox,
+  type IPoint,
+  isPointInPolygon,
+} from '@suika/geo';
 import { Matrix, type Optional } from 'pixi.js';
 
 import { type ImgManager } from '../Img_manager';
@@ -37,6 +43,21 @@ export class Star extends Graph<StarAttrs> {
       ...super.toJSON(),
       count: this.attrs.count,
     };
+  }
+
+  override getMinBbox(): Readonly<IBox> {
+    if (this._cacheMinBbox) {
+      return this._cacheMinBbox;
+    }
+    const tf = new Matrix(...this.attrs.transform);
+    const points = getStar(
+      this.getSize(),
+      this.attrs.count,
+      this.attrs.starInnerScale,
+    ).map((pt) => tf.apply(pt));
+    const bbox = getPointsBbox(points);
+    this._cacheMinBbox = bbox;
+    return bbox;
   }
 
   override draw(

@@ -1,6 +1,8 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  getPointsBbox,
   getRegularPolygon,
+  type IBox,
   type IPoint,
   isPointInConvexPolygon,
 } from '@suika/geo';
@@ -40,6 +42,19 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
       ...super.toJSON(),
       count: this.attrs.count,
     };
+  }
+
+  override getMinBbox(): Readonly<IBox> {
+    if (this._cacheMinBbox) {
+      return this._cacheMinBbox;
+    }
+    const tf = new Matrix(...this.attrs.transform);
+    const points = getRegularPolygon(this.getSize(), this.attrs.count).map(
+      (pt) => tf.apply(pt),
+    );
+    const bbox = getPointsBbox(points);
+    this._cacheMinBbox = bbox;
+    return bbox;
   }
 
   override draw(

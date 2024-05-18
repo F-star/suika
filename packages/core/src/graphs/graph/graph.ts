@@ -45,6 +45,8 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   attrs: ATTRS;
   protected _cacheBboxWithStroke: Readonly<IBox> | null = null;
   protected _cacheBbox: Readonly<IBox> | null = null;
+  protected _cacheMinBbox: IBox | null = null;
+
   /** hide graph temporarily, it's possible that attrs.visible is true */
   noRender = false;
 
@@ -89,6 +91,13 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       'strokeWidth' in attrs
     );
   }
+
+  protected clearBboxCache() {
+    this._cacheBbox = null;
+    this._cacheBboxWithStroke = null;
+    this._cacheMinBbox = null;
+  }
+
   updateAttrs(
     partialAttrs: Partial<GraphAttrs> & IGraphOpts,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,8 +106,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     // TODO: 提示，x、y、rotation 不能和 transform 同时存在，否则效果不可预测
     // 目前是后者会覆盖前者
     if (this.shouldUpdateBbox(partialAttrs)) {
-      this._cacheBbox = null;
-      this._cacheBboxWithStroke = null;
+      this.clearBboxCache();
     }
 
     if (
@@ -147,6 +155,10 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     const bbox = this._calcBbox();
     this._cacheBbox = bbox;
     return bbox;
+  }
+
+  getMinBbox(): Readonly<IBox> {
+    return this.getBbox();
   }
 
   /**
@@ -259,7 +271,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
    */
   intersectWithBox(box: IBox) {
     let isIntersected = false;
-    if (!isBoxIntersect(box, this.getBbox())) {
+    if (!isBoxIntersect(box, this.getMinBbox())) {
       isIntersected = false;
     } else {
       const rotate = this.getRotate();
@@ -305,7 +317,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
    * whether the element contain with the rect
    */
   containWithBox(box: IBox) {
-    const bbox = this.getBbox();
+    const bbox = this.getMinBbox();
     return isBoxContain(box, bbox) || isBoxContain(bbox, box);
   }
 
