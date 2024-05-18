@@ -23,7 +23,7 @@ export class PencilTool implements ITool {
 
   constructor(private editor: Editor) {}
   onActive() {
-    // do nothing
+    this.editor.selectedElements.clear();
   }
   onInactive() {
     this.unbindEvent();
