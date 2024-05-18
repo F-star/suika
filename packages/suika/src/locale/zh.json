@@ -16,6 +16,7 @@
   "tool.star": "星形",
   "tool.text": "文字",
   "tool.hand": "拖拽画布",
+  "tool.pencil": "铅笔",
   "command.copy": "复制",
   "command.copyAsSVG": "复制 SVG 代码",
   "command.pasteHere": "粘贴到此处",

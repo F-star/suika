@@ -16,6 +16,7 @@
   "tool.star": "Star",
   "tool.text": "Text",
   "tool.hand": "Hand",
+  "tool.pencil": "Pencil",
   "command.copy": "Copy",
   "command.copyAsSVG": "Copy as SVG",
   "command.pasteHere": "Paste here",

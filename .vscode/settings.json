@@ -11,6 +11,7 @@
     "clonedeep",
     "Dists",
     "Formatjs",
+    "IRGB",
     "IRGBA",
     "isequal",
     "outfile",

@@ -8,13 +8,21 @@ interface IRGBA extends IRGB {
   a: number;
 }
 
-export function parseRGBAStr({ r, g, b, a }: IRGBA) {
+export const parseRGBAStr = ({ r, g, b, a }: IRGBA) => {
   return `rgba(${r},${g},${b},${a})`;
-}
+};
 
-export function parseRGBStr({ r, g, b }: { r: number; g: number; b: number }) {
+export const parseRGBStr = ({
+  r,
+  g,
+  b,
+}: {
+  r: number;
+  g: number;
+  b: number;
+}) => {
   return `rgb(${r},${g},${b})`;
-}
+};
 /**
  * normalize hex to `RRGGBB` string format
  *
