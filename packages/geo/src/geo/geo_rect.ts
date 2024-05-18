@@ -148,48 +148,12 @@ export const mergeRect = (...rects: IRect[]): IRect => {
   };
 };
 
-/**
- * get merged rect from rects
- */
-export const mergeBoxes = (boxes: IBox[]): IBox => {
-  if (boxes.length === 0) {
-    throw new Error('the count of boxes can not be 0');
-  }
-
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const box of boxes) {
-    minX = Math.min(minX, box.minX);
-    minY = Math.min(minY, box.minY);
-    maxX = Math.max(maxX, box.maxX);
-    maxY = Math.max(maxY, box.maxY);
-  }
-
-  return {
-    minX,
-    minY,
-    maxX,
-    maxY,
-  };
-};
-
 export const isRectIntersect = (rect1: IRect, rect2: IRect) => {
   return (
     rect1.x <= rect2.x + rect2.width &&
     rect1.x + rect1.width >= rect2.x &&
     rect1.y <= rect2.y + rect2.height &&
     rect1.y + rect1.height >= rect2.y
-  );
-};
-
-export const isBoxIntersect = (box1: IBox, box2: IBox) => {
-  return (
-    box1.minX <= box2.maxX &&
-    box1.maxX >= box2.minX &&
-    box1.minY <= box2.maxY &&
-    box1.maxY >= box2.minY
   );
 };
 
@@ -200,16 +164,6 @@ export const isRectContain = (rect1: IRect, rect2: IRect) => {
     rect1.y <= rect2.y &&
     rect1.x + rect1.width >= rect2.x + rect2.width &&
     rect1.y + rect1.height >= rect2.y + rect2.height
-  );
-};
-
-/** whether box1 contains box2 */
-export const isBoxContain = (box1: IBox, box2: IBox) => {
-  return (
-    box1.minX <= box2.minX &&
-    box1.minY <= box2.minY &&
-    box1.maxX >= box2.maxX &&
-    box1.maxY >= box2.maxY
   );
 };
 
