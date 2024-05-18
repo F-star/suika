@@ -5,6 +5,7 @@ import {
   EllipseOutlined,
   HandOutlined,
   LineOutlined,
+  PencilOutlined,
   PenOutlined,
   PolygonOutlined,
   RectOutlined,
@@ -88,6 +89,12 @@ export const ToolBar = () => {
       hotkey: 'P',
       intlId: 'tool.pen',
       icon: <PenOutlined />,
+    },
+    pencil: {
+      name: 'pencil',
+      hotkey: '',
+      intlId: 'tool.pencil',
+      icon: <PencilOutlined />,
     },
     drawLine: {
       name: 'drawLine',

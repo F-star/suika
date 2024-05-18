@@ -6,6 +6,7 @@ export interface ITool extends IBaseTool {
   type: string;
   cursor: ICursor;
   onMoveExcludeDrag: (event: PointerEvent, isOutsideCanvas: boolean) => void;
+  getDragBlockStep?: () => number;
 }
 
 export interface IBaseTool {

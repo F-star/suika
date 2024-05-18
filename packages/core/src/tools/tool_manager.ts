@@ -11,6 +11,7 @@ import { DrawRegularPolygon } from './tool_draw_regular_polygon';
 import { DrawStar } from './tool_draw_star';
 import { DrawTextTool } from './tool_draw_text';
 import { PathSelectTool } from './tool_path_select/tool_path_select';
+import { PencilTool } from './tool_pencil';
 import { SelectTool } from './tool_select';
 import { type ITool, type IToolClassConstructor } from './type';
 
@@ -49,12 +50,14 @@ export class ToolManager {
     this.registerToolCtor(DrawPathTool);
     this.registerToolCtor(DrawRegularPolygon);
     this.registerToolCtor(DrawStar);
+    this.registerToolCtor(PencilTool);
 
     this.setEnableHotKeyTools([
       SelectTool.type,
       DrawRectTool.type,
       DrawEllipseTool.type,
       DrawPathTool.type,
+      PencilTool.type,
       DrawLineTool.type,
       DrawRegularPolygon.type,
       DrawStar.type,
@@ -100,6 +103,7 @@ export class ToolManager {
       this.hotkeySet.add(hotkey);
 
       const keyCode = `Key${toolCtor.hotkey.toUpperCase()}`;
+      // TODO: support complex hotkey
       const token = this.editor.keybindingManager.register({
         key: { keyCode: keyCode },
         actionName: type,
@@ -157,7 +161,9 @@ export class ToolManager {
         }
         const dx = e.clientX - startPos.x;
         const dy = e.clientY - startPos.y;
-        const dragBlockStep = this.editor.setting.get('dragBlockStep');
+        const dragBlockStep =
+          this.currentTool.getDragBlockStep?.() ??
+          this.editor.setting.get('dragBlockStep');
         if (
           !this._isDragging &&
           (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep)
