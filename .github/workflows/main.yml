@@ -27,9 +27,12 @@ jobs:
       - name: Install Dep
         run: |
           sudo apt-get install snapd
-          sudo snap install node --classic --channel=18
-          npm i -g pnpm@7
+          sudo snap install node --classic --channel=20
+          npm i -g pnpm@9
           pnpm install
+      # 单元测试
+      - name: Unit Testing
+        run: pnpm test
 
       # 构建 html
       - name: build static files
