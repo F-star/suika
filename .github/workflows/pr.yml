@@ -1,4 +1,4 @@
-name: ESLint
+name: ESLint and Unit Testing
 
 on:
   pull_request:
@@ -12,7 +12,8 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'
-      - run: npm i -g pnpm@7
+          node-version: '20'
+      - run: npm i -g pnpm@9
       - run: pnpm install
       - run: pnpm run eslint:check
+      - run: pnpm run test
