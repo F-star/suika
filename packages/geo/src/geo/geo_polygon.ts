@@ -58,7 +58,7 @@ export const isPointInConvexPolygon = (polygon: IPoint[], point: IPoint) => {
 };
 
 export const isPointInPolygon = (polygon: IPoint[], pt: IPoint): boolean => {
-  let count = 0;
+  let isIn = false;
   for (let i = 0; i < polygon.length; i++) {
     let a = polygon[i];
     let b = polygon[(i + 1) % polygon.length];
@@ -68,25 +68,15 @@ export const isPointInPolygon = (polygon: IPoint[], pt: IPoint): boolean => {
     }
 
     if (a.y <= pt.y && b.y > pt.y) {
-      const crossProduct = cp(a, b, pt);
+      const crossProduct =
+        (pt.x - a.x) * (b.y - a.y) - (b.x - a.x) * (pt.y - a.y);
       if (crossProduct === 0) {
         return true;
       } else if (crossProduct > 0) {
-        count++;
+        isIn = !isIn;
       }
     }
   }
 
-  return count % 2 === 1;
-};
-
-/**
- * cross product of "p1->p2" and "p1->p3"
- */
-const cp = (p1: IPoint, p2: IPoint, p3: IPoint): number => {
-  const x1 = p2.x - p1.x;
-  const y1 = p2.y - p1.y;
-  const x2 = p3.x - p1.x;
-  const y2 = p3.y - p1.y;
-  return x1 * y2 - x2 * y1;
+  return isIn;
 };
