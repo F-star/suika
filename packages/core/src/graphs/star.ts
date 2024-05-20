@@ -45,16 +45,16 @@ export class Star extends Graph<StarAttrs> {
     };
   }
 
+  private getPoints() {
+    return getStar(this.getSize(), this.attrs.count, this.attrs.starInnerScale);
+  }
+
   override getMinBbox(): Readonly<IBox> {
     if (this._cacheMinBbox) {
       return this._cacheMinBbox;
     }
     const tf = new Matrix(...this.attrs.transform);
-    const points = getStar(
-      this.getSize(),
-      this.attrs.count,
-      this.attrs.starInnerScale,
-    ).map((pt) => tf.apply(pt));
+    const points = this.getPoints().map((pt) => tf.apply(pt));
     const bbox = getPointsBbox(points);
     this._cacheMinBbox = bbox;
     return bbox;
@@ -94,7 +94,7 @@ export class Star extends Graph<StarAttrs> {
 
     ctx.transform(...attrs.transform);
 
-    const points = getStar(this.getSize(), attrs.count, attrs.starInnerScale);
+    const points = this.getPoints();
 
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
@@ -172,10 +172,7 @@ export class Star extends Graph<StarAttrs> {
     // TODO: solve padding
     const tf = new Matrix(...this.attrs.transform);
     const point = tf.applyInverse({ x, y });
-    return isPointInPolygon(
-      getStar(this.getSize(), this.attrs.count, this.attrs.starInnerScale),
-      point,
-    );
+    return isPointInPolygon(this.getPoints(), point);
   }
 
   protected override getSVGTagHead(offset?: IPoint) {
@@ -185,11 +182,7 @@ export class Star extends Graph<StarAttrs> {
       tf[5] += offset.y;
     }
 
-    const points = getStar(
-      this.getSize(),
-      this.attrs.count,
-      this.attrs.starInnerScale,
-    );
+    const points = this.getPoints();
 
     return `<polygon points="${points
       .map((p) => `${p.x},${p.y}`)

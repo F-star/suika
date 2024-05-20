@@ -44,14 +44,16 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
     };
   }
 
+  private getPoints() {
+    return getRegularPolygon(this.getSize(), this.attrs.count);
+  }
+
   override getMinBbox(): Readonly<IBox> {
     if (this._cacheMinBbox) {
       return this._cacheMinBbox;
     }
     const tf = new Matrix(...this.attrs.transform);
-    const points = getRegularPolygon(this.getSize(), this.attrs.count).map(
-      (pt) => tf.apply(pt),
-    );
+    const points = this.getPoints().map((pt) => tf.apply(pt));
     const bbox = getPointsBbox(points);
     this._cacheMinBbox = bbox;
     return bbox;
@@ -91,7 +93,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
 
     ctx.transform(...attrs.transform);
 
-    const points = getRegularPolygon(this.getSize(), attrs.count);
+    const points = this.getPoints();
 
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
@@ -161,10 +163,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
     // TODO: solve padding
     const tf = new Matrix(...this.attrs.transform);
     const point = tf.applyInverse({ x, y });
-    return isPointInConvexPolygon(
-      getRegularPolygon(this.getSize(), this.attrs.count),
-      point,
-    );
+    return isPointInConvexPolygon(this.getPoints(), point);
   }
 
   override getSVGTagHead(offset?: IPoint) {
@@ -174,7 +173,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
       tf[5] += offset.y;
     }
 
-    const points = getRegularPolygon(this.getSize(), this.attrs.count);
+    const points = this.getPoints();
 
     return `<polygon points="${points
       .map((p) => `${p.x},${p.y}`)

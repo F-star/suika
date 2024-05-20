@@ -21,16 +21,6 @@ export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
   };
 };
 
-export const getRectByPoints = (points: IPoint[]): IRect => {
-  const xs = points.map((p) => p.x);
-  const ys = points.map((p) => p.y);
-  const x = Math.min(...xs);
-  const y = Math.min(...ys);
-  const width = Math.max(...xs) - x;
-  const height = Math.max(...ys) - y;
-  return { x, y, width, height };
-};
-
 export const isPointInRect = (
   point: IPoint,
   rect: {
