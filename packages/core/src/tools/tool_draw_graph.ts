@@ -46,20 +46,6 @@ export abstract class DrawGraphTool implements ITool {
       }
     };
     hotkeysManager.on('shiftToggle', updateRect);
-    hotkeysManager.on('altToggle', updateRect);
-
-    // 记录空格键按下时的坐标位置
-    const handleSpaceToggle = (isDown: boolean) => {
-      if (this.isDragging && isDown) {
-        this.startPointWhenSpaceDown = this.startPoint;
-        this.lastDragPointWhenSpaceDown = this.lastMousePoint;
-        this.updateRect();
-      } else {
-        this.startPointWhenSpaceDown = null;
-        this.lastDragPointWhenSpaceDown = null;
-      }
-    };
-    hotkeysManager.on('spaceToggle', handleSpaceToggle);
 
     const updateRectWhenViewportTranslate = () => {
       if (editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -78,11 +64,27 @@ export abstract class DrawGraphTool implements ITool {
 
     this.unbindEvent = () => {
       hotkeysManager.off('shiftToggle', updateRect);
-      hotkeysManager.off('altToggle', updateRect);
       editor.viewportManager.off('xOrYChange', updateRectWhenViewportTranslate);
-      hotkeysManager.off('spaceToggle', handleSpaceToggle);
     };
   }
+
+  onSpaceToggle(isSpacePressing: boolean) {
+    if (this.isDragging && isSpacePressing) {
+      this.startPointWhenSpaceDown = this.startPoint;
+      this.lastDragPointWhenSpaceDown = this.lastMousePoint;
+      this.updateRect();
+    } else {
+      this.startPointWhenSpaceDown = null;
+      this.lastDragPointWhenSpaceDown = null;
+    }
+  }
+
+  onAltToggle() {
+    if (this.isDragging) {
+      this.updateRect();
+    }
+  }
+
   onInactive() {
     this.unbindEvent();
   }

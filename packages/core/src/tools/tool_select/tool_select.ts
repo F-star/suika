@@ -239,4 +239,10 @@ export class SelectTool implements ITool {
     }
     // TODO: resetHoverItem after drag canvas end
   }
+
+  onSpaceToggle(isSpacePressing: boolean) {
+    if (this.currStrategy?.onSpaceToggle) {
+      this.currStrategy.onSpaceToggle(isSpacePressing);
+    }
+  }
 }

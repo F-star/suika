@@ -2,15 +2,20 @@ import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../../editor';
 import { type Graph } from '../../graphs';
+import { SnapHelper } from '../../snap';
 import { type IBaseTool } from '../type';
 
 /**
  * draw selection box
  */
 export class DrawSelection implements IBaseTool {
-  private lastPoint: IPoint = { x: -1, y: -1 };
+  private startPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
   private startSelectedGraphs: Graph[] = [];
+  private startPointWhenSpaceDown: IPoint | null = null;
+  private lastDragPointWhenSpaceDown: IPoint | null = null;
+  private lastMouseScenePoint!: IPoint;
+  private lastMousePoint!: IPoint;
 
   constructor(private editor: Editor) {}
   onActive() {
@@ -29,16 +34,40 @@ export class DrawSelection implements IBaseTool {
       this.editor.selectedElements.clear();
     }
 
-    const pos = this.editor.getCursorXY(e);
-    this.lastPoint = this.editor.viewportCoordsToScene(pos.x, pos.y);
+    this.startPoint = SnapHelper.getSnapPtBySetting(
+      this.editor.getSceneCursorXY(e),
+      this.editor.setting,
+    );
 
     this.editor.render();
-    this.editor.sceneGraph.setSelection(this.lastPoint);
+    this.editor.sceneGraph.setSelection(this.startPoint);
   }
   onDrag(e: PointerEvent) {
-    const point = this.editor.getSceneCursorXY(e);
+    this.lastMouseScenePoint = this.editor.getSceneCursorXY(e);
 
-    const box = getRectByTwoPoint(this.lastPoint, point);
+    this.lastMousePoint = SnapHelper.getSnapPtBySetting(
+      this.lastMouseScenePoint,
+      this.editor.setting,
+    );
+
+    this.updateSelection();
+  }
+
+  private updateSelection() {
+    const { x, y } = this.lastMouseScenePoint;
+
+    if (this.startPointWhenSpaceDown && this.lastDragPointWhenSpaceDown) {
+      const { x: sx, y: sy } = this.startPointWhenSpaceDown;
+      const { x: lx, y: ly } = this.lastDragPointWhenSpaceDown;
+      const dx = x - lx;
+      const dy = y - ly;
+      this.startPoint = {
+        x: sx + dx,
+        y: sy + dy,
+      };
+    }
+
+    const box = getRectByTwoPoint(this.startPoint, this.lastMouseScenePoint);
     this.editor.sceneGraph.setSelection(box);
 
     const graphsInSelection = this.editor.sceneGraph.getElementsInSelection();
@@ -60,5 +89,18 @@ export class DrawSelection implements IBaseTool {
     this.startSelectedGraphs = [];
     this.editor.sceneGraph.selection = null;
     this.editor.render();
+    this.startPointWhenSpaceDown = null;
+    this.lastDragPointWhenSpaceDown = null;
+  }
+
+  onSpaceToggle(isSpacePressing: boolean) {
+    if (this.editor.toolManager.isDragging() && isSpacePressing) {
+      this.startPointWhenSpaceDown = this.startPoint;
+      this.lastDragPointWhenSpaceDown = this.lastMousePoint;
+      this.updateSelection();
+    } else {
+      this.startPointWhenSpaceDown = null;
+      this.lastDragPointWhenSpaceDown = null;
+    }
   }
 }
