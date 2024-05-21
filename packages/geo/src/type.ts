@@ -35,3 +35,16 @@ export interface ICircle {
 }
 
 export type IMatrixArr = [number, number, number, number, number, number];
+
+export interface ISegment {
+  point: IPoint;
+  /** the coordinates relative to point */
+  in: IPoint;
+  /** the coordinates relative to point */
+  out: IPoint;
+}
+
+export interface IPathItem {
+  segs: ISegment[];
+  closed: boolean;
+}

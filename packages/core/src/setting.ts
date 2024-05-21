@@ -115,6 +115,7 @@ export class Setting {
 
     /**** tool ****/
     keepToolSelectedAfterUse: false,
+    pencilCurveFitTolerance: 1,
 
     /******** path control handle ******/
     pathLineStroke: '#a4a4a4',

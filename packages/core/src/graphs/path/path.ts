@@ -2,8 +2,10 @@ import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   addPoint,
   type IMatrixArr,
+  type IPathItem,
   type IPoint,
   type IRect,
+  type ISegment,
   type ITransformRect,
   resizeLine,
   resizeRect,
@@ -15,7 +17,6 @@ import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
 import { GraphType, type Optional } from '../../type';
 import { Graph, type GraphAttrs, type IGraphOpts } from '../graph';
-import { type IPathItem, type ISegment } from './type';
 
 export interface PathAttrs extends GraphAttrs {
   pathData: IPathItem[];

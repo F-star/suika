@@ -1,4 +1,5 @@
 import { cloneDeep, noop } from '@suika/common';
+import { simplePath } from '@suika/geo';
 
 import { AddGraphCmd } from '../commands';
 import { type ICursor } from '../cursor_manager';
@@ -71,12 +72,19 @@ export class PencilTool implements ITool {
   }
 
   onEnd(_e: PointerEvent, isDragHappened: boolean) {
+    const path = this.path!;
     if (isDragHappened) {
+      const segs = path.attrs.pathData[0].segs;
+      const newSegs = simplePath(
+        segs,
+        this.editor.setting.get('pencilCurveFitTolerance'),
+      );
+      path.attrs.pathData[0].segs = newSegs;
       this.editor.commandManager.pushCommand(
-        new AddGraphCmd('Add Path by pencil', this.editor, [this.path!]),
+        new AddGraphCmd('Add Path by pencil', this.editor, [path]),
       );
     } else {
-      this.editor.sceneGraph.removeItems([this.path!]);
+      this.editor.sceneGraph.removeItems([path]);
     }
   }
 

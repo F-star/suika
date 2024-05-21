@@ -1,11 +1,17 @@
 import { cloneDeep, getClosestTimesVal, parseHexToRGBA } from '@suika/common';
-import { distance, type IMatrixArr, type IPoint } from '@suika/geo';
+import {
+  distance,
+  type IMatrixArr,
+  type IPathItem,
+  type IPoint,
+  type ISegment,
+} from '@suika/geo';
 
 import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
-import { Ellipse, type IPathItem, type ISegment, Path } from '../graphs';
+import { Ellipse, Path } from '../graphs';
 import { PaintType } from '../paint';
 import { PathSelectTool } from './tool_path_select';
 import { type ITool } from './type';

@@ -237,6 +237,9 @@ importers:
 
   packages/geo:
     dependencies:
+      fit-curve:
+        specifier: ^0.2.0
+        version: 0.2.0
       pixi.js:
         specifier: ^8.0.2
         version: 8.0.2
@@ -4675,6 +4678,9 @@ packages:
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
+
+  fit-curve@0.2.0:
+    resolution: {integrity: sha512-op7ofeL13getbqL5J5ACeNxTlLWzusn4/jjEjSVA1sS7PfXWumdtNITvLuTjSobis+jZzMil2rsJ3Vhw7OxQyQ==}
 
   flat-cache@3.0.4:
     resolution: {integrity: sha512-dm9s5Pw7Jc0GvMYbshN6zchCA9RgQlzzEZX3vylR9IqFfS8XciblUXOKfW6SiuJ0e13eDYZoZV5wdrev7P3Nwg==}
@@ -14948,6 +14954,8 @@ snapshots:
     dependencies:
       locate-path: 6.0.0
       path-exists: 4.0.0
+
+  fit-curve@0.2.0: {}
 
   flat-cache@3.0.4:
     dependencies:

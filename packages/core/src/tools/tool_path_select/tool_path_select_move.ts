@@ -1,10 +1,14 @@
 import { cloneDeep } from '@suika/common';
-import { type IMatrixArr, type IPoint } from '@suika/geo';
+import {
+  type IMatrixArr,
+  type IPathItem,
+  type IPoint,
+  type ISegment,
+} from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../../commands';
 import { type ICursor } from '../../cursor_manager';
 import { type Editor } from '../../editor';
-import { type IPathItem, type ISegment } from '../../graphs';
 import { type ISelectedIdxInfo, PathEditor } from '../../path_editor';
 import { type ITool } from '../type';
 
