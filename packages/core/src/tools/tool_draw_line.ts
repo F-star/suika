@@ -1,16 +1,15 @@
 import { cloneDeep } from '@suika/common';
 import {
   getSweepAngle,
-  type IMatrixArr,
   type IPoint,
   type IRect,
   type ISize,
+  Matrix,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../constant';
 import { type Editor } from '../editor';
-import { Line } from '../graphs';
+import { SuikaLine } from '../graphs';
 import { adjustSizeToKeepPolarSnap } from '../utils';
 import { DrawGraphTool } from './tool_draw_graph';
 import { type ITool } from './type';
@@ -35,13 +34,18 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
       return null;
     }
     const attrs = this.calcAttrs(rect);
-    return new Line({
-      objectName: '',
-      ...attrs,
-      height: 0,
-      stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
-      strokeWidth: this.editor.setting.get('strokeWidth'),
-    });
+    return new SuikaLine(
+      {
+        objectName: '',
+        ...attrs,
+        height: 0,
+        stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
+        strokeWidth: this.editor.setting.get('strokeWidth'),
+      },
+      {
+        doc: this.editor.doc,
+      },
+    );
   }
 
   protected override adjustSizeWhenShiftPressing(rect: IRect) {
@@ -81,7 +85,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
 
     return {
       width: Math.sqrt(width * width + height * height),
-      transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty] as IMatrixArr,
+      transform: tf.getArray(),
     };
   }
 }

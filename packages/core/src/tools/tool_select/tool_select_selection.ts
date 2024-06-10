@@ -1,9 +1,11 @@
 import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../../editor';
-import { type Graph } from '../../graphs';
+import { type SuikaGraphics } from '../../graphs';
+import { getParentIdSet } from '../../service/group_and_record';
 import { SnapHelper } from '../../snap';
 import { type IBaseTool } from '../type';
+import { getElementsInSelection } from './utils';
 
 /**
  * draw selection box
@@ -11,7 +13,7 @@ import { type IBaseTool } from '../type';
 export class DrawSelection implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private isShiftPressingWhenStart = false;
-  private startSelectedGraphs: Graph[] = [];
+  private startSelectedGraphs: SuikaGraphics[] = [];
   private startPointWhenSpaceDown: IPoint | null = null;
   private lastDragPointWhenSpaceDown: IPoint | null = null;
   private lastMouseScenePoint!: IPoint;
@@ -70,12 +72,19 @@ export class DrawSelection implements IBaseTool {
     const box = getRectByTwoPoint(this.startPoint, this.lastMouseScenePoint);
     this.editor.sceneGraph.setSelection(box);
 
-    const graphsInSelection = this.editor.sceneGraph.getElementsInSelection();
-
     if (this.isShiftPressingWhenStart) {
+      const parentIdSet = getParentIdSet(this.startSelectedGraphs);
+
+      const graphsInSelection = getElementsInSelection(
+        this.editor,
+        parentIdSet,
+      );
       this.editor.selectedElements.setItems(this.startSelectedGraphs);
-      this.editor.selectedElements.toggleItems(graphsInSelection);
+      this.editor.selectedElements.toggleItems(
+        graphsInSelection.filter((item) => !parentIdSet.has(item.attrs.id)),
+      );
     } else {
+      const graphsInSelection = getElementsInSelection(this.editor);
       this.editor.selectedElements.setItems(graphsInSelection);
     }
 

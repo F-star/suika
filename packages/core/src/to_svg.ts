@@ -1,8 +1,8 @@
 import { boxToRect, mergeBoxes } from '@suika/geo';
 
-import { type Graph } from './graphs';
+import { type SuikaGraphics } from './graphs';
 
-export const toSVG = (graphs: Graph[]) => {
+export const toSVG = (graphs: SuikaGraphics[]) => {
   // FIXME: to sort
   const mergedBbox = mergeBoxes(graphs.map((el) => el.getBboxWithStroke()));
   const mergedRect = boxToRect(mergedBbox);

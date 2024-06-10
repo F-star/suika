@@ -7,6 +7,7 @@ import {
   type IHistoryStatus,
   MutateGraphsAndRecord,
 } from '@suika/core';
+import { groupAndRecord } from '@suika/core/src/service/group_and_record';
 import { type IPoint } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -160,7 +161,7 @@ export const ContextMenu: FC = () => {
           onClick={() => {
             setVisible(false);
             if (editor) {
-              editor.selectedElements.group();
+              groupAndRecord(editor.selectedElements.getItems(), editor);
             }
           }}
         >

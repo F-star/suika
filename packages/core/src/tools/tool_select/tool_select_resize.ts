@@ -1,20 +1,28 @@
-import { arrMap, isEqual, noop } from '@suika/common';
+import { cloneDeep, isEqual, noop } from '@suika/common';
 import {
   type IMatrixArr,
+  invertMatrix,
   type IPoint,
   type IRect,
+  type ITransformRect,
+  Matrix,
+  multiplyMatrix,
   recomputeTransformRect,
   resizeRect,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
 
-import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
+import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { HALF_PI } from '../../constant';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
-import { type Graph, type GraphAttrs } from '../../graphs';
+import { type GraphicsAttrs, type SuikaGraphics } from '../../graphs';
+import {
+  getChildNodeSet,
+  getParentIdSet,
+} from '../../service/group_and_record';
 import { SnapHelper } from '../../snap';
 import { type IBaseTool } from '../type';
+import { updateParentSize } from './utils';
 
 /**
  * scale element
@@ -23,7 +31,13 @@ export class SelectResizeTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private handleName!: string;
   private startSelectBbox: IRect | null = null;
-  private startGraphsAttrs: GraphAttrs[] = [];
+
+  private originAttrsMap = new Map<string, GraphicsAttrs>();
+  private originWorldTransforms = new Map<string, IMatrixArr>();
+  private childNodeSet = new Set<SuikaGraphics>();
+
+  private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
+
   private lastPoint: IPoint | null = null;
   private prevLastPoint: IPoint | null = null;
   private unbind = noop;
@@ -32,7 +46,7 @@ export class SelectResizeTool implements IBaseTool {
 
   onActive() {
     const handler = () => {
-      this.resize();
+      this.updateGraphics();
     };
     this.editor.hostEventManager.on('shiftToggle', handler);
     this.editor.hostEventManager.on('altToggle', handler);
@@ -57,7 +71,21 @@ export class SelectResizeTool implements IBaseTool {
 
     const selectedItems = this.editor.selectedElements.getItems();
 
-    this.startGraphsAttrs = arrMap(selectedItems, (item) => item.getAttrs());
+    selectedItems.forEach((item) => {
+      this.originAttrsMap.set(item.attrs.id, item.getAttrs());
+      this.originWorldTransforms.set(item.attrs.id, [
+        ...item.getWorldTransform(),
+      ]);
+    });
+
+    this.childNodeSet = getChildNodeSet(selectedItems);
+    for (const item of this.childNodeSet) {
+      this.originAttrsMap.set(item.attrs.id, item.getAttrs());
+      this.originWorldTransforms.set(item.attrs.id, [
+        ...item.getWorldTransform(),
+      ]);
+    }
+
     const startSelectBbox = this.editor.selectedElements.getBbox();
     if (!startSelectBbox) {
       throw new Error('startSelectBbox should not be null, please issue to us');
@@ -94,124 +122,210 @@ export class SelectResizeTool implements IBaseTool {
       return;
     }
 
-    this.resize();
-  }
-  private resize() {
-    if (!this.lastPoint) return;
-
-    const selectItems = this.editor.selectedElements.getItems();
-    if (selectItems.length === 1) {
-      const newAttrs = selectItems[0].calcNewAttrsByControlHandle(
-        this.handleName,
-        this.lastPoint,
-        this.startGraphsAttrs[0],
-        this.editor.hostEventManager.isShiftPressing,
-        this.editor.hostEventManager.isAltPressing,
-        this.editor.setting.get('flipObjectsWhileResizing'),
-      );
-
-      // width and height both zero
-      if (
-        (newAttrs.width === 0 || newAttrs?.transform?.[0] === 0) &&
-        (newAttrs.height === 0 || newAttrs?.transform?.[3] === 0)
-      ) {
-        return;
-      }
-
-      const isLineLikeGraph =
-        this.startGraphsAttrs[0].width === 0 ||
-        this.startGraphsAttrs[0].height === 0;
-      if (
-        !isLineLikeGraph &&
-        (newAttrs.width === 0 ||
-          newAttrs.height === 0 ||
-          (newAttrs.transform &&
-            (newAttrs.transform[0] === 0 || newAttrs.transform[3]) === 0))
-      ) {
-        return;
-      }
-
-      selectItems[0].updateAttrs(newAttrs, { finishRecomputed: true });
-
-      const controlHandleManager = this.editor.controlHandleManager;
-      // update custom control handles
-      if (
-        !isTransformHandle(this.handleName) &&
-        controlHandleManager.hasCustomHandles()
-      ) {
-        const controlHandle = selectItems[0].getControlHandles(
-          this.editor.zoomManager.getZoom(),
-        );
-        if (controlHandle) {
-          controlHandleManager.setCustomHandles(controlHandle);
-        }
-      }
-    } else {
-      // multi elements case
-      this.resizeMultiGraphs(selectItems);
-    }
-
+    this.updateGraphics();
     this.editor.render();
   }
 
-  private resizeMultiGraphs(selectItems: Graph[]) {
+  private checkEnableUpdate(
+    originAttrs: ITransformRect,
+    updatedAttrs: ITransformRect,
+  ) {
+    if (
+      (updatedAttrs.width === 0 || updatedAttrs?.transform?.[0] === 0) &&
+      (updatedAttrs.height === 0 || updatedAttrs?.transform?.[3] === 0)
+    ) {
+      return false;
+    }
+
+    const isLineLikeGraph = originAttrs.width === 0 || originAttrs.height === 0;
+    if (
+      !isLineLikeGraph &&
+      (updatedAttrs.width === 0 ||
+        updatedAttrs.height === 0 ||
+        (updatedAttrs.transform &&
+          (updatedAttrs.transform[0] === 0 || updatedAttrs.transform[3]) === 0))
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  private updateSingleGraphicsWithNoResize(graphics: SuikaGraphics) {
+    const updatedAttrs = graphics.calcNewAttrsByControlHandle(
+      this.handleName,
+      this.lastPoint!,
+      this.originAttrsMap.get(graphics.attrs.id)!,
+      this.originWorldTransforms.get(graphics.attrs.id)!,
+      this.editor.hostEventManager.isShiftPressing,
+      this.editor.hostEventManager.isAltPressing,
+      this.editor.setting.get('flipObjectsWhileResizing'),
+    );
+
+    graphics.updateAttrs(updatedAttrs, {
+      finishRecomputed: true,
+    });
+    this.updatedAttrsMap.set(graphics.attrs.id, cloneDeep(updatedAttrs));
+
+    this.updateControls(graphics);
+  }
+
+  private isResizeOp = () => {
+    return ['nw', 'ne', 'se', 'sw', 'n', 'e', 's', 'w'].includes(
+      this.handleName,
+    );
+  };
+
+  private updateControls = (graphics: SuikaGraphics) => {
+    const controlHandleManager = this.editor.controlHandleManager;
+    if (
+      !isTransformHandle(this.handleName) &&
+      controlHandleManager.hasCustomHandles()
+    ) {
+      const controlHandle = graphics.getControlHandles(
+        this.editor.zoomManager.getZoom(),
+      );
+      if (controlHandle) {
+        controlHandleManager.setCustomHandles(controlHandle);
+      }
+    }
+  };
+
+  private updateGraphics() {
     if (!this.lastPoint) return;
 
-    // multi elements case
-    if (!this.startSelectBbox) {
-      throw new Error('startSelectBbox should not be null, please issue to us');
+    let prependedTransform: Matrix = new Matrix();
+
+    const selectedElements = this.editor.selectedElements.getItems();
+    if (selectedElements.length === 1) {
+      // 非 resize 操作，比如修改矩形的圆角，修改直线的端点位置
+      if (!this.isResizeOp() || selectedElements[0].attrs.height === 0) {
+        this.updateSingleGraphicsWithNoResize(selectedElements[0]);
+        return;
+      }
+
+      const originWorldTf = this.originWorldTransforms.get(
+        selectedElements[0].attrs.id,
+      )!;
+
+      const originAttrs = this.originAttrsMap.get(
+        selectedElements[0].attrs.id,
+      )!;
+
+      const updatedTransformRect = resizeRect(
+        this.handleName,
+        this.lastPoint,
+        {
+          width: originAttrs.width,
+          height: originAttrs.height,
+          transform: originWorldTf,
+        },
+        {
+          keepRatio: this.editor.hostEventManager.isShiftPressing,
+          scaleFromCenter: this.editor.hostEventManager.isAltPressing,
+          noChangeWidthAndHeight: true,
+          flip: this.editor.setting.get('flipObjectsWhileResizing'),
+        },
+      );
+
+      if (
+        !this.checkEnableUpdate(
+          originAttrs,
+          recomputeTransformRect(updatedTransformRect) as ITransformRect,
+        )
+      ) {
+        return;
+      }
+      prependedTransform = new Matrix(...updatedTransformRect.transform).append(
+        new Matrix(...originWorldTf).invert(),
+      );
+
+      this.updateControls(selectedElements[0]);
+    } else {
+      const startSelectBbox = this.startSelectBbox!;
+      const startSelectedBoxTf = new Matrix().translate(
+        startSelectBbox.x,
+        startSelectBbox.y,
+      );
+
+      const transformRect = resizeRect(
+        this.handleName,
+        this.lastPoint,
+        {
+          width: startSelectBbox.width,
+          height: startSelectBbox.height,
+          transform: startSelectedBoxTf.getArray(),
+        },
+        {
+          keepRatio: this.editor.hostEventManager.isShiftPressing,
+          scaleFromCenter: this.editor.hostEventManager.isAltPressing,
+          noChangeWidthAndHeight: true,
+          flip: this.editor.setting.get('flipObjectsWhileResizing'),
+        },
+      );
+
+      prependedTransform = new Matrix(...transformRect.transform).append(
+        startSelectedBoxTf.clone().invert(),
+      );
     }
 
-    const startTransform: IMatrixArr = [
-      1,
-      0,
-      0,
-      1,
-      this.startSelectBbox.x,
-      this.startSelectBbox.y,
-    ];
-    const transformRect = resizeRect(
-      this.handleName,
-      this.lastPoint,
-      {
-        width: this.startSelectBbox.width,
-        height: this.startSelectBbox.height,
-        transform: startTransform,
-      },
-      {
-        keepRatio: this.editor.hostEventManager.isShiftPressing,
-        scaleFromCenter: this.editor.hostEventManager.isAltPressing,
-        noChangeWidthAndHeight: true,
-        flip: this.editor.setting.get('flipObjectsWhileResizing'),
-      },
-    );
-    if (
-      transformRect.width === 0 ||
-      transformRect.height === 0 ||
-      transformRect.transform[0] === 0 ||
-      transformRect.transform[3] === 0
-    ) {
-      return;
+    if (this.isResizeOp()) {
+      this.resizeGraphicsArray(prependedTransform.getArray());
+    } else {
+      console.error('should reach here, please put a issue');
+    }
+  }
+
+  private resizeGraphicsArray(prependedTransform: IMatrixArr) {
+    const selectedItems = this.editor.selectedElements.getItems();
+    for (const item of selectedItems) {
+      const id = item.attrs.id;
+      const originWorldTf = this.originWorldTransforms.get(id)!;
+      const newWorldTf = multiplyMatrix(prependedTransform, originWorldTf);
+      const newLocalTf = multiplyMatrix(
+        invertMatrix(item.getParentWorldTransform()),
+        newWorldTf,
+      );
+
+      const { width, height } = this.originAttrsMap.get(id)!;
+      const newAttrs = recomputeTransformRect({
+        width,
+        height,
+        transform: newLocalTf,
+      });
+      item.updateAttrs(newAttrs);
+      this.updatedAttrsMap.set(id, cloneDeep(newAttrs));
     }
 
-    const scaleTf = new Matrix(...transformRect.transform).append(
-      new Matrix(...startTransform).invert(),
+    // 2. update children width/height/transform
+    this.updateChildren(prependedTransform);
+
+    // 3. update parents width/height/transform
+    updateParentSize(
+      this.editor,
+      getParentIdSet(selectedItems),
+      this.originAttrsMap,
+      this.updatedAttrsMap,
     );
+  }
 
-    for (let i = 0; i < selectItems.length; i++) {
-      const startAttrs = this.startGraphsAttrs[i];
-      const graph = selectItems[i];
+  private updateChildren(prependedTransform: IMatrixArr) {
+    for (const item of this.childNodeSet) {
+      const id = item.attrs.id;
+      const originWorldTf = this.originWorldTransforms.get(id)!;
+      const newWorldTf = multiplyMatrix(prependedTransform, originWorldTf);
+      const newLocalTf = multiplyMatrix(
+        invertMatrix(item.getParentWorldTransform()),
+        newWorldTf,
+      );
 
-      const tf = new Matrix(...this.startGraphsAttrs[i].transform).prepend(
-        scaleTf,
-      );
-      graph.updateAttrs(
-        recomputeTransformRect({
-          width: startAttrs.width,
-          height: startAttrs.height,
-          transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
-        }),
-      );
+      const { width, height } = this.originAttrsMap.get(id)!;
+      const updatedAttrs = recomputeTransformRect({
+        width,
+        height,
+        transform: newLocalTf,
+      });
+      item.updateAttrs(updatedAttrs);
+      this.updatedAttrsMap.set(id, cloneDeep(updatedAttrs));
     }
   }
 
@@ -221,11 +335,11 @@ export class SelectResizeTool implements IBaseTool {
     }
     const items = this.editor.selectedElements.getItems();
     this.editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'Update Selected Graphs by Control Handle',
-        items,
-        arrMap(items, (item) => item.getAttrs()),
-        this.startGraphsAttrs,
+      new UpdateGraphicsAttrsCmd(
+        'Update Selected Graphics attributes by Control Handle',
+        this.editor,
+        this.originAttrsMap,
+        this.updatedAttrsMap,
       ),
     );
 
@@ -240,7 +354,9 @@ export class SelectResizeTool implements IBaseTool {
     this.editor.hostEventManager.enableDelete();
   }
   afterEnd() {
-    this.startGraphsAttrs = [];
+    this.originAttrsMap = new Map();
+    this.updatedAttrsMap = new Map();
+
     this.lastPoint = null;
   }
 }

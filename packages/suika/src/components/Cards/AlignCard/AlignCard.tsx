@@ -1,6 +1,6 @@
 import './AlignCard.scss';
 
-import { alignAndRecord, AlignType, type Graph } from '@suika/core';
+import { alignAndRecord, AlignType, type SuikaGraphics } from '@suika/core';
 import {
   AlignHCenter,
   AlignLeft,
@@ -24,7 +24,7 @@ export const AlignCard: FC = () => {
       const selectedEls = editor.selectedElements.getItems();
       setDisable(selectedEls.length < 2);
 
-      const handler = (items: Graph[]) => {
+      const handler = (items: SuikaGraphics[]) => {
         setDisable(items.length < 2);
       };
 

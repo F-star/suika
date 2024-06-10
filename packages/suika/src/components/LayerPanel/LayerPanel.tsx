@@ -34,7 +34,10 @@ export const LayerPanel: FC = () => {
   ) => {
     if (!editor) return;
     if (event.ctrlKey || event.metaKey) {
-      editor.selectedElements.toggleItemById(objId);
+      // parent and child can not be selected together, remove parent in selected object
+      editor.selectedElements.toggleItemById(objId, {
+        disableParentAndChildCoexist: true,
+      });
     } else {
       editor.selectedElements.setItemsById(new Set([objId]));
     }

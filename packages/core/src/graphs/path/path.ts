@@ -2,34 +2,40 @@ import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   addPoint,
   type IMatrixArr,
+  invertMatrix,
   type IPathItem,
   type IPoint,
   type IRect,
   type ISegment,
   type ITransformRect,
+  Matrix,
+  multiplyMatrix,
   resizeLine,
   resizeRect,
 } from '@suika/geo';
 import { Bezier } from 'bezier-js';
-import { Matrix } from 'pixi.js';
 
 import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
-import { GraphType, type Optional } from '../../type';
-import { Graph, type GraphAttrs, type IGraphOpts } from '../graph';
+import { GraphicsType, type Optional } from '../../type';
+import {
+  type GraphicsAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from '../graphics';
 
-export interface PathAttrs extends GraphAttrs {
+export interface PathAttrs extends GraphicsAttrs {
   pathData: IPathItem[];
 }
 
-export class Path extends Graph<PathAttrs> {
-  override type = GraphType.Path;
+export class SuikaPath extends SuikaGraphics<PathAttrs> {
+  override type = GraphicsType.Path;
 
   constructor(
     attrs: Optional<PathAttrs, 'id' | 'transform'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
-    super({ ...attrs, type: GraphType.Path }, opts);
+    super({ ...attrs, type: GraphicsType.Path }, opts);
   }
 
   static computeRect(pathData: IPathItem[]): IRect {
@@ -47,8 +53,8 @@ export class Path extends Graph<PathAttrs> {
         const prevSeg = segs[i - 1];
         const bbox = new Bezier(
           prevSeg.point,
-          Path.getHandleOut(prevSeg),
-          Path.getHandleIn(seg),
+          SuikaPath.getHandleOut(prevSeg),
+          SuikaPath.getHandleIn(seg),
           seg.point,
         ).bbox();
         minX = Math.min(minX, bbox.x.min);
@@ -69,7 +75,7 @@ export class Path extends Graph<PathAttrs> {
   }
 
   static recomputeAttrs(pathData: IPathItem[], transform: IMatrixArr) {
-    const rect = Path.computeRect(pathData);
+    const rect = SuikaPath.computeRect(pathData);
     for (const pathItem of pathData) {
       for (const seg of pathItem.segs) {
         seg.point = {
@@ -124,7 +130,7 @@ export class Path extends Graph<PathAttrs> {
       this.attrs.pathData = partialAttrs.pathData;
       partialAttrs = {
         ...partialAttrs,
-        ...Path.recomputeAttrs(partialAttrs.pathData!, transform),
+        ...SuikaPath.recomputeAttrs(partialAttrs.pathData!, transform),
       };
     }
 
@@ -144,10 +150,18 @@ export class Path extends Graph<PathAttrs> {
     type: string,
     newPos: IPoint,
     oldRect: ITransformRect,
+    oldWorldTransform: IMatrixArr,
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
     flipWhenResize?: boolean,
   ): Partial<PathAttrs> {
+    const parentTf = this.getParentWorldTransform();
+    oldRect = {
+      width: oldRect.width,
+      height: oldRect.height,
+      transform: oldWorldTransform,
+    };
+
     const rect =
       this.attrs.height === 0
         ? resizeLine(type, newPos, oldRect, {
@@ -159,6 +173,7 @@ export class Path extends Graph<PathAttrs> {
             scaleFromCenter: scaleFromCenter,
             flip: flipWhenResize,
           });
+    rect.transform = multiplyMatrix(invertMatrix(parentTf), rect.transform);
     const newAttrs: Partial<PathAttrs> = rect;
     const newPathData = this.recomputedPathData(rect.width, rect.height);
     return { ...newAttrs, pathData: newPathData };
@@ -203,6 +218,7 @@ export class Path extends Graph<PathAttrs> {
         },
       ],
       strokeWidth,
+      transform: this.getWorldTransform(),
     });
   }
 
@@ -214,10 +230,13 @@ export class Path extends Graph<PathAttrs> {
       fill?: IPaint[];
       stroke?: IPaint[];
       strokeWidth?: number;
+      transform?: IMatrixArr;
     },
   ) {
-    const { pathData, transform } = this.attrs;
+    const { pathData } = this.attrs;
+    const transform = overrideStyle?.transform ?? this.attrs.transform;
     const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
+    ctx.save();
     ctx.transform(...transform);
 
     ctx.beginPath();
@@ -235,8 +254,8 @@ export class Path extends Graph<PathAttrs> {
         const prevSeg = segs[i - 1];
         const pointX = currSeg.point.x;
         const pointY = currSeg.point.y;
-        const handle1 = Path.getHandleOut(prevSeg);
-        const handle2 = Path.getHandleIn(currSeg);
+        const handle1 = SuikaPath.getHandleOut(prevSeg);
+        const handle2 = SuikaPath.getHandleIn(currSeg);
         if (!handle1 && !handle2) {
           ctx.lineTo(pointX, pointY);
         } else {
@@ -253,6 +272,7 @@ export class Path extends Graph<PathAttrs> {
       if (pathItem.closed) {
         ctx.closePath();
       }
+      ctx.restore();
     }
 
     for (const paint of fill ?? []) {
@@ -321,10 +341,10 @@ export class Path extends Graph<PathAttrs> {
     segIdx: number,
     options?: { applyTransform: boolean },
   ) {
-    let seg = Path.getSeg(this.attrs.pathData, pathIdx, segIdx);
+    let seg = SuikaPath.getSeg(this.attrs.pathData, pathIdx, segIdx);
     seg = cloneDeep(seg);
     if (seg && options?.applyTransform) {
-      const tf = new Matrix(...this.attrs.transform);
+      const tf = new Matrix(...this.getWorldTransform());
       const transformedPt = tf.apply(seg.point);
       seg.point.x = transformedPt.x;
       seg.point.y = transformedPt.y;
@@ -350,7 +370,7 @@ export class Path extends Graph<PathAttrs> {
     }
 
     partialSeg = cloneDeep(partialSeg);
-    const transform = this.attrs.transform;
+    const transform = this.getWorldTransform();
     if (partialSeg.point) {
       const tf = new Matrix(...transform);
       const anchor = tf.invert().apply(partialSeg.point);
@@ -390,7 +410,7 @@ export class Path extends Graph<PathAttrs> {
     if (!pathItem) {
       throw new Error(`pathIdx ${pathIdx} is out of range`);
     }
-    const tf = new Matrix(...this.attrs.transform);
+    const tf = new Matrix(...this.getWorldTransform());
     const anchor = tf.invert().apply(seg.point);
     pathItem.segs.push({
       point: anchor,
@@ -463,8 +483,8 @@ export class Path extends Graph<PathAttrs> {
         const prevSeg = segs[i - 1];
         const pointX = currSeg.point.x;
         const pointY = currSeg.point.y;
-        const handle1 = Path.getHandleOut(prevSeg);
-        const handle2 = Path.getHandleIn(currSeg);
+        const handle1 = SuikaPath.getHandleOut(prevSeg);
+        const handle2 = SuikaPath.getHandleIn(currSeg);
         if (!handle1 && !handle2) {
           d += `L${pointX} ${pointY}`;
         } else {

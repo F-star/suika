@@ -1,36 +1,37 @@
-import {
-  arrMap,
-  EventEmitter,
-  forEach,
-  getDevicePixelRatio,
-} from '@suika/common';
-import { type IPoint, type IRect, isBoxIntersect, rectToBox } from '@suika/geo';
+import { EventEmitter, forEach, getDevicePixelRatio } from '@suika/common';
+import { type IPoint, type IRect, rectToBox } from '@suika/geo';
 
 import { type Editor } from '../editor';
 import {
-  Ellipse,
-  Graph,
-  type GraphAttrs,
-  Line,
-  Path,
-  Rect,
-  TextGraph,
+  type GraphicsAttrs,
+  SuikaEllipse,
+  SuikaFrame,
+  SuikaGraphics,
+  SuikaLine,
+  SuikaPath,
+  SuikaRect,
+  SuikaText,
 } from '../graphs';
-import { RegularPolygon } from '../graphs/regular_polygon';
-import { Star } from '../graphs/star';
+import { SuikaCanvas } from '../graphs/canvas';
+import { SuikaDocument } from '../graphs/document';
+import { SuikaRegularPolygon } from '../graphs/regular_polygon';
+import { SuikaStar } from '../graphs/star';
 import Grid from '../grid';
-import { GraphType, type IEditorPaperData, type IObject } from '../type';
+import { GraphicsType, type IEditorPaperData } from '../type';
 import { rafThrottle } from '../utils';
 
 const graphCtorMap = {
-  [GraphType.Graph]: Graph,
-  [GraphType.Rect]: Rect,
-  [GraphType.Ellipse]: Ellipse,
-  [GraphType.Line]: Line,
-  [GraphType.Text]: TextGraph,
-  [GraphType.Path]: Path,
-  [GraphType.RegularPolygon]: RegularPolygon,
-  [GraphType.Star]: Star,
+  [GraphicsType.Graph]: SuikaGraphics,
+  [GraphicsType.Rect]: SuikaRect,
+  [GraphicsType.Ellipse]: SuikaEllipse,
+  [GraphicsType.Line]: SuikaLine,
+  [GraphicsType.Text]: SuikaText,
+  [GraphicsType.Path]: SuikaPath,
+  [GraphicsType.RegularPolygon]: SuikaRegularPolygon,
+  [GraphicsType.Star]: SuikaStar,
+  [GraphicsType.Frame]: SuikaFrame,
+  [GraphicsType.Canvas]: SuikaCanvas,
+  [GraphicsType.Document]: SuikaDocument,
 };
 
 interface Events {
@@ -38,7 +39,7 @@ interface Events {
 }
 
 export class SceneGraph {
-  children: Graph[] = [];
+  children: SuikaGraphics[] = [];
   selection: {
     x: number;
     y: number;
@@ -55,11 +56,15 @@ export class SceneGraph {
     this.grid = new Grid(editor);
   }
 
-  addItems(element: Graph[], idx?: number) {
+  addItems(graphicsArr: SuikaGraphics[], idx?: number) {
     if (idx === undefined) {
-      this.children.push(...element);
+      this.children.push(...graphicsArr);
     } else {
-      this.children.splice(idx, 0, ...element);
+      this.children.splice(idx, 0, ...graphicsArr);
+    }
+
+    for (const graph of graphicsArr) {
+      this.editor.doc.graphicsStore.add(graph);
     }
   }
 
@@ -69,10 +74,10 @@ export class SceneGraph {
 
   getVisibleItems() {
     // TODO: cache if items are not changed
-    return this.children.filter((item) => item.getVisible());
+    return this.children.filter((item) => item.isVisible());
   }
 
-  getElementById(id: string): Graph | undefined {
+  getElementById(id: string): SuikaGraphics | undefined {
     return this.getElementsByIds(new Set([id]))[0];
   }
 
@@ -80,7 +85,7 @@ export class SceneGraph {
     return this.children.filter((item) => ids.has(item.attrs.id));
   }
 
-  removeItems(elements: Graph[]) {
+  removeItems(elements: SuikaGraphics[]) {
     if (elements.length > 1) {
       forEach(elements, (element) => {
         this.removeItems([element]);
@@ -104,21 +109,8 @@ export class SceneGraph {
     } = this.editor;
     const viewport = viewportManager.getViewport();
     const zoom = this.editor.zoomManager.getZoom();
-    const viewportBoxInScene = this.editor.viewportManager.getBbox();
     const selectedElements = this.editor.selectedElements;
 
-    const visibleGraphs = this.getVisibleItems();
-    const visibleGraphsInViewport: Graph[] = [];
-    // 1. 找出视口下所有元素
-    // 暂时都认为是矩形
-    for (const graph of visibleGraphs) {
-      if (
-        isBoxIntersect(graph.getBboxWithStroke(), viewportBoxInScene) &&
-        !graph.noRender
-      ) {
-        visibleGraphsInViewport.push(graph);
-      }
-    }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     // 2. 清空画布，然后绘制所有可见元素
@@ -139,12 +131,12 @@ export class SceneGraph {
     ctx.translate(dx, dy);
 
     const imgManager = this.editor.imgManager;
-    for (let i = 0, len = visibleGraphsInViewport.length; i < len; i++) {
-      ctx.save();
-      const element = visibleGraphsInViewport[i];
-      // 抗锯齿
+
+    const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
+    if (canvasGraphics) {
       const smooth = zoom <= 1;
-      element.draw(ctx, imgManager, smooth);
+      ctx.save();
+      canvasGraphics.draw(ctx, imgManager, smooth);
       ctx.restore();
     }
 
@@ -180,7 +172,7 @@ export class SceneGraph {
       this.drawGraphsOutline(
         this.editor.selectedElements
           .getItems()
-          .filter((item) => item.getVisible()),
+          .filter((item) => item.isVisible()),
         setting.get('selectedOutlineStrokeWidth'),
         this.editor.setting.get('hoverOutlineStroke'),
       );
@@ -240,7 +232,7 @@ export class SceneGraph {
   });
 
   private drawGraphsOutline(
-    graphs: Graph[],
+    graphs: SuikaGraphics[],
     strokeWidth: number,
     stroke: string,
   ) {
@@ -265,19 +257,26 @@ export class SceneGraph {
     ctx.restore();
   }
 
-  getTopHitElement(point: IPoint): Graph | null {
+  /**
+   * @deprecated
+   */
+  getTopHitElement(point: IPoint): SuikaGraphics | null {
     const padding =
       this.editor.setting.get('selectionHitPadding') /
       this.editor.zoomManager.getZoom();
 
-    let topHitElement: Graph | null = null;
+    let topHitElement: SuikaGraphics | null = null;
+    const parentIdSet = this.editor.selectedElements.getParentIdSet();
+
     // TODO: optimize, use r-tree to reduce time complexity
     for (let i = this.children.length - 1; i >= 0; i--) {
       const el = this.children[i];
       if (
-        el.getVisible() &&
-        !el.getLock() &&
-        el.hitTest(point.x, point.y, padding)
+        el.isVisible() &&
+        !el.isLock() &&
+        el.hitTest(point.x, point.y, padding) &&
+        // parent of select graphics can't be hovered
+        !parentIdSet.has(el.attrs.id)
       ) {
         topHitElement = el;
         break;
@@ -288,6 +287,7 @@ export class SceneGraph {
   setSelection(partialRect: Partial<IRect>) {
     this.selection = Object.assign({}, this.selection, partialRect);
   }
+
   /**
    * get elements in selection
    *
@@ -302,11 +302,11 @@ export class SceneGraph {
 
     const selectionMode = this.editor.setting.get('selectionMode');
     const elements = this.getVisibleItems();
-    const containedElements: Graph[] = [];
-    // TODO: optimize, use r-tree to reduce time complexity
+    const containedElements: SuikaGraphics[] = [];
+    // TODO: to optimize, use r-tree to reduce time complexity
     const selectionBox = rectToBox(selection);
     for (const el of elements) {
-      if (el.getLock()) {
+      if (el.isLock() || el instanceof SuikaCanvas) {
         continue;
       }
       let isSelected = false;
@@ -326,68 +326,29 @@ export class SceneGraph {
    * get tree data with simple info (for layer panel)
    */
   toObjects() {
-    const graphs = this.children;
-    const objects: IObject[] = [];
-
-    const groupManager = this.editor.groupManager;
-    const groupObjectMap = new Map<string, IObject & { children: IObject[] }>();
-
-    forEach(graphs, (item) => {
-      const obj = item.toObject();
-      const groupIds = Array.from(groupManager.getGraphGroupIds(item.attrs.id));
-
-      if (groupIds.length === 0) {
-        objects.push(obj);
-        return;
-      }
-
-      /**
-       * create group object
-       */
-      let prevGroupObj: (IObject & { children: IObject[] }) | null = null;
-      for (const groupId of groupIds) {
-        const groupObj = groupObjectMap.get(groupId);
-
-        if (!groupObj) {
-          const group = groupManager.getGroup(groupId);
-          if (!group) {
-            throw new Error('group not found');
-          }
-          const groupObj = { ...group.toObject(), children: [] };
-          groupObjectMap.set(groupId, groupObj);
-          if (!prevGroupObj) {
-            objects.push(groupObj);
-          }
-        }
-
-        const currGroupObj = groupObjectMap.get(groupId)!;
-        if (prevGroupObj && !prevGroupObj.children.includes(currGroupObj)) {
-          prevGroupObj.children.push(currGroupObj);
-        }
-        prevGroupObj = currGroupObj;
-      }
-
-      prevGroupObj!.children.push(obj);
-    });
-    return objects;
+    const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
+    if (!canvasGraphics) {
+      return [];
+    }
+    return canvasGraphics.toObject().children ?? [];
   }
 
   toJSON() {
-    const data = arrMap(this.children, (item) => item.toJSON());
+    const data = this.children
+      .filter((graphics) => !graphics.isDeleted())
+      .map((item) => item.toJSON());
     const paperData: IEditorPaperData = {
       appVersion: 'suika-editor_0.0.1',
       paperId: this.editor.paperId,
-      groups: this.editor.groupManager.export(),
       data: data,
     };
     return JSON.stringify(paperData);
   }
 
-  addGraphsByStr(info: string | GraphAttrs[]) {
-    const data: GraphAttrs[] =
-      typeof info === 'string' ? JSON.parse(info) : info;
+  parseStrAndAddGraphics(info: GraphicsAttrs[]) {
+    const data: GraphicsAttrs[] = info;
 
-    const newChildren: Graph[] = [];
+    const newChildren: SuikaGraphics[] = [];
     for (const attrs of data) {
       const type = attrs.type;
       const Ctor = graphCtorMap[type!];
@@ -395,16 +356,37 @@ export class SceneGraph {
         console.error(`Unsupported graph type "${attrs.type}", ignore it`);
         continue;
       }
-      newChildren.push(new Ctor(attrs as any));
+      newChildren.push(new Ctor(attrs as any, { doc: this.editor.doc }));
     }
-
-    this.children.push(...newChildren);
+    this.addItems(newChildren);
     return newChildren;
   }
 
-  load(info: string | GraphAttrs[]) {
+  initGraphicsTree() {
+    const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
+    for (const graphics of this.children) {
+      const parentId = graphics.attrs.parentIndex?.guid;
+      // TODO: 兜底为当前 canvas
+
+      const parent = parentId
+        ? this.editor.doc.getGraphicsById(parentId)
+        : canvasGraphics;
+      if (parent && parent !== graphics) {
+        parent.appendChild(graphics);
+      }
+    }
+  }
+
+  load(info: GraphicsAttrs[]) {
+    /**
+     * 1. 找出 document 节点，额外保存起来。
+     * document 只能有一个，否则为错误数据
+     *
+     * 2. 构造成树结构
+     */
     this.children = [];
-    this.addGraphsByStr(info);
+    this.parseStrAndAddGraphics(info);
+    this.initGraphicsTree();
   }
 
   on(eventName: 'render', handler: () => void) {

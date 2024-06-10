@@ -3,31 +3,37 @@ import {
   getPointsBbox,
   getRegularPolygon,
   type IBox,
+  type IMatrixArr,
   type IPoint,
   isPointInConvexPolygon,
+  Matrix,
 } from '@suika/geo';
-import { Matrix, type Optional } from 'pixi.js';
 
 import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
-import { GraphType } from '../type';
-import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
+import { GraphicsType, type Optional } from '../type';
+import {
+  type GraphicsAttrs,
+  type IAdvancedAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from './graphics';
 
-interface RegularPolygonAttrs extends GraphAttrs {
+interface RegularPolygonAttrs extends GraphicsAttrs {
   count: number;
 }
 
-export class RegularPolygon extends Graph<RegularPolygonAttrs> {
-  override type = GraphType.RegularPolygon;
+export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
+  override type = GraphicsType.RegularPolygon;
 
   constructor(
     attrs: Optional<RegularPolygonAttrs, 'transform' | 'id'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
     super(
       {
         ...attrs,
-        type: GraphType.RegularPolygon,
+        type: GraphicsType.RegularPolygon,
       },
       opts,
     );
@@ -75,6 +81,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
     this._realDraw(ctx, undefined, undefined, {
       stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
       strokeWidth,
+      transform: this.getWorldTransform(),
     });
   }
 
@@ -86,11 +93,13 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
       fill?: IPaint[];
       stroke?: IPaint[];
       strokeWidth?: number;
+      transform: IMatrixArr;
     },
   ) {
     const attrs = this.attrs;
     const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
 
+    ctx.save();
     ctx.transform(...attrs.transform);
 
     const points = this.getPoints();
@@ -136,6 +145,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
       }
     }
     ctx.closePath();
+    ctx.restore();
   }
 
   override getInfoPanelAttrs() {
@@ -153,7 +163,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
   }
 
   override updateAttrs(
-    partialAttrs: Partial<RegularPolygonAttrs> & IGraphOpts,
+    partialAttrs: Partial<RegularPolygonAttrs> & IAdvancedAttrs,
     options?: { finishRecomputed?: boolean },
   ) {
     super.updateAttrs(partialAttrs, options);
@@ -161,7 +171,7 @@ export class RegularPolygon extends Graph<RegularPolygonAttrs> {
 
   override hitTest(x: number, y: number, _padding?: number) {
     // TODO: solve padding
-    const tf = new Matrix(...this.attrs.transform);
+    const tf = new Matrix(...this.getWorldTransform());
     const point = tf.applyInverse({ x, y });
     return isPointInConvexPolygon(this.getPoints(), point);
   }

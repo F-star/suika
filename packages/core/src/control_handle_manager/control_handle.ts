@@ -1,7 +1,7 @@
 import { type IMatrixArr, type ITransformRect } from '@suika/geo';
 
 import { type ICursor } from '../cursor_manager';
-import { type Graph } from '../graphs';
+import { type SuikaGraphics } from '../graphs';
 
 type HitTest = (
   x: number,
@@ -21,7 +21,7 @@ export class ControlHandle {
   rotation?: number;
   transform?: IMatrixArr;
   type: string;
-  graph: Graph;
+  graph: SuikaGraphics;
   padding: number;
   /** rotation will follow rotated bbox */
   isTransformHandle: boolean;
@@ -35,7 +35,7 @@ export class ControlHandle {
     rotation?: number;
     transform?: IMatrixArr;
     padding?: number;
-    graph: Graph;
+    graph: SuikaGraphics;
     hitTest?: HitTest;
     getCursor: GetCursorFn;
     isTransformHandle?: boolean;

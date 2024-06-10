@@ -1,16 +1,17 @@
 import { cloneDeep } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
-import { RemoveGraphsCmd, SetGraphsAttrsCmd } from '../commands';
+import { SetGraphsAttrsCmd } from '../commands';
 import { AddGraphCmd } from '../commands/add_graphs';
 import { type Editor } from '../editor';
-import { TextGraph } from '../graphs';
+import { SuikaText } from '../graphs';
+import { removeGraphicsAndRecord } from '../service/remove_service';
 
 export class TextEditor {
   textarea: HTMLInputElement;
   x = -1;
   y = -1;
-  private textGraph: TextGraph | null = null;
+  private textGraph: SuikaText | null = null;
 
   constructor(private editor: Editor) {
     this.textarea = document.createElement('input');
@@ -20,7 +21,7 @@ export class TextEditor {
     editor.containerElement.appendChild(this.textarea);
   }
 
-  active(params: { textGraph?: TextGraph; pos?: IPoint }) {
+  active(params: { textGraph?: SuikaText; pos?: IPoint }) {
     const { textGraph, pos } = params;
     if (textGraph) {
       this.textGraph = textGraph;
@@ -102,9 +103,7 @@ export class TextEditor {
     if (!textGraph) return;
 
     if (!this.textarea.value) {
-      this.editor.commandManager.pushCommand(
-        new RemoveGraphsCmd('remove text', this.editor, [textGraph]),
-      );
+      removeGraphicsAndRecord(this.editor, [textGraph]);
       return;
     }
 
@@ -129,7 +128,7 @@ export class TextEditor {
       this.y,
       this.editor.setting.get('snapToGrid'),
     );
-    const text = new TextGraph(
+    const text = new SuikaText(
       {
         objectName: '',
         content: this.textarea.value,
@@ -138,8 +137,12 @@ export class TextEditor {
         height: this.editor.setting.get('defaultFontSize'),
         fill: cloneDeep(this.editor.setting.get('textFill')),
       },
-      sceneXY,
+      {
+        advancedAttrs: sceneXY,
+        doc: this.editor.doc,
+      },
     );
+    this.editor.doc.getCurrCanvas().appendChild(text);
     this.editor.sceneGraph.addItems([text]);
 
     if (!this.editor.setting.get('keepToolSelectedAfterUse')) {

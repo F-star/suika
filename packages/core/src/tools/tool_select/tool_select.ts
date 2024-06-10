@@ -3,12 +3,18 @@ import { type IPoint } from '@suika/geo';
 
 import { type ICursor, isRotationCursor } from '../../cursor_manager';
 import { type Editor } from '../../editor';
-import { type Graph, Path, TextGraph } from '../../graphs';
+import {
+  SuikaFrame,
+  type SuikaGraphics,
+  SuikaPath,
+  SuikaText,
+} from '../../graphs';
 import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectResizeTool } from './tool_select_resize';
 import { SelectRotationTool } from './tool_select_rotation';
 import { DrawSelection as DrawSelectionTool } from './tool_select_selection';
+import { getTopHitElement } from './utils';
 
 const TYPE = 'select';
 const HOTKEY = 'v';
@@ -33,7 +39,7 @@ export class SelectTool implements ITool {
   private readonly strategySelectResize: SelectResizeTool;
 
   /** the graph should be removed from selected if not moved */
-  private graphShouldRemovedFromSelectedIfNotMoved: Graph | null = null;
+  private graphShouldRemovedFromSelectedIfNotMoved: SuikaGraphics | null = null;
 
   constructor(private editor: Editor) {
     this.strategyMove = new SelectMoveTool(editor);
@@ -52,17 +58,32 @@ export class SelectTool implements ITool {
   private onDblClick = () => {
     const point = this.editor.toolManager.getCurrPoint();
     const editor = this.editor;
-    if (editor.hostEventManager.isShiftPressing) return;
     const handleInfo = editor.controlHandleManager.getHandleInfoByPoint(point);
     if (handleInfo) return;
 
-    const topHitElement = editor.sceneGraph.getTopHitElement(point);
-    if (!topHitElement) return;
+    const topHitElement = getTopHitElement(editor, point);
 
-    if (topHitElement instanceof Path) {
+    if (!topHitElement) {
+      return;
+    }
+
+    if (topHitElement instanceof SuikaPath) {
       editor.pathEditor.active(topHitElement);
-    } else if (topHitElement instanceof TextGraph) {
+    } else if (topHitElement instanceof SuikaText) {
       editor.textEditor.active({ textGraph: topHitElement });
+    } else if (topHitElement instanceof SuikaFrame) {
+      const children = topHitElement.getChildren();
+      for (let i = children.length - 1; i >= 0; i--) {
+        if (children[i].hitTestChildren(point.x, point.y)) {
+          if (this.editor.hostEventManager.isShiftPressing) {
+            this.editor.selectedElements.toggleItems([children[i]]);
+          } else {
+            this.editor.selectedElements.setItems([children[i]]);
+          }
+          editor.selectedElements.setHoverItem(children[i]);
+          break;
+        }
+      }
     }
   };
 
@@ -99,10 +120,14 @@ export class SelectTool implements ITool {
 
     this.editor.setCursor(handleInfo?.cursor || 'default');
 
-    if (handleInfo) {
+    if (
+      handleInfo ||
+      (!this.editor.hostEventManager.isShiftPressing &&
+        this.editor.selectedBox.hitTest(point))
+    ) {
       this.editor.selectedElements.setHoverItem(null);
     } else {
-      const topHitElement = this.editor.sceneGraph.getTopHitElement(point);
+      const topHitElement = getTopHitElement(this.editor, point);
       this.editor.selectedElements.setHoverItem(topHitElement);
     }
   }, 20);
@@ -142,7 +167,7 @@ export class SelectTool implements ITool {
       const isInsideSelectedBox = this.editor.selectedBox.hitTest(
         this.startPoint,
       );
-      const topHitElement = sceneGraph.getTopHitElement(this.startPoint);
+      const topHitElement = getTopHitElement(this.editor, this.startPoint);
       if (
         topHitElement &&
         isShiftPressing &&

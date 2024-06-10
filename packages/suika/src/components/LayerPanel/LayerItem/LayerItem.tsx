@@ -5,6 +5,7 @@ import {
   HideOutlined,
   LockFilled,
   ShowOutlined,
+  SmallCaretDownSolid,
   UnlockFilled,
 } from '@suika/icons';
 import classNames from 'classnames';
@@ -17,6 +18,7 @@ interface IProps extends IBaseEvents {
   name: string;
   children?: IObject[];
   active?: boolean;
+  activeSecond?: boolean;
   level?: number;
   activeIds?: string[];
   hlId?: string;
@@ -28,6 +30,7 @@ const LayerItem: FC<IProps> = ({
   name,
   children,
   active = false,
+  activeSecond = false,
   id,
   activeIds = [],
   level = 0,
@@ -85,6 +88,7 @@ const LayerItem: FC<IProps> = ({
       <div
         className={classNames('sk-layer-item', {
           'sk-active': active,
+          'sk-active-second': active ? false : activeSecond,
           'sk-hidden': !visible,
           'sk-hover': isHl,
           'sk-editing': isEditing,
@@ -101,6 +105,9 @@ const LayerItem: FC<IProps> = ({
         onDoubleClick={handleDbClick}
       >
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
+        <div style={{ width: 20, color: '#ccc' }}>
+          {children?.length ? <SmallCaretDownSolid /> : undefined}
+        </div>
         {!isEditing && (
           <span key={'span'} className="sk-layout-name">
             {layoutName}
@@ -160,6 +167,7 @@ const LayerItem: FC<IProps> = ({
               id={item.id}
               name={item.name}
               active={activeIds.includes(item.id)}
+              activeSecond={activeSecond || activeIds.includes(item.id)}
               level={level + 1}
               children={item.children}
               activeIds={activeIds}

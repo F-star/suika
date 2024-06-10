@@ -1,5 +1,9 @@
 import { cloneDeep, isEqual } from '@suika/common';
-import { type Graph, type IPaint, SetGraphsAttrsCmd } from '@suika/core';
+import {
+  type IPaint,
+  SetGraphsAttrsCmd,
+  type SuikaGraphics,
+} from '@suika/core';
 import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -66,7 +70,7 @@ export const FillCard: FC = () => {
 
   const pushToHistory = (
     cmdDesc: string,
-    selectedElements: Graph[],
+    selectedElements: SuikaGraphics[],
     newPaints: IPaint[],
   ) => {
     if (!editor) return;
@@ -90,7 +94,7 @@ export const FillCard: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      const updatePrevFill = (els: Graph[]) => {
+      const updatePrevFill = (els: SuikaGraphics[]) => {
         prevFills.current = els.map((el) => cloneDeep(el.attrs.fill ?? []));
       };
       const updateInfo = () => {

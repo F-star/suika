@@ -14,6 +14,7 @@
     "@suika/common": "workspace:^",
     "@suika/geo": "workspace:^",
     "bezier-js": "^6.1.4",
+    "fractional-indexing": "^3.2.0",
     "stats.js": "^0.17.0"
   },
   "devDependencies": {

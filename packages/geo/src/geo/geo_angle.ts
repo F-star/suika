@@ -1,6 +1,5 @@
-import { Matrix } from 'pixi.js';
-
 import { type IMatrixArr, type IPoint } from '../type';
+import { Matrix } from './geo_matrix_class';
 
 const DOUBLE_PI = Math.PI * 2;
 

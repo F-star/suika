@@ -12,6 +12,7 @@ export * from './pencil-outlined';
 export * from './remove-outlined';
 export * from './right-outlined';
 export * from './show-outlined';
+export * from './small-caret-down-solid';
 export * from './social';
 export * from './tool';
 export * from './unlock-filled';

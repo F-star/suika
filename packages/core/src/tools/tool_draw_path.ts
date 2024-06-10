@@ -11,7 +11,7 @@ import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
-import { Ellipse, Path } from '../graphs';
+import { SuikaEllipse, SuikaPath } from '../graphs';
 import { PaintType } from '../paint';
 import { PathSelectTool } from './tool_path_select';
 import { type ITool } from './type';
@@ -27,7 +27,7 @@ export class DrawPathTool implements ITool {
   cursor: ICursor = 'pen';
 
   private startPoint: IPoint | null = null;
-  private path: Path | null = null;
+  private path: SuikaPath | null = null;
   private prevAttrs: {
     transform: IMatrixArr;
     pathData: IPathItem[];
@@ -92,7 +92,7 @@ export class DrawPathTool implements ITool {
         },
       ];
 
-      const path = new Path(
+      const path = new SuikaPath(
         {
           objectName: '',
           width: 100,
@@ -106,10 +106,14 @@ export class DrawPathTool implements ITool {
           ],
           pathData,
         },
-        this.startPoint,
+        {
+          advancedAttrs: this.startPoint,
+          doc: this.editor.doc,
+        },
       );
       this.path = path;
 
+      this.editor.doc.getCurrCanvas().appendChild(path);
       this.editor.sceneGraph.addItems([path]);
       this.editor.commandManager.batchCommandStart();
       this.editor.commandManager.pushCommand(
@@ -318,44 +322,52 @@ export class DrawPathTool implements ITool {
           cy: point.y,
           type: 'path-preview-curve',
           getCursor: () => 'default',
-          graph: new Path({
-            objectName: 'path-preview-curve',
-            width: 0,
-            height: 0,
-            pathData: [
-              {
-                segs: [
-                  {
-                    point: this.editor.sceneCoordsToViewport(
-                      lastSeg.point.x,
-                      lastSeg.point.y,
-                    ),
-                    in: {
-                      x: this.editor.sceneSizeToViewport(lastSeg.in.x),
-                      y: this.editor.sceneSizeToViewport(lastSeg.in.y),
+          graph: new SuikaPath(
+            {
+              objectName: 'path-preview-curve',
+              width: 0,
+              height: 0,
+              pathData: [
+                {
+                  segs: [
+                    {
+                      point: this.editor.sceneCoordsToViewport(
+                        lastSeg.point.x,
+                        lastSeg.point.y,
+                      ),
+                      in: {
+                        x: this.editor.sceneSizeToViewport(lastSeg.in.x),
+                        y: this.editor.sceneSizeToViewport(lastSeg.in.y),
+                      },
+                      out: {
+                        x: this.editor.sceneSizeToViewport(lastSeg.out.x),
+                        y: this.editor.sceneSizeToViewport(lastSeg.out.y),
+                      },
                     },
-                    out: {
-                      x: this.editor.sceneSizeToViewport(lastSeg.out.x),
-                      y: this.editor.sceneSizeToViewport(lastSeg.out.y),
+                    {
+                      point: this.editor.sceneCoordsToViewport(
+                        point.x,
+                        point.y,
+                      ),
+                      in: { x: 0, y: 0 },
+                      out: { x: 0, y: 0 },
                     },
-                  },
-                  {
-                    point: this.editor.sceneCoordsToViewport(point.x, point.y),
-                    in: { x: 0, y: 0 },
-                    out: { x: 0, y: 0 },
-                  },
-                ],
-                closed: false,
-              },
-            ],
-            stroke: [
-              {
-                type: PaintType.Solid,
-                attrs: parseHexToRGBA('#1592fe')!,
-              },
-            ],
-            strokeWidth: 1,
-          }),
+                  ],
+                  closed: false,
+                },
+              ],
+              stroke: [
+                {
+                  type: PaintType.Solid,
+                  attrs: parseHexToRGBA('#1592fe')!,
+                },
+              ],
+              strokeWidth: 1,
+            },
+            {
+              doc: this.editor.doc,
+            },
+          ),
         });
         previewHandles.push(previewCurve);
       }
@@ -368,7 +380,7 @@ export class DrawPathTool implements ITool {
       cy: point.y,
       type: 'path-preview-anchor',
       getCursor: () => 'default',
-      graph: new Ellipse(
+      graph: new SuikaEllipse(
         {
           objectName: 'path-preview-anchor',
           width: 6,
@@ -387,7 +399,10 @@ export class DrawPathTool implements ITool {
           ],
           strokeWidth: 1,
         },
-        point,
+        {
+          advancedAttrs: point,
+          doc: this.editor.doc,
+        },
       ),
     });
     previewHandles.push(previewPoint);

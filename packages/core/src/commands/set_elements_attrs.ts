@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPathItem } from '@suika/geo';
 
-import { type Graph } from '../graphs';
+import { type IParentIndex, type SuikaGraphics } from '../graphs';
 import { type IPaint } from '../paint';
 import { type ICommand } from './type';
 
@@ -23,13 +23,14 @@ export type ISetElementsAttrsType = Partial<{
   content: string;
   count: number;
   starInnerScale: number;
+  parentIndex: IParentIndex;
 }>;
 
 export class SetGraphsAttrsCmd implements ICommand {
   static readonly type = 'SetElementsAttrs';
   constructor(
     public desc: string,
-    private elements: Graph[],
+    private elements: SuikaGraphics[],
     private attrs: ISetElementsAttrsType | ISetElementsAttrsType[],
     private prevAttrs: ISetElementsAttrsType[],
   ) {
@@ -42,17 +43,37 @@ export class SetGraphsAttrsCmd implements ICommand {
   redo() {
     const { elements, attrs } = this;
     for (let i = 0, len = this.elements.length; i < len; i++) {
-      if (Array.isArray(attrs)) {
-        elements[i].updateAttrs(attrs[i]);
-      } else {
-        elements[i].updateAttrs(cloneDeep(attrs));
+      const attrs_ = Array.isArray(attrs) ? attrs[i] : cloneDeep(attrs);
+      const el = elements[i];
+      // 更新维护父子关系
+
+      if (attrs_.parentIndex) {
+        el.removeFromParent();
+      }
+      el.updateAttrs(attrs_);
+      if (attrs_.parentIndex) {
+        const parent = el.getParent();
+        if (parent) {
+          parent.appendChild(el, el.attrs.parentIndex?.position);
+        }
       }
     }
   }
   undo() {
     const { elements, prevAttrs } = this;
     for (let i = 0, len = this.elements.length; i < len; i++) {
+      const el = elements[i];
+      const attrs_ = prevAttrs[i];
       elements[i].updateAttrs(prevAttrs[i]);
+
+      if ('parentIndex' in attrs_ && attrs_.parentIndex === undefined) {
+        el.removeFromParent();
+      } else if (attrs_.parentIndex) {
+        const parent = el.getParent();
+        if (parent) {
+          parent.appendChild(el, el.attrs.parentIndex?.position);
+        }
+      }
     }
   }
 }

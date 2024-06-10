@@ -1,9 +1,9 @@
 import { EventEmitter } from '@suika/common';
 
-import { RemoveGraphsCmd } from '../commands';
 import { type ControlHandle } from '../control_handle_manager';
 import { type Editor } from '../editor';
-import { type Graph, type Path } from '../graphs';
+import { type SuikaGraphics, type SuikaPath } from '../graphs';
+import { removeGraphicsAndRecord } from '../service/remove_service';
 import { DrawPathTool, PathSelectTool } from '../tools';
 import { SelectTool } from '../tools/tool_select';
 import { SelectedControl } from './selected_control';
@@ -15,7 +15,7 @@ interface Events {
 
 export class PathEditor {
   private _active = false;
-  private path: Path | null = null;
+  private path: SuikaPath | null = null;
   private eventTokens: number[] = [];
   private prevToolKeys: string[] = [];
   private eventEmitter = new EventEmitter<Events>();
@@ -26,7 +26,7 @@ export class PathEditor {
     this.selectedControl = new SelectedControl(editor);
   }
 
-  private onSelectedChange = (items: Graph[]) => {
+  private onSelectedChange = (items: SuikaGraphics[]) => {
     if (items.length === 0 || items[0] === this.path) {
       return;
     }
@@ -40,7 +40,7 @@ export class PathEditor {
   isActive() {
     return this._active;
   }
-  active(path: Path) {
+  active(path: SuikaPath) {
     this._active = true;
     this.path = path;
 
@@ -103,9 +103,8 @@ export class PathEditor {
       pathData.length === 0 ||
       pathData.every((item) => item.segs.length <= 1)
     ) {
-      this.editor.commandManager.pushCommand(
-        new RemoveGraphsCmd('remove empty path', this.editor, [path]),
-      );
+      removeGraphicsAndRecord(this.editor, [path]);
+      this.editor.selectedElements.clear();
     }
   }
   private bindHotkeys() {

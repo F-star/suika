@@ -3,8 +3,8 @@ import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type Editor } from '../editor';
-import { Ellipse, Line, Path } from '../graphs';
-import { RegularPolygon } from '../graphs/regular_polygon';
+import { SuikaEllipse, SuikaLine, SuikaPath } from '../graphs';
+import { SuikaRegularPolygon } from '../graphs/regular_polygon';
 import { PaintType } from '../paint';
 import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
 
@@ -104,7 +104,7 @@ export class SelectedControl {
   public generateControls(): ControlHandle[] {
     const path = this.editor.pathEditor.getPath();
     if (!path) {
-      console.warn('path is not exist');
+      // console.warn('path is not exist');
       return [];
     }
     // TODO: move to setting.ts
@@ -145,7 +145,7 @@ export class SelectedControl {
           cx: anchor.x,
           cy: anchor.y,
           type: ['anchor', i, j].join('-'),
-          graph: new Ellipse(
+          graph: new SuikaEllipse(
             {
               objectName: 'anchor',
               width: anchorSize,
@@ -164,10 +164,13 @@ export class SelectedControl {
               ],
               strokeWidth: 1,
             },
-            this.editor.sceneCoordsToViewport(
-              anchor.x + anchorSize / 2,
-              anchor.y + anchorSize / 2,
-            ),
+            {
+              advancedAttrs: this.editor.sceneCoordsToViewport(
+                anchor.x + anchorSize / 2,
+                anchor.y + anchorSize / 2,
+              ),
+              doc: this.editor.doc,
+            },
           ),
           padding,
           getCursor: () => 'default',
@@ -183,7 +186,10 @@ export class SelectedControl {
         const pathLineStroke = parseHexToRGBA(
           this.editor.setting.get('pathLineStroke'),
         )!;
-        const handles = [Path.getHandleIn(seg), Path.getHandleOut(seg)];
+        const handles = [
+          SuikaPath.getHandleIn(seg),
+          SuikaPath.getHandleOut(seg),
+        ];
         for (let handleIdx = 0; handleIdx < handles.length; handleIdx++) {
           const handle = handles[handleIdx];
           if (isPointEqual(handle, anchor)) {
@@ -200,7 +206,7 @@ export class SelectedControl {
             cy: rect.y + rect.height / 2,
             type: 'handleLine',
             rotation: rect.rotation,
-            graph: new Line(
+            graph: new SuikaLine(
               {
                 objectName: 'handleLine',
                 height: rect.height,
@@ -215,7 +221,10 @@ export class SelectedControl {
                 ],
                 strokeWidth: 1,
               },
-              { x: rect.x, y: rect.y },
+              {
+                advancedAttrs: { x: rect.x, y: rect.y },
+                doc: this.editor.doc,
+              },
             ),
             hitTest: () => false,
             getCursor: () => 'default',
@@ -226,7 +235,7 @@ export class SelectedControl {
             cx: handle.x,
             cy: handle.y,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
-            graph: new RegularPolygon(
+            graph: new SuikaRegularPolygon(
               {
                 objectName: 'pathHandle',
                 width: size,
@@ -246,10 +255,13 @@ export class SelectedControl {
                 strokeWidth: isSelected ? 1.5 : 1,
                 count: 4,
               },
-              this.editor.sceneCoordsToViewport(
-                handle.x + size / 2,
-                handle.y + size / 2,
-              ),
+              {
+                advancedAttrs: this.editor.sceneCoordsToViewport(
+                  handle.x + size / 2,
+                  handle.y + size / 2,
+                ),
+                doc: this.editor.doc,
+              },
             ),
             padding,
             getCursor: () => 'default',

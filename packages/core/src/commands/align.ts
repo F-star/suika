@@ -1,4 +1,4 @@
-import { type Graph } from '../graphs';
+import { type SuikaGraphics } from '../graphs';
 import { type ICommand } from './type';
 
 export enum AlignType {
@@ -18,7 +18,11 @@ export enum AlignType {
 export class AlignCmd implements ICommand {
   dx: number[] = [];
   dy: number[] = [];
-  constructor(public desc: string, private elements: Graph[], type: AlignType) {
+  constructor(
+    public desc: string,
+    private elements: SuikaGraphics[],
+    type: AlignType,
+  ) {
     if (elements.length < 2) {
       throw new Error('you can not algin zero or one element');
     }

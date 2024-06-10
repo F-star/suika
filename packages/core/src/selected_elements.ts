@@ -1,34 +1,40 @@
 import { EventEmitter, isSameArray } from '@suika/common';
-import { boxToRect, type IRect, mergeRect } from '@suika/geo';
+import { boxToRect, type IRect, mergeBoxes } from '@suika/geo';
 
-import { GroupCmd } from './commands/group';
-import { RemoveGraphsCmd } from './commands/remove_graphs';
 import { type Editor } from './editor';
-import { type Graph } from './graphs';
+import { isGroupGraphics, type SuikaGraphics } from './graphs';
+import { getParentIdSet } from './service/group_and_record';
+import { removeGraphicsAndRecord } from './service/remove_service';
 import { getRectCenterPoint } from './utils';
 
 interface Events {
-  itemsChange(items: Graph[]): void;
-  hoverItemChange(item: Graph | null, prevItem: Graph | null): void;
-  highlightedItemChange(item: Graph | null, prevItem: Graph | null): void;
+  itemsChange(items: SuikaGraphics[]): void;
+  hoverItemChange(
+    item: SuikaGraphics | null,
+    prevItem: SuikaGraphics | null,
+  ): void;
+  highlightedItemChange(
+    item: SuikaGraphics | null,
+    prevItem: SuikaGraphics | null,
+  ): void;
 }
 
-class SelectedElements {
-  private items: Graph[] = [];
-  private hoverItem: Graph | null = null;
-  private highlightedItem: Graph | null = null;
+export class SelectedElements {
+  private items: SuikaGraphics[] = [];
+  private hoverItem: SuikaGraphics | null = null;
+  private highlightedItem: SuikaGraphics | null = null;
 
   private eventEmitter = new EventEmitter<Events>();
 
   constructor(private editor: Editor) {}
-  setItems(items: Graph[]) {
+  setItems(items: SuikaGraphics[]) {
     const prevItems = this.items;
     this.items = items;
     this.emitItemsChangeIfChanged(prevItems, items);
   }
-  getItems({ excludeLocked = false } = {}): Graph[] {
+  getItems({ excludeLocked = false } = {}): SuikaGraphics[] {
     if (excludeLocked) {
-      return this.items.filter((item) => !item.getLock());
+      return this.items.filter((item) => !item.isLock());
     }
     return [...this.items];
   }
@@ -46,10 +52,10 @@ class SelectedElements {
   }
 
   isAllLocked() {
-    return this.items.every((item) => item.getLock());
+    return this.items.every((item) => item.isLock());
   }
 
-  hasItem(item: Graph) {
+  hasItem(item: SuikaGraphics) {
     return this.items.includes(item);
   }
 
@@ -63,9 +69,9 @@ class SelectedElements {
    * “追加” 多个元素
    * 如果已选中元素中存在追加元素，将其从已选中元素中取出，否则添加进去
    */
-  toggleItems(toggledElements: Graph[]) {
+  toggleItems(toggledElements: SuikaGraphics[]) {
     const prevItems = this.items;
-    const retItems: Graph[] = [];
+    const retItems: SuikaGraphics[] = [];
     for (let i = 0, len = prevItems.length; i < len; i++) {
       const item = prevItems[i];
       const idx = toggledElements.indexOf(item);
@@ -80,25 +86,37 @@ class SelectedElements {
 
     this.emitItemsChangeIfChanged(prevItems, retItems);
   }
-  private emitItemsChangeIfChanged(prevItems: Graph[], items: Graph[]) {
+  private emitItemsChangeIfChanged(
+    prevItems: SuikaGraphics[],
+    items: SuikaGraphics[],
+  ) {
     if (!isSameArray(prevItems, items)) {
       this.eventEmitter.emit('itemsChange', items);
     }
   }
-  toggleItemById(id: string) {
+  toggleItemById(id: string, opts?: { disableParentAndChildCoexist: boolean }) {
     const toggledElement = this.editor.sceneGraph.getElementById(id);
-    if (toggledElement) {
-      this.toggleItems([toggledElement]);
-    } else {
+    if (!toggledElement) {
       console.warn('can not find element by id');
+      return;
     }
+
+    if (opts?.disableParentAndChildCoexist) {
+      if (isGroupGraphics(toggledElement)) {
+        this.items = this.items.filter((item) => !item.containAncestor(id));
+      } else {
+        const pathIdSet = new Set(toggledElement.getParentIds());
+        this.items = this.items.filter((item) => !pathIdSet.has(item.attrs.id));
+      }
+    }
+    this.toggleItems([toggledElement]);
   }
   getCenterPoint() {
-    const bBox = this.getBbox();
-    if (!bBox) {
+    const bbox = this.getBbox();
+    if (!bbox) {
       throw new Error('no selected elements');
     }
-    return getRectCenterPoint(bBox);
+    return getRectCenterPoint(bbox);
   }
   size() {
     return this.items.length;
@@ -110,8 +128,8 @@ class SelectedElements {
     if (this.isEmpty()) {
       return null;
     }
-    const rects = this.items.map((element) => boxToRect(element.getBbox()));
-    return mergeRect(...rects);
+    const bboxes = this.items.map((element) => element.getBbox());
+    return boxToRect(mergeBoxes(bboxes));
   }
   getRotation() {
     if (this.items.length === 0 || this.items.length > 1) {
@@ -138,29 +156,28 @@ class SelectedElements {
     if (this.isEmpty()) {
       return;
     }
-    this.editor.commandManager.pushCommand(
-      new RemoveGraphsCmd('Remove Elements', this.editor, this.items),
-    );
+    removeGraphicsAndRecord(this.editor, this.items);
+    this.clear();
     this.editor.render();
   }
 
   selectAll() {
-    this.setItems(
-      this.editor.sceneGraph.children.filter((item) => !item.getLock()),
-    );
-  }
+    // 判断选中图形的父节点是否相同
+    // 如果是，将父节点下的子节点全部选中
+    // 如果不是，不做任何操作。
+    const parent =
+      this.items[0]?.getParent?.() ?? this.editor.doc.getCurrCanvas();
 
-  group() {
-    if (this.size() === 0) {
-      console.warn('can not group, no element');
-      return;
+    for (let i = 1; i < this.items.length; i++) {
+      if (parent !== this.items[i].getParent()) {
+        return;
+      }
     }
-    this.editor.commandManager.pushCommand(
-      new GroupCmd('Group Elements', this.editor, this.items),
-    );
+
+    this.setItems(parent.getChildren().filter((item) => !item.isLock()));
   }
 
-  setHoverItem(graph: Graph | null) {
+  setHoverItem(graph: SuikaGraphics | null) {
     const prevHoverItem = this.hoverItem;
     this.hoverItem = graph;
     this.setHighlightedItem(graph);
@@ -169,11 +186,11 @@ class SelectedElements {
     }
   }
 
-  getHoverItem(): Graph | null {
+  getHoverItem(): SuikaGraphics | null {
     return this.hoverItem;
   }
 
-  setHighlightedItem(graph: Graph | null) {
+  setHighlightedItem(graph: SuikaGraphics | null) {
     const prevHighlightItem = this.highlightedItem;
     this.highlightedItem = graph;
     if (prevHighlightItem !== graph) {
@@ -185,9 +202,15 @@ class SelectedElements {
     }
   }
 
-  getHighlightedItem(): Graph | null {
+  getHighlightedItem(): SuikaGraphics | null {
     return this.highlightedItem;
   }
-}
 
-export default SelectedElements;
+  /**
+   * get ParentId of selected graphics
+   * ids will keep order from bottom to top
+   */
+  getParentIdSet() {
+    return getParentIdSet(this.items);
+  }
+}

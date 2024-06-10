@@ -2,6 +2,7 @@ import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
 import { type IPoint, isBoxIntersect, rectToBox } from '@suika/geo';
 
 import { type Editor } from './editor';
+import { isGroupGraphics } from './graphs';
 import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
   bboxToBboxWithMid,
@@ -43,7 +44,7 @@ export class RefLine {
     const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox();
     for (const graph of this.editor.sceneGraph.getVisibleItems()) {
-      if (selectIdSet.has(graph.attrs.id)) {
+      if (selectIdSet.has(graph.attrs.id) || isGroupGraphics(graph)) {
         continue;
       }
 
@@ -76,7 +77,7 @@ export class RefLine {
        * top 和 bottom 要绘制水平参考线，不要绘制垂直参照线
        * left 和 right 要绘制垂直参照线，不要绘制水平参照线
        */
-      const bboxVerts = graph.getBboxVerts();
+      const bboxVerts = graph.getWorldBboxVerts();
       const top = bboxVerts.filter((p) => p.x === bbox.minX);
       const bottom = bboxVerts.filter((p) => p.x === bbox.maxX);
       const left = bboxVerts.filter((p) => p.y === bbox.minY);
@@ -123,7 +124,10 @@ export class RefLine {
     // 选中的为单个图形，要以旋转后的 4 个顶点和中心点为目标线
     if (this.editor.selectedElements.size() === 1) {
       const [targetGraph] = this.editor.selectedElements.getItems();
-      targetPoints = [...targetGraph.getBboxVerts(), targetGraph.getCenter()];
+      targetPoints = [
+        ...targetGraph.getWorldBboxVerts(),
+        targetGraph.getWorldCenter(),
+      ];
     } else {
       const targetBbox = bboxToBboxWithMid(
         rectToBox(this.editor.selectedElements.getBbox()!),

@@ -2,7 +2,7 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type Editor } from '../editor';
-import { Star } from '../graphs/star';
+import { SuikaStar } from '../graphs/star';
 import { DrawGraphTool } from './tool_draw_graph';
 import { type ITool } from './type';
 
@@ -21,7 +21,7 @@ export class DrawStar extends DrawGraphTool implements ITool {
 
   protected createGraph(rect: IRect) {
     rect = normalizeRect(rect);
-    return new Star(
+    return new SuikaStar(
       {
         objectName: '',
         width: rect.width,
@@ -31,8 +31,8 @@ export class DrawStar extends DrawGraphTool implements ITool {
         starInnerScale: this.editor.setting.get('defaultStarInnerScale'),
       },
       {
-        x: rect.x,
-        y: rect.y,
+        advancedAttrs: { x: rect.x, y: rect.y },
+        doc: this.editor.doc,
       },
     );
   }

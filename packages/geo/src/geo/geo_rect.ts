@@ -1,5 +1,3 @@
-import { Matrix } from 'pixi.js';
-
 import { transformRotate } from '../transform';
 import {
   type IBox,
@@ -10,6 +8,7 @@ import {
   type ITransformRect,
 } from '../type';
 import { normalizeRadian } from './geo_angle';
+import { Matrix } from './geo_matrix_class';
 import { distance } from './geo_point';
 
 export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
@@ -298,7 +297,7 @@ export const recomputeTransformRect = (
   return {
     width: newSize.width,
     height: newSize.height,
-    transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
+    transform: tf.getArray(),
   };
 };
 

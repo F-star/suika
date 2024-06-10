@@ -1,7 +1,13 @@
 import { ArrangeType } from '../commands/arrange';
 import { type Editor } from '../editor';
-import { Path, TextGraph } from '../graphs';
+import {
+  isGroupGraphics,
+  type SuikaGraphics,
+  SuikaPath,
+  SuikaText,
+} from '../graphs';
 import { arrangeAndRecord, MutateGraphsAndRecord } from '../service';
+import { groupAndRecord } from '../service/group_and_record';
 
 export class CommandKeyBinding {
   private isBound = false;
@@ -239,7 +245,8 @@ export class CommandKeyBinding {
     /*************** group **************/
     // group
     const groupAction = () => {
-      editor.selectedElements.group();
+      // editor.selectedElements.group();
+      groupAndRecord(this.editor.selectedElements.getItems(), editor);
       editor.render();
     };
     editor.keybindingManager.register({
@@ -283,24 +290,46 @@ export class CommandKeyBinding {
     });
 
     /******** enter path edit *******/
-    const enterGraphEdit = () => {
-      if (
-        !editor.pathEditor.isActive() &&
-        editor.selectedElements.size() === 1
-      ) {
-        const graph = editor.selectedElements.getItems()[0];
-        if (graph instanceof Path) {
-          editor.pathEditor.active(graph);
-        } else if (graph instanceof TextGraph) {
-          editor.textEditor.active({ textGraph: graph });
+    const enterGraphicsEditWithGroup = () => {
+      const items = editor.selectedElements.getItems();
+      const newItems: SuikaGraphics[] = [];
+      let hasGroup = false;
+      for (const item of items) {
+        if (isGroupGraphics(item)) {
+          newItems.push(...item.getChildren());
+          hasGroup = true;
+        } else {
+          newItems.push(item);
         }
+      }
+      if (hasGroup) {
+        editor.selectedElements.setItems(newItems);
+        editor.render();
+      }
+    };
+    const enterGraphicsEdit = () => {
+      const selectedCount = editor.selectedElements.size();
+      if (editor.pathEditor.isActive() || selectedCount === 0) return;
+
+      if (selectedCount === 1) {
+        const graphics = editor.selectedElements.getItems()[0];
+        if (graphics instanceof SuikaPath) {
+          editor.pathEditor.active(graphics);
+        } else if (graphics instanceof SuikaText) {
+          editor.textEditor.active({ textGraph: graphics });
+        } else if (isGroupGraphics(graphics)) {
+          enterGraphicsEditWithGroup();
+        }
+      } else {
+        // 如果有 group，取消 group 的选中，改为选中其下的 children
+        enterGraphicsEditWithGroup();
       }
     };
     editor.keybindingManager.register({
       key: { keyCode: 'Enter' },
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'EnterGraphEdit',
-      action: enterGraphEdit,
+      action: enterGraphicsEdit,
     });
   }
 

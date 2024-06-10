@@ -4,7 +4,7 @@ import { simplePath } from '@suika/geo';
 import { AddGraphCmd } from '../commands';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
-import { Path } from '../graphs';
+import { SuikaPath } from '../graphs';
 import { type ITool } from './type';
 
 const TYPE = 'pencil';
@@ -19,7 +19,7 @@ export class PencilTool implements ITool {
   commandDesc = 'draw by Pencil';
   private unbindEvent: () => void = noop;
 
-  private path: Path | null = null;
+  private path: SuikaPath | null = null;
   private isFirstDrag = true;
 
   constructor(private editor: Editor) {}
@@ -34,19 +34,24 @@ export class PencilTool implements ITool {
   }
 
   onStart(e: PointerEvent) {
-    this.path = new Path({
-      objectName: '',
-      width: 0,
-      height: 0,
-      pathData: [
-        {
-          segs: [],
-          closed: false,
-        },
-      ],
-      stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
-      strokeWidth: 3,
-    });
+    this.path = new SuikaPath(
+      {
+        objectName: '',
+        width: 0,
+        height: 0,
+        pathData: [
+          {
+            segs: [],
+            closed: false,
+          },
+        ],
+        stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],
+        strokeWidth: 3,
+      },
+      {
+        doc: this.editor.doc,
+      },
+    );
 
     const point = this.editor.getSceneCursorXY(e);
     this.path!.addSeg(0, {
@@ -58,14 +63,16 @@ export class PencilTool implements ITool {
 
   onDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
-    this.path!.addSeg(0, {
+    const path = this.path!;
+    path.addSeg(0, {
       point,
       in: { x: 0, y: 0 },
       out: { x: 0, y: 0 },
     });
 
     if (this.isFirstDrag) {
-      this.editor.sceneGraph.addItems([this.path!]);
+      this.editor.sceneGraph.addItems([path]);
+      this.editor.doc.getCurrCanvas().appendChild(path);
       this.isFirstDrag = false;
     }
     this.editor.render();

@@ -1,23 +1,26 @@
 import { parseRGBAStr } from '@suika/common';
-import { type IPoint } from '@suika/geo';
-import { Matrix } from 'pixi.js';
+import { type IPoint, Matrix } from '@suika/geo';
 
 import { DOUBLE_PI } from '../constant';
 import { type ImgManager } from '../Img_manager';
 import { PaintType } from '../paint';
-import { GraphType, type Optional } from '../type';
-import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
+import { GraphicsType, type Optional } from '../type';
+import {
+  type GraphicsAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from './graphics';
 
-export type EllipseAttrs = GraphAttrs;
+export type EllipseAttrs = GraphicsAttrs;
 
-export class Ellipse extends Graph<EllipseAttrs> {
-  override type = GraphType.Ellipse;
+export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
+  override type = GraphicsType.Ellipse;
 
   constructor(
     attrs: Optional<EllipseAttrs, 'id' | 'transform'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
-    super({ ...attrs, type: GraphType.Ellipse }, opts);
+    super({ ...attrs, type: GraphicsType.Ellipse }, opts);
   }
 
   override hitTest(x: number, y: number, padding = 0) {
@@ -29,7 +32,7 @@ export class Ellipse extends Graph<EllipseAttrs> {
     const w = attrs.width / 2 + padding;
     const h = attrs.height / 2 + padding;
 
-    const tf = new Matrix(...this.attrs.transform);
+    const tf = new Matrix(...this.getWorldTransform());
     const rotatedHitPoint = tf.applyInverse({ x, y });
 
     return (
@@ -48,6 +51,7 @@ export class Ellipse extends Graph<EllipseAttrs> {
     const cx = attrs.width / 2;
     const cy = attrs.height / 2;
 
+    ctx.save();
     ctx.transform(...attrs.transform);
 
     ctx.beginPath();
@@ -79,6 +83,7 @@ export class Ellipse extends Graph<EllipseAttrs> {
     }
 
     ctx.closePath();
+    ctx.restore();
   }
 
   override drawOutline(
@@ -86,11 +91,11 @@ export class Ellipse extends Graph<EllipseAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    const { width, height, transform } = this.attrs;
+    const { width, height } = this.attrs;
     const cx = width / 2;
     const cy = height / 2;
 
-    ctx.transform(...transform);
+    ctx.transform(...this.getWorldTransform());
 
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;

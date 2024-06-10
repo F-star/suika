@@ -1,6 +1,5 @@
-import { Matrix } from 'pixi.js';
-
 import { type IPoint, type ITransformRect } from '../../type';
+import { Matrix } from '../geo_matrix_class';
 
 interface IResizeOp {
   getLocalOrigin(width: number, height: number): IPoint;
@@ -217,13 +216,6 @@ export const resizeRect = (
   return {
     width: newRect.width,
     height: newRect.height,
-    transform: [
-      newRect.transform.a,
-      newRect.transform.b,
-      newRect.transform.c,
-      newRect.transform.d,
-      newRect.transform.tx,
-      newRect.transform.ty,
-    ],
+    transform: newRect.transform.getArray(),
   };
 };
