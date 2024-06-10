@@ -417,8 +417,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     imgManager?: ImgManager,
     smooth?: boolean,
   ) {
-    if (!(this.attrs.visible ?? true)) return;
-
+    if (!this.isVisible()) return;
     ctx.save();
     ctx.transform(...this.attrs.transform);
     for (const child of this.children) {
@@ -929,5 +928,26 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this.updateAttrs({
       transform: localTf,
     });
+  }
+
+  getVisibleLeafNodeSet() {
+    const graphicsSet = new Set<SuikaGraphics>();
+    this.forEachVisibleLeafNode((graphics) => {
+      graphicsSet.add(graphics);
+    });
+    return graphicsSet;
+  }
+
+  forEachVisibleLeafNode(cb: (graphics: SuikaGraphics) => void) {
+    if (!this.isVisible()) {
+      return;
+    }
+    if (this.isContainer) {
+      for (const chid of this.children) {
+        chid.forEachVisibleLeafNode(cb);
+      }
+    } else {
+      cb(this);
+    }
   }
 }

@@ -70,6 +70,7 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     imgManager?: ImgManager,
     smooth?: boolean,
   ) {
+    if (!this.isVisible()) return;
     this._realDraw(ctx, imgManager, smooth);
   }
 

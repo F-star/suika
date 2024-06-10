@@ -51,6 +51,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
+    if (!this.isVisible()) return;
     const { transform, fill, stroke, fontSize, content } = this.attrs;
     ctx.save();
     ctx.transform(...transform);

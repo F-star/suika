@@ -30,6 +30,7 @@ export class SuikaLine extends SuikaGraphics<LineAttrs> {
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
+    if (!this.isVisible()) return;
     const { width, transform, stroke, strokeWidth } = this.attrs;
     ctx.save();
     ctx.transform(...transform);

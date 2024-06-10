@@ -122,6 +122,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     imgManager?: ImgManager,
     smooth?: boolean,
   ) {
+    if (!this.isVisible()) return;
     this._realDraw(ctx, imgManager, smooth);
   }
 

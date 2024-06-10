@@ -71,6 +71,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
     imgManager?: ImgManager,
     smooth?: boolean,
   ) {
+    if (!this.isVisible()) return;
     this._realDraw(ctx, imgManager, smooth);
   }
 

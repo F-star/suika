@@ -72,6 +72,7 @@ export class SceneGraph {
     return this.children;
   }
 
+  /** @deprecated */
   getVisibleItems() {
     // TODO: cache if items are not changed
     return this.children.filter((item) => item.isVisible());

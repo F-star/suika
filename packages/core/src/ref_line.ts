@@ -2,7 +2,6 @@ import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
 import { type IPoint, isBoxIntersect, rectToBox } from '@suika/geo';
 
 import { type Editor } from './editor';
-import { isGroupGraphics } from './graphs';
 import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
   bboxToBboxWithMid,
@@ -43,8 +42,22 @@ export class RefLine {
 
     const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox();
-    for (const graph of this.editor.sceneGraph.getVisibleItems()) {
-      if (selectIdSet.has(graph.attrs.id) || isGroupGraphics(graph)) {
+
+    const refGraphicsSet = this.editor.doc
+      .getCurrCanvas()
+      .getVisibleLeafNodeSet();
+
+    const selectedItems = this.editor.selectedElements.getItems();
+    for (const selectedItem of selectedItems) {
+      selectedItem.forEachVisibleLeafNode((graphics) => {
+        if (refGraphicsSet.has(graphics)) {
+          refGraphicsSet.delete(graphics);
+        }
+      });
+    }
+
+    for (const graph of refGraphicsSet) {
+      if (selectIdSet.has(graph.attrs.id)) {
         continue;
       }
 

@@ -46,7 +46,8 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     ctx: CanvasRenderingContext2D,
     imgManager?: ImgManager,
     smooth?: boolean,
-  ): void {
+  ) {
+    if (!this.isVisible()) return;
     const attrs = this.attrs;
     const cx = attrs.width / 2;
     const cy = attrs.height / 2;

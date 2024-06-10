@@ -241,7 +241,9 @@ export class Editor {
 
   getCanvasBbox() {
     const canvasGraphics = this.doc.getCurrCanvas();
-    const children = canvasGraphics.getChildren();
+    const children = canvasGraphics
+      .getChildren()
+      .filter((item) => item.isVisible());
     if (children.length === 0) return null;
     return mergeBoxes(children.map((item) => item.getBbox()));
   }
