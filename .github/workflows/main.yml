@@ -28,7 +28,9 @@ jobs:
         run: |
           sudo apt-get install snapd
           sudo snap install node --classic --channel=20
-          npm i -g pnpm@9
+          npm i -g pnpm@9.0.2
+          echo 'pnpm version:'
+          pnpm -v
           pnpm install
       # 单元测试
       - name: Unit Testing
