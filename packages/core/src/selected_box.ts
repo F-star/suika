@@ -38,7 +38,7 @@ export class SelectedBox {
         this.box = {
           width: rect.width,
           height: rect.height,
-          transform: selectedGraph.attrs.transform!,
+          transform: selectedGraph.getWorldTransform(),
         };
       } else {
         const rect = selectedElements.getBbox()!;

@@ -1,5 +1,5 @@
 import { type Editor } from '../../editor';
-import { type Graph } from '../../graphs';
+import { type SuikaGraphics } from '../../graphs';
 import { type ICommand } from '../type';
 import { firstInfoOfUnmovedGraphs, lastInfoOfUnmovedGraphs } from './util';
 
@@ -15,15 +15,15 @@ export enum ArrangeType {
  * reference: https://mp.weixin.qq.com/s/OBITvCA6OM8_nBgU_Vh9qA
  */
 export class ArrangeCmd implements ICommand {
-  private movedGraphSet: Set<Graph>;
-  private prevGraphs: Graph[] = []; // TODO: optimize space complexity
+  private movedGraphSet: Set<SuikaGraphics>;
+  private prevGraphs: SuikaGraphics[] = []; // TODO: optimize space complexity
   constructor(
     public desc: string,
     private editor: Editor,
     /**
      * it's no need to keep right relative order
      */
-    movedGraphs: Graph[],
+    movedGraphs: SuikaGraphics[],
     public type: ArrangeType,
   ) {
     if (movedGraphs.length === 0) {
@@ -69,8 +69,8 @@ export class ArrangeCmd implements ICommand {
   }
   static shouldExecCmd(
     type: ArrangeType,
-    graphs: Graph[],
-    movedGraphSet: Set<Graph>,
+    graphs: SuikaGraphics[],
+    movedGraphSet: Set<SuikaGraphics>,
   ): boolean {
     if (
       graphs.length === 0 ||
@@ -100,9 +100,9 @@ export class ArrangeCmd implements ICommand {
   }
 }
 
-const front = (graphs: Graph[], movedGraphSet: Set<Graph>) => {
-  const newGraphs: Graph[] = [];
-  const tailGraphs: Graph[] = [];
+const front = (graphs: SuikaGraphics[], movedGraphSet: Set<SuikaGraphics>) => {
+  const newGraphs: SuikaGraphics[] = [];
+  const tailGraphs: SuikaGraphics[] = [];
   for (let i = 0; i < graphs.length; i++) {
     const graph = graphs[i];
     if (movedGraphSet.has(graph)) {
@@ -115,9 +115,9 @@ const front = (graphs: Graph[], movedGraphSet: Set<Graph>) => {
   return newGraphs;
 };
 
-const back = (graphs: Graph[], movedGraphSet: Set<Graph>) => {
-  const newGraphs: Graph[] = [];
-  const tailGraphs: Graph[] = [];
+const back = (graphs: SuikaGraphics[], movedGraphSet: Set<SuikaGraphics>) => {
+  const newGraphs: SuikaGraphics[] = [];
+  const tailGraphs: SuikaGraphics[] = [];
   for (let i = graphs.length - 1; i >= 0; i--) {
     const graph = graphs[i];
     if (movedGraphSet.has(graph)) {
@@ -130,7 +130,7 @@ const back = (graphs: Graph[], movedGraphSet: Set<Graph>) => {
   return newGraphs.reverse(); // reverse
 };
 
-const forward = (graphs: Graph[], movedGraphs: Set<Graph>) => {
+const forward = (graphs: SuikaGraphics[], movedGraphs: Set<SuikaGraphics>) => {
   const newGraphs = [...graphs];
 
   let i = lastInfoOfUnmovedGraphs(newGraphs, movedGraphs).index;
@@ -143,7 +143,7 @@ const forward = (graphs: Graph[], movedGraphs: Set<Graph>) => {
   return newGraphs;
 };
 
-const backward = (graphs: Graph[], movedGraphs: Set<Graph>) => {
+const backward = (graphs: SuikaGraphics[], movedGraphs: Set<SuikaGraphics>) => {
   const newGraphs = [...graphs];
 
   let i = firstInfoOfUnmovedGraphs(newGraphs, movedGraphs).index;

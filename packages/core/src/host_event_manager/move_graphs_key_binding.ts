@@ -3,7 +3,7 @@ import { type IPoint } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
-import { Graph } from '../graphs';
+import { SuikaGraphics } from '../graphs';
 
 /**
  * move graphs by arrow key binding
@@ -27,7 +27,7 @@ export class MoveGraphsKeyBinding {
     let startPoints: IPoint[] = [];
     let isEnableUpdateStartPoints = true;
 
-    const recordDebounce = debounce((moveEls: Graph[]) => {
+    const recordDebounce = debounce((moveEls: SuikaGraphics[]) => {
       this.editor.controlHandleManager.showCustomHandles();
       isEnableUpdateStartPoints = true;
       this.editor.commandManager.enableRedoUndo();
@@ -35,7 +35,7 @@ export class MoveGraphsKeyBinding {
         new SetGraphsAttrsCmd(
           'Move elements',
           moveEls,
-          arrMap(moveEls, (el) => el.getPosition()),
+          arrMap(moveEls, (el) => el.getLocalPosition()),
           startPoints,
         ),
       );
@@ -69,7 +69,7 @@ export class MoveGraphsKeyBinding {
 
       if (isEnableUpdateStartPoints) {
         startPoints = arrMap(movedEls, (el) => ({
-          ...el.getPosition(),
+          ...el.getLocalPosition(),
         }));
         isEnableUpdateStartPoints = false;
       }
@@ -78,16 +78,16 @@ export class MoveGraphsKeyBinding {
       if (event.shiftKey) nudge = editor.setting.get('bigNudge');
 
       if (pressed.ArrowLeft) {
-        Graph.dMove(movedEls, -nudge, 0);
+        SuikaGraphics.dMove(movedEls, -nudge, 0);
       }
       if (pressed.ArrowRight) {
-        Graph.dMove(movedEls, nudge, 0);
+        SuikaGraphics.dMove(movedEls, nudge, 0);
       }
       if (pressed.ArrowUp) {
-        Graph.dMove(movedEls, 0, -nudge);
+        SuikaGraphics.dMove(movedEls, 0, -nudge);
       }
       if (pressed.ArrowDown) {
-        Graph.dMove(movedEls, 0, nudge);
+        SuikaGraphics.dMove(movedEls, 0, nudge);
       }
 
       this.editor.commandManager.disableRedoUndo();

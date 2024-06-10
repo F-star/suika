@@ -1,29 +1,37 @@
 import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
-import { type IPoint, isPointInRoundRect } from '@suika/geo';
-import { Matrix } from 'pixi.js';
+import {
+  type IMatrixArr,
+  type IPoint,
+  isPointInRoundRect,
+  Matrix,
+} from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
-import { GraphType, type Optional } from '../type';
-import { Ellipse } from './ellipse';
-import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
+import { GraphicsType, type Optional } from '../type';
+import { SuikaEllipse } from './ellipse';
+import {
+  type GraphicsAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from './graphics';
 
-export interface RectAttrs extends GraphAttrs {
+export interface RectAttrs extends GraphicsAttrs {
   cornerRadius?: number;
 }
 
-export class Rect extends Graph<RectAttrs> {
-  override type = GraphType.Rect;
+export class SuikaRect extends SuikaGraphics<RectAttrs> {
+  override type = GraphicsType.Rect;
 
   constructor(
     attrs: Optional<RectAttrs, 'transform' | 'id'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
     super(
       {
         ...attrs,
-        type: GraphType.Rect,
+        type: GraphicsType.Rect,
       },
       opts,
     );
@@ -52,12 +60,15 @@ export class Rect extends Graph<RectAttrs> {
       fill?: IPaint[];
       stroke?: IPaint[];
       strokeWidth?: number;
+      transform: IMatrixArr;
     },
   ) {
     const attrs = this.attrs;
-    const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
+    const { fill, strokeWidth, stroke, transform } =
+      overrideStyle || this.attrs;
 
-    ctx.transform(...attrs.transform);
+    ctx.save();
+    ctx.transform(...transform);
 
     ctx.beginPath();
     if (attrs.cornerRadius) {
@@ -103,6 +114,7 @@ export class Rect extends Graph<RectAttrs> {
       }
     }
     ctx.closePath();
+    ctx.restore();
   }
 
   override draw(
@@ -121,6 +133,7 @@ export class Rect extends Graph<RectAttrs> {
     this._realDraw(ctx, undefined, undefined, {
       stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
       strokeWidth,
+      transform: this.getWorldTransform(),
     });
   }
 
@@ -129,25 +142,28 @@ export class Rect extends Graph<RectAttrs> {
    */
   override getRect() {
     return {
-      ...this.getPosition(),
+      ...this.getLocalPosition(),
       width: this.attrs.width,
       height: this.attrs.height,
     };
   }
 
   private createCornerRadiusHandleGraph() {
-    return new Ellipse({
-      objectName: 'cornerRadius',
-      width: 8,
-      height: 8,
-      fill: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#fff')! }],
-      stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#1592fe')! }],
-      strokeWidth: 1,
-    });
+    return new SuikaEllipse(
+      {
+        objectName: 'cornerRadius',
+        width: 8,
+        height: 8,
+        fill: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#fff')! }],
+        stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA('#1592fe')! }],
+        strokeWidth: 1,
+      },
+      { doc: this.doc },
+    );
   }
 
   override hitTest(x: number, y: number, padding = 0): boolean {
-    const tf = new Matrix(...this.attrs.transform);
+    const tf = new Matrix(...this.getWorldTransform());
     const point = tf.applyInverse({ x, y });
     const maxCornerRadius = this.getMaxCornerRadius();
     return isPointInRoundRect(
@@ -233,7 +249,7 @@ export class Rect extends Graph<RectAttrs> {
       let x = info.origin.x + info.direction.x * cornerRadius;
       let y = info.origin.y + info.direction.y * cornerRadius;
 
-      const tf = new Matrix(...attrs.transform);
+      const tf = new Matrix(...this.getWorldTransform());
       const pos = tf.apply({ x, y });
       x = pos.x;
       y = pos.y;
@@ -254,6 +270,7 @@ export class Rect extends Graph<RectAttrs> {
     type: string,
     newPos: IPoint,
     oldBox: RectAttrs,
+    oldWorldTransform: IMatrixArr,
     keepRatio?: boolean,
     scaleFromCenter?: boolean,
     flipWhenResize?: boolean,
@@ -261,7 +278,7 @@ export class Rect extends Graph<RectAttrs> {
     const newAttrs = {} as Partial<RectAttrs>;
     if (type.endsWith('CornerRadius')) {
       const attrs = this.attrs;
-      const tf = new Matrix(...attrs.transform);
+      const tf = new Matrix(...oldWorldTransform);
       const pos = tf.applyInverse(newPos);
 
       let a = { x: 0, y: 0 };
@@ -310,6 +327,7 @@ export class Rect extends Graph<RectAttrs> {
           type,
           newPos,
           oldBox,
+          oldWorldTransform,
           keepRatio,
           scaleFromCenter,
           flipWhenResize,

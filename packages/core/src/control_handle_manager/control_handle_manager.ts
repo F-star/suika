@@ -3,16 +3,16 @@ import {
   type IPoint,
   type IRect,
   type ITransformRect,
+  Matrix,
   offsetRect,
   rectToMidPoints,
   rectToVertices,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
-import { GraphType } from '../type';
+import { GraphicsType } from '../type';
 import { type ControlHandle } from './control_handle';
 import { type ITransformHandleType } from './type';
 import { createTransformHandles } from './util';
@@ -45,12 +45,15 @@ export class ControlHandleManager {
 
   constructor(private editor: Editor) {
     const setting = editor.setting;
-    this.transformHandles = createTransformHandles({
-      size: setting.get('handleSize'),
-      fill: setting.get('handleFill'),
-      stroke: setting.get('handleStroke'),
-      strokeWidth: setting.get('handleStrokeWidth'),
-    });
+    this.transformHandles = createTransformHandles(
+      {
+        size: setting.get('handleSize'),
+        fill: setting.get('handleFill'),
+        stroke: setting.get('handleStroke'),
+        strokeWidth: setting.get('handleStrokeWidth'),
+      },
+      editor.doc,
+    );
   }
 
   private onHoverItemChange = () => {
@@ -206,7 +209,7 @@ export class ControlHandleManager {
     const rotate = rect ? getTransformAngle(rect.transform) : 0;
     handles.forEach((handle) => {
       const graph = handle.graph;
-      if (graph.type === GraphType.Path) {
+      if (graph.type === GraphicsType.Path) {
         // TODO:
       } else {
         const { x, y } = this.editor.sceneCoordsToViewport(
@@ -231,7 +234,7 @@ export class ControlHandleManager {
         graph.setRotate(handle.rotation);
       }
 
-      if (!graph.getVisible()) {
+      if (!graph.isVisible()) {
         return;
       }
       ctx.save();

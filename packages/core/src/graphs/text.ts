@@ -2,10 +2,15 @@ import { escapeHtml, parseRGBAStr } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { PaintType } from '../paint';
-import { GraphType, type Optional } from '../type';
-import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
+import { GraphicsType, type Optional } from '../type';
+import {
+  type GraphicsAttrs,
+  type IAdvancedAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from './graphics';
 
-export interface TextAttrs extends GraphAttrs {
+export interface TextAttrs extends GraphicsAttrs {
   content: string;
   fontSize: number;
   autoFit?: boolean;
@@ -16,17 +21,17 @@ const DEFAULT_TEXT_WEIGHT = 30;
 
 const tmpCtx = document.createElement('canvas').getContext('2d')!;
 
-export class TextGraph extends Graph<TextAttrs> {
-  override type = GraphType.Text;
+export class SuikaText extends SuikaGraphics<TextAttrs> {
+  override type = GraphicsType.Text;
 
   constructor(
     attrs: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height' | 'transform'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
     super(
       {
         ...attrs,
-        type: GraphType.Text,
+        type: GraphicsType.Text,
         width: attrs.width ?? DEFAULT_TEXT_WIDTH,
         height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
       },
@@ -41,12 +46,13 @@ export class TextGraph extends Graph<TextAttrs> {
     }
   }
 
-  override updateAttrs(partialAttrs: Partial<TextAttrs> & IGraphOpts) {
+  override updateAttrs(partialAttrs: Partial<TextAttrs> & IAdvancedAttrs) {
     super.updateAttrs(partialAttrs);
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
     const { transform, fill, stroke, fontSize, content } = this.attrs;
+    ctx.save();
     ctx.transform(...transform);
     ctx.beginPath();
     ctx.textBaseline = 'top';
@@ -68,6 +74,7 @@ export class TextGraph extends Graph<TextAttrs> {
     }
 
     ctx.fillText(content, 0, 0);
+    ctx.restore();
   }
 
   protected override getSVGTagHead(offset?: IPoint) {

@@ -8,60 +8,74 @@ import {
 } from '@suika/common';
 import {
   boxToRect,
+  calcRectBbox,
   getTransformAngle,
   getTransformedSize,
   type IBox,
   identityMatrix,
   type IMatrixArr,
+  invertMatrix,
   type IPoint,
   isBoxContain,
   isBoxIntersect,
   isPointInRect,
   isRectIntersect,
   type ITransformRect,
+  Matrix,
+  multiplyMatrix,
   normalizeRadian,
   rad2Deg,
+  recomputeTransformRect,
   rectToVertices,
   resizeLine,
   resizeRect,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
+import { generateKeyBetween, generateNKeysBetween } from 'fractional-indexing';
 
 import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
 import { DEFAULT_IMAGE, type PaintImage, PaintType } from '../../paint';
 import {
-  GraphType,
+  GraphicsType,
   type IFillStrokeSVGAttrs,
   type IObject,
   type Optional,
 } from '../../type';
 import { drawRoundRectPath } from '../../utils';
-import { type GraphAttrs, type IGraphOpts } from './graph_attrs';
+import { type SuikaDocument } from '../document';
+import {
+  type GraphicsAttrs,
+  type IAdvancedAttrs,
+  type IGraphicsOpts,
+} from './graphics_attrs';
 
-export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
-  type = GraphType.Graph;
+export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
+  type = GraphicsType.Graph;
   attrs: ATTRS;
+  protected doc: SuikaDocument;
   protected _cacheBboxWithStroke: Readonly<IBox> | null = null;
   protected _cacheBbox: Readonly<IBox> | null = null;
   protected _cacheMinBbox: IBox | null = null;
 
-  /** hide graph temporarily, it's possible that attrs.visible is true */
+  /** hide graphics temporarily, it's possible that attrs.visible is true */
   noRender = false;
+  private _deleted = false;
 
   constructor(
     attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
+    this.doc = opts.doc;
     const transform = attrs.transform ?? identityMatrix();
 
-    if (opts && !attrs.transform) {
-      if (opts.x !== undefined) {
-        transform[4] = opts.x;
+    const advancedAttrs = opts.advancedAttrs;
+    if (advancedAttrs && !attrs.transform) {
+      if (advancedAttrs.x !== undefined) {
+        transform[4] = advancedAttrs.x;
       }
-      if (opts.y !== undefined) {
-        transform[5] = opts.y;
+      if (advancedAttrs.y !== undefined) {
+        transform[5] = advancedAttrs.y;
       }
     }
 
@@ -80,7 +94,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return cloneDeep(this.attrs);
   }
 
-  protected shouldUpdateBbox(attrs: Partial<GraphAttrs> & IGraphOpts) {
+  protected shouldUpdateBbox(attrs: Partial<GraphicsAttrs> & IAdvancedAttrs) {
     // TODO: if x, y, width, height value no change, bbox should not be updated
     return (
       attrs.x !== undefined ||
@@ -88,7 +102,8 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       attrs.width !== undefined ||
       attrs.height !== undefined ||
       attrs.transform !== undefined ||
-      'strokeWidth' in attrs
+      'strokeWidth' in attrs ||
+      'parentIndex' in attrs
     );
   }
 
@@ -99,7 +114,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   updateAttrs(
-    partialAttrs: Partial<GraphAttrs> & IGraphOpts,
+    partialAttrs: Partial<GraphicsAttrs> & IAdvancedAttrs,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _options?: { finishRecomputed?: boolean },
   ) {
@@ -143,16 +158,32 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     if (this._cacheBboxWithStroke) {
       return this._cacheBboxWithStroke;
     }
-    const bbox = this._calcBbox(this.getStrokeWidth() / 2);
+    const bbox = calcRectBbox(
+      {
+        ...this.getSize(),
+        transform: this.getWorldTransform(),
+      },
+      this.getStrokeWidth() / 2,
+    );
     this._cacheBboxWithStroke = bbox;
     return bbox;
   }
 
   getBbox(): Readonly<IBox> {
+    return calcRectBbox({
+      ...this.getSize(),
+      transform: this.getWorldTransform(),
+    });
+  }
+
+  getLocalBbox(): Readonly<IBox> {
     if (this._cacheBbox) {
       return this._cacheBbox;
     }
-    const bbox = this._calcBbox();
+    const bbox = calcRectBbox({
+      ...this.getSize(),
+      transform: this.attrs.transform,
+    });
     this._cacheBbox = bbox;
     return bbox;
   }
@@ -161,65 +192,23 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return this.getBbox();
   }
 
-  /**
-   * AABB (axis-aligned bounding box), without considering strokeWidth)
-   * Consider rotation (orthogonal bounding box after rotation)
-   */
-  private _calcBbox(padding?: number): Readonly<IBox> {
-    let x = 0;
-    let y = 0;
-    let width = this.attrs.width;
-    let height = this.attrs.height;
-    if (padding) {
-      x -= padding;
-      y -= padding;
-      width += padding * 2;
-      height += padding * 2;
-    }
-
-    const tf = new Matrix(...this.attrs.transform);
-    const vertices = rectToVertices({
-      x,
-      y,
-      width,
-      height,
-    }).map((item) => {
-      const pos = tf.apply(item);
-      return { x: pos.x, y: pos.y };
-    });
-
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-
-    for (const vertex of vertices) {
-      minX = Math.min(minX, vertex.x);
-      minY = Math.min(minY, vertex.y);
-      maxX = Math.max(maxX, vertex.x);
-      maxY = Math.max(maxY, vertex.y);
-    }
-
-    return {
-      minX,
-      minY,
-      maxX,
-      maxY,
-    };
-  }
-
-  getBboxVerts(): IPoint[] {
+  getWorldBboxVerts(): IPoint[] {
     const rect = {
       x: 0,
       y: 0,
       width: this.attrs.width,
       height: this.attrs.height,
     };
-    return rectToVertices(rect, this.attrs.transform);
+    return rectToVertices(rect, this.getWorldTransform());
   }
 
-  getPosition() {
+  getLocalPosition() {
     return { x: this.attrs.transform[4], y: this.attrs.transform[5] };
+  }
+
+  getWorldPosition() {
+    const tf = this.getWorldTransform();
+    return { x: tf[4], y: tf[5] };
   }
 
   getX() {
@@ -236,7 +225,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
   getRect() {
     return {
-      ...this.getPosition(),
+      ...this.getLocalPosition(),
       width: this.attrs.width,
       height: this.attrs.height,
     };
@@ -246,13 +235,20 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     return getTransformedSize(this.attrs);
   }
 
-  getCenter(): IPoint {
+  getLocalCenter(): IPoint {
     const tf = new Matrix(...this.attrs.transform);
-    const center = tf.apply({
+    return tf.apply({
       x: this.attrs.width / 2,
       y: this.attrs.height / 2,
     });
-    return { x: center.x, y: center.y };
+  }
+
+  getWorldCenter(): IPoint {
+    const tf = new Matrix(...this.getWorldTransform());
+    return tf.apply({
+      x: this.attrs.width / 2,
+      y: this.attrs.height / 2,
+    });
   }
 
   hitTest(x: number, y: number, padding = 0) {
@@ -260,10 +256,43 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       { x, y },
       {
         ...this.getSize(),
-        transform: this.attrs.transform,
+        transform: this.getWorldTransform(),
       },
       padding + this.getStrokeWidth() / 2,
     );
+  }
+
+  hitTestChildren(x: number, y: number, padding = 0): boolean {
+    if (!this.isContainer) {
+      return this.hitTest(x, y, padding);
+    }
+
+    if (!this.hitTest(x, y, padding)) {
+      return false;
+    }
+    const children = this.getChildren();
+    for (let i = children.length - 1; i >= 0; i--) {
+      if (children[i].hitTest(x, y, padding)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  intersectWithChildrenBox(box: IBox) {
+    if (!this.isContainer) {
+      return this.intersectWithBox(box);
+    }
+    if (!this.intersectWithBox(box)) {
+      return false;
+    }
+    const children = this.getChildren();
+    for (const child of children) {
+      if (child.isVisible() && child.intersectWithBox(box)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -280,15 +309,10 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       } else {
         // OBB intersect
         // use SAT algorithm to check intersect
-        const tf = new Matrix(...this.attrs.transform).invert();
-        const [s1, s2, s3, s4] = rectToVertices(boxToRect(box), [
-          tf.a,
-          tf.b,
-          tf.c,
-          tf.d,
-          tf.tx,
-          tf.ty,
-        ]);
+        const [s1, s2, s3, s4] = rectToVertices(
+          boxToRect(box),
+          invertMatrix(this.getWorldTransform()),
+        );
 
         const minX = Math.min(s1.x, s2.x, s3.x, s4.x);
         const minY = Math.min(s1.y, s2.y, s3.y, s4.y);
@@ -329,10 +353,17 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     type: string,
     newPos: IPoint,
     oldRect: ITransformRect,
+    oldWorldTransform: IMatrixArr,
     isShiftPressing = false,
     isAltPressing = false,
     flipWhenResize?: boolean,
   ): Partial<ATTRS> {
+    const parentTf = this.getParentWorldTransform();
+    oldRect = {
+      width: oldRect.width,
+      height: oldRect.height,
+      transform: oldWorldTransform,
+    };
     const rect =
       this.attrs.height === 0
         ? resizeLine(type, newPos, oldRect, {
@@ -344,6 +375,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
             scaleFromCenter: isAltPressing,
             flip: flipWhenResize,
           });
+    rect.transform = multiplyMatrix(invertMatrix(parentTf), rect.transform);
     return rect as Partial<ATTRS>;
   }
 
@@ -362,6 +394,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     type: string,
     newPos: IPoint,
     oldRect: ITransformRect,
+    oldWorldTransform: IMatrixArr,
     isShiftPressing = false,
     isAltPressing = false,
     flipWhenResize?: boolean,
@@ -370,6 +403,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       type,
       newPos,
       oldRect,
+      oldWorldTransform,
       isShiftPressing,
       isAltPressing,
       flipWhenResize,
@@ -377,15 +411,20 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
 
     this.updateAttrs(rect, { finishRecomputed: true });
   }
+
   draw(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _ctx: CanvasRenderingContext2D,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _imgManager?: ImgManager,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _smooth?: boolean,
+    ctx: CanvasRenderingContext2D,
+    imgManager?: ImgManager,
+    smooth?: boolean,
   ) {
-    throw new Error('draw Method not implemented.');
+    if (!(this.attrs.visible ?? true)) return;
+
+    ctx.save();
+    ctx.transform(...this.attrs.transform);
+    for (const child of this.children) {
+      child.draw(ctx, imgManager, smooth);
+    }
+    ctx.restore();
   }
 
   drawOutline(
@@ -393,8 +432,8 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    const { width, height, transform } = this.attrs;
-    ctx.transform(...transform);
+    const { width, height } = this.attrs;
+    ctx.transform(...this.getWorldTransform());
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
     ctx.beginPath();
@@ -466,27 +505,36 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
     }
   }
 
-  static dMove(graphs: Graph[], dx: number, dy: number) {
-    for (const graph of graphs) {
-      const transform = graph.attrs.transform;
-      transform[4] += dx;
-      transform[5] += dy;
-      graph.updateAttrs({
-        transform,
+  static dMove(graphs: SuikaGraphics[], dx: number, dy: number) {
+    for (const graphics of graphs) {
+      let tf = graphics.getWorldTransform();
+      tf[4] += dx;
+      tf[5] += dy;
+      tf = multiplyMatrix(invertMatrix(graphics.getParentWorldTransform()), tf);
+      graphics.updateAttrs({
+        transform: tf,
       });
     }
   }
 
-  toJSON(): GraphAttrs {
+  toJSON(): GraphicsAttrs {
     return { ...this.attrs };
   }
 
-  getVisible() {
+  isVisible() {
     return this.attrs.visible ?? true;
   }
 
-  getLock() {
+  isLock() {
     return this.attrs.lock ?? false;
+  }
+
+  isDeleted() {
+    return this._deleted;
+  }
+
+  setDeleted(val: boolean) {
+    this._deleted = val;
   }
 
   /**
@@ -497,8 +545,9 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       type: this.type,
       id: this.attrs.id,
       name: this.attrs.objectName,
-      visible: this.getVisible(),
-      lock: this.getLock(),
+      visible: this.isVisible(),
+      lock: this.isLock(),
+      children: this.children.map((item) => item.toObject()),
     };
   }
 
@@ -508,7 +557,7 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   }
 
   getRotate() {
-    return getTransformAngle(this.attrs.transform);
+    return getTransformAngle(this.getWorldTransform());
   }
 
   getRotateDegree() {
@@ -518,47 +567,55 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
   setRotate(newRotate: number, center?: IPoint) {
     const rotate = this.getRotate();
     const delta = newRotate - rotate;
-    center ??= this.getCenter();
+    center ??= this.getWorldCenter();
     const rotateMatrix = new Matrix()
       .translate(-center.x, -center.y)
       .rotate(delta)
       .translate(center.x, center.y);
-    const tf = new Matrix(...this.attrs.transform);
-    const newTf = rotateMatrix.append(tf);
-    this.updateAttrs({
-      transform: [newTf.a, newTf.b, newTf.c, newTf.d, newTf.tx, newTf.ty],
-    });
+    this.prependWorldTransform(rotateMatrix.getArray());
   }
 
-  dRotate(
-    dRotation: number,
-    initAttrs: { transform: IMatrixArr },
-    center: IPoint,
-  ) {
+  prependWorldTransform(m: IMatrixArr) {
+    const parentTf = this.getParentWorldTransform();
+    const tf = multiplyMatrix(
+      m,
+      multiplyMatrix(parentTf, this.attrs.transform),
+    );
+    this.updateAttrs(
+      recomputeTransformRect({
+        ...this.getSize(),
+        transform: multiplyMatrix(invertMatrix(parentTf), tf),
+      }),
+    );
+  }
+
+  dRotate(dRotation: number, originWorldTf: IMatrixArr, center: IPoint) {
     const rotateMatrix = new Matrix()
       .translate(-center.x, -center.y)
       .rotate(dRotation)
       .translate(center.x, center.y);
-    const tf = new Matrix(...initAttrs.transform);
-    const newTf = rotateMatrix.append(tf);
-    this.updateAttrs({
-      transform: [newTf.a, newTf.b, newTf.c, newTf.d, newTf.tx, newTf.ty],
-    });
+
+    const newWoldTf = rotateMatrix
+      .append(new Matrix(...originWorldTf))
+      .getArray();
+
+    this.setWorldTransform(newWoldTf);
   }
 
   getInfoPanelAttrs() {
     const size = this.getTransformedSize();
+    const pos = this.getWorldPosition();
     return [
       {
         label: 'X',
         key: 'x',
-        value: this.getX(),
+        value: pos.x,
         uiType: 'number',
       },
       {
         label: 'Y',
         key: 'y',
-        value: this.getY(),
+        value: pos.y,
         uiType: 'number',
       },
       {
@@ -685,5 +742,192 @@ export class Graph<ATTRS extends GraphAttrs = GraphAttrs> {
       fillPaints: this.attrs.fill ?? [],
       strokePaints: this.attrs.stroke ?? [],
     };
+  }
+
+  getWorldTransform(): IMatrixArr {
+    const parent = this.getParent();
+    if (parent) {
+      return multiplyMatrix(parent.getWorldTransform(), this.attrs.transform);
+    }
+    return [...this.attrs.transform];
+  }
+
+  protected children: SuikaGraphics[] = [];
+  protected isContainer = false;
+
+  getChildren() {
+    if (!this.isContainer) {
+      return [];
+    }
+    return [...this.children];
+  }
+
+  setChildren(graphs: SuikaGraphics[]) {
+    if (!this.isContainer) {
+      return;
+    }
+
+    const sortKeys = generateNKeysBetween(null, null, graphs.length);
+    for (let i = 0; i < graphs.length; i++) {
+      const el = graphs[i];
+      el.updateAttrs({
+        parentIndex: {
+          guid: this.attrs.id,
+          position: sortKeys[i],
+        },
+      });
+    }
+  }
+
+  appendAtParent(position: string) {
+    const parent = this.getParent();
+    if (parent) {
+      parent.appendChild(this, position);
+    }
+  }
+
+  appendChild(graphics: SuikaGraphics, sortIdx?: string) {
+    if (!this.isContainer) {
+      console.warn(`graphics "${this.type}" is not container`);
+      return;
+    }
+    if (this.children.some((item) => item.attrs.id === graphics.attrs.id)) {
+      return;
+    }
+    if (!sortIdx) {
+      const maxSortIdx = this.getMaxChildIndex();
+      sortIdx = generateKeyBetween(maxSortIdx, null);
+    }
+
+    graphics.removeFromParent(); // 这个应该要删除？
+    graphics.updateAttrs({
+      parentIndex: {
+        guid: this.attrs.id,
+        position: sortIdx,
+      },
+    });
+    this.children.push(graphics);
+    this.sortChildren();
+  }
+
+  removeChild(graphics: SuikaGraphics) {
+    this.children = this.children.filter(
+      (item) => item.attrs.id !== graphics.attrs.id,
+    );
+    // TODO: 更新 graphics 的 parentIndex
+  }
+
+  sortChildren() {
+    // TODO: 改为判断 dirtySort 是否为 true
+    this.children.sort((a, b) => {
+      return (a.attrs.parentIndex?.position ?? '') <
+        (b.attrs.parentIndex?.position ?? '')
+        ? -1
+        : 1;
+    });
+  }
+
+  getParent() {
+    const parentId = this.attrs.parentIndex?.guid;
+    if (!parentId) {
+      return undefined;
+    }
+    return this.doc.getGraphicsById(parentId);
+  }
+
+  getParentWorldTransform() {
+    const parent = this.getParent();
+    return parent ? parent.getWorldTransform() : identityMatrix();
+  }
+
+  removeFromParent() {
+    const parent = this.getParent();
+    if (parent) {
+      parent.removeChild(this);
+    }
+  }
+
+  getMaxChildIndex() {
+    if (this.children.length === 0) {
+      return null;
+    }
+    this.sortChildren();
+    return this.children.at(-1)?.attrs.parentIndex?.position ?? null;
+  }
+
+  getSortIndex() {
+    return this.attrs.parentIndex?.position ?? '';
+  }
+  getSortIndexPath() {
+    const path: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let node: SuikaGraphics | undefined = this;
+    while (node) {
+      path.push(node.getSortIndex());
+      node = node.getParent();
+    }
+    path.reverse();
+    return path;
+  }
+
+  static sortGraphics(graphics: SuikaGraphics[]) {
+    const elements = graphics.map((item) => ({
+      path: item.getSortIndexPath(),
+      val: item,
+    }));
+
+    elements.sort((a, b) => {
+      const len = Math.max(a.path.length, b.path.length);
+      for (let i = 0; i < len; i++) {
+        const sortIdxA = a.path[i];
+        const sortIdxB = b.path[i];
+        if (sortIdxA === sortIdxB) {
+          continue;
+        }
+        return sortIdxA < sortIdxB ? -1 : 1;
+      }
+      return a.path.length < b.path.length ? -1 : 1;
+    });
+    return elements.map((item) => item.val);
+  }
+
+  containAncestor(id: string) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let node: SuikaGraphics | undefined = this;
+    while (node) {
+      if (node.attrs.id === id) {
+        return true;
+      }
+      node = node.getParent();
+    }
+    return false;
+  }
+
+  getParentIds() {
+    const ids: string[] = [];
+    let node = this.getParent();
+    while (node) {
+      ids.push(node.attrs.id);
+      node = node.getParent();
+    }
+    return ids;
+  }
+
+  getFrameParentIds() {
+    const ids: string[] = [];
+    let node = this.getParent();
+    while (node && node.type !== GraphicsType.Canvas) {
+      ids.push(node.attrs.id);
+      node = node.getParent();
+    }
+    return ids;
+  }
+
+  setWorldTransform(worldTf: IMatrixArr) {
+    const parentTf = this.getParentWorldTransform();
+    const localTf = multiplyMatrix(invertMatrix(parentTf), worldTf);
+    this.updateAttrs({
+      transform: localTf,
+    });
   }
 }

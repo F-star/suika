@@ -205,8 +205,11 @@ export class ToolManager {
     const handleSpaceToggle = (isSpacePressing: boolean) => {
       this.currentTool?.onSpaceToggle?.(isSpacePressing);
     };
-    const handleAltToggle = (isSpacePressing: boolean) => {
-      this.currentTool?.onAltToggle?.(isSpacePressing);
+    const handleShiftToggle = (isShiftPressing: boolean) => {
+      this.currentTool?.onShiftToggle?.(isShiftPressing);
+    };
+    const handleAltToggle = (isAltPressing: boolean) => {
+      this.currentTool?.onAltToggle?.(isAltPressing);
     };
     const handleViewportXOrYChange = (x: number, y: number) => {
       this.currentTool?.onViewportXOrYChange?.(x, y);
@@ -220,6 +223,7 @@ export class ToolManager {
     window.addEventListener('pointerup', handleUp);
     this.editor.commandManager.on('change', handleCommandChange);
     this.editor.hostEventManager.on('spaceToggle', handleSpaceToggle);
+    this.editor.hostEventManager.on('shiftToggle', handleShiftToggle);
     this.editor.hostEventManager.on('altToggle', handleAltToggle);
     this.editor.viewportManager.on('xOrYChange', handleViewportXOrYChange);
     this.editor.canvasDragger.on('activeChange', handleCanvasDragActiveChange);
@@ -230,6 +234,7 @@ export class ToolManager {
       window.removeEventListener('pointerup', handleUp);
       this.editor.commandManager.off('change', handleCommandChange);
       this.editor.hostEventManager.off('spaceToggle', handleSpaceToggle);
+      this.editor.hostEventManager.off('shiftToggle', handleShiftToggle);
       this.editor.hostEventManager.off('altToggle', handleAltToggle);
       this.editor.viewportManager.off('xOrYChange', handleViewportXOrYChange);
       this.editor.canvasDragger.off(

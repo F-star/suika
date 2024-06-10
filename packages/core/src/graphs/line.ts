@@ -2,10 +2,14 @@ import { parseRGBAStr } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { PaintType } from '../paint';
-import { GraphType, type Optional } from '../type';
-import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
+import { GraphicsType, type Optional } from '../type';
+import {
+  type GraphicsAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from './graphics';
 
-export type LineAttrs = GraphAttrs;
+export type LineAttrs = GraphicsAttrs;
 
 /**
  * x
@@ -15,18 +19,19 @@ export type LineAttrs = GraphAttrs;
  *
  */
 
-export class Line extends Graph<LineAttrs> {
-  override type = GraphType.Line;
+export class SuikaLine extends SuikaGraphics<LineAttrs> {
+  override type = GraphicsType.Line;
 
   constructor(
     attrs: Optional<LineAttrs, 'id' | 'transform'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
-    super({ ...attrs, height: 0, type: GraphType.Line }, opts);
+    super({ ...attrs, height: 0, type: GraphicsType.Line }, opts);
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
     const { width, transform, stroke, strokeWidth } = this.attrs;
+    ctx.save();
     ctx.transform(...transform);
     ctx.beginPath();
     ctx.moveTo(0, 0);
@@ -47,6 +52,7 @@ export class Line extends Graph<LineAttrs> {
       }
 
       ctx.closePath();
+      ctx.restore();
     }
   }
 
@@ -55,11 +61,10 @@ export class Line extends Graph<LineAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    const { width, transform } = this.attrs;
-    ctx.transform(...transform);
+    ctx.transform(...this.getWorldTransform());
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(width, 0);
+    ctx.lineTo(this.attrs.width, 0);
     ctx.lineWidth = strokeWidth;
     ctx.strokeStyle = stroke;
     ctx.stroke();

@@ -1,14 +1,19 @@
 import { type Editor } from '../editor';
-import { type Graph } from '../graphs';
+import { type SuikaGraphics } from '../graphs';
+import { getParent } from '../utils/common';
 import { type ICommand } from './type';
 
+/**
+ * @deprecated
+ * use UpdateGraphicsAttrsCmd
+ */
 export class RemoveGraphsCmd implements ICommand {
   private removedIndexes: number[] = [];
 
   constructor(
     public desc: string,
     private editor: Editor,
-    private removedElements: Graph[],
+    private removedElements: SuikaGraphics[],
   ) {
     this.do();
   }
@@ -19,14 +24,17 @@ export class RemoveGraphsCmd implements ICommand {
       throw new Error('removedElements 不能有重复元素');
     }
     const sceneGraph = this.editor.sceneGraph;
-    const nextElements: Graph[] = [];
+    const nextElements: SuikaGraphics[] = [];
     const elements = sceneGraph.children;
+
     for (let i = 0, len = elements.length; i < len; i++) {
-      const element = elements[i];
-      if (set.has(element)) {
+      const el = elements[i];
+      if (set.has(el)) {
         this.removedIndexes.push(i);
+        el.removeFromParent();
+        // 更新父节点们的 transform
       } else {
-        nextElements.push(element);
+        nextElements.push(el);
       }
     }
     sceneGraph.children = nextElements;
@@ -42,7 +50,7 @@ export class RemoveGraphsCmd implements ICommand {
     const removedElements = this.removedElements;
     const elements = sceneGraph.children;
     const removedIndexes = this.removedIndexes;
-    const nextElements: Graph[] = new Array(
+    const nextElements: SuikaGraphics[] = new Array(
       elements.length + removedIndexes.length,
     );
 
@@ -61,6 +69,10 @@ export class RemoveGraphsCmd implements ICommand {
     }
     sceneGraph.children = nextElements;
 
+    for (const el of removedElements) {
+      const parent = getParent(el, this.editor.doc.graphicsStore)!;
+      parent.appendChild(el, el.attrs.parentIndex?.position);
+    }
     this.editor.selectedElements.setItems(removedElements);
   }
 }

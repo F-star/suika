@@ -3,14 +3,15 @@ import {
   checkTransformFlip,
   getTransformAngle,
   type ITransformRect,
+  Matrix,
   normalizeDegree,
   rad2Deg,
 } from '@suika/geo';
-import { Matrix } from 'pixi.js';
 
 import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
-import { Rect } from '../graphs';
+import { SuikaRect } from '../graphs';
+import { type SuikaDocument } from '../graphs/document';
 import { type IPaint, PaintType } from '../paint';
 import { ControlHandle } from './control_handle';
 import { type ITransformHandleType } from './type';
@@ -103,12 +104,15 @@ export const getRotationCursor = (
   return r;
 };
 
-export const createTransformHandles = (params: {
-  size: number;
-  fill: string;
-  stroke: string;
-  strokeWidth: number;
-}) => {
+export const createTransformHandles = (
+  params: {
+    size: number;
+    fill: string;
+    stroke: string;
+    strokeWidth: number;
+  },
+  doc: SuikaDocument,
+) => {
   const getDefaultAttrs = () => {
     const attrs: {
       width: number;
@@ -136,13 +140,20 @@ export const createTransformHandles = (params: {
     return attrs;
   };
 
+  const opts = {
+    doc,
+  };
+
   /********************** resize handle  *******************/
   // north-west
   const nw = new ControlHandle({
-    graph: new Rect({
-      objectName: 'nw',
-      ...getDefaultAttrs(),
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'nw',
+        ...getDefaultAttrs(),
+      },
+      opts,
+    ),
     type: 'nw',
     padding: 3,
     getCursor: getResizeCursor,
@@ -150,10 +161,13 @@ export const createTransformHandles = (params: {
   });
 
   const ne = new ControlHandle({
-    graph: new Rect({
-      objectName: 'ne',
-      ...getDefaultAttrs(),
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'ne',
+        ...getDefaultAttrs(),
+      },
+      opts,
+    ),
     type: 'ne',
     padding: 3,
     getCursor: getResizeCursor,
@@ -161,10 +175,13 @@ export const createTransformHandles = (params: {
   });
 
   const se = new ControlHandle({
-    graph: new Rect({
-      objectName: 'se',
-      ...getDefaultAttrs(),
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'se',
+        ...getDefaultAttrs(),
+      },
+      opts,
+    ),
     type: 'se',
     padding: 3,
     getCursor: getResizeCursor,
@@ -172,10 +189,13 @@ export const createTransformHandles = (params: {
   });
 
   const sw = new ControlHandle({
-    graph: new Rect({
-      objectName: 'sw',
-      ...getDefaultAttrs(),
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'sw',
+        ...getDefaultAttrs(),
+      },
+      opts,
+    ),
     type: 'sw',
     padding: 3,
     getCursor: getResizeCursor,
@@ -185,52 +205,64 @@ export const createTransformHandles = (params: {
   /************************* rotation handle  **********************/
   const rotationHandleSize = params.size * 2.5;
   const nwRotation = new ControlHandle({
-    graph: new Rect({
-      objectName: 'nwRotation',
-      ...getDefaultAttrs(),
-      width: rotationHandleSize,
-      height: rotationHandleSize,
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'nwRotation',
+        ...getDefaultAttrs(),
+        width: rotationHandleSize,
+        height: rotationHandleSize,
+        visible: false,
+      },
+      opts,
+    ),
     type: 'nwRotation',
     getCursor: getRotationCursor,
     isTransformHandle: true,
   });
 
   const neRotation = new ControlHandle({
-    graph: new Rect({
-      objectName: 'neRotation',
-      ...getDefaultAttrs(),
-      width: rotationHandleSize,
-      height: rotationHandleSize,
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'neRotation',
+        ...getDefaultAttrs(),
+        width: rotationHandleSize,
+        height: rotationHandleSize,
+        visible: false,
+      },
+      opts,
+    ),
     type: 'neRotation',
     getCursor: getRotationCursor,
     isTransformHandle: true,
   });
 
   const seRotation = new ControlHandle({
-    graph: new Rect({
-      objectName: 'seRotation',
-      ...getDefaultAttrs(),
-      width: rotationHandleSize,
-      height: rotationHandleSize,
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'seRotation',
+        ...getDefaultAttrs(),
+        width: rotationHandleSize,
+        height: rotationHandleSize,
+        visible: false,
+      },
+      opts,
+    ),
     type: 'seRotation',
     getCursor: getRotationCursor,
     isTransformHandle: true,
   });
 
   const swRotation = new ControlHandle({
-    graph: new Rect({
-      objectName: 'swRotation',
-      ...getDefaultAttrs(),
-      width: rotationHandleSize,
-      height: rotationHandleSize,
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'swRotation',
+        ...getDefaultAttrs(),
+        width: rotationHandleSize,
+        height: rotationHandleSize,
+        visible: false,
+      },
+      opts,
+    ),
     type: 'swRotation',
     getCursor: getRotationCursor,
     isTransformHandle: true,
@@ -251,22 +283,28 @@ export const createTransformHandles = (params: {
   };
 
   const n = new ControlHandle({
-    graph: new Rect({
-      objectName: 'n',
-      ...getDefaultAttrs(),
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'n',
+        ...getDefaultAttrs(),
+        visible: false,
+      },
+      opts,
+    ),
     type: 'n',
     hitTest,
     getCursor: getResizeCursor,
     isTransformHandle: true,
   });
   const e = new ControlHandle({
-    graph: new Rect({
-      objectName: 'e',
-      ...getDefaultAttrs(),
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'e',
+        ...getDefaultAttrs(),
+        visible: false,
+      },
+      opts,
+    ),
     type: 'e',
     hitTest,
     getCursor: getResizeCursor,
@@ -274,11 +312,14 @@ export const createTransformHandles = (params: {
   });
 
   const s = new ControlHandle({
-    graph: new Rect({
-      objectName: 's',
-      ...getDefaultAttrs(),
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 's',
+        ...getDefaultAttrs(),
+        visible: false,
+      },
+      opts,
+    ),
     type: 's',
     hitTest,
     getCursor: getResizeCursor,
@@ -286,11 +327,14 @@ export const createTransformHandles = (params: {
   });
 
   const w = new ControlHandle({
-    graph: new Rect({
-      objectName: 'w',
-      ...getDefaultAttrs(),
-      visible: false,
-    }),
+    graph: new SuikaRect(
+      {
+        objectName: 'w',
+        ...getDefaultAttrs(),
+        visible: false,
+      },
+      opts,
+    ),
     type: 'w',
     hitTest,
     getCursor: getResizeCursor,

@@ -11,10 +11,10 @@ Suika, an open-source vector graphics editor based on Canvas, similar to Figma.
 ## Feature
 
 - Graphics editing, path editing
-- Tools: select, rectangle, ellipse, line, path, text, hand...
+- Tools: select, rectangle, ellipse, group, line, path, text, hand...
 - Zoom, arrange, align, fill, stroke...
 - KeyBinding, copy / paste
-- Pixel grid, Snap to pixiel grid, ruler
+- Pixel grid, Snap to pixel grid, ruler
 - History: undo / Redo
 - Localization (i18n)
 

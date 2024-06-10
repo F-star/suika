@@ -1,5 +1,4 @@
-import { type GraphAttrs } from './graphs';
-import { type IGroupsData } from './group_manager';
+import { type GraphicsAttrs } from './graphs';
 
 /**
  * 数组长度必须大于等于 1 的数组
@@ -15,7 +14,7 @@ export interface IObject {
   children?: IObject[];
 }
 
-export enum GraphType {
+export enum GraphicsType {
   Graph = 'Graph',
   Rect = 'Rect',
   Ellipse = 'Ellipse',
@@ -24,7 +23,9 @@ export enum GraphType {
   Path = 'Path',
   RegularPolygon = 'RegularPolygon',
   Star = 'Star',
-  // Group = 'Group',
+  Frame = 'Frame',
+  Canvas = 'Canvas',
+  Document = 'Document',
 }
 
 /**
@@ -40,8 +41,7 @@ export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export interface IEditorPaperData {
   appVersion: string;
   paperId: string;
-  groups: IGroupsData;
-  data: GraphAttrs[];
+  data: GraphicsAttrs[];
 }
 
 export interface IVerticalLine {

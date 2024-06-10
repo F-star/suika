@@ -3,32 +3,38 @@ import {
   getPointsBbox,
   getStar,
   type IBox,
+  type IMatrixArr,
   type IPoint,
   isPointInPolygon,
+  Matrix,
 } from '@suika/geo';
-import { Matrix, type Optional } from 'pixi.js';
 
 import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
-import { GraphType } from '../type';
-import { Graph, type GraphAttrs, type IGraphOpts } from './graph';
+import { GraphicsType, type Optional } from '../type';
+import {
+  type GraphicsAttrs,
+  type IAdvancedAttrs,
+  type IGraphicsOpts,
+  SuikaGraphics,
+} from './graphics';
 
-interface StarAttrs extends GraphAttrs {
+interface StarAttrs extends GraphicsAttrs {
   count: number;
   starInnerScale: number;
 }
 
-export class Star extends Graph<StarAttrs> {
-  override type = GraphType.Star;
+export class SuikaStar extends SuikaGraphics<StarAttrs> {
+  override type = GraphicsType.Star;
 
   constructor(
     attrs: Optional<StarAttrs, 'transform' | 'id'>,
-    opts?: IGraphOpts,
+    opts: IGraphicsOpts,
   ) {
     super(
       {
         ...attrs,
-        type: GraphType.Star,
+        type: GraphicsType.Star,
       },
       opts,
     );
@@ -76,6 +82,7 @@ export class Star extends Graph<StarAttrs> {
     this._realDraw(ctx, undefined, undefined, {
       stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
       strokeWidth,
+      transform: this.getWorldTransform(),
     });
   }
 
@@ -87,12 +94,14 @@ export class Star extends Graph<StarAttrs> {
       fill?: IPaint[];
       stroke?: IPaint[];
       strokeWidth?: number;
+      transform: IMatrixArr;
     },
   ) {
-    const attrs = this.attrs;
-    const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
+    const { fill, strokeWidth, stroke, transform } =
+      overrideStyle || this.attrs;
 
-    ctx.transform(...attrs.transform);
+    ctx.save();
+    ctx.transform(...transform);
 
     const points = this.getPoints();
 
@@ -137,6 +146,7 @@ export class Star extends Graph<StarAttrs> {
       }
     }
     ctx.closePath();
+    ctx.restore();
   }
 
   override getInfoPanelAttrs() {
@@ -162,7 +172,7 @@ export class Star extends Graph<StarAttrs> {
   }
 
   override updateAttrs(
-    partialAttrs: Partial<StarAttrs> & IGraphOpts,
+    partialAttrs: Partial<StarAttrs> & IAdvancedAttrs,
     options?: { finishRecomputed?: boolean },
   ) {
     super.updateAttrs(partialAttrs, options);
@@ -170,7 +180,7 @@ export class Star extends Graph<StarAttrs> {
 
   override hitTest(x: number, y: number, _padding?: number) {
     // TODO: solve padding
-    const tf = new Matrix(...this.attrs.transform);
+    const tf = new Matrix(...this.getWorldTransform());
     const point = tf.applyInverse({ x, y });
     return isPointInPolygon(this.getPoints(), point);
   }

@@ -1,4 +1,6 @@
-import { type IBox, type IPoint } from '../type';
+import { type IBox, type IPoint, type ITransformRect } from '../type';
+import { applyMatrix } from './geo_matrix';
+import { rectToVertices } from './geo_rect';
 
 /**
  * get merged rect from rects
@@ -65,4 +67,34 @@ export const getPointsBbox = (points: IPoint[]): IBox => {
     maxX,
     maxY,
   };
+};
+
+/**
+ * calculate AABB
+ */
+export const calcRectBbox = (
+  transformRect: ITransformRect,
+  paddingBeforeTransform?: number,
+): Readonly<IBox> => {
+  let x = 0;
+  let y = 0;
+  let width = transformRect.width;
+  let height = transformRect.height;
+  if (paddingBeforeTransform) {
+    x -= paddingBeforeTransform;
+    y -= paddingBeforeTransform;
+    width += paddingBeforeTransform * 2;
+    height += paddingBeforeTransform * 2;
+  }
+  const tf = transformRect.transform;
+  const vertices = rectToVertices({
+    x,
+    y,
+    width,
+    height,
+  }).map((item) => {
+    return applyMatrix(tf, item);
+  });
+
+  return getPointsBbox(vertices);
 };

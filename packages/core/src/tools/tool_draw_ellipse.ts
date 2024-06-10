@@ -2,7 +2,7 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type Editor } from '../editor';
-import { Ellipse } from '../graphs';
+import { SuikaEllipse } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
 import { type ITool } from './type';
 
@@ -21,7 +21,7 @@ export class DrawEllipseTool extends DrawGraphTool implements ITool {
 
   protected createGraph(rect: IRect) {
     rect = normalizeRect(rect);
-    return new Ellipse(
+    return new SuikaEllipse(
       {
         objectName: '',
         width: rect.width,
@@ -29,8 +29,11 @@ export class DrawEllipseTool extends DrawGraphTool implements ITool {
         fill: [cloneDeep(this.editor.setting.get('firstFill'))],
       },
       {
-        x: rect.x,
-        y: rect.y,
+        advancedAttrs: {
+          x: rect.x,
+          y: rect.y,
+        },
+        doc: this.editor.doc,
       },
     );
   }

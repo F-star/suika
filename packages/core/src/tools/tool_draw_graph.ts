@@ -4,7 +4,7 @@ import { type IPoint, type IRect, type ISize, normalizeRect } from '@suika/geo';
 import { AddGraphCmd } from '../commands/add_graphs';
 import { type ICursor } from '../cursor_manager';
 import { type Editor } from '../editor';
-import { type Graph } from '../graphs';
+import { type SuikaGraphics } from '../graphs';
 import { SnapHelper } from '../snap';
 import { type ITool } from './type';
 
@@ -20,7 +20,7 @@ export abstract class DrawGraphTool implements ITool {
   cursor: ICursor = 'crosshair';
   commandDesc = 'Add Graph';
 
-  protected drawingGraph: Graph | null = null;
+  protected drawingGraph: SuikaGraphics | null = null;
 
   private startPoint: IPoint = { x: -1, y: -1 };
   private lastDragPoint!: IPoint;
@@ -122,7 +122,10 @@ export abstract class DrawGraphTool implements ITool {
    * create graph, and give the original rect (width may be negative)
    * noMove: if true, the graph will not move when drag
    */
-  protected abstract createGraph(rect: IRect, noMove?: boolean): Graph | null;
+  protected abstract createGraph(
+    rect: IRect,
+    noMove?: boolean,
+  ): SuikaGraphics | null;
 
   protected adjustSizeWhenShiftPressing(rect: IRect) {
     // pressing Shift to draw a square
@@ -223,6 +226,7 @@ export abstract class DrawGraphTool implements ITool {
       this.updateGraph(rect);
     } else {
       const element = this.createGraph(rect)!;
+      this.editor.doc.getCurrCanvas().appendChild(element);
       sceneGraph.addItems([element]);
 
       this.drawingGraph = element;
@@ -268,7 +272,9 @@ export abstract class DrawGraphTool implements ITool {
         },
         true,
       );
+
       if (this.drawingGraph) {
+        this.editor.doc.getCurrCanvas().appendChild(this.drawingGraph);
         this.editor.sceneGraph.addItems([this.drawingGraph]);
 
         this.editor.selectedElements.setItems([this.drawingGraph]);

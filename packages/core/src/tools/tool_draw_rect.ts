@@ -2,7 +2,7 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type Editor } from '../editor';
-import { Rect } from '../graphs';
+import { SuikaRect } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
 import { type ITool } from './type';
 
@@ -20,9 +20,9 @@ export class DrawRectTool extends DrawGraphTool implements ITool {
     this.commandDesc = 'Add Rect';
   }
 
-  protected createGraph(rect: IRect) {
+  protected override createGraph(rect: IRect) {
     rect = normalizeRect(rect);
-    return new Rect(
+    const graphics = new SuikaRect(
       {
         objectName: '',
         width: rect.width,
@@ -30,9 +30,13 @@ export class DrawRectTool extends DrawGraphTool implements ITool {
         fill: [cloneDeep(this.editor.setting.get('firstFill'))],
       },
       {
-        x: rect.x,
-        y: rect.y,
+        advancedAttrs: {
+          x: rect.x,
+          y: rect.y,
+        },
+        doc: this.editor.doc,
       },
     );
+    return graphics;
   }
 }

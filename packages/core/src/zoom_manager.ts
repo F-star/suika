@@ -1,5 +1,5 @@
 import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
-import { boxToRect, type IPoint, type IRect, mergeRect } from '@suika/geo';
+import { boxToRect, type IPoint, type IRect } from '@suika/geo';
 
 import { type Editor } from './editor';
 
@@ -159,13 +159,12 @@ export class ZoomManager {
    * reference: https://mp.weixin.qq.com/s/XtNEl1dWCYkTIKStne4A4w
    */
   zoomToFit(maxZoom?: number) {
-    const visibleGraphs = this.editor.sceneGraph.getVisibleItems();
-    if (visibleGraphs.length === 0) {
+    const canvasBbox = this.editor.getCanvasBbox();
+    if (!canvasBbox) {
       this.reset();
       return;
     }
-    const rects = visibleGraphs.map((item) => boxToRect(item.getBbox()));
-    this.zoomBoxToFit(mergeRect(...rects), maxZoom);
+    this.zoomBoxToFit(boxToRect(canvasBbox), maxZoom);
   }
   private getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();

@@ -1,58 +1,70 @@
+import { cloneDeep } from '@suika/common';
+import { type IMatrixArr, invertMatrix, multiplyMatrix } from '@suika/geo';
+
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
-import { type Graph, type Rect } from '../graphs';
-import { type RegularPolygon } from '../graphs/regular_polygon';
-import { type Star } from '../graphs/star';
-import { GraphType } from '../type';
+import { type SuikaGraphics, type SuikaRect } from '../graphs';
+import { type SuikaRegularPolygon } from '../graphs/regular_polygon';
+import { type SuikaStar } from '../graphs/star';
+import { GraphicsType } from '../type';
 
 /**
  * mutate elements and record to history
  */
 export const MutateGraphsAndRecord = {
-  setX(editor: Editor, elements: Graph[], newX: number) {
+  setX(editor: Editor, elements: SuikaGraphics[], newX: number) {
     if (elements.length === 0) {
       return;
     }
 
-    const prevXs: { x: number }[] = new Array(elements.length);
+    const prevAttrs: { transform: IMatrixArr }[] = new Array(elements.length);
     for (let i = 0, len = elements.length; i < len; i++) {
-      const element = elements[i];
-      prevXs[i] = { x: element.getX() };
-      element.updateAttrs({
-        x: newX,
+      const el = elements[i];
+      prevAttrs[i] = { transform: cloneDeep(el.attrs.transform) };
+      const parentInvertTf = invertMatrix(el.getParentWorldTransform());
+
+      const tf = el.getWorldTransform();
+      tf[4] = newX;
+      el.updateAttrs({
+        transform: multiplyMatrix(parentInvertTf, tf),
       });
     }
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update X of Elements',
         elements,
-        elements.map((el) => ({ x: el.getX() })),
-        prevXs,
+        elements.map((el) => ({ transform: el.attrs.transform })),
+        prevAttrs,
       ),
     );
   },
-  setY(editor: Editor, elements: Graph[], newY: number) {
+  setY(editor: Editor, elements: SuikaGraphics[], newY: number) {
     if (elements.length === 0) {
       return;
     }
-    const prevXs: { y: number }[] = new Array(elements.length);
+
+    const prevAttrs: { transform: IMatrixArr }[] = new Array(elements.length);
     for (let i = 0, len = elements.length; i < len; i++) {
-      const element = elements[i];
-      prevXs[i] = { y: element.getY() };
-      element.updateAttrs({
-        y: newY,
+      const el = elements[i];
+      prevAttrs[i] = { transform: cloneDeep(el.attrs.transform) };
+      const parentInvertTf = invertMatrix(el.getParentWorldTransform());
+
+      const tf = el.getWorldTransform();
+      tf[5] = newY;
+      el.updateAttrs({
+        transform: multiplyMatrix(parentInvertTf, tf),
       });
     }
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'Update Y of Elements',
         elements,
-        elements.map((el) => ({ y: el.getY() })),
-        prevXs,
+        elements.map((el) => ({ transform: el.attrs.transform })),
+        prevAttrs,
       ),
     );
   },
-  setWidth(editor: Editor, graphs: Graph[], width: number) {
+  setWidth(editor: Editor, graphs: SuikaGraphics[], width: number) {
     if (graphs.length === 0) {
       return;
     }
@@ -74,7 +86,7 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
-  setHeight(editor: Editor, graphs: Graph[], height: number) {
+  setHeight(editor: Editor, graphs: SuikaGraphics[], height: number) {
     if (graphs.length === 0) {
       return;
     }
@@ -98,7 +110,7 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
-  setRotation(editor: Editor, elements: Graph[], rotation: number) {
+  setRotation(editor: Editor, elements: SuikaGraphics[], rotation: number) {
     if (elements.length === 0) {
       return;
     }
@@ -118,14 +130,18 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
-  setCornerRadius(editor: Editor, elements: Graph[], cornerRadius: number) {
+  setCornerRadius(
+    editor: Editor,
+    elements: SuikaGraphics[],
+    cornerRadius: number,
+  ) {
     if (elements.length === 0) {
       return;
     }
 
     const rectGraphics = elements.filter(
-      (el) => el.type === GraphType.Rect,
-    ) as Rect[];
+      (el) => el.type === GraphicsType.Rect,
+    ) as SuikaRect[];
 
     const prevAttrs = rectGraphics.map((el) => ({
       cornerRadius: el.attrs.cornerRadius || 0,
@@ -143,15 +159,16 @@ export const MutateGraphsAndRecord = {
     );
   },
 
-  setCount(editor: Editor, elements: Graph[], count: number) {
+  setCount(editor: Editor, elements: SuikaGraphics[], count: number) {
     if (elements.length === 0) {
       return;
     }
 
     const rectGraphics = elements.filter(
       (el) =>
-        el.type === GraphType.RegularPolygon || el.type === GraphType.Star,
-    ) as RegularPolygon[];
+        el.type === GraphicsType.RegularPolygon ||
+        el.type === GraphicsType.Star,
+    ) as SuikaRegularPolygon[];
 
     const prevAttrs = rectGraphics.map((el) => ({
       count: el.attrs.count,
@@ -171,14 +188,14 @@ export const MutateGraphsAndRecord = {
     );
   },
 
-  setStarInnerScale(editor: Editor, elements: Graph[], val: number) {
+  setStarInnerScale(editor: Editor, elements: SuikaGraphics[], val: number) {
     if (elements.length === 0) {
       return;
     }
 
     const rectGraphics = elements.filter(
-      (el) => el.type === GraphType.Star,
-    ) as Star[];
+      (el) => el.type === GraphicsType.Star,
+    ) as SuikaStar[];
 
     const prevAttrs = rectGraphics.map((el) => ({
       starInnerScale: el.attrs.starInnerScale,
@@ -203,13 +220,13 @@ export const MutateGraphsAndRecord = {
    * and
    * hide graphs when all graphs are shown
    */
-  toggleVisible(editor: Editor, graphs: Graph[]) {
+  toggleVisible(editor: Editor, graphs: SuikaGraphics[]) {
     if (graphs.length === 0) {
       return;
     }
 
     // if at least one graph is hidden, show all graphs; otherwise, hide all graphs
-    const newVisible = graphs.some((item) => !item.getVisible());
+    const newVisible = graphs.some((item) => !item.isVisible());
     const prevAttrs = graphs.map((el) => ({ visible: el.attrs.visible }));
     graphs.forEach((el) => {
       el.attrs.visible = newVisible;
@@ -226,13 +243,13 @@ export const MutateGraphsAndRecord = {
   /**
    * lock / unlock
    */
-  toggleLock(editor: Editor, graphs: Graph[]) {
+  toggleLock(editor: Editor, graphs: SuikaGraphics[]) {
     if (graphs.length === 0) {
       return;
     }
 
     // if at least one graph is unlocked, lock all graphs; otherwise, unlock all graphs
-    const newLock = graphs.some((item) => !item.getLock());
+    const newLock = graphs.some((item) => !item.isLock());
     const prevAttrs = graphs.map((el) => ({ lock: el.attrs.lock }));
     graphs.forEach((el) => {
       el.attrs.lock = newLock;
@@ -248,7 +265,7 @@ export const MutateGraphsAndRecord = {
   },
 
   /** set name of graph */
-  setGraphName(editor: Editor, graph: Graph, objectName: string) {
+  setGraphName(editor: Editor, graph: SuikaGraphics, objectName: string) {
     const prevAttrs = [{ objectName: graph.attrs.objectName }];
     graph.attrs.objectName = objectName;
     editor.commandManager.pushCommand(

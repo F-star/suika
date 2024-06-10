@@ -12,8 +12,7 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "fit-curve": "^0.2.0",
-    "pixi.js": "^8.0.2"
+    "fit-curve": "^0.2.0"
   },
   "devDependencies": {
     "vite": "^4.2.0"

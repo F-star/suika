@@ -1,4 +1,4 @@
-import { forEach, getClosestTimesVal } from '@suika/common';
+import { getClosestTimesVal } from '@suika/common';
 import {
   getSweepAngle,
   type IMatrixArr,
@@ -6,32 +6,29 @@ import {
   rad2Deg,
 } from '@suika/geo';
 
-import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
+import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { getRotationCursor } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
+import { type GraphicsAttrs } from '../../graphs';
 import { type IBaseTool } from '../type';
+import { updateParentSize } from './utils';
 
 /**
  * select tool
  * sub case: rotate selected elements
- *
  * reference: https://mp.weixin.qq.com/s/WEpYS08H44qsU4qFQx6j8Q
  */
 export class SelectRotationTool implements IBaseTool {
+  private originWorldTfMap = new Map<string, IMatrixArr>();
+  private originAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
+  private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
+
   private lastPoint: IPoint | null = null;
   private startRotation = 0;
   private startBboxRotation = 0;
   private dRotation = 0; // 按下，然后释放的整个过程中，产生的相对角度
   /** center of selected graphs */
   private selectedBoxCenter: [x: number, y: number] | null = null;
-  private prevGraphAttrs: {
-    rotation: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    transform: IMatrixArr;
-  }[] = [];
   handleType = '';
 
   private shiftPressHandler = () => {
@@ -47,23 +44,22 @@ export class SelectRotationTool implements IBaseTool {
     this.editor.hostEventManager.off('shiftToggle', this.shiftPressHandler);
   }
   onStart(e: PointerEvent) {
-    this.lastPoint = null;
-    this.dRotation = 0;
-    this.selectedBoxCenter = null;
-    this.prevGraphAttrs = [];
+    const selectedElements = this.editor.selectedElements.getItems({
+      excludeLocked: true,
+    });
 
-    const selectedElements = this.editor.selectedElements.getItems();
-    // 记录旋转前所有元素的（1）旋转值、（2）中点、（3）宽高 / 2
-    for (let i = 0, len = selectedElements.length; i < len; i++) {
-      const el = selectedElements[i];
-      this.prevGraphAttrs[i] = {
-        ...el.getRect(),
-        rotation: el.getRotate(),
-        transform: el.attrs.transform,
-      };
+    for (const graphics of selectedElements) {
+      this.originAttrsMap.set(graphics.attrs.id, {
+        transform: [...graphics.attrs.transform],
+      });
+
+      this.originWorldTfMap.set(
+        graphics.attrs.id,
+        graphics.getWorldTransform(),
+      );
     }
 
-    this.selectedBoxCenter = this.editor.selectedElements.getCenterPoint(); // getRectCenterPoint(selectedElementsBBox);
+    this.selectedBoxCenter = this.editor.selectedElements.getCenterPoint();
 
     const mousePoint = this.editor.getSceneCursorXY(e);
     this.startRotation = getSweepAngle(
@@ -83,9 +79,10 @@ export class SelectRotationTool implements IBaseTool {
     const lastPoint = this.lastPoint;
     if (!lastPoint) return;
 
-    const selectedElements = this.editor.selectedElements.getItems();
+    const editor = this.editor;
+    const selectedElements = editor.selectedElements.getItems();
     /**** 旋转多个元素 ****/
-    const selectedElementsBBox = this.editor.selectedElements.getBbox();
+    const selectedElementsBBox = editor.selectedElements.getBbox();
     if (selectedElementsBBox) {
       const [cxInSelectedElementsBBox, cyInSelectedElementsBBox] = this
         .selectedBoxCenter as [number, number];
@@ -99,59 +96,69 @@ export class SelectRotationTool implements IBaseTool {
       );
 
       this.dRotation = lastMouseRotation - this.startRotation;
-      if (this.editor.hostEventManager.isShiftPressing) {
-        const lockRotation = this.editor.setting.get('lockRotation');
+      if (editor.hostEventManager.isShiftPressing) {
+        const lockRotation = editor.setting.get('lockRotation');
         const bboxRotation = this.startBboxRotation + this.dRotation;
         this.dRotation =
           getClosestTimesVal(bboxRotation, lockRotation) -
           this.startBboxRotation;
       }
 
-      if (this.editor.selectedElements.size() === 1) {
-        this.editor.setCursor(
-          getRotationCursor(this.handleType, this.editor.selectedBox.getBox()!),
+      if (editor.selectedElements.size() === 1) {
+        editor.setCursor(
+          getRotationCursor(this.handleType, editor.selectedBox.getBox()!),
         );
       } else {
-        this.editor.setCursor({
+        editor.setCursor({
           type: 'rotation',
           degree: rad2Deg(lastMouseRotation),
         });
       }
 
-      forEach(selectedElements, (graph, i) => {
-        graph.dRotate(this.dRotation, this.prevGraphAttrs[i], {
-          x: cxInSelectedElementsBBox,
-          y: cyInSelectedElementsBBox,
+      for (const graphics of selectedElements) {
+        graphics.dRotate(
+          this.dRotation,
+          this.originWorldTfMap.get(graphics.attrs.id)!,
+          {
+            x: cxInSelectedElementsBBox,
+            y: cyInSelectedElementsBBox,
+          },
+        );
+
+        this.updatedAttrsMap.set(graphics.attrs.id, {
+          transform: [...graphics.attrs.transform],
         });
-      });
+      }
+
+      updateParentSize(
+        this.editor,
+        this.editor.selectedElements.getParentIdSet(),
+        this.originAttrsMap,
+        this.updatedAttrsMap,
+      );
     } else {
       throw new Error('no selected elements, please report issue');
     }
-    this.editor.render();
+    editor.render();
   }
   onEnd() {
-    const selectedElements = this.editor.selectedElements.getItems();
     const commandDesc = 'Rotate Elements';
     if (this.dRotation !== 0) {
       this.editor.commandManager.pushCommand(
-        new SetGraphsAttrsCmd(
+        new UpdateGraphicsAttrsCmd(
           commandDesc,
-          selectedElements,
-          selectedElements.map((el) => ({
-            rotation: el.getRotate(),
-            ...el.getPosition(),
-          })),
-          this.prevGraphAttrs.map(({ rotation, x, y, transform }) => ({
-            x,
-            y,
-            rotation,
-            transform,
-          })),
+          this.editor,
+          this.originAttrsMap,
+          this.updatedAttrsMap,
         ),
       );
     }
   }
   afterEnd() {
-    // do nothing
+    this.originAttrsMap = new Map();
+    this.updatedAttrsMap = new Map();
+    this.lastPoint = null;
+    this.dRotation = 0;
+    this.selectedBoxCenter = null;
   }
 }

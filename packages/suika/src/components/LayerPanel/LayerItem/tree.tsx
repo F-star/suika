@@ -25,6 +25,7 @@ export const Tree: FC<IProps> = ({
       {[...treeData].reverse().map((item) => (
         <LayerItem
           active={activeIds.includes(item.id)}
+          activeSecond={activeIds.includes(item.id)}
           key={item.id}
           id={item.id}
           name={item.name}

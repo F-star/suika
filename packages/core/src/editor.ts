@@ -3,13 +3,15 @@ import {
   sceneCoordsToViewportUtil,
   viewportCoordsToSceneUtil,
 } from '@suika/common';
+import { mergeBoxes } from '@suika/geo';
 
 import { CanvasDragger } from './canvas_dragger';
 import { ClipboardManager } from './clipboard';
 import { CommandManager } from './commands/command_manager';
 import { ControlHandleManager } from './control_handle_manager';
 import { CursorManger, type ICursor } from './cursor_manager';
-import { GroupManager } from './group_manager';
+import { SuikaCanvas } from './graphs/canvas';
+import { SuikaDocument } from './graphs/document';
 import { HostEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
@@ -19,7 +21,7 @@ import { RefLine } from './ref_line';
 import Ruler from './ruler';
 import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
-import SelectedElements from './selected_elements';
+import { SelectedElements } from './selected_elements';
 import { Setting } from './setting';
 import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { TextEditor } from './text/text_editor';
@@ -45,9 +47,9 @@ export class Editor {
   appVersion = 'suika-editor_0.0.1';
   paperId: string;
 
+  doc: SuikaDocument;
   sceneGraph: SceneGraph;
   controlHandleManager: ControlHandleManager;
-  groupManager: GroupManager;
 
   setting: Setting;
 
@@ -91,8 +93,12 @@ export class Editor {
     this.keybindingManager = new KeyBindingManager(this);
     this.keybindingManager.bindEvent();
 
+    this.doc = new SuikaDocument({
+      objectName: 'Document',
+      width: 0,
+      height: 0,
+    });
     this.sceneGraph = new SceneGraph(this);
-    this.groupManager = new GroupManager(this);
 
     this.cursorManager = new CursorManger(this);
     this.viewportManager = new ViewportManager(this);
@@ -130,6 +136,19 @@ export class Editor {
     if (data) {
       this.loadData(data);
     }
+    if (this.sceneGraph.children.length === 0) {
+      const canvas = new SuikaCanvas(
+        {
+          objectName: 'Canvas',
+          width: 0,
+          height: 0,
+        },
+        {
+          doc: this.doc,
+        },
+      );
+      this.sceneGraph.addItems([canvas]);
+    }
     this.paperId ??= genId();
     this.autoSaveGraphs.autoSave();
 
@@ -156,10 +175,8 @@ export class Editor {
       this.render();
     });
   }
+
   loadData(data: IEditorPaperData) {
-    if (data.groups) {
-      this.groupManager.load(data.groups);
-    }
     this.sceneGraph.load(data.data);
     this.commandManager.clearRecords();
     this.paperId = data.paperId;
@@ -220,5 +237,12 @@ export class Editor {
   }
   render() {
     this.sceneGraph.render();
+  }
+
+  getCanvasBbox() {
+    const canvasGraphics = this.doc.getCurrCanvas();
+    const children = canvasGraphics.getChildren();
+    if (children.length === 0) return null;
+    return mergeBoxes(children.map((item) => item.getBbox()));
   }
 }

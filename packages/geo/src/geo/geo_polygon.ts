@@ -1,6 +1,5 @@
-import { Matrix } from 'pixi.js';
-
 import { type IPoint, type ISize } from '../type';
+import { Matrix } from './geo_matrix_class';
 import { lerp } from './geo_point';
 
 export const getRegularPolygon = (size: ISize, count: number): IPoint[] => {

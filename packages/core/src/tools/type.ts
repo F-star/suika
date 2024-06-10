@@ -27,8 +27,10 @@ export interface IBaseTool {
   onCommandChange?: () => void;
   /** space key toggle */
   onSpaceToggle?: (isSpacePressing: boolean) => void;
+  /** shift key toggle */
+  onShiftToggle?: (isShiftPressing: boolean) => void;
   /** alt key toggle */
-  onAltToggle?: (isSpacePressing: boolean) => void;
+  onAltToggle?: (isAltPressing: boolean) => void;
   /** viewport x or y change */
   onViewportXOrYChange?: (x: number, y: number) => void;
   /** canvas drag active change */

@@ -1,9 +1,9 @@
 import { arrMap, cloneDeep, forEach, isEqual } from '@suika/common';
 import {
-  type Graph,
   type IPaint,
   type ISetElementsAttrsType,
   SetGraphsAttrsCmd,
+  type SuikaGraphics,
 } from '@suika/core';
 import { LineWidthOutlined } from '@suika/icons';
 import { type FC, useContext, useEffect, useRef, useState } from 'react';
@@ -23,7 +23,7 @@ export const StrokeCard: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      const updatePrevStroke = (els: Graph[]) => {
+      const updatePrevStroke = (els: SuikaGraphics[]) => {
         prevStrokes.current = els.map((el) => cloneDeep(el.attrs.stroke ?? []));
       };
 
@@ -127,7 +127,7 @@ export const StrokeCard: FC = () => {
 
   const pushToHistory = (
     cmdDesc: string,
-    selectedElements: Graph[],
+    selectedElements: SuikaGraphics[],
     newStroke: IPaint[],
     isAddAction?: boolean,
   ) => {

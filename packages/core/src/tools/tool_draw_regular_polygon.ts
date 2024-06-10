@@ -2,7 +2,7 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type Editor } from '../editor';
-import { RegularPolygon } from '../graphs/regular_polygon';
+import { SuikaRegularPolygon } from '../graphs/regular_polygon';
 import { DrawGraphTool } from './tool_draw_graph';
 import { type ITool } from './type';
 
@@ -21,7 +21,7 @@ export class DrawRegularPolygon extends DrawGraphTool implements ITool {
 
   protected createGraph(rect: IRect) {
     rect = normalizeRect(rect);
-    return new RegularPolygon(
+    return new SuikaRegularPolygon(
       {
         objectName: '',
         width: rect.width,
@@ -30,8 +30,11 @@ export class DrawRegularPolygon extends DrawGraphTool implements ITool {
         count: 3,
       },
       {
-        x: rect.x,
-        y: rect.y,
+        advancedAttrs: {
+          x: rect.x,
+          y: rect.y,
+        },
+        doc: this.editor.doc,
       },
     );
   }

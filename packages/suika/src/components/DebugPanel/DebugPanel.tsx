@@ -1,4 +1,4 @@
-import { type Graph } from '@suika/core';
+import { type SuikaGraphics } from '@suika/core';
 import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../context';
@@ -17,7 +17,7 @@ export const DebugPanel: FC = () => {
     };
     editor.selectedBox.on('hoverChange', handleSelectedBoxHover);
 
-    const handleHoverItemChange = (hoveredItem: Graph | null) => {
+    const handleHoverItemChange = (hoveredItem: SuikaGraphics | null) => {
       setHoveredGraphName(hoveredItem?.attrs?.objectName ?? '');
     };
     editor.selectedElements.on('hoverItemChange', handleHoverItemChange);

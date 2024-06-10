@@ -1,4 +1,4 @@
-import { type Graph } from '../../graphs';
+import { type SuikaGraphics } from '../../graphs';
 
 /**
  * return
@@ -6,8 +6,8 @@ import { type Graph } from '../../graphs';
  * count: the count of movedGraphs when reach first unmovedGraph
  */
 export const firstInfoOfUnmovedGraphs = (
-  graphs: Graph[],
-  movedGraphSet: Set<Graph>,
+  graphs: SuikaGraphics[],
+  movedGraphSet: Set<SuikaGraphics>,
 ): { index: number; count: number } => {
   let index = 0;
   let count = 0;
@@ -21,8 +21,8 @@ export const firstInfoOfUnmovedGraphs = (
 };
 
 export const lastInfoOfUnmovedGraphs = (
-  graphs: Graph[],
-  movedGraphSet: Set<Graph>,
+  graphs: SuikaGraphics[],
+  movedGraphSet: Set<SuikaGraphics>,
 ): { index: number; count: number } => {
   let index = graphs.length - 1;
   let count = 0;

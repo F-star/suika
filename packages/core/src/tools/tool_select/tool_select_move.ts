@@ -1,9 +1,11 @@
 import { noop } from '@suika/common';
-import { type IPoint } from '@suika/geo';
+import { type IMatrixArr, type IPoint, Matrix } from '@suika/geo';
 
-import { MoveGraphsCommand } from '../../commands/move_graphs';
+import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { type Editor } from '../../editor';
+import { type GraphicsAttrs } from '../../graphs';
 import { type IBaseTool } from '../type';
+import { updateParentSize } from './utils';
 
 /**
  * select tool
@@ -11,8 +13,11 @@ import { type IBaseTool } from '../type';
  * move selected elements
  */
 export class SelectMoveTool implements IBaseTool {
+  private originWorldTfMap = new Map<string, IMatrixArr>();
+  private originAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
+  private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
+
   private startPoint: IPoint = { x: -1, y: -1 };
-  private startPoints: IPoint[] = [];
   private dragPoint: IPoint | null = null;
   private dx = 0;
   private dy = 0;
@@ -40,12 +45,16 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.controlHandleManager.hideCustomHandles();
 
     this.startPoint = this.editor.getSceneCursorXY(e);
-    const selectedElements = this.editor.selectedElements.getItems({
+    const selectedItems = this.editor.selectedElements.getItems({
       excludeLocked: true,
     });
-    this.startPoints = selectedElements.map((graph) => {
-      return graph.getPosition();
-    });
+    for (const item of selectedItems) {
+      this.originAttrsMap.set(item.attrs.id, {
+        transform: [...item.attrs.transform],
+      });
+      this.originWorldTfMap.set(item.attrs.id, item.getWorldTransform());
+    }
+
     const bBox = this.editor.selectedElements.getBbox();
     if (!bBox) {
       console.error(
@@ -96,24 +105,43 @@ export class SelectMoveTool implements IBaseTool {
     const selectedElements = this.editor.selectedElements.getItems({
       excludeLocked: true,
     });
-    const startPoints = this.startPoints;
     for (let i = 0, len = selectedElements.length; i < len; i++) {
-      selectedElements[i].updateAttrs({
-        x: startPoints[i].x + dx,
-        y: startPoints[i].y + dy,
+      const el = selectedElements[i];
+      const tf = new Matrix(...this.originWorldTfMap.get(el.attrs.id)!)
+        .clone()
+        .translate(dx, dy)
+        .prepend(new Matrix(...el.getParentWorldTransform()).invert());
+
+      el.updateAttrs({
+        transform: tf.getArray(),
+      });
+
+      this.updatedAttrsMap.set(el.attrs.id, {
+        transform: tf.getArray(),
       });
     }
 
     // 参照线处理（目前不处理 “吸附到像素网格的情况” 的特殊情况）
-
     const { offsetX, offsetY } = this.editor.refLine.updateRefLine();
 
     for (let i = 0, len = selectedElements.length; i < len; i++) {
-      selectedElements[i].updateAttrs({
-        x: startPoints[i].x + dx + offsetX,
-        y: startPoints[i].y + dy + offsetY,
+      const el = selectedElements[i];
+      const tf = new Matrix(...this.originWorldTfMap.get(el.attrs.id)!)
+        .clone()
+        .translate(dx + offsetX, dy + offsetY)
+        .prepend(new Matrix(...el.getParentWorldTransform()).invert());
+
+      el.updateAttrs({
+        transform: tf.getArray(),
       });
     }
+
+    updateParentSize(
+      this.editor,
+      this.editor.selectedElements.getParentIdSet(),
+      this.originAttrsMap,
+      this.updatedAttrsMap,
+    );
 
     this.editor.render();
   }
@@ -138,7 +166,12 @@ export class SelectMoveTool implements IBaseTool {
 
     if (this.dx !== 0 || this.dy !== 0) {
       this.editor.commandManager.pushCommand(
-        new MoveGraphsCommand('Move Elements', selectedItems, this.dx, this.dy),
+        new UpdateGraphicsAttrsCmd(
+          'Update Graphics Attributes',
+          this.editor,
+          this.originAttrsMap,
+          this.updatedAttrsMap,
+        ),
       );
 
       // update custom control handles
@@ -153,6 +186,8 @@ export class SelectMoveTool implements IBaseTool {
     }
   }
   afterEnd() {
+    this.originAttrsMap = new Map();
+    this.updatedAttrsMap = new Map();
     this.dragPoint = null;
 
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = true;

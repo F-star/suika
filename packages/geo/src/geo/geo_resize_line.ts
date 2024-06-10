@@ -1,8 +1,7 @@
-import { Matrix } from 'pixi.js';
-
 import { type IPoint, type ITransformRect } from '../type';
 import { getSweepAngle } from './geo_angle';
 import { closestPolarPt } from './geo_line';
+import { Matrix } from './geo_matrix_class';
 import { distance } from './geo_point';
 
 /**
@@ -81,7 +80,7 @@ export const resizeLine = (
     return {
       width,
       height: 0,
-      transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
+      transform: tf.getArray(),
     };
   } else {
     const offset = {
@@ -104,7 +103,7 @@ export const resizeLine = (
     return {
       width,
       height: 0,
-      transform: [tf.a, tf.b, tf.c, tf.d, tf.tx, tf.ty],
+      transform: tf.getArray(),
     };
   }
 };

@@ -34,7 +34,14 @@ export interface ICircle {
   radius: number;
 }
 
-export type IMatrixArr = [number, number, number, number, number, number];
+export type IMatrixArr = [
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  tx: number,
+  ty: number,
+];
 
 export interface ISegment {
   point: IPoint;
