@@ -1,145 +1,129 @@
 import { cloneDeep } from '@suika/common';
-import { type IMatrixArr, invertMatrix, multiplyMatrix } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
 import { type SuikaGraphics, type SuikaRect } from '../graphs';
 import { type SuikaRegularPolygon } from '../graphs/regular_polygon';
 import { type SuikaStar } from '../graphs/star';
+import { Transaction } from '../transaction';
 import { GraphicsType } from '../type';
 
 /**
  * mutate elements and record to history
  */
 export const MutateGraphsAndRecord = {
-  setX(editor: Editor, elements: SuikaGraphics[], newX: number) {
-    if (elements.length === 0) {
+  setX(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const prevAttrs: { transform: IMatrixArr }[] = new Array(elements.length);
-    for (let i = 0, len = elements.length; i < len; i++) {
-      const el = elements[i];
-      prevAttrs[i] = { transform: cloneDeep(el.attrs.transform) };
-      const parentInvertTf = invertMatrix(el.getParentWorldTransform());
+    const transaction = new Transaction(editor);
 
-      const tf = el.getWorldTransform();
-      tf[4] = newX;
-      el.updateAttrs({
-        transform: multiplyMatrix(parentInvertTf, tf),
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+
+      const tf = graphics.getWorldTransform();
+      tf[4] = val;
+
+      graphics.setWorldTransform(tf);
+      transaction.update(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
       });
     }
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'Update X of Elements',
-        elements,
-        elements.map((el) => ({ transform: el.attrs.transform })),
-        prevAttrs,
-      ),
-    );
+
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update X of Elements');
   },
-  setY(editor: Editor, elements: SuikaGraphics[], newY: number) {
-    if (elements.length === 0) {
+  setY(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const prevAttrs: { transform: IMatrixArr }[] = new Array(elements.length);
-    for (let i = 0, len = elements.length; i < len; i++) {
-      const el = elements[i];
-      prevAttrs[i] = { transform: cloneDeep(el.attrs.transform) };
-      const parentInvertTf = invertMatrix(el.getParentWorldTransform());
+    const transaction = new Transaction(editor);
 
-      const tf = el.getWorldTransform();
-      tf[5] = newY;
-      el.updateAttrs({
-        transform: multiplyMatrix(parentInvertTf, tf),
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+
+      const tf = graphics.getWorldTransform();
+      tf[5] = val;
+
+      graphics.setWorldTransform(tf);
+      transaction.update(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
       });
     }
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'Update Y of Elements',
-        elements,
-        elements.map((el) => ({ transform: el.attrs.transform })),
-        prevAttrs,
-      ),
-    );
+
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update Y of Elements');
   },
-  setWidth(editor: Editor, graphs: SuikaGraphics[], width: number) {
-    if (graphs.length === 0) {
+  setWidth(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const prevAttrs = graphs.map((el) => ({
-      width: el.attrs.width,
-    }));
-    graphs.forEach((graph) => {
-      graph.updateAttrs({ width });
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'Update Width of Elements',
-        graphs,
-        graphs.map((item) => ({
-          width: item.attrs.width,
-        })),
-        prevAttrs,
-      ),
-    );
+    const transaction = new Transaction(editor);
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, { width: graphics.attrs.width });
+      graphics.updateAttrs({ width: val });
+      transaction.update(graphics.attrs.id, { width: graphics.attrs.width });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    // FIXME: update children
+    transaction.commit('Update Width of Elements');
   },
-  setHeight(editor: Editor, graphs: SuikaGraphics[], height: number) {
-    if (graphs.length === 0) {
+  setHeight(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const prevAttrs = graphs.map((el) => ({
-      height: el.attrs.height,
-    }));
-    graphs.forEach((graph) => {
-      graph.updateAttrs({
-        height,
+    const transaction = new Transaction(editor);
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        height: graphics.attrs.height,
       });
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'update Height of Elements',
-        graphs,
-        graphs.map((el) => ({
-          height: el.attrs.height,
-        })),
-        prevAttrs,
-      ),
-    );
+      graphics.updateAttrs({ height: val });
+      transaction.update(graphics.attrs.id, { height: graphics.attrs.height });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    // FIXME: update children
+    transaction.commit('Update Height of Elements');
   },
-  setRotation(editor: Editor, elements: SuikaGraphics[], rotation: number) {
-    if (elements.length === 0) {
+  setRotation(editor: Editor, graphicsArr: SuikaGraphics[], rotation: number) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const prevAttrs = elements.map((el) => ({
-      rotation: el.getRotate(),
-    }));
-    elements.forEach((el) => {
-      el.setRotate(rotation);
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'update Rotation',
-        elements,
-        { rotation },
-        prevAttrs,
-      ),
-    );
+    const transaction = new Transaction(editor);
+
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+      graphics.setRotate(rotation);
+      transaction.update(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update Rotation');
   },
   setCornerRadius(
     editor: Editor,
-    elements: SuikaGraphics[],
+    graphicsArr: SuikaGraphics[],
     cornerRadius: number,
   ) {
-    if (elements.length === 0) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const rectGraphics = elements.filter(
+    const rectGraphics = graphicsArr.filter(
       (el) => el.type === GraphicsType.Rect,
     ) as SuikaRect[];
 

@@ -48,11 +48,15 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     for (const child of this.getChildren()) {
       const id = child.attrs.id;
 
-      if (!originAttrsMap.has(id)) {
-        originAttrsMap.set(id, {
-          transform: [...child.attrs.transform],
-        });
-      }
+      originAttrsMap.set(
+        id,
+        Object.assign(
+          {
+            transform: [...child.attrs.transform],
+          },
+          originAttrsMap.get(id) ?? {},
+        ),
+      );
 
       const tf = new Matrix(...child.attrs.transform).translate(
         -boundingRect.x,
