@@ -202,6 +202,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     imgManager?: ImgManager | undefined,
     smooth?: boolean | undefined,
   ) {
+    if (!this.isVisible()) return;
     this._realDraw(ctx, imgManager, smooth);
   }
 
