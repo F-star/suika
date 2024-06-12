@@ -1,5 +1,4 @@
 export * from './add_graphs';
-export * from './align';
 export * from './command_manager';
 export * from './macro';
 export * from './remove_graphs';

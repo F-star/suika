@@ -70,3 +70,12 @@ export interface IFillStrokeSVGAttrs {
   stroke?: string;
   'stroke-opacity'?: number;
 }
+
+export enum AlignType {
+  Left = 'Left',
+  HCenter = 'HCenter',
+  Right = 'Right',
+  Top = 'Top',
+  VCenter = 'VCenter',
+  Bottom = 'Bottom',
+}
