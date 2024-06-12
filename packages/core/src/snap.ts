@@ -17,13 +17,19 @@ export const SnapHelper = {
     point = { x: point.x, y: point.y };
     const snapGrid = setting.get('snapToGrid');
     if (snapGrid) {
-      const gridSnapX = setting.get('gridSnapX');
-      const gridSnapY = setting.get('gridSnapY');
-      return {
-        x: getClosestTimesVal(point.x, gridSnapX),
-        y: getClosestTimesVal(point.y, gridSnapY),
+      const gridSnapSpacing = {
+        x: setting.get('gridSnapX'),
+        y: setting.get('gridSnapY'),
       };
+      return this.getGridSnapPt(point, gridSnapSpacing);
     }
     return point;
+  },
+
+  getGridSnapPt(point: IPoint, snapSpacing: IPoint) {
+    return {
+      x: getClosestTimesVal(point.x, snapSpacing.x),
+      y: getClosestTimesVal(point.y, snapSpacing.y),
+    };
   },
 };

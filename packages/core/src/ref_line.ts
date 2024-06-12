@@ -1,4 +1,9 @@
-import { arrMap, forEach, getClosestValInSortedArr } from '@suika/common';
+import {
+  arrMap,
+  forEach,
+  getClosestTimesVal,
+  getClosestValInSortedArr,
+} from '@suika/common';
 import { type IPoint, isBoxIntersect, rectToBox } from '@suika/geo';
 
 import { type Editor } from './editor';
@@ -66,6 +71,18 @@ export class RefLine {
         continue;
       }
 
+      const setting = this.editor.setting;
+      if (setting.get('snapToGrid')) {
+        const gridSnapSpacingX = setting.get('gridSnapX');
+        const gridSnapSpacingY = setting.get('gridSnapY');
+        bbox.minX = getClosestTimesVal(bbox.minX, gridSnapSpacingX);
+        bbox.minY = getClosestTimesVal(bbox.minY, gridSnapSpacingY);
+        bbox.midX = getClosestTimesVal(bbox.midX, gridSnapSpacingX);
+        bbox.midY = getClosestTimesVal(bbox.midY, gridSnapSpacingY);
+        bbox.maxX = getClosestTimesVal(bbox.maxX, gridSnapSpacingX);
+        bbox.maxY = getClosestTimesVal(bbox.maxY, gridSnapSpacingY);
+      }
+
       // bbox 中水平线
       this.addBboxToMap(vRefLineMap, bbox.midX, [bbox.minY, bbox.maxY]);
       // bbox 中垂直线
@@ -91,6 +108,16 @@ export class RefLine {
        * left 和 right 要绘制垂直参照线，不要绘制水平参照线
        */
       const bboxVerts = graph.getWorldBboxVerts();
+
+      if (setting.get('snapToGrid')) {
+        const gridSnapSpacingX = setting.get('gridSnapX');
+        const gridSnapSpacingY = setting.get('gridSnapY');
+        for (const vert of bboxVerts) {
+          vert.x = getClosestTimesVal(vert.x, gridSnapSpacingX);
+          vert.y = getClosestTimesVal(vert.y, gridSnapSpacingY);
+        }
+      }
+
       const top = bboxVerts.filter((p) => p.x === bbox.minX);
       const bottom = bboxVerts.filter((p) => p.x === bbox.maxX);
       const left = bboxVerts.filter((p) => p.y === bbox.minY);
