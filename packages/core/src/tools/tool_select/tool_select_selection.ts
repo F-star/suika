@@ -3,7 +3,6 @@ import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 import { type Editor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
 import { getParentIdSet } from '../../service/group_and_record';
-import { SnapHelper } from '../../snap';
 import { type IBaseTool } from '../type';
 import { getElementsInSelection } from './utils';
 
@@ -36,10 +35,7 @@ export class DrawSelection implements IBaseTool {
       this.editor.selectedElements.clear();
     }
 
-    this.startPoint = SnapHelper.getSnapPtBySetting(
-      this.editor.getSceneCursorXY(e),
-      this.editor.setting,
-    );
+    this.startPoint = this.editor.getSceneCursorXY(e);
 
     this.editor.render();
     this.editor.sceneGraph.setSelection(this.startPoint);
@@ -47,10 +43,7 @@ export class DrawSelection implements IBaseTool {
   onDrag(e: PointerEvent) {
     this.lastMouseScenePoint = this.editor.getSceneCursorXY(e);
 
-    this.lastMousePoint = SnapHelper.getSnapPtBySetting(
-      this.lastMouseScenePoint,
-      this.editor.setting,
-    );
+    this.lastMousePoint = this.lastMouseScenePoint;
 
     this.updateSelection();
   }
