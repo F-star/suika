@@ -1,11 +1,10 @@
-import { noop } from '@suika/common';
-import { type IMatrixArr, type IPoint, Matrix } from '@suika/geo';
+import { cloneDeep, noop } from '@suika/common';
+import { type IMatrixArr, type IPoint } from '@suika/geo';
 
-import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { type Editor } from '../../editor';
-import { type GraphicsAttrs } from '../../graphs';
+import { type SuikaGraphics } from '../../graphs';
+import { Transaction } from '../../transaction';
 import { type IBaseTool } from '../type';
-import { updateParentSize } from './utils';
 
 /**
  * select tool
@@ -14,8 +13,9 @@ import { updateParentSize } from './utils';
  */
 export class SelectMoveTool implements IBaseTool {
   private originWorldTfMap = new Map<string, IMatrixArr>();
-  private originAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
-  private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
+
+  private transaction: Transaction;
+  private selectedItems: SuikaGraphics[] = [];
 
   private startPoint: IPoint = { x: -1, y: -1 };
   private dragPoint: IPoint | null = null;
@@ -25,7 +25,9 @@ export class SelectMoveTool implements IBaseTool {
 
   unbindEvents = noop;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: Editor) {
+    this.transaction = new Transaction(editor);
+  }
   onActive() {
     const hotkeysManager = this.editor.hostEventManager;
     const moveWhenToggleShift = () => {
@@ -45,12 +47,12 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.controlHandleManager.hideCustomHandles();
 
     this.startPoint = this.editor.getSceneCursorXY(e);
-    const selectedItems = this.editor.selectedElements.getItems({
+    this.selectedItems = this.editor.selectedElements.getItems({
       excludeLocked: true,
     });
-    for (const item of selectedItems) {
-      this.originAttrsMap.set(item.attrs.id, {
-        transform: [...item.attrs.transform],
+    for (const item of this.selectedItems) {
+      this.transaction.recordOld(item.attrs.id, {
+        transform: cloneDeep(item.attrs.transform),
       });
       this.originWorldTfMap.set(item.attrs.id, item.getWorldTransform());
     }
@@ -102,46 +104,40 @@ export class SelectMoveTool implements IBaseTool {
     this.dx = dx;
     this.dy = dy;
 
-    const selectedElements = this.editor.selectedElements.getItems({
-      excludeLocked: true,
-    });
-    for (let i = 0, len = selectedElements.length; i < len; i++) {
-      const el = selectedElements[i];
-      const tf = new Matrix(...this.originWorldTfMap.get(el.attrs.id)!)
-        .clone()
-        .translate(dx, dy)
-        .prepend(new Matrix(...el.getParentWorldTransform()).invert());
+    const selectedItems = this.selectedItems;
 
-      el.updateAttrs({
-        transform: tf.getArray(),
-      });
+    // 1. update graphics position
+    for (const graphics of selectedItems) {
+      const newWorldTf = cloneDeep(
+        this.originWorldTfMap.get(graphics.attrs.id)!,
+      );
+      newWorldTf[4] += dx;
+      newWorldTf[5] += dy;
 
-      this.updatedAttrsMap.set(el.attrs.id, {
-        transform: tf.getArray(),
-      });
+      graphics.setWorldTransform(newWorldTf);
     }
 
-    // 参照线处理（目前不处理 “吸附到像素网格的情况” 的特殊情况）
     const { offsetX, offsetY } = this.editor.refLine.updateRefLine();
 
-    for (let i = 0, len = selectedElements.length; i < len; i++) {
-      const el = selectedElements[i];
-      const tf = new Matrix(...this.originWorldTfMap.get(el.attrs.id)!)
-        .clone()
-        .translate(dx + offsetX, dy + offsetY)
-        .prepend(new Matrix(...el.getParentWorldTransform()).invert());
+    // 2. snap to ref line
+    for (const graphics of selectedItems) {
+      const newWorldTf = cloneDeep(
+        this.originWorldTfMap.get(graphics.attrs.id)!,
+      );
+      newWorldTf[4] += dx + offsetX;
+      newWorldTf[5] += dy + offsetY;
 
-      el.updateAttrs({
-        transform: tf.getArray(),
+      graphics.setWorldTransform(newWorldTf);
+    }
+
+    // 3. record update attrs
+    for (const graphics of selectedItems) {
+      this.transaction.update(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
       });
     }
 
-    updateParentSize(
-      this.editor,
-      this.editor.selectedElements.getParentIdSet(),
-      this.originAttrsMap,
-      this.updatedAttrsMap,
-    );
+    this.transaction.updateParentSize(selectedItems);
 
     this.editor.render();
   }
@@ -165,14 +161,7 @@ export class SelectMoveTool implements IBaseTool {
     }
 
     if (this.dx !== 0 || this.dy !== 0) {
-      this.editor.commandManager.pushCommand(
-        new UpdateGraphicsAttrsCmd(
-          'Update Graphics Attributes',
-          this.editor,
-          this.originAttrsMap,
-          this.updatedAttrsMap,
-        ),
-      );
+      this.transaction.commit('Update Graphics Attributes');
 
       // update custom control handles
       if (selectedItems.length === 1) {
@@ -186,8 +175,7 @@ export class SelectMoveTool implements IBaseTool {
     }
   }
   afterEnd() {
-    this.originAttrsMap = new Map();
-    this.updatedAttrsMap = new Map();
+    this.transaction = new Transaction(this.editor);
     this.dragPoint = null;
 
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = true;

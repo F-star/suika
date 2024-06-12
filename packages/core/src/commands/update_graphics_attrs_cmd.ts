@@ -15,6 +15,8 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
       console.warn(
         `originAttrsMap 和 updatedAttrsMap 数量不匹配 ${originAttrsMap.size} ${updatedAttrsMap.size}`,
       );
+      console.log('origin:', originAttrsMap);
+      console.log('update:', updatedAttrsMap);
     }
   }
   redo() {
