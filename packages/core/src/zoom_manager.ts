@@ -101,7 +101,7 @@ export class ZoomManager {
       y: -viewport.height / 2,
     });
   }
-  private zoomBoxToFit(composedBBox: IRect, maxZoom?: number) {
+  private zoomRectToFit(rect: IRect, maxZoom?: number) {
     const padding = this.editor.setting.get('zoomToFixPadding');
     const viewport = this.editor.viewportManager.getViewport();
 
@@ -123,22 +123,20 @@ export class ZoomManager {
 
     let newZoom: number;
     const viewportRatio = vw / vh;
-    const bboxRatio = composedBBox.width / composedBBox.height;
+    const bboxRatio = rect.width / rect.height;
     if (viewportRatio > bboxRatio) {
       // basic height
-      newZoom = vh / composedBBox.height;
+      newZoom = vh / rect.height;
     } else {
-      newZoom = vw / composedBBox.width;
+      newZoom = vw / rect.width;
     }
 
     if (maxZoom && newZoom > maxZoom) {
       newZoom = maxZoom;
     }
 
-    const newViewportX =
-      composedBBox.x - (viewport.width / newZoom - composedBBox.width) / 2;
-    const newViewportY =
-      composedBBox.y - (viewport.height / newZoom - composedBBox.height) / 2;
+    const newViewportX = rect.x - (viewport.width / newZoom - rect.width) / 2;
+    const newViewportY = rect.y - (viewport.height / newZoom - rect.height) / 2;
 
     this.setZoom(newZoom);
     this.editor.viewportManager.setViewport({
@@ -147,11 +145,11 @@ export class ZoomManager {
     });
   }
   zoomToSelection() {
-    const selectionBox = this.editor.selectedElements.getBbox();
-    if (!selectionBox) {
+    const selectedBoundingRect = this.editor.selectedElements.getBoundingRect();
+    if (!selectedBoundingRect) {
       this.zoomToFit();
     } else {
-      this.zoomBoxToFit(selectionBox);
+      this.zoomRectToFit(selectedBoundingRect);
     }
   }
   /**
@@ -164,7 +162,7 @@ export class ZoomManager {
       this.reset();
       return;
     }
-    this.zoomBoxToFit(boxToRect(canvasBbox), maxZoom);
+    this.zoomRectToFit(boxToRect(canvasBbox), maxZoom);
   }
   private getCanvasCenter() {
     const { width, height } = this.editor.viewportManager.getViewport();

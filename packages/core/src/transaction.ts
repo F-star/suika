@@ -33,7 +33,6 @@ export class Transaction {
   }
 
   commit(desc: string) {
-    console.log(this);
     this.editor.commandManager.pushCommand(
       new UpdateGraphicsAttrsCmd(
         desc,

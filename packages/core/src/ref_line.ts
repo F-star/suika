@@ -170,7 +170,7 @@ export class RefLine {
       ];
     } else {
       const targetBbox = bboxToBboxWithMid(
-        rectToBox(this.editor.selectedElements.getBbox()!),
+        rectToBox(this.editor.selectedElements.getBoundingRect()!),
       );
       targetPoints = [
         { x: targetBbox.minX, y: targetBbox.minY },

@@ -3,18 +3,6 @@ import { getSweepAngle, type IBox, type IPoint, type IRect } from '@suika/geo';
 import { HALF_PI } from '../constant';
 
 /**
- * rect 中心点
- */
-export function getRectCenterPoint({
-  x,
-  y,
-  width,
-  height,
-}: IRect): [cx: number, cy: number] {
-  return [x + width / 2, y + height / 2];
-}
-
-/**
  * 计算绝对坐标
  */
 export function getAbsoluteCoords(

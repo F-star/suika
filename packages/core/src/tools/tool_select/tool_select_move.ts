@@ -8,8 +8,7 @@ import { type IBaseTool } from '../type';
 
 /**
  * select tool
- *
- * move selected elements
+ * sub case: move selected elements
  */
 export class SelectMoveTool implements IBaseTool {
   private originWorldTfMap = new Map<string, IMatrixArr>();
@@ -57,13 +56,13 @@ export class SelectMoveTool implements IBaseTool {
       this.originWorldTfMap.set(item.attrs.id, item.getWorldTransform());
     }
 
-    const bBox = this.editor.selectedElements.getBbox();
-    if (!bBox) {
+    const boundingRect = this.editor.selectedElements.getBoundingRect();
+    if (!boundingRect) {
       console.error(
         "selected elements should't be empty when moving, please report us issue",
       );
     } else {
-      this.prevBBoxPos = { x: bBox.x, y: bBox.y };
+      this.prevBBoxPos = { x: boundingRect.x, y: boundingRect.y };
     }
 
     this.editor.refLine.cacheXYToBbox();

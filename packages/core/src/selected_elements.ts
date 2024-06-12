@@ -5,7 +5,6 @@ import { type Editor } from './editor';
 import { isGroupGraphics, type SuikaGraphics } from './graphs';
 import { getParentIdSet } from './service/group_and_record';
 import { removeGraphicsAndRecord } from './service/remove_service';
-import { getRectCenterPoint } from './utils';
 
 interface Events {
   itemsChange(items: SuikaGraphics[]): void;
@@ -111,20 +110,13 @@ export class SelectedElements {
     }
     this.toggleItems([toggledElement]);
   }
-  getCenterPoint() {
-    const bbox = this.getBbox();
-    if (!bbox) {
-      throw new Error('no selected elements');
-    }
-    return getRectCenterPoint(bbox);
-  }
   size() {
     return this.items.length;
   }
   isEmpty() {
     return this.items.length === 0;
   }
-  getBbox(): IRect | null {
+  getBoundingRect(): IRect | null {
     if (this.isEmpty()) {
       return null;
     }

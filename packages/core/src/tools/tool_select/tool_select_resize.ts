@@ -30,7 +30,7 @@ import { updateParentSize } from './utils';
 export class SelectResizeTool implements IBaseTool {
   private startPoint: IPoint = { x: -1, y: -1 };
   private handleName!: string;
-  private startSelectBbox: IRect | null = null;
+  private startSelectBRect: IRect | null = null;
 
   private originAttrsMap = new Map<string, GraphicsAttrs>();
   private originWorldTransforms = new Map<string, IMatrixArr>();
@@ -86,11 +86,11 @@ export class SelectResizeTool implements IBaseTool {
       ]);
     }
 
-    const startSelectBbox = this.editor.selectedElements.getBbox();
-    if (!startSelectBbox) {
+    const startSelectBRect = this.editor.selectedElements.getBoundingRect();
+    if (!startSelectBRect) {
       throw new Error('startSelectBbox should not be null, please issue to us');
     }
-    this.startSelectBbox = startSelectBbox;
+    this.startSelectBRect = startSelectBRect;
 
     if (isTransformHandle(handleInfo.handleName)) {
       this.editor.controlHandleManager.hideCustomHandles();
@@ -241,7 +241,7 @@ export class SelectResizeTool implements IBaseTool {
 
       this.updateControls(selectedElements[0]);
     } else {
-      const startSelectBbox = this.startSelectBbox!;
+      const startSelectBbox = this.startSelectBRect!;
       const startSelectedBoxTf = new Matrix().translate(
         startSelectBbox.x,
         startSelectBbox.y,

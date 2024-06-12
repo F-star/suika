@@ -143,19 +143,19 @@ export class ClipboardManager {
     );
     editor.selectedElements.setItems(pastedGraphs);
 
-    const bbox = editor.selectedElements.getBbox()!;
+    const boundingRect = editor.selectedElements.getBoundingRect()!;
     if (
       (x === undefined || y === undefined) &&
       pastedData.paperId !== editor.paperId
     ) {
       const vwCenter = this.editor.viewportManager.getCenter();
-      x = vwCenter.x - bbox.width / 2;
-      y = vwCenter.y - bbox.height / 2;
+      x = vwCenter.x - boundingRect.width / 2;
+      y = vwCenter.y - boundingRect.height / 2;
     }
 
     if (x !== undefined && y !== undefined) {
-      const dx = x - bbox.x;
-      const dy = y - bbox.y;
+      const dx = x - boundingRect.x;
+      const dy = y - boundingRect.y;
       if (dx || dy) {
         SuikaGraphics.dMove(pastedGraphs, dx, dy);
       }
