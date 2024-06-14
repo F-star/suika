@@ -59,7 +59,9 @@ export class HostEventManager {
       this.isCtrlPressing = event.ctrlKey;
       this.isAltPressing = event.altKey;
       this.isCommandPressing = event.metaKey;
-      this.isSpacePressing = event.code === 'Space' && event.type === 'keydown';
+      if (event.code === 'Space') {
+        this.isSpacePressing = event.type === 'keydown';
+      }
 
       if (prevShift !== this.isShiftPressing) {
         this.eventEmitter.emit('shiftToggle', this.isShiftPressing);
