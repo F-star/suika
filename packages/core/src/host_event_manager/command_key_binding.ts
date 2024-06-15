@@ -1,4 +1,3 @@
-import { ArrangeType } from '../commands/arrange';
 import { type Editor } from '../editor';
 import {
   isGroupGraphics,
@@ -8,6 +7,7 @@ import {
 } from '../graphs';
 import { arrangeAndRecord, MutateGraphsAndRecord } from '../service';
 import { groupAndRecord } from '../service/group_and_record';
+import { ArrangeType } from '../type';
 
 export class CommandKeyBinding {
   private isBound = false;

@@ -71,7 +71,7 @@ export class RemoveGraphsCmd implements ICommand {
 
     for (const el of removedElements) {
       const parent = getParent(el, this.editor.doc.graphicsStore)!;
-      parent.appendChild(el, el.attrs.parentIndex?.position);
+      parent.insertChild(el, el.attrs.parentIndex?.position);
     }
     this.editor.selectedElements.setItems(removedElements);
   }

@@ -366,14 +366,9 @@ export class SceneGraph {
   initGraphicsTree() {
     const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
     for (const graphics of this.children) {
-      const parentId = graphics.attrs.parentIndex?.guid;
-      // TODO: 兜底为当前 canvas
-
-      const parent = parentId
-        ? this.editor.doc.getGraphicsById(parentId)
-        : canvasGraphics;
+      const parent = graphics.getParent() ?? canvasGraphics;
       if (parent && parent !== graphics) {
-        parent.appendChild(graphics);
+        parent.insertChild(graphics, graphics.attrs.parentIndex?.position);
       }
     }
   }

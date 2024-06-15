@@ -14,7 +14,7 @@ export class AddGraphCmd implements ICommand {
     for (const el of this.elements) {
       const parent = el.getParent();
       if (parent) {
-        parent.appendChild(el, el.attrs.parentIndex?.position);
+        parent.insertChild(el, el.attrs.parentIndex?.position);
       }
     }
 

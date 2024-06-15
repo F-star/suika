@@ -1,3 +1,5 @@
+import { identityMatrix } from '@suika/geo';
+
 import { GraphicsType, type Optional } from '../type';
 import {
   type GraphicsAttrs,
@@ -16,5 +18,9 @@ export class SuikaCanvas extends SuikaGraphics<SuikaCanvasAttrs> {
     opts: IGraphicsOpts,
   ) {
     super({ ...attrs, type: GraphicsType.Canvas }, opts);
+  }
+
+  override getWorldTransform() {
+    return identityMatrix();
   }
 }

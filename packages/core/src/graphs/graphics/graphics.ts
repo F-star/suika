@@ -61,6 +61,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   /** hide graphics temporarily, it's possible that attrs.visible is true */
   noRender = false;
   private _deleted = false;
+  private _sortDirty = false;
 
   constructor(
     attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
@@ -758,7 +759,14 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     if (!this.isContainer) {
       return [];
     }
+    if (this._sortDirty) {
+      this.sortChildren();
+    }
     return [...this.children];
+  }
+
+  getChildrenCount() {
+    return this.children.length;
   }
 
   setChildren(graphs: SuikaGraphics[]) {
@@ -778,19 +786,22 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
   }
 
-  appendAtParent(position: string) {
+  insertAtParent(position: string) {
     const parent = this.getParent();
     if (parent) {
-      parent.appendChild(this, position);
+      parent.insertChild(this, position);
     }
   }
 
-  appendChild(graphics: SuikaGraphics, sortIdx?: string) {
+  insertChild(graphics: SuikaGraphics, sortIdx?: string) {
     if (!this.isContainer) {
       console.warn(`graphics "${this.type}" is not container`);
       return;
     }
     if (this.children.some((item) => item.attrs.id === graphics.attrs.id)) {
+      if (sortIdx) {
+        this.sortChildren();
+      }
       return;
     }
     if (!sortIdx) {
@@ -806,24 +817,34 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
       },
     });
     this.children.push(graphics);
-    this.sortChildren();
+    if (sortIdx) {
+      // TODO: 考虑 this._sortDirty 标记为 true，然后找个合适的时机再排序，减少图形重复地调用 sortChildren
+      this.sortChildren();
+    }
   }
 
   removeChild(graphics: SuikaGraphics) {
     this.children = this.children.filter(
       (item) => item.attrs.id !== graphics.attrs.id,
     );
-    // TODO: 更新 graphics 的 parentIndex
+  }
+
+  markSortDirty() {
+    this._sortDirty = true;
   }
 
   sortChildren() {
-    // TODO: 改为判断 dirtySort 是否为 true
-    this.children.sort((a, b) => {
+    SuikaGraphics.sortGraphicsArray(this.children);
+  }
+
+  static sortGraphicsArray(graphicsArr: SuikaGraphics[]) {
+    graphicsArr.sort((a, b) => {
       return (a.attrs.parentIndex?.position ?? '') <
         (b.attrs.parentIndex?.position ?? '')
         ? -1
         : 1;
     });
+    return graphicsArr;
   }
 
   getParent() {
@@ -850,13 +871,40 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     if (this.children.length === 0) {
       return null;
     }
-    this.sortChildren();
-    return this.children.at(-1)?.attrs.parentIndex?.position ?? null;
+    if (!this._sortDirty) {
+      return this.children.at(-1)!.getSortIndex() ?? null;
+    }
+    let maxIndex = this.children[0].getSortIndex()!;
+    for (let i = 1; i < this.children.length; i++) {
+      const currIndex = this.children[i].getSortIndex();
+      if (currIndex > maxIndex) {
+        maxIndex = currIndex;
+      }
+    }
+    return maxIndex;
+  }
+
+  getMinChildIndex() {
+    if (this.children.length === 0) {
+      return null;
+    }
+    if (!this._sortDirty) {
+      return this.children.at(0)!.getSortIndex() ?? null;
+    }
+    let minIndex = this.children[0].getSortIndex()!;
+    for (let i = 1; i < this.children.length; i++) {
+      const currIndex = this.children[i].getSortIndex();
+      if (currIndex < minIndex) {
+        minIndex = currIndex;
+      }
+    }
+    return minIndex;
   }
 
   getSortIndex() {
     return this.attrs.parentIndex?.position ?? '';
   }
+
   getSortIndexPath() {
     const path: string[] = [];
     // eslint-disable-next-line @typescript-eslint/no-this-alias
