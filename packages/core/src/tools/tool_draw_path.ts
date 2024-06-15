@@ -113,7 +113,7 @@ export class DrawPathTool implements ITool {
       );
       this.path = path;
 
-      this.editor.doc.getCurrCanvas().appendChild(path);
+      this.editor.doc.getCurrCanvas().insertChild(path);
       this.editor.sceneGraph.addItems([path]);
       this.editor.commandManager.batchCommandStart();
       this.editor.commandManager.pushCommand(

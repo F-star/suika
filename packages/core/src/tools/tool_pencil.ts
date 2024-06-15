@@ -72,7 +72,7 @@ export class PencilTool implements ITool {
 
     if (this.isFirstDrag) {
       this.editor.sceneGraph.addItems([path]);
-      this.editor.doc.getCurrCanvas().appendChild(path);
+      this.editor.doc.getCurrCanvas().insertChild(path);
       this.isFirstDrag = false;
     }
     this.editor.render();

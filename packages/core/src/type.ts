@@ -79,3 +79,10 @@ export enum AlignType {
   VCenter = 'VCenter',
   Bottom = 'Bottom',
 }
+
+export enum ArrangeType {
+  Front = 'Front',
+  Back = 'Back',
+  Forward = 'Forward',
+  Backward = 'Backward',
+}

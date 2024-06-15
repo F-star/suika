@@ -142,7 +142,7 @@ export class TextEditor {
         doc: this.editor.doc,
       },
     );
-    this.editor.doc.getCurrCanvas().appendChild(text);
+    this.editor.doc.getCurrCanvas().insertChild(text);
     this.editor.sceneGraph.addItems([text]);
 
     if (!this.editor.setting.get('keepToolSelectedAfterUse')) {

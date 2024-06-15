@@ -30,12 +30,9 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
         return;
       }
       graphics.updateAttrs(attrs);
-      // if (attrs.parentIndex) {
-      //   graphics.removeFromParent();
-      // }
-      // if (parent) {
-      //   parent.appendChild(el, el.attrs.parentIndex?.position);
-      // }
+      if (attrs.parentIndex) {
+        graphics.insertAtParent(graphics.attrs.parentIndex!.position);
+      }
     }
 
     for (const id of this.removedIds) {
@@ -56,12 +53,9 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
         return;
       }
       graphics.updateAttrs(attrs);
-      // if (attrs.parentIndex) {
-      //   graphics.removeFromParent();
-      // }
-      // if (parent) {
-      //   parent.appendChild(el, el.attrs.parentIndex?.position);
-      // }
+      if (attrs.parentIndex) {
+        graphics.insertAtParent(graphics.attrs.parentIndex!.position);
+      }
     }
 
     for (const id of this.removedIds) {
@@ -70,7 +64,7 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
         graphics.setDeleted(false);
         const position = graphics.attrs.parentIndex?.position;
         if (position) {
-          graphics.appendAtParent(position);
+          graphics.insertAtParent(position);
         } else {
           console.error('position lost');
         }

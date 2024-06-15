@@ -45,7 +45,7 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
       return;
     }
 
-    for (const child of this.getChildren()) {
+    for (const child of this.children) {
       const id = child.attrs.id;
 
       originAttrsMap.set(

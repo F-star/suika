@@ -58,14 +58,14 @@ export const groupAndRecord = (graphs: SuikaGraphics[], editor: Editor) => {
       doc: editor.doc,
     },
   );
-  parentOfGroup.appendChild(group, groupSortIndex);
+  parentOfGroup.insertChild(group, groupSortIndex);
   const groupInvertTf = invertMatrix(group.getWorldTransform());
 
   for (const el of graphs) {
     el.updateAttrs({
       transform: multiplyMatrix(groupInvertTf, el.getWorldTransform()),
     });
-    group.appendChild(el);
+    group.insertChild(el);
   }
 
   const AttrsArr = graphs.map((item) => ({

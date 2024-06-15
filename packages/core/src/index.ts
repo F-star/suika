@@ -1,5 +1,4 @@
 export * from './commands';
-export { ArrangeType } from './commands/arrange';
 export * from './editor';
 export * from './graphs';
 export * from './paint';

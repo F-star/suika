@@ -226,7 +226,7 @@ export abstract class DrawGraphTool implements ITool {
       this.updateGraph(rect);
     } else {
       const element = this.createGraph(rect)!;
-      this.editor.doc.getCurrCanvas().appendChild(element);
+      this.editor.doc.getCurrCanvas().insertChild(element);
       sceneGraph.addItems([element]);
 
       this.drawingGraph = element;
@@ -274,7 +274,7 @@ export abstract class DrawGraphTool implements ITool {
       );
 
       if (this.drawingGraph) {
-        this.editor.doc.getCurrCanvas().appendChild(this.drawingGraph);
+        this.editor.doc.getCurrCanvas().insertChild(this.drawingGraph);
         this.editor.sceneGraph.addItems([this.drawingGraph]);
 
         this.editor.selectedElements.setItems([this.drawingGraph]);
