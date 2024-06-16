@@ -44,6 +44,7 @@
   "paintType.image": "图片",
 
   "group": "创建编组",
+  "ungroup": "取消编组",
   "showOrHide": "显示/隐藏",
   "lockOrUnlock": "锁定/解锁",
 

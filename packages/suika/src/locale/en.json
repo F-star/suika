@@ -44,6 +44,7 @@
   "paintType.image": "Image",
 
   "group": "Group selection",
+  "ungroup": "Ungroup",
 
   "showOrHide": "Show/Hide",
   "lockOrUnlock": "Lock/Unlock",

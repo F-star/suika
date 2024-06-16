@@ -847,8 +847,12 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     return graphicsArr;
   }
 
+  getParentId() {
+    return this.attrs.parentIndex?.guid;
+  }
+
   getParent() {
-    const parentId = this.attrs.parentIndex?.guid;
+    const parentId = this.getParentId();
     if (!parentId) {
       return undefined;
     }
@@ -991,8 +995,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
       return;
     }
     if (this.isContainer) {
-      for (const chid of this.children) {
-        chid.forEachVisibleLeafNode(cb);
+      for (const child of this.children) {
+        child.forEachVisibleLeafNode(cb);
       }
     } else {
       cb(this);

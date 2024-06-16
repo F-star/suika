@@ -7,6 +7,7 @@ import {
   groupAndRecord,
   type IHistoryStatus,
   MutateGraphsAndRecord,
+  ungroupAndRecord,
 } from '@suika/core';
 import { type IPoint } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
@@ -166,6 +167,17 @@ export const ContextMenu: FC = () => {
           }}
         >
           <FormattedMessage id="group" />
+        </ContextMenuItem>
+        <ContextMenuItem
+          suffix={isWindows ? 'Ctrl+Backspace' : '⌘⌫'}
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              ungroupAndRecord(editor.selectedElements.getItems(), editor);
+            }
+          }}
+        >
+          <FormattedMessage id="ungroup" />
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem

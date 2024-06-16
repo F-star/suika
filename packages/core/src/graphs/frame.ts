@@ -101,5 +101,11 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
 export const isGroupGraphics = (
   graphics: SuikaGraphics,
 ): graphics is SuikaFrame => {
-  return graphics instanceof SuikaFrame; // && graphics.attrs.resizeToFit
+  return graphics instanceof SuikaFrame && graphics.attrs.resizeToFit;
+};
+
+export const isFrameGraphics = (
+  graphics: SuikaGraphics,
+): graphics is SuikaFrame => {
+  return graphics instanceof SuikaFrame;
 };

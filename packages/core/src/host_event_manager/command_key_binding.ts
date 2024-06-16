@@ -5,7 +5,11 @@ import {
   SuikaPath,
   SuikaText,
 } from '../graphs';
-import { arrangeAndRecord, MutateGraphsAndRecord } from '../service';
+import {
+  arrangeAndRecord,
+  MutateGraphsAndRecord,
+  ungroupAndRecord,
+} from '../service';
 import { groupAndRecord } from '../service/group_and_record';
 import { ArrangeType } from '../type';
 
@@ -245,7 +249,6 @@ export class CommandKeyBinding {
     /*************** group **************/
     // group
     const groupAction = () => {
-      // editor.selectedElements.group();
       groupAndRecord(this.editor.selectedElements.getItems(), editor);
       editor.render();
     };
@@ -255,6 +258,19 @@ export class CommandKeyBinding {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Group',
       action: groupAction,
+    });
+
+    // ungroup
+    const ungroupAction = () => {
+      ungroupAndRecord(this.editor.selectedElements.getItems(), editor);
+      editor.render();
+    };
+    editor.keybindingManager.register({
+      key: { metaKey: true, keyCode: 'Backspace' },
+      winKey: { ctrlKey: true, keyCode: 'Backspace' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'Ungroup',
+      action: ungroupAction,
     });
 
     /******* show/hide *****/
