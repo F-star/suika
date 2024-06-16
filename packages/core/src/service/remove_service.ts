@@ -5,8 +5,7 @@ import {
   type SuikaFrame,
   type SuikaGraphics,
 } from '../graphs';
-import { updateParentSize } from '../tools/tool_select/utils';
-import { getChildNodeSet, getParentIdSet } from './group_and_record';
+import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../utils';
 
 export const removeGraphicsAndRecord = (
   editor: Editor,
@@ -41,7 +40,7 @@ export const removeGraphicsAndRecord = (
   const originAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
   const updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
 
-  updateParentSize(editor, parentIdSet, originAttrsMap, updatedAttrsMap);
+  updateNodeSize(editor, parentIdSet, originAttrsMap, updatedAttrsMap);
 
   editor.commandManager.pushCommand(
     new UpdateGraphicsAttrsCmd(

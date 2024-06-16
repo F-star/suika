@@ -16,13 +16,9 @@ import { HALF_PI } from '../../constant';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type Editor } from '../../editor';
 import { type GraphicsAttrs, type SuikaGraphics } from '../../graphs';
-import {
-  getChildNodeSet,
-  getParentIdSet,
-} from '../../service/group_and_record';
 import { SnapHelper } from '../../snap';
+import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../../utils';
 import { type IBaseTool } from '../type';
-import { updateParentSize } from './utils';
 
 /**
  * scale element
@@ -300,7 +296,7 @@ export class SelectResizeTool implements IBaseTool {
     this.updateChildren(prependedTransform);
 
     // 3. update parents width/height/transform
-    updateParentSize(
+    updateNodeSize(
       this.editor,
       getParentIdSet(selectedItems),
       this.originAttrsMap,

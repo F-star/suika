@@ -3,8 +3,8 @@ import { boxToRect, type IRect, mergeBoxes } from '@suika/geo';
 
 import { type Editor } from './editor';
 import { isGroupGraphics, type SuikaGraphics } from './graphs';
-import { getParentIdSet } from './service/group_and_record';
 import { removeGraphicsAndRecord } from './service/remove_service';
+import { getParentIdSet } from './utils';
 
 interface Events {
   itemsChange(items: SuikaGraphics[]): void;

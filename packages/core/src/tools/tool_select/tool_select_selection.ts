@@ -2,7 +2,7 @@ import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
-import { getParentIdSet } from '../../service/group_and_record';
+import { getParentIdSet } from '../../utils';
 import { type IBaseTool } from '../type';
 import { getElementsInSelection } from './utils';
 

@@ -10,6 +10,7 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
     private originAttrsMap: Map<string, Partial<GraphicsAttrs>>,
     private updatedAttrsMap: Map<string, Partial<GraphicsAttrs>>,
     private removedIds: Set<string> = new Set(),
+    private newIds: Set<string> = new Set(),
   ) {
     if (originAttrsMap.size !== updatedAttrsMap.size) {
       console.warn(
@@ -41,6 +42,19 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
         graphics.setDeleted(true);
       }
     }
+
+    for (const id of this.newIds) {
+      const graphics = doc.getGraphicsById(id);
+      if (graphics) {
+        graphics.setDeleted(false);
+        const position = graphics.attrs.parentIndex?.position;
+        if (position) {
+          graphics.insertAtParent(position);
+        } else {
+          console.error('position lost');
+        }
+      }
+    }
   }
   undo() {
     const attrsMap = this.originAttrsMap;
@@ -69,6 +83,19 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
           console.error('position lost');
         }
       }
+    }
+
+    for (const id of this.newIds) {
+      const graphics = doc.getGraphicsById(id);
+      if (graphics) {
+        graphics.setDeleted(true);
+        graphics.removeFromParent();
+      }
+    }
+
+    // resolve temporarily
+    if (this.newIds.size !== 0) {
+      this.editor.selectedElements.clear();
     }
   }
 }

@@ -1,13 +1,13 @@
 import { UpdateGraphicsAttrsCmd } from './commands';
 import { type Editor } from './editor';
 import { type GraphicsAttrs, type SuikaGraphics } from './graphs';
-import { getParentIdSet } from './service/group_and_record';
-import { updateParentSize } from './tools/tool_select/utils';
+import { getParentIdSet, updateNodeSize } from './utils';
 
 export class Transaction {
   private originAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
   private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
   private removedIds = new Set<string>();
+  private newIds = new Set<string>();
 
   constructor(private editor: Editor) {}
 
@@ -23,8 +23,12 @@ export class Transaction {
     this.removedIds.add(id);
   }
 
+  newId(id: string) {
+    this.newIds.add(id);
+  }
+
   updateParentSize(elements: SuikaGraphics[]) {
-    updateParentSize(
+    updateNodeSize(
       this.editor,
       getParentIdSet(elements),
       this.originAttrsMap,
@@ -32,7 +36,17 @@ export class Transaction {
     );
   }
 
+  updateNodeSize(idSet: Set<string>) {
+    updateNodeSize(
+      this.editor,
+      idSet,
+      this.originAttrsMap,
+      this.updatedAttrsMap,
+    );
+  }
+
   commit(desc: string) {
+    // TODO: check duplicated id between removeIds and newIds
     this.editor.commandManager.pushCommand(
       new UpdateGraphicsAttrsCmd(
         desc,
@@ -40,6 +54,7 @@ export class Transaction {
         this.originAttrsMap,
         this.updatedAttrsMap,
         this.removedIds,
+        this.newIds,
       ),
     );
   }

@@ -1,12 +1,7 @@
 import { type IBox, type IPoint, rectToBox } from '@suika/geo';
 
 import { type Editor } from '../../editor';
-import {
-  type GraphicsAttrs,
-  isGroupGraphics,
-  SuikaFrame,
-  type SuikaGraphics,
-} from '../../graphs';
+import { SuikaFrame, type SuikaGraphics } from '../../graphs';
 
 /********* get top hit element ********/
 export const getTopHitElement = (
@@ -93,19 +88,4 @@ const getElementsInSelectionDFS = (
     }
   }
   return graphicsArr;
-};
-
-// 修正父节点的 width/height/transform
-export const updateParentSize = (
-  editor: Editor,
-  parentIdSet: Set<string>,
-  originAttrsMap: Map<string, Partial<GraphicsAttrs>>,
-  updatedAttrsMap: Map<string, Partial<GraphicsAttrs>>,
-) => {
-  parentIdSet.forEach((id) => {
-    const node = editor.doc.getGraphicsById(id);
-    if (node && isGroupGraphics(node) && !node.isEmpty()) {
-      node.updateSizeByChildren(originAttrsMap, updatedAttrsMap);
-    }
-  });
 };
