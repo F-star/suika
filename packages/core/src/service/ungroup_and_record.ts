@@ -55,6 +55,10 @@ export const ungroupAndRecord = (
       const leftSortIndex = children[i - 1]?.getSortIndex() ?? null;
       const rightSortIndex = child.getSortIndex();
 
+      child.removeFromParent();
+      child.setDeleted(true);
+      transaction.remove(child.attrs.id);
+
       const flattedGraphics = flatFrame(
         transaction,
         parentId,
@@ -63,10 +67,6 @@ export const ungroupAndRecord = (
         rightSortIndex,
       );
       allFlattedGraphicsArr = allFlattedGraphicsArr.concat(flattedGraphics);
-
-      child.removeFromParent();
-      child.setDeleted(true);
-      transaction.remove(child.attrs.id);
     }
   }
 
