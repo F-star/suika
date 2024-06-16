@@ -30,6 +30,9 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
         console.warn(`graphics ${id} is lost.`);
         return;
       }
+      if (attrs.parentIndex) {
+        graphics.removeFromParent();
+      }
       graphics.updateAttrs(attrs);
       if (attrs.parentIndex) {
         graphics.insertAtParent(graphics.attrs.parentIndex!.position);
@@ -40,6 +43,7 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
       const graphics = doc.getGraphicsById(id);
       if (graphics) {
         graphics.setDeleted(true);
+        graphics.removeFromParent();
       }
     }
 
@@ -65,6 +69,9 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
       if (!graphics) {
         console.warn(`graphics ${id} is lost.`);
         return;
+      }
+      if (attrs.parentIndex) {
+        graphics.removeFromParent();
       }
       graphics.updateAttrs(attrs);
       if (attrs.parentIndex) {
