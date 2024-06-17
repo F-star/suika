@@ -273,7 +273,6 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
       if (pathItem.closed) {
         ctx.closePath();
       }
-      ctx.restore();
     }
 
     for (const paint of fill ?? []) {
@@ -309,6 +308,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
       }
     }
     ctx.closePath();
+    ctx.restore();
   }
 
   override toJSON() {
