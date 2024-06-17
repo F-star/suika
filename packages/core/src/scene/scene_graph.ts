@@ -339,7 +339,7 @@ export class SceneGraph {
       .filter((graphics) => !graphics.isDeleted())
       .map((item) => item.toJSON());
     const paperData: IEditorPaperData = {
-      appVersion: 'suika-editor_0.0.1',
+      appVersion: this.editor.appVersion,
       paperId: this.editor.paperId,
       data: data,
     };

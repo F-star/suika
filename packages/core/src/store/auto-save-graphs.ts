@@ -22,6 +22,9 @@ export class AutoSaveGraphs {
   save() {
     localStorage.setItem(STORE_KEY, this.editor.sceneGraph.toJSON());
   }
+  clear() {
+    localStorage.removeItem(STORE_KEY);
+  }
   load() {
     const dataStr = localStorage.getItem(STORE_KEY);
     if (!dataStr) return null;

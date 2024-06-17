@@ -44,7 +44,7 @@ export class Editor {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
-  appVersion = 'suika-editor_0.0.1';
+  appVersion = 'suika-editor_0.0.2';
   paperId: string;
 
   doc: SuikaDocument;
@@ -134,7 +134,13 @@ export class Editor {
 
     const data = this.autoSaveGraphs.load();
     if (data) {
-      this.loadData(data);
+      if (data.appVersion !== this.appVersion) {
+        if (confirm('编辑器版本和图纸版本不兼容，将清空本地缓存')) {
+          this.autoSaveGraphs.clear();
+        }
+      } else {
+        this.loadData(data);
+      }
     }
     if (this.sceneGraph.children.length === 0) {
       const canvas = new SuikaCanvas(
