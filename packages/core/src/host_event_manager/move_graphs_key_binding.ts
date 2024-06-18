@@ -1,9 +1,8 @@
-import { arrMap, debounce, noop } from '@suika/common';
-import { type IPoint } from '@suika/geo';
+import { cloneDeep, debounce, noop } from '@suika/common';
 
-import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type Editor } from '../editor';
 import { SuikaGraphics } from '../graphs';
+import { Transaction } from '../transaction';
 
 /**
  * move graphs by arrow key binding
@@ -11,8 +10,11 @@ import { SuikaGraphics } from '../graphs';
 export class MoveGraphsKeyBinding {
   private unbindHandler = noop;
   private hadBound = false;
+  private transaction: Transaction;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: Editor) {
+    this.transaction = new Transaction(editor);
+  }
 
   bindKey() {
     if (this.hadBound) {
@@ -24,21 +26,22 @@ export class MoveGraphsKeyBinding {
     this.hadBound = true;
 
     const editor = this.editor;
-    let startPoints: IPoint[] = [];
-    let isEnableUpdateStartPoints = true;
+    let needRecordOriginAttrs = true;
 
-    const recordDebounce = debounce((moveEls: SuikaGraphics[]) => {
+    const recordDebounce = debounce((movedGraphicsArr: SuikaGraphics[]) => {
       this.editor.controlHandleManager.showCustomHandles();
-      isEnableUpdateStartPoints = true;
+      needRecordOriginAttrs = true;
+
+      for (const graphics of movedGraphicsArr) {
+        this.transaction.update(graphics.attrs.id, {
+          transform: cloneDeep(graphics.attrs.transform),
+        });
+      }
+
       this.editor.commandManager.enableRedoUndo();
-      editor.commandManager.pushCommand(
-        new SetGraphsAttrsCmd(
-          'Move elements',
-          moveEls,
-          arrMap(moveEls, (el) => el.getLocalPosition()),
-          startPoints,
-        ),
-      );
+      this.transaction.commit('Move elements by direction key');
+
+      this.transaction = new Transaction(editor);
     }, editor.setting.get('moveElementsDelay'));
 
     const flushRecordDebounce = () => {
@@ -59,40 +62,44 @@ export class MoveGraphsKeyBinding {
       pressed.ArrowDown;
 
     const handleKeydown = (event: KeyboardEvent) => {
-      const movedEls = editor.selectedElements.getItems();
-      if (movedEls.length === 0) return;
+      const movedGraphicsArr = editor.selectedElements.getItems();
+      if (movedGraphicsArr.length === 0) return;
 
       if (event.key in pressed) {
         pressed[event.key as keyof typeof pressed] = true;
       }
       if (!checkPressed()) return;
 
-      if (isEnableUpdateStartPoints) {
-        startPoints = arrMap(movedEls, (el) => ({
-          ...el.getLocalPosition(),
-        }));
-        isEnableUpdateStartPoints = false;
+      if (needRecordOriginAttrs) {
+        for (const graphics of movedGraphicsArr) {
+          this.transaction.recordOld(graphics.attrs.id, {
+            transform: cloneDeep(graphics.attrs.transform),
+          });
+        }
+        needRecordOriginAttrs = false;
       }
 
       let nudge = editor.setting.get('smallNudge');
       if (event.shiftKey) nudge = editor.setting.get('bigNudge');
 
       if (pressed.ArrowLeft) {
-        SuikaGraphics.dMove(movedEls, -nudge, 0);
+        SuikaGraphics.dMove(movedGraphicsArr, -nudge, 0);
       }
       if (pressed.ArrowRight) {
-        SuikaGraphics.dMove(movedEls, nudge, 0);
+        SuikaGraphics.dMove(movedGraphicsArr, nudge, 0);
       }
       if (pressed.ArrowUp) {
-        SuikaGraphics.dMove(movedEls, 0, -nudge);
+        SuikaGraphics.dMove(movedGraphicsArr, 0, -nudge);
       }
       if (pressed.ArrowDown) {
-        SuikaGraphics.dMove(movedEls, 0, nudge);
+        SuikaGraphics.dMove(movedGraphicsArr, 0, nudge);
       }
+
+      this.transaction.updateParentSize(movedGraphicsArr);
 
       this.editor.commandManager.disableRedoUndo();
       this.editor.controlHandleManager.hideCustomHandles();
-      recordDebounce(movedEls);
+      recordDebounce(movedGraphicsArr);
       editor.render();
     };
 

@@ -35,6 +35,10 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
       ),
     );
 
+    // TODO:
+    // 子节点被删除，自己也要被删除。
+    // 字节点全都隐藏了，自己的宽高要换成 NaN，然后不能被选中，计算时不贡献 size
+
     if (
       boundingRect.x === 0 &&
       boundingRect.y === 0 &&

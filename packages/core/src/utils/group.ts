@@ -55,10 +55,10 @@ export const updateNodeSize = (
   originAttrsMap: Map<string, Partial<GraphicsAttrs>>,
   updatedAttrsMap: Map<string, Partial<GraphicsAttrs>>,
 ) => {
-  idSet.forEach((id) => {
+  for (const id of idSet) {
     const node = editor.doc.getGraphicsById(id);
     if (node && isGroupGraphics(node) && !node.isEmpty()) {
       node.updateSizeByChildren(originAttrsMap, updatedAttrsMap);
     }
-  });
+  }
 };

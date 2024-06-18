@@ -505,15 +505,12 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
   }
 
-  static dMove(graphs: SuikaGraphics[], dx: number, dy: number) {
-    for (const graphics of graphs) {
-      let tf = graphics.getWorldTransform();
+  static dMove(graphicsArr: SuikaGraphics[], dx: number, dy: number) {
+    for (const graphics of graphicsArr) {
+      const tf = graphics.getWorldTransform();
       tf[4] += dx;
       tf[5] += dy;
-      tf = multiplyMatrix(invertMatrix(graphics.getParentWorldTransform()), tf);
-      graphics.updateAttrs({
-        transform: tf,
-      });
+      graphics.setWorldTransform(tf);
     }
   }
 
