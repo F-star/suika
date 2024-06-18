@@ -204,25 +204,27 @@ export const MutateGraphsAndRecord = {
    * and
    * hide graphs when all graphs are shown
    */
-  toggleVisible(editor: Editor, graphs: SuikaGraphics[]) {
-    if (graphs.length === 0) {
+  toggleVisible(editor: Editor, graphicsArr: SuikaGraphics[]) {
+    if (graphicsArr.length === 0) {
       return;
     }
-
     // if at least one graph is hidden, show all graphs; otherwise, hide all graphs
-    const newVisible = graphs.some((item) => !item.isVisible());
-    const prevAttrs = graphs.map((el) => ({ visible: el.attrs.visible }));
-    graphs.forEach((el) => {
-      el.attrs.visible = newVisible;
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'update visible of graphs',
-        graphs,
-        { visible: newVisible },
-        prevAttrs,
-      ),
-    );
+    const newVal = graphicsArr.some((item) => !item.isVisible());
+
+    const transaction = new Transaction(editor);
+
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        visible: graphics.attrs.visible,
+      });
+      graphics.updateAttrs({
+        visible: newVal,
+      });
+      transaction.update(graphics.attrs.id, { visible: newVal });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('update visible of graphs');
   },
   /**
    * lock / unlock
