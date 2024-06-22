@@ -146,7 +146,7 @@ export class SelectResizeTool implements IBaseTool {
     return true;
   }
 
-  private updateSingleGraphicsWithNoResize(graphics: SuikaGraphics) {
+  private updateSingleGraphics(graphics: SuikaGraphics) {
     const updatedAttrs = graphics.calcNewAttrsByControlHandle(
       this.handleName,
       this.lastPoint!,
@@ -161,6 +161,13 @@ export class SelectResizeTool implements IBaseTool {
       finishRecomputed: true,
     });
     this.updatedAttrsMap.set(graphics.attrs.id, cloneDeep(updatedAttrs));
+
+    updateNodeSize(
+      this.editor,
+      getParentIdSet([graphics]),
+      this.originAttrsMap,
+      this.updatedAttrsMap,
+    );
 
     this.updateControls(graphics);
   }
@@ -195,7 +202,7 @@ export class SelectResizeTool implements IBaseTool {
     if (selectedElements.length === 1) {
       // 非 resize 操作，比如修改矩形的圆角，修改直线的端点位置
       if (!this.isResizeOp() || selectedElements[0].attrs.height === 0) {
-        this.updateSingleGraphicsWithNoResize(selectedElements[0]);
+        this.updateSingleGraphics(selectedElements[0]);
         return;
       }
 
