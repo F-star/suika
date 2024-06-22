@@ -23,6 +23,8 @@ export type ICursor =
   | 'grab'
   | 'grabbing'
   | 'move'
+  | 'move-ns'
+  | 'move-ew'
   | 'pointer'
   | 'crosshair'
   | 'text'
@@ -35,6 +37,8 @@ export class CursorManger {
   private customClassCursor = new Set<ICursor>([
     'default',
     'move',
+    'move-ns',
+    'move-ew',
     'pen',
     'pen-close',
     'crosshair',

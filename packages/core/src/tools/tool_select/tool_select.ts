@@ -270,4 +270,10 @@ export class SelectTool implements ITool {
       this.currStrategy.onSpaceToggle(isSpacePressing);
     }
   }
+
+  onShiftToggle(isShiftPressing: boolean) {
+    if (this.currStrategy?.onShiftToggle) {
+      this.currStrategy.onShiftToggle(isShiftPressing);
+    }
+  }
 }

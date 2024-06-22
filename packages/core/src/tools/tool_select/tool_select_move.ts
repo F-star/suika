@@ -1,4 +1,4 @@
-import { cloneDeep, noop } from '@suika/common';
+import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../../editor';
@@ -22,25 +22,19 @@ export class SelectMoveTool implements IBaseTool {
   private dy = 0;
   private prevBBoxPos: IPoint = { x: -1, y: -1 };
 
-  unbindEvents = noop;
-
   constructor(private editor: Editor) {
     this.transaction = new Transaction(editor);
   }
   onActive() {
-    const hotkeysManager = this.editor.hostEventManager;
-    const moveWhenToggleShift = () => {
-      if (this.dragPoint) {
-        this.move();
-      }
-    };
-    hotkeysManager.on('shiftToggle', moveWhenToggleShift);
-    this.unbindEvents = () => {
-      hotkeysManager.off('shiftToggle', moveWhenToggleShift);
-    };
+    // noop
   }
   onInactive() {
-    this.unbindEvents();
+    // noop
+  }
+  onShiftToggle() {
+    if (this.dragPoint) {
+      this.move();
+    }
   }
   onStart(e: PointerEvent) {
     this.editor.controlHandleManager.hideCustomHandles();
@@ -136,10 +130,28 @@ export class SelectMoveTool implements IBaseTool {
       });
     }
 
+    // 4. update cursor
+    this.updateCursor();
+
     this.transaction.updateParentSize(selectedItems);
 
     this.editor.render();
   }
+
+  private updateCursor() {
+    if (this.editor.hostEventManager.isShiftPressing) {
+      if (this.dx === 0 && this.dy !== 0) {
+        this.editor.setCursor('move-ns');
+        return;
+      }
+      if (this.dx !== 0 && this.dy === 0) {
+        this.editor.setCursor('move-ew');
+        return;
+      }
+    }
+    this.editor.setCursor('default');
+  }
+
   onEnd(e: PointerEvent, isDragHappened: boolean) {
     const selectedItems = this.editor.selectedElements.getItems({
       excludeLocked: true,
