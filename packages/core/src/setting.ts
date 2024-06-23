@@ -125,7 +125,8 @@ export class Setting {
 
     flipObjectsWhileResizing: true,
 
-    continueSelectMaxGap: 350, // millisecond
+    continueClickMaxGap: 350, // millisecond
+    continueClickDistanceTol: 5,
   };
   toggle<K extends BooleanKeys<Setting['value']>>(key: K) {
     const value = this.value[key];

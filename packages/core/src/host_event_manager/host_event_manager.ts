@@ -1,5 +1,5 @@
 import { EventEmitter } from '@suika/common';
-import { type IPoint } from '@suika/geo';
+import { distance, type IPoint } from '@suika/geo';
 
 import { type Editor } from '../editor';
 import { CommandKeyBinding } from './command_key_binding';
@@ -86,26 +86,29 @@ export class HostEventManager {
 
   private bindMouseRecordEvent() {
     let pointerDownTimeStamp = -Infinity;
-    let lastPointerDownPos: IPoint = { x: -9999, y: -9999 };
+    let lastPointerDownPos: IPoint = { x: -99, y: -99 };
 
     const handlePointerEvent = (event: PointerEvent) => {
       // mouse left
       if (event.button === 0 && event.type === 'pointerdown') {
         const now = new Date().getTime();
+        const newPos = {
+          x: event.pageX,
+          y: event.pageY,
+        };
+
+        const interval = now - pointerDownTimeStamp;
+        const clickDistanceDiff = distance(newPos, lastPointerDownPos);
         if (
-          now - pointerDownTimeStamp <
-            this.editor.setting.get('continueSelectMaxGap') &&
-          event.pageX === lastPointerDownPos.x &&
-          event.pageY === lastPointerDownPos.y
+          interval < this.editor.setting.get('continueClickMaxGap') &&
+          clickDistanceDiff <
+            this.editor.setting.get('continueClickDistanceTol')
         ) {
           pointerDownTimeStamp = now;
           this.eventEmitter.emit('continueClick');
         }
         pointerDownTimeStamp = now;
-        lastPointerDownPos = {
-          x: event.pageX,
-          y: event.pageY,
-        };
+        lastPointerDownPos = newPos;
       }
 
       // mouse middle
