@@ -1,4 +1,4 @@
-import { EventEmitter } from '@suika/common';
+import { EventEmitter, shallowCompare } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type Editor } from '../editor';
@@ -86,6 +86,7 @@ export class HostEventManager {
 
   private bindMouseRecordEvent() {
     let pointerDownTimeStamp = -Infinity;
+    let lastPointerDownPos: IPoint = { x: -9999, y: -9999 };
 
     const handlePointerEvent = (event: PointerEvent) => {
       // mouse left
@@ -93,12 +94,18 @@ export class HostEventManager {
         const now = new Date().getTime();
         if (
           now - pointerDownTimeStamp <
-          this.editor.setting.get('continueSelectMaxGap')
+            this.editor.setting.get('continueSelectMaxGap') &&
+          event.pageX === lastPointerDownPos.x &&
+          event.pageY === lastPointerDownPos.y
         ) {
           pointerDownTimeStamp = now;
           this.eventEmitter.emit('continueClick');
         }
         pointerDownTimeStamp = now;
+        lastPointerDownPos = {
+          x: event.pageX,
+          y: event.pageY,
+        };
       }
 
       // mouse middle
