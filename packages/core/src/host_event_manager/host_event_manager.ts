@@ -1,4 +1,4 @@
-import { EventEmitter, shallowCompare } from '@suika/common';
+import { EventEmitter } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type Editor } from '../editor';

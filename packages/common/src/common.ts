@@ -30,17 +30,6 @@ export const objectNameGenerator = {
 };
 
 /**
- * 浅比较
- */
-type IObject = Record<string | symbol, any>;
-
-export const shallowCompare = (a: IObject, b: IObject) => {
-  for (const i in a) if (!(i in b)) return true;
-  for (const i in b) if (a[i] !== b[i]) return true;
-  return false;
-};
-
-/**
  * 找出离 value 最近的 segment 的倍数值
  */
 export const getClosestTimesVal = (value: number, segment: number) => {
