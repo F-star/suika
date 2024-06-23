@@ -55,7 +55,7 @@ export class SelectTool implements ITool {
   };
 
   // double click to active path editor
-  private onDblClick = () => {
+  private onContinueClick = () => {
     const point = this.editor.toolManager.getCurrPoint();
     const editor = this.editor;
     const handleInfo = editor.controlHandleManager.getHandleInfoByPoint(point);
@@ -92,14 +92,14 @@ export class SelectTool implements ITool {
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.canvasElement.addEventListener('dblclick', this.onDblClick);
+    this.editor.hostEventManager.on('continueClick', this.onContinueClick);
   }
   onInactive() {
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.canvasElement.removeEventListener('dblclick', this.onDblClick);
+    this.editor.hostEventManager.off('continueClick', this.onContinueClick);
     this.editor.render();
   }
 

@@ -11,6 +11,7 @@ interface Events {
   spaceToggle(press: boolean): void;
   wheelBtnToggle(press: boolean, event: PointerEvent): void;
   contextmenu(point: IPoint): void;
+  continueClick(): void;
 }
 
 /**
@@ -84,26 +85,42 @@ export class HostEventManager {
   }
 
   private bindMouseRecordEvent() {
-    const handler = (event: PointerEvent) => {
-      if (event.button !== 1) return;
+    let pointerDownTimeStamp = -Infinity;
 
-      const prevWheelBtnPressing = this.isWheelBtnPressing;
-      this.isWheelBtnPressing = event.type === 'pointerdown';
-      if (prevWheelBtnPressing !== this.isWheelBtnPressing) {
-        this.eventEmitter.emit(
-          'wheelBtnToggle',
-          this.isWheelBtnPressing,
-          event,
-        );
+    const handlePointerEvent = (event: PointerEvent) => {
+      // mouse left
+      if (event.button === 0 && event.type === 'pointerdown') {
+        const now = new Date().getTime();
+        if (
+          now - pointerDownTimeStamp <
+          this.editor.setting.get('continueSelectMaxGap')
+        ) {
+          pointerDownTimeStamp = now;
+          this.eventEmitter.emit('continueClick');
+        }
+        pointerDownTimeStamp = now;
+      }
+
+      // mouse middle
+      if (event.button === 1) {
+        const prevWheelBtnPressing = this.isWheelBtnPressing;
+        this.isWheelBtnPressing = event.type === 'pointerdown';
+        if (prevWheelBtnPressing !== this.isWheelBtnPressing) {
+          this.eventEmitter.emit(
+            'wheelBtnToggle',
+            this.isWheelBtnPressing,
+            event,
+          );
+        }
       }
     };
 
-    document.addEventListener('pointerdown', handler);
-    document.addEventListener('pointerup', handler);
+    document.addEventListener('pointerdown', handlePointerEvent);
+    document.addEventListener('pointerup', handlePointerEvent);
 
     this.unbindHandlers.push(() => {
-      document.removeEventListener('pointerdown', handler);
-      document.removeEventListener('pointerup', handler);
+      document.removeEventListener('pointerdown', handlePointerEvent);
+      document.removeEventListener('pointerup', handlePointerEvent);
     });
   }
 
