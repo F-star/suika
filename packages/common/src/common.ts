@@ -7,8 +7,17 @@ export const noop = () => {
 /**
  * 生成唯一 ID
  */
-export const genId = () => {
+export const genUuid = () => {
   return uuidv4();
+};
+
+export const increaseIdGenerator = () => {
+  let count = 0;
+  return () => {
+    const id = String(count);
+    count++;
+    return id;
+  };
 };
 
 export const objectNameGenerator = {

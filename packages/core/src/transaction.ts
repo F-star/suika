@@ -8,23 +8,30 @@ export class Transaction {
   private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
   private removedIds = new Set<string>();
   private newIds = new Set<string>();
+  private isCommitDone = false;
 
   constructor(private editor: Editor) {}
 
   recordOld(id: string, attrs: Partial<GraphicsAttrs>) {
     this.originAttrsMap.set(id, attrs);
+    return this;
   }
 
   update(id: string, attrs: Partial<GraphicsAttrs>) {
     this.updatedAttrsMap.set(id, attrs);
+    return this;
   }
 
   remove(id: string) {
     this.removedIds.add(id);
+    return this;
   }
 
-  newId(id: string) {
-    this.newIds.add(id);
+  addNewIds(ids: string[]) {
+    for (const id of ids) {
+      this.newIds.add(id);
+    }
+    return this;
   }
 
   updateParentSize(elements: SuikaGraphics[]) {
@@ -34,6 +41,7 @@ export class Transaction {
       this.originAttrsMap,
       this.updatedAttrsMap,
     );
+    return this;
   }
 
   updateNodeSize(idSet: Set<string>) {
@@ -43,9 +51,15 @@ export class Transaction {
       this.originAttrsMap,
       this.updatedAttrsMap,
     );
+    return this;
   }
 
   commit(desc: string) {
+    if (this.isCommitDone) {
+      console.error('It had committed before, can not commit again!');
+      return;
+    }
+
     // TODO: check duplicated id between removeIds and newIds
     this.editor.commandManager.pushCommand(
       new UpdateGraphicsAttrsCmd(
@@ -57,5 +71,7 @@ export class Transaction {
         this.newIds,
       ),
     );
+
+    this.isCommitDone = true;
   }
 }

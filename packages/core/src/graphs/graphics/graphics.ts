@@ -1,7 +1,7 @@
 import {
   calcCoverScale,
   cloneDeep,
-  genId,
+  genUuid,
   objectNameGenerator,
   omit,
   parseRGBToHex,
@@ -81,7 +81,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
 
     this.attrs = { ...attrs } as ATTRS;
-    this.attrs.id ??= genId();
+    this.attrs.id ??= genUuid();
     this.attrs.transform = transform;
 
     if (this.attrs.objectName) {
@@ -904,6 +904,19 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
 
   getSortIndex() {
     return this.attrs.parentIndex?.position ?? '';
+  }
+
+  getNextSibling() {
+    const parent = this.getParent();
+    if (!parent) {
+      return null;
+    }
+    const children = parent.getChildren();
+    const index = children.findIndex((item) => item === this);
+    if (index == -1) {
+      console.warn('index should not be -1!');
+    }
+    return children[index + 1] ?? null;
   }
 
   getSortIndexPath() {

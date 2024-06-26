@@ -1,10 +1,19 @@
-import { arrMap, noop, omit } from '@suika/common';
+import { genUuid, increaseIdGenerator, noop } from '@suika/common';
+import {
+  boxToRect,
+  invertMatrix,
+  mergeBoxes,
+  multiplyMatrix,
+} from '@suika/geo';
+import { generateNKeysBetween } from 'fractional-indexing';
 
-import { AddGraphCmd } from './commands/add_graphs';
 import { type Editor } from './editor';
-import { SuikaGraphics } from './graphs';
+import { type GraphicsAttrs, isFrameGraphics, SuikaGraphics } from './graphs';
+import { isCanvasGraphics } from './graphs/canvas';
 import { toSVG } from './to_svg';
+import { Transaction } from './transaction';
 import { type IEditorPaperData } from './type';
+import { getChildNodeSet } from './utils';
 
 /**
  * Clipboard Manager
@@ -88,21 +97,123 @@ export class ClipboardManager {
   }
 
   private getSelectedItemsSnapshot() {
-    const selectedItems = this.editor.selectedElements.getItems();
+    const selectedItems = SuikaGraphics.sortGraphics(
+      this.editor.selectedElements.getItems(),
+    );
     if (selectedItems.length === 0) {
       return null;
     }
 
-    // remove id attr
-    const copiedData = arrMap(selectedItems, (item) =>
-      omit(item.getAttrs(), 'id'),
-    );
+    const idGenerator = increaseIdGenerator();
+    const replacedIdMap = new Map<string, string>();
+    const copiedData: GraphicsAttrs[] = [];
+
+    for (const item of selectedItems) {
+      const attrs = item.getAttrs();
+      attrs.transform = item.getWorldTransform();
+      attrs.parentIndex = undefined;
+      const tmpId = idGenerator();
+      replacedIdMap.set(attrs.id, tmpId);
+      attrs.id = tmpId;
+
+      copiedData.push(attrs);
+    }
+
+    const childNodes = getChildNodeSet(selectedItems);
+    for (const item of childNodes) {
+      const attrs = item.getAttrs();
+      const tmpId = idGenerator();
+      replacedIdMap.set(attrs.id, tmpId);
+      attrs.id = tmpId;
+
+      if (attrs.parentIndex) {
+        attrs.parentIndex.guid = replacedIdMap.get(attrs.parentIndex.guid)!;
+      }
+
+      copiedData.push(attrs);
+    }
 
     return JSON.stringify({
       appVersion: this.editor.appVersion,
       paperId: this.editor.paperId,
-      data: JSON.stringify(copiedData),
+      data: copiedData,
     });
+  }
+
+  /**
+   * update parentIndex.guid and transform for attributes array
+   * @param attrsArr attribute array
+   * @returns top parent count
+   */
+  private updateAttrsParentIndex(attrsArr: GraphicsAttrs[]): number {
+    /**
+     * TODO: to finish
+     * （逻辑待梳理）
+     * 如果选中一个 group 节点。按顺序粘贴子节点中的到最上方
+     * 如果选中一个非 group 节点，按顺序粘贴到它的上方
+     * 如果选中多个节点。等价于选中最靠上的那一个节点，应用上面两种情况之一的效果
+     *
+     * 选中单个 group 后，然后粘贴的位置依旧是这个 group，在 group 后粘贴。
+     */
+    let left: string | null = null;
+    let right: string | null = null;
+    const firstGraphics =
+      SuikaGraphics.sortGraphics(this.editor.selectedElements.getItems()).at(
+        -1,
+      ) ?? this.editor.doc.getCurrCanvas();
+    let parent = firstGraphics;
+
+    if (isCanvasGraphics(firstGraphics) || isFrameGraphics(firstGraphics)) {
+      left = firstGraphics.getMaxChildIndex();
+    } else {
+      parent = firstGraphics.getParent()!;
+      left = firstGraphics.getSortIndex();
+      const nextSibling = firstGraphics.getNextSibling();
+      right = nextSibling ? nextSibling.getSortIndex() : null;
+    }
+
+    const parentId = parent.attrs.id;
+    const parentInvertWorldTf = invertMatrix(parent.getWorldTransform());
+
+    let i = 0;
+    while (i < attrsArr.length) {
+      const attrs = attrsArr[i];
+      if (attrs.parentIndex) {
+        break;
+      }
+      i++;
+    }
+
+    const topGraphicsCount = i;
+    const sortIndies = generateNKeysBetween(left, right, topGraphicsCount);
+
+    // top parent node
+    const oldNewIdMap = new Map<string, string>();
+    for (let j = 0; j < topGraphicsCount; j++) {
+      const attrs = attrsArr[j];
+      attrs.parentIndex = {
+        guid: parentId,
+        position: sortIndies[j],
+      };
+
+      const newId = genUuid();
+      oldNewIdMap.set(attrs.id, newId);
+      attrs.id = newId;
+
+      attrs.transform = multiplyMatrix(parentInvertWorldTf, attrs.transform);
+    }
+
+    // child node
+    while (i < attrsArr.length) {
+      const attrs = attrsArr[i];
+      const newId = genUuid();
+      oldNewIdMap.set(attrs.id, newId);
+      attrs.id = newId;
+      attrs.parentIndex!.guid = oldNewIdMap.get(attrs.parentIndex!.guid)!;
+      i++;
+    }
+
+    return topGraphicsCount;
   }
 
   private addGraphsFromClipboard(dataStr: string): void;
@@ -130,20 +241,23 @@ export class ClipboardManager {
     }
 
     const editor = this.editor;
-    const pastedGraphs = editor.sceneGraph.parseStrAndAddGraphics(
-      pastedData.data,
-    );
-    if (pastedGraphs.length === 0) {
+    if (pastedData.data.length === 0) {
       return;
     }
 
-    // TODO: duplicated objectName should be renamed
-    editor.commandManager.pushCommand(
-      new AddGraphCmd('pasted graphs', editor, pastedGraphs),
+    const topGraphicsCount = this.updateAttrsParentIndex(pastedData.data);
+    const pastedGraphicsArr = editor.sceneGraph.createGraphicsArr(
+      pastedData.data,
     );
-    editor.selectedElements.setItems(pastedGraphs);
+    editor.sceneGraph.addItems(pastedGraphicsArr);
+    editor.sceneGraph.initGraphicsTree(pastedGraphicsArr);
 
-    const boundingRect = editor.selectedElements.getBoundingRect()!;
+    const selectedItems = pastedGraphicsArr.slice(0, topGraphicsCount);
+    editor.selectedElements.setItems(selectedItems);
+
+    const boundingRect = boxToRect(
+      mergeBoxes(selectedItems.map((item) => item.getBbox())),
+    );
     if (
       (x === undefined || y === undefined) &&
       pastedData.paperId !== editor.paperId
@@ -157,9 +271,18 @@ export class ClipboardManager {
       const dx = x - boundingRect.x;
       const dy = y - boundingRect.y;
       if (dx || dy) {
-        SuikaGraphics.dMove(pastedGraphs, dx, dy);
+        SuikaGraphics.dMove(selectedItems, dx, dy);
       }
     }
+
+    // TODO: duplicated objectName should be renamed
+
+    const transaction = new Transaction(editor);
+    transaction
+      .addNewIds(pastedGraphicsArr.map((item) => item.attrs.id))
+      .updateParentSize(selectedItems)
+      .commit('pasted graphs');
+
     editor.render();
   }
 

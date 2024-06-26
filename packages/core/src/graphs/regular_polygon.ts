@@ -1,4 +1,4 @@
-import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   getPointsBbox,
   getRegularPolygon,
@@ -40,7 +40,7 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
   }
 
   override getAttrs(): RegularPolygonAttrs {
-    return { ...this.attrs, count: this.attrs.count };
+    return cloneDeep({ ...this.attrs, count: this.attrs.count });
   }
 
   override toJSON() {

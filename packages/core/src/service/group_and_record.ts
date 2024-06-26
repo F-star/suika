@@ -62,7 +62,7 @@ export const groupAndRecord = (
   const groupInvertTf = invertMatrix(group.getWorldTransform());
 
   const transaction = new Transaction(editor);
-  transaction.newId(group.attrs.id);
+  transaction.addNewIds([group.attrs.id]);
 
   for (const graphics of graphicsArr) {
     transaction.recordOld(graphics.attrs.id, {

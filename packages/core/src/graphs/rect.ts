@@ -1,4 +1,4 @@
-import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   type IMatrixArr,
   type IPoint,
@@ -38,7 +38,10 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
   }
 
   override getAttrs(): RectAttrs {
-    return { ...this.attrs, cornerRadius: this.attrs.cornerRadius ?? 0 };
+    return cloneDeep({
+      ...this.attrs,
+      cornerRadius: this.attrs.cornerRadius ?? 0,
+    });
   }
 
   override toJSON() {
