@@ -1,4 +1,4 @@
-import { parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   getPointsBbox,
   getStar,
@@ -41,7 +41,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
   }
 
   override getAttrs(): StarAttrs {
-    return { ...this.attrs, count: this.attrs.count };
+    return cloneDeep({ ...this.attrs, count: this.attrs.count });
   }
 
   override toJSON() {

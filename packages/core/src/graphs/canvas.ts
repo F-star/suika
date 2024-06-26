@@ -24,3 +24,9 @@ export class SuikaCanvas extends SuikaGraphics<SuikaCanvasAttrs> {
     return identityMatrix();
   }
 }
+
+export const isCanvasGraphics = (
+  graphics: SuikaGraphics,
+): graphics is SuikaCanvas => {
+  return graphics instanceof SuikaCanvas;
+};

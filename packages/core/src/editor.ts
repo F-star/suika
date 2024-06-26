@@ -1,5 +1,5 @@
 import {
-  genId,
+  genUuid,
   sceneCoordsToViewportUtil,
   viewportCoordsToSceneUtil,
 } from '@suika/common';
@@ -155,7 +155,7 @@ export class Editor {
       );
       this.sceneGraph.addItems([canvas]);
     }
-    this.paperId ??= genId();
+    this.paperId ??= genUuid();
     this.autoSaveGraphs.autoSave();
 
     // 设置初始视口
@@ -186,7 +186,7 @@ export class Editor {
     this.sceneGraph.load(data.data);
     this.commandManager.clearRecords();
     this.paperId = data.paperId;
-    this.paperId ??= genId();
+    this.paperId ??= genUuid();
   }
   destroy() {
     this.containerElement.removeChild(this.canvasElement);

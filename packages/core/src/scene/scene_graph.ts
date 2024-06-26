@@ -56,12 +56,8 @@ export class SceneGraph {
     this.grid = new Grid(editor);
   }
 
-  addItems(graphicsArr: SuikaGraphics[], idx?: number) {
-    if (idx === undefined) {
-      this.children.push(...graphicsArr);
-    } else {
-      this.children.splice(idx, 0, ...graphicsArr);
-    }
+  addItems(graphicsArr: SuikaGraphics[]) {
+    this.children.push(...graphicsArr);
 
     for (const graph of graphicsArr) {
       this.editor.doc.graphicsStore.add(graph);
@@ -346,10 +342,8 @@ export class SceneGraph {
     return JSON.stringify(paperData);
   }
 
-  parseStrAndAddGraphics(info: GraphicsAttrs[]) {
-    const data: GraphicsAttrs[] = info;
-
-    const newChildren: SuikaGraphics[] = [];
+  createGraphicsArr(data: GraphicsAttrs[]) {
+    const children: SuikaGraphics[] = [];
     for (const attrs of data) {
       const type = attrs.type;
       const Ctor = graphCtorMap[type!];
@@ -357,15 +351,14 @@ export class SceneGraph {
         console.error(`Unsupported graph type "${attrs.type}", ignore it`);
         continue;
       }
-      newChildren.push(new Ctor(attrs as any, { doc: this.editor.doc }));
+      children.push(new Ctor(attrs as any, { doc: this.editor.doc }));
     }
-    this.addItems(newChildren);
-    return newChildren;
+    return children;
   }
 
-  initGraphicsTree() {
+  initGraphicsTree(graphicsArr: SuikaGraphics[]) {
     const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
-    for (const graphics of this.children) {
+    for (const graphics of graphicsArr) {
       const parent = graphics.getParent() ?? canvasGraphics;
       if (parent && parent !== graphics) {
         parent.insertChild(graphics, graphics.attrs.parentIndex?.position);
@@ -374,15 +367,10 @@ export class SceneGraph {
   }
 
   load(info: GraphicsAttrs[]) {
-    /**
-     * 1. 找出 document 节点，额外保存起来。
-     * document 只能有一个，否则为错误数据
-     *
-     * 2. 构造成树结构
-     */
     this.children = [];
-    this.parseStrAndAddGraphics(info);
-    this.initGraphicsTree();
+    const graphicsArr = this.createGraphicsArr(info);
+    this.addItems(graphicsArr);
+    this.initGraphicsTree(graphicsArr);
   }
 
   on(eventName: 'render', handler: () => void) {
