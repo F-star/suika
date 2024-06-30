@@ -160,10 +160,12 @@ export class HostEventManager {
         if (isZoomOut) {
           editor.zoomManager.zoomOut({
             center: point,
+            deltaY: event.deltaY,
           });
         } else {
           editor.zoomManager.zoomIn({
             center: point,
+            deltaY: event.deltaY,
           });
         }
         editor.render();

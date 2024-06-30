@@ -100,10 +100,7 @@ export class ZoomManager {
   }
 
   private deltaYToZoomStep(deltaY: number) {
-    return Math.max(
-      0.035,
-      0.12937973 * Math.log(Math.abs(deltaY)) - 0.33227472,
-    );
+    return Math.max(0.05, 0.12937973 * Math.log(Math.abs(deltaY)) - 0.33227472);
   }
 
   /**
