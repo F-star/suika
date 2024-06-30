@@ -57,16 +57,7 @@ export class ViewportManager {
     this.scrollY += dy;
     this.eventEmitter.emit('xOrYChange', this.scrollX, this.scrollY);
   }
-  // getBbox(): IRect {
-  //   const { x, y, width, height } = this.getViewport();
-  //   const zoom = this.editor.zoomManager.getZoom();
-  //   return {
-  //     x: x,
-  //     y: y,
-  //     width: width / zoom,
-  //     height: height / zoom,
-  //   };
-  // }
+
   getBbox(): IBox {
     const { x, y, width, height } = this.getViewport();
     const zoom = this.editor.zoomManager.getZoom();

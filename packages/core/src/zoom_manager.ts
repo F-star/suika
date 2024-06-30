@@ -3,6 +3,12 @@ import { boxToRect, type IPoint, type IRect } from '@suika/geo';
 
 import { type Editor } from './editor';
 
+interface IZoomOptions {
+  center?: IPoint;
+  isLevelZoom?: boolean;
+  deltaY?: number;
+}
+
 interface Events {
   zoomChange(zoom: number, prevZoom: number): void;
 }
@@ -45,16 +51,18 @@ export class ZoomManager {
    * @param center zoom center
    * @param enableLevel zoom by level
    */
-  zoomIn(opts?: { center?: IPoint; enableLevel?: boolean }) {
-    const zoomStep = this.editor.setting.get('zoomStep');
+  zoomIn(opts?: IZoomOptions) {
     const prevZoom = this.zoom;
 
     let zoom: number;
-    if (opts?.enableLevel) {
+    if (opts?.isLevelZoom) {
       const levels = this.editor.setting.get('zoomLevels');
       const [, right] = getNearestVals(levels, prevZoom);
       zoom = right;
     } else {
+      const zoomStep = opts?.deltaY
+        ? this.deltaYToZoomStep(opts.deltaY)
+        : this.editor.setting.get('zoomStep');
       zoom = Math.min(
         prevZoom * (1 + zoomStep),
         this.editor.setting.get('zoomMax'),
@@ -70,15 +78,17 @@ export class ZoomManager {
    * @param center zoom center
    * @param enableLevel zoom by level
    */
-  zoomOut(opts?: { center?: IPoint; enableLevel?: boolean }) {
-    const zoomStep = this.editor.setting.get('zoomStep');
+  zoomOut(opts?: IZoomOptions) {
     const prevZoom = this.zoom;
     let zoom: number;
-    if (opts?.enableLevel) {
+    if (opts?.isLevelZoom) {
       const levels = this.editor.setting.get('zoomLevels');
       const [left] = getNearestVals(levels, prevZoom);
       zoom = left;
     } else {
+      const zoomStep = opts?.deltaY
+        ? this.deltaYToZoomStep(opts.deltaY)
+        : this.editor.setting.get('zoomStep');
       zoom = Math.max(
         prevZoom / (1 + zoomStep),
         this.editor.setting.get('zoomMin'),
@@ -88,6 +98,14 @@ export class ZoomManager {
     this.setZoom(zoom);
     this.adjustScroll(prevZoom, opts?.center);
   }
+
+  private deltaYToZoomStep(deltaY: number) {
+    return Math.max(
+      0.035,
+      0.12937973 * Math.log(Math.abs(deltaY)) - 0.33227472,
+    );
+  }
+
   /**
    * make origin in viewport center
    * and set zoom 100%

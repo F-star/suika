@@ -127,7 +127,7 @@ export class CommandKeyBinding {
 
     // zoom in
     const zoomInAction = () => {
-      editor.zoomManager.zoomIn({ enableLevel: true });
+      editor.zoomManager.zoomIn({ isLevelZoom: true });
       editor.render();
     };
     editor.keybindingManager.register({
@@ -139,7 +139,7 @@ export class CommandKeyBinding {
 
     // zoom out
     const zoomOutAction = () => {
-      editor.zoomManager.zoomOut({ enableLevel: true });
+      editor.zoomManager.zoomOut({ isLevelZoom: true });
       editor.render();
     };
     editor.keybindingManager.register({
