@@ -5,6 +5,7 @@ import {
   objectNameGenerator,
   omit,
   parseRGBToHex,
+  pick,
 } from '@suika/common';
 import {
   boxToRect,
@@ -63,6 +64,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   private _deleted = false;
   private _sortDirty = false;
 
+  private noCollectUpdate: boolean;
+
   constructor(
     attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
     opts: IGraphicsOpts,
@@ -89,6 +92,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     } else {
       this.attrs.objectName = objectNameGenerator.gen(this.attrs.type ?? '');
     }
+
+    this.noCollectUpdate = Boolean(opts?.noCollectUpdate);
   }
 
   getAttrs(): ATTRS {
@@ -114,6 +119,12 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this._cacheMinBbox = null;
   }
 
+  private updatedKeys = new Set<string>();
+
+  getUpdatedAttrs() {
+    return pick(this.attrs, [...this.updatedKeys]);
+  }
+
   updateAttrs(
     partialAttrs: Partial<GraphicsAttrs> & IAdvancedAttrs,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -133,22 +144,37 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
 
     if (!partialAttrs.transform) {
-      if (partialAttrs.x !== undefined) {
-        this.attrs.transform[4] = partialAttrs.x;
-      }
-      if (partialAttrs.y !== undefined) {
-        this.attrs.transform[5] = partialAttrs.y;
+      if (partialAttrs.x !== undefined || partialAttrs.y !== undefined) {
+        const tf = cloneDeep(this.attrs.transform);
+        if (partialAttrs.x) {
+          tf[4] = partialAttrs.x;
+        }
+        if (partialAttrs.y) {
+          tf[5] = partialAttrs.y;
+        }
+        this.attrs.transform = tf;
+        this.updatedKeys.add('transform');
       }
     }
 
     if (partialAttrs.rotate !== undefined) {
       this.setRotate(partialAttrs.rotate);
     }
-    partialAttrs = omit(partialAttrs, 'x', 'y', 'rotate');
+    partialAttrs = omit(partialAttrs, 'x', 'y', 'rotate', 'strokeWidth');
     for (const key in partialAttrs) {
+      this.updatedKeys.add(key);
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       (this.attrs as any)[key] = partialAttrs[key as keyof typeof partialAttrs];
     }
+
+    // TODO: 通知 doc，doc 再做协同上的同步。
+    if (!this.noCollectUpdate) {
+      this.doc.collectUpdatedGraphics(this.attrs.id);
+    }
+  }
+
+  cancelCollectUpdate() {
+    this.noCollectUpdate = true;
   }
 
   getStrokeWidth() {

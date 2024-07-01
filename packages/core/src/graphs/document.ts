@@ -25,4 +25,26 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   getCurrCanvas() {
     return this.graphicsStore.getCanvas();
   }
+
+  private updatedGraphicsIds = new Set<string>();
+  collectUpdatedGraphics(id: string) {
+    this.updatedGraphicsIds.add(id);
+  }
+
+  getDeltas() {
+    const deltas = [];
+    for (const id of this.updatedGraphicsIds) {
+      const graphics = this.getGraphicsById(id);
+      if (!graphics) {
+        console.error(`graphics ${id} is lost!`);
+        continue;
+      }
+      deltas.push({
+        type: 'update',
+        id,
+        payload: graphics.getUpdatedAttrs(),
+      });
+    }
+    return deltas;
+  }
 }

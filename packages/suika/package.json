@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
+    "@hocuspocus/provider": "^2.13.2",
     "@suika/common": "workspace:^",
     "@suika/components": "workspace:^",
     "@suika/core": "workspace:^",
@@ -25,7 +26,8 @@
     "react-intl": "^6.3.2",
     "react-scripts": "5.0.1",
     "sass": "^1.57.1",
-    "stats.js": "^0.17.0"
+    "stats.js": "^0.17.0",
+    "yjs": "^13.6.17"
   },
   "devDependencies": {
     "@types/react": "^18.2.25",

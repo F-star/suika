@@ -12,6 +12,7 @@
     "dev": "run-p common:dev icons:dev components:dev geo:dev core:dev app:dev",
     "all:build": "pnpm -r exec pnpm run build",
     "app:dev": "pnpm --filter @suika/suika dev",
+    "server:dev": "pnpm -filter @suika/doc-server run dev",
     "app:build": "pnpm --filter @suika/suika build",
     "storybook": "pnpm --filter @suika/components storybook",
     "components:build": "pnpm --filter @suika/components build",

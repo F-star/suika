@@ -1,7 +1,8 @@
 import './Editor.scss';
 
+import { HocuspocusProvider } from '@hocuspocus/provider';
 import { throttle } from '@suika/common';
-import { Editor as GraphEditor } from '@suika/core';
+import { Editor as GraphicsEditor } from '@suika/core';
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../context';
@@ -16,11 +17,26 @@ const leftRightMargin = 240 * 2;
 const Editor: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [editor, setEditor] = useState<GraphEditor | null>(null);
+  const [editor, setEditor] = useState<GraphicsEditor | null>(null);
 
   useEffect(() => {
     if (containerRef.current) {
-      const editor = new GraphEditor({
+      // TODO: 加入 new HocuspocusProvider
+
+      // const provider = new HocuspocusProvider({
+      //   url: 'ws://127.0.0.1:5678',
+      //   name: 'example-document',
+      // });
+
+      // const tasks = provider.document.getArray('task');
+
+      // tasks.observe(() => {
+      //   console.log('tasks were modified');
+      // });
+
+      // tasks.push(['buy milk']);
+
+      const editor = new GraphicsEditor({
         containerElement: containerRef.current,
         width: document.body.clientWidth - leftRightMargin,
         height: document.body.clientHeight - topMargin,

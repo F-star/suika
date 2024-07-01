@@ -42,4 +42,5 @@ export interface IGraphicsOpts {
   // advance attribute, will convert to 'attrs.transform'
   advancedAttrs?: IAdvancedAttrs;
   doc: SuikaDocument;
+  noCollectUpdate?: boolean;
 }

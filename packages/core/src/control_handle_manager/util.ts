@@ -142,12 +142,13 @@ export const createTransformHandles = (
 
   const opts = {
     doc,
+    noCollectChange: true,
   };
 
   /********************** resize handle  *******************/
   // north-west
   const nw = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'nw',
         ...getDefaultAttrs(),
@@ -161,7 +162,7 @@ export const createTransformHandles = (
   });
 
   const ne = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'ne',
         ...getDefaultAttrs(),
@@ -175,7 +176,7 @@ export const createTransformHandles = (
   });
 
   const se = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'se',
         ...getDefaultAttrs(),
@@ -189,7 +190,7 @@ export const createTransformHandles = (
   });
 
   const sw = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'sw',
         ...getDefaultAttrs(),
@@ -205,7 +206,7 @@ export const createTransformHandles = (
   /************************* rotation handle  **********************/
   const rotationHandleSize = params.size * 2.5;
   const nwRotation = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'nwRotation',
         ...getDefaultAttrs(),
@@ -221,7 +222,7 @@ export const createTransformHandles = (
   });
 
   const neRotation = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'neRotation',
         ...getDefaultAttrs(),
@@ -237,7 +238,7 @@ export const createTransformHandles = (
   });
 
   const seRotation = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'seRotation',
         ...getDefaultAttrs(),
@@ -253,7 +254,7 @@ export const createTransformHandles = (
   });
 
   const swRotation = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'swRotation',
         ...getDefaultAttrs(),
@@ -279,11 +280,11 @@ export const createTransformHandles = (
     if (!rect || rect.width === 0 || rect.height === 0) {
       return false;
     }
-    return this.graph.hitTest(x, y, tol);
+    return this.graphics.hitTest(x, y, tol);
   };
 
   const n = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'n',
         ...getDefaultAttrs(),
@@ -297,7 +298,7 @@ export const createTransformHandles = (
     isTransformHandle: true,
   });
   const e = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'e',
         ...getDefaultAttrs(),
@@ -312,7 +313,7 @@ export const createTransformHandles = (
   });
 
   const s = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 's',
         ...getDefaultAttrs(),
@@ -327,7 +328,7 @@ export const createTransformHandles = (
   });
 
   const w = new ControlHandle({
-    graph: new SuikaRect(
+    graphics: new SuikaRect(
       {
         objectName: 'w',
         ...getDefaultAttrs(),

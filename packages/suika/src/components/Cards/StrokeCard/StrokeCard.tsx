@@ -86,7 +86,9 @@ export const StrokeCard: FC = () => {
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
     });
 
     return newStrokes;
@@ -119,7 +121,9 @@ export const StrokeCard: FC = () => {
 
     const selectItems = editor.selectedElements.getItems();
     selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
     });
     pushToHistory('Update Stroke', selectItems, newStrokes);
     editor.render();
