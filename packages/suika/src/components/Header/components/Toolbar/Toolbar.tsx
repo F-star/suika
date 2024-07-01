@@ -92,7 +92,7 @@ export const ToolBar = () => {
     },
     pencil: {
       name: 'pencil',
-      hotkey: '',
+      hotkey: '⇧P',
       intlId: 'tool.pencil',
       icon: <PencilOutlined />,
     },

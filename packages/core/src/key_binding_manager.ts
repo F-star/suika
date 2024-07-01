@@ -2,7 +2,7 @@ import { isWindows } from '@suika/common';
 
 import { type Editor } from './editor';
 
-interface IKey {
+export interface IKey {
   ctrlKey?: boolean;
   shiftKey?: boolean;
   altKey?: boolean;
@@ -124,6 +124,8 @@ export class KeyBindingManager {
   }
 
   register(keybinding: IKeyBinding) {
+    console.log(keybinding);
+
     const id = this.id;
     this.keyBindingMap.set(id, keybinding);
 

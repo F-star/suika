@@ -8,7 +8,7 @@ import { SuikaPath } from '../graphs';
 import { type ITool } from './type';
 
 const TYPE = 'pencil';
-const HOTKEY = '';
+const HOTKEY = { shiftKey: true, keyCode: 'KeyP' };
 
 export class PencilTool implements ITool {
   static readonly type = TYPE;
