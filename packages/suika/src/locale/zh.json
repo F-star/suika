@@ -48,6 +48,9 @@
   "showOrHide": "显示/隐藏",
   "lockOrUnlock": "锁定/解锁",
 
+  "flip.horizontal": "水平翻转",
+  "flip.vertical": "垂直翻转",
+
   "import.originFile": "从本地导入",
   "export.originFile": "导出到本地",
 

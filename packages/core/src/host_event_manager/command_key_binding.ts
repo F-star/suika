@@ -7,6 +7,8 @@ import {
 } from '../graphs';
 import {
   arrangeAndRecord,
+  flipHorizontalAndRecord,
+  flipVerticalAndRecord,
   MutateGraphsAndRecord,
   ungroupAndRecord,
 } from '../service';
@@ -303,6 +305,32 @@ export class CommandKeyBinding {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Lock/Unlock',
       action: lockOrUnlockAction,
+    });
+
+    /******* flip vertical *****/
+    const flipVerticalAction = () => {
+      flipVerticalAndRecord(editor, editor.selectedElements.getItems());
+      editor.render();
+    };
+    editor.keybindingManager.register({
+      key: { shiftKey: true, keyCode: 'KeyV' },
+      winKey: { shiftKey: true, keyCode: 'KeyV' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'FlipVertical',
+      action: flipVerticalAction,
+    });
+
+    /******* flip horizontal *****/
+    const flipHorizontalAction = () => {
+      flipHorizontalAndRecord(editor, editor.selectedElements.getItems());
+      editor.render();
+    };
+    editor.keybindingManager.register({
+      key: { shiftKey: true, keyCode: 'KeyH' },
+      winKey: { shiftKey: true, keyCode: 'KeyH' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'FlipHorizontal',
+      action: flipHorizontalAction,
     });
 
     /******** enter path edit *******/
