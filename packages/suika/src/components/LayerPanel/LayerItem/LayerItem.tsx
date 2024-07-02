@@ -4,6 +4,7 @@ import { type IObject } from '@suika/core';
 import {
   HideOutlined,
   LockFilled,
+  PointSolid,
   ShowOutlined,
   SmallCaretDownSolid,
   UnlockFilled,
@@ -23,7 +24,9 @@ interface IProps extends IBaseEvents {
   activeIds?: string[];
   hlId?: string;
   visible: boolean;
+  visibleSecond?: boolean;
   lock: boolean;
+  lockSecond?: boolean;
 }
 
 const LayerItem: FC<IProps> = ({
@@ -36,7 +39,9 @@ const LayerItem: FC<IProps> = ({
   level = 0,
   hlId,
   visible,
+  visibleSecond = true,
   lock,
+  lockSecond = false,
   toggleVisible,
   toggleLock,
   setHlId,
@@ -83,13 +88,16 @@ const LayerItem: FC<IProps> = ({
 
   const isHl = hlId === id;
 
+  const finalVisible = visible && visibleSecond;
+  const finalLock = lock || lockSecond;
+
   return (
     <>
       <div
         className={classNames('sk-layer-item', {
           'sk-active': active,
           'sk-active-second': active ? false : activeSecond,
-          'sk-hidden': !visible,
+          'sk-hidden': !finalVisible,
           'sk-hover': isHl,
           'sk-editing': isEditing,
         })}
@@ -105,7 +113,7 @@ const LayerItem: FC<IProps> = ({
         onDoubleClick={handleDbClick}
       >
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
-        <div style={{ width: 20, color: '#ccc' }}>
+        <div className="sk-group-collapse-btn">
           {children?.length ? <SmallCaretDownSolid /> : undefined}
         </div>
         {!isEditing && (
@@ -131,13 +139,19 @@ const LayerItem: FC<IProps> = ({
           <span
             className="sk-action-btn"
             style={{
-              visibility: lock ? 'visible' : undefined,
+              visibility: finalLock ? 'visible' : undefined,
             }}
             onMouseDown={() => {
               toggleLock(id);
             }}
           >
-            {lock ? <LockFilled /> : <UnlockFilled />}
+            {lock ? (
+              <LockFilled />
+            ) : lockSecond ? (
+              <PointSolid />
+            ) : (
+              <UnlockFilled />
+            )}
           </span>
 
           {/* visible button */}
@@ -149,13 +163,19 @@ const LayerItem: FC<IProps> = ({
           <span
             className="sk-action-btn"
             style={{
-              visibility: !visible ? 'visible' : undefined,
+              visibility: !finalVisible ? 'visible' : undefined,
             }}
             onMouseDown={() => {
               toggleVisible && toggleVisible(id);
             }}
           >
-            {visible ? <ShowOutlined /> : <HideOutlined />}
+            {!visible ? (
+              <HideOutlined />
+            ) : !visibleSecond ? (
+              <PointSolid />
+            ) : (
+              <ShowOutlined />
+            )}
           </span>
         </div>
       </div>
@@ -173,7 +193,9 @@ const LayerItem: FC<IProps> = ({
               activeIds={activeIds}
               hlId={hlId}
               visible={item.visible}
+              visibleSecond={finalVisible}
               lock={item.lock}
+              lockSecond={finalLock}
               setName={setName}
               toggleVisible={toggleVisible}
               toggleLock={toggleLock}

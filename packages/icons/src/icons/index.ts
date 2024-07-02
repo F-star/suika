@@ -9,6 +9,7 @@ export * from './line-width-outlined';
 export * from './lock-filled';
 export * from './pen-outlined';
 export * from './pencil-outlined';
+export * from './point-solid';
 export * from './remove-outlined';
 export * from './right-outlined';
 export * from './show-outlined';
