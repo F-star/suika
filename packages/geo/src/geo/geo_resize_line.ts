@@ -1,6 +1,6 @@
 import { type IPoint, type ITransformRect } from '../type';
 import { getSweepAngle } from './geo_angle';
-import { closestPolarPt } from './geo_line';
+import { getPolarTrackSnapPt } from './geo_line';
 import { Matrix } from './geo_matrix_class';
 import { distance } from './geo_point';
 
@@ -49,7 +49,7 @@ export const resizeLine = (
   }
 
   if (options.keepPolarSnap) {
-    newPos = closestPolarPt(globalOrigin, newPos);
+    newPos = getPolarTrackSnapPt(globalOrigin, newPos);
   }
 
   let width = distance(newPos, globalOrigin);

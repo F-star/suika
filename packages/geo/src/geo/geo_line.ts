@@ -35,7 +35,7 @@ export const closestPtOnLine = (
 /**
  * get closest point of polar coords. 0, 45, 90, 135, 150
  */
-export const closestPolarPt = (center: IPoint, p: IPoint, count = 4) => {
+export const getPolarTrackSnapPt = (center: IPoint, p: IPoint, count = 4) => {
   let closestPt: IPoint = { x: 0, y: 0 };
   let closestDist = Infinity;
   for (let i = 1; i <= count; i++) {
@@ -46,6 +46,9 @@ export const closestPolarPt = (center: IPoint, p: IPoint, count = 4) => {
     };
     const { point } = closestPtOnLine(center, pt, p);
     const dist = distance(point, p);
+    if (dist === 0) {
+      return point;
+    }
     if (dist < closestDist) {
       closestDist = dist;
       closestPt = point;
