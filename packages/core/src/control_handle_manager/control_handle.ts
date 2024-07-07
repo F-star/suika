@@ -21,7 +21,7 @@ export class ControlHandle {
   rotation?: number;
   transform?: IMatrixArr;
   type: string;
-  graph: SuikaGraphics;
+  graphics: SuikaGraphics;
   padding: number;
   /** rotation will follow rotated bbox */
   isTransformHandle: boolean;
@@ -35,7 +35,7 @@ export class ControlHandle {
     rotation?: number;
     transform?: IMatrixArr;
     padding?: number;
-    graph: SuikaGraphics;
+    graphics: SuikaGraphics;
     hitTest?: HitTest;
     getCursor: GetCursorFn;
     isTransformHandle?: boolean;
@@ -50,11 +50,13 @@ export class ControlHandle {
     }
     this.type = attrs.type;
     this.padding = attrs.padding ?? 0;
-    this.graph = attrs.graph;
+    this.graphics = attrs.graphics;
     this.getCursor = attrs.getCursor;
     if (attrs.hitTest) {
       this.hitTest = attrs.hitTest;
     }
     this.isTransformHandle = attrs.isTransformHandle ?? false;
+
+    this.graphics.cancelCollectUpdate();
   }
 }

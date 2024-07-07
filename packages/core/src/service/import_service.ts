@@ -3,7 +3,7 @@ import { type Editor } from '../editor';
 export const importService = {
   importOriginFile: (editor: Editor) => {
     readTextFile('.suika', (content) => {
-      editor.loadData(JSON.parse(content));
+      editor.setContents(JSON.parse(content));
     });
   },
 };

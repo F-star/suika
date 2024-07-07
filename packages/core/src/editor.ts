@@ -1,4 +1,5 @@
 import {
+  EventEmitter,
   genUuid,
   sceneCoordsToViewportUtil,
   viewportCoordsToSceneUtil,
@@ -10,6 +11,7 @@ import { ClipboardManager } from './clipboard';
 import { CommandManager } from './commands/command_manager';
 import { ControlHandleManager } from './control_handle_manager';
 import { CursorManger, type ICursor } from './cursor_manager';
+import { type GraphicsAttrs } from './graphs';
 import { SuikaCanvas } from './graphs/canvas';
 import { SuikaDocument } from './graphs/document';
 import { HostEventManager } from './host_event_manager';
@@ -23,10 +25,9 @@ import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
 import { SelectedElements } from './selected_elements';
 import { Setting } from './setting';
-import { AutoSaveGraphs } from './store/auto-save-graphs';
 import { TextEditor } from './text/text_editor';
 import { ToolManager } from './tools';
-import { type IEditorPaperData } from './type';
+import { type IChanges, type IEditorPaperData } from './type';
 import { ViewportManager } from './viewport_manager';
 import { ZoomManager } from './zoom_manager';
 
@@ -39,6 +40,10 @@ interface IEditorOptions {
   showPerfMonitor?: boolean;
 }
 
+interface Events {
+  destroy(): void;
+}
+
 export class Editor {
   containerElement: HTMLDivElement;
   canvasElement: HTMLCanvasElement;
@@ -46,6 +51,8 @@ export class Editor {
 
   appVersion = 'suika-editor_0.0.2';
   paperId: string;
+
+  private emitter = new EventEmitter<Events>();
 
   doc: SuikaDocument;
   sceneGraph: SceneGraph;
@@ -73,7 +80,6 @@ export class Editor {
   textEditor: TextEditor;
   pathEditor: PathEditor;
 
-  autoSaveGraphs: AutoSaveGraphs;
   perfMonitor: PerfMonitor;
 
   constructor(options: IEditorOptions) {
@@ -126,47 +132,30 @@ export class Editor {
     this.clipboard = new ClipboardManager(this);
     this.clipboard.bindEvents();
 
-    this.autoSaveGraphs = new AutoSaveGraphs(this);
-
     this.imgManager.on('added', () => {
       this.render();
     });
 
-    const data = this.autoSaveGraphs.load();
-    if (data) {
-      if (data.appVersion !== this.appVersion) {
-        if (confirm('编辑器版本和图纸版本不兼容，将清空本地缓存')) {
-          this.autoSaveGraphs.clear();
-        }
-      } else {
-        this.loadData(data);
-      }
-    }
-    if (this.sceneGraph.children.length === 0) {
-      const canvas = new SuikaCanvas(
-        {
-          objectName: 'Canvas',
-          width: 0,
-          height: 0,
-        },
-        {
-          doc: this.doc,
-        },
-      );
-      this.sceneGraph.addItems([canvas]);
-    }
-    this.paperId ??= genUuid();
-    this.autoSaveGraphs.autoSave();
+    this.paperId = genUuid();
 
-    // 设置初始视口
+    const canvas = new SuikaCanvas(
+      {
+        objectName: 'Canvas',
+        width: 0,
+        height: 0,
+      },
+      {
+        doc: this.doc,
+      },
+    );
+    this.sceneGraph.addItems([canvas]);
+
     this.viewportManager.setViewport({
       x: -options.width / 2,
       y: -options.height / 2,
       width: options.width,
       height: options.height,
     });
-
-    this.zoomManager.zoomToFit(1);
 
     this.perfMonitor = new PerfMonitor();
     if (options.showPerfMonitor) {
@@ -182,12 +171,28 @@ export class Editor {
     });
   }
 
-  loadData(data: IEditorPaperData) {
+  setContents(data: IEditorPaperData) {
     this.sceneGraph.load(data.data);
     this.commandManager.clearRecords();
-    this.paperId = data.paperId;
-    this.paperId ??= genUuid();
+    this.paperId = data.paperId ?? genUuid();
+
+    if (!this.doc.getCurrCanvas()) {
+      const canvas = new SuikaCanvas(
+        {
+          objectName: 'Canvas',
+          width: 0,
+          height: 0,
+        },
+        {
+          doc: this.doc,
+        },
+      );
+      this.sceneGraph.addItems([canvas]);
+    }
+
+    this.zoomManager.zoomToFit(1);
   }
+
   destroy() {
     this.containerElement.removeChild(this.canvasElement);
     this.textEditor.destroy();
@@ -199,6 +204,7 @@ export class Editor {
     this.toolManager.destroy();
     this.perfMonitor.destroy();
     this.controlHandleManager.unbindEvents();
+    this.emitter.emit('destroy');
   }
   setCursor(cursor: ICursor) {
     this.cursorManager.setCursor(cursor);
@@ -252,5 +258,39 @@ export class Editor {
       .filter((item) => item.isVisible());
     if (children.length === 0) return null;
     return mergeBoxes(children.map((item) => item.getBbox()));
+  }
+
+  applyChanges(changes: IChanges) {
+    const addedGraphicsArr: GraphicsAttrs[] = [];
+    for (const [, attrs] of changes.added) {
+      addedGraphicsArr.push(attrs);
+    }
+    this.sceneGraph.load(addedGraphicsArr, true);
+
+    for (const [id, partialAttrs] of changes.update) {
+      const graphics = this.doc.getGraphicsById(id);
+      if (!graphics) {
+        console.warn(`graphics ${id} is not exist`);
+        continue;
+      }
+      graphics.updateAttrs(partialAttrs);
+    }
+
+    for (const id of changes.deleted) {
+      const graphics = this.doc.getGraphicsById(id);
+      if (!graphics) {
+        console.warn(`graphics ${id} is not exist`);
+        continue;
+      }
+      graphics.setDeleted(true);
+      graphics.removeFromParent();
+    }
+  }
+
+  on<T extends keyof Events>(eventName: T, listener: Events[T]) {
+    this.emitter.on(eventName, listener);
+  }
+  off<T extends keyof Events>(eventName: T, listener: Events[T]) {
+    this.emitter.off(eventName, listener);
   }
 }

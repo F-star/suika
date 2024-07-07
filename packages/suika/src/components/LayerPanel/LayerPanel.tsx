@@ -46,7 +46,7 @@ export const LayerPanel: FC = () => {
 
   const setEditorHlId = (id: string) => {
     if (editor) {
-      const graph = editor.sceneGraph.getElementById(id) ?? null;
+      const graph = editor.doc.getGraphicsById(id) ?? null;
 
       editor.selectedElements.setHighlightedItem(graph);
       editor.render();
@@ -55,7 +55,7 @@ export const LayerPanel: FC = () => {
 
   const setName = (id: string, newName: string) => {
     if (editor) {
-      const graph = editor.sceneGraph.getElementById(id);
+      const graph = editor.doc.getGraphicsById(id);
       if (graph && graph.attrs.objectName !== newName) {
         MutateGraphsAndRecord.setGraphName(editor, graph, newName);
         editor.render();
@@ -65,7 +65,7 @@ export const LayerPanel: FC = () => {
 
   const toggleVisible = (id: string) => {
     if (editor) {
-      const graph = editor.sceneGraph.getElementById(id);
+      const graph = editor.doc.getGraphicsById(id);
       if (graph) {
         MutateGraphsAndRecord.toggleVisible(editor, [graph]);
         editor.render();
@@ -75,7 +75,7 @@ export const LayerPanel: FC = () => {
 
   const toggleLock = (id: string) => {
     if (editor) {
-      const graph = editor.sceneGraph.getElementById(id);
+      const graph = editor.doc.getGraphicsById(id);
       if (graph) {
         MutateGraphsAndRecord.toggleLock(editor, [graph]);
         editor.render();

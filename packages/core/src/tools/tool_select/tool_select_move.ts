@@ -5,6 +5,7 @@ import { type Editor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
 import { Transaction } from '../../transaction';
 import { type IBaseTool } from '../type';
+import { getTopHitElement } from './utils';
 
 /**
  * select tool
@@ -164,7 +165,7 @@ export class SelectMoveTool implements IBaseTool {
     if (!isDragHappened) {
       // clear selected elements if click on blank area and not dragging
       const point = this.editor.getSceneCursorXY(e);
-      const topHitElement = this.editor.sceneGraph.getTopHitElement(point);
+      const topHitElement = getTopHitElement(this.editor, point);
       if (!topHitElement && !this.editor.hostEventManager.isShiftPressing) {
         this.editor.selectedElements.clear();
       }

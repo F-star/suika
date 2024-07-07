@@ -166,14 +166,14 @@ export class ControlHandleManager {
     const s = this.transformHandles.get('s')!;
     const w = this.transformHandles.get('w')!;
     const e = this.transformHandles.get('e')!;
-    n.graph.attrs.width = s.graph.attrs.width =
+    n.graphics.attrs.width = s.graphics.attrs.width =
       rect.width * zoom - handleSize - handleStrokeWidth;
-    w.graph.attrs.height = e.graph.attrs.height =
+    w.graphics.attrs.height = e.graphics.attrs.height =
       rect.height * zoom - handleSize - handleStrokeWidth;
-    n.graph.attrs.height =
-      s.graph.attrs.height =
-      w.graph.attrs.width =
-      e.graph.attrs.width =
+    n.graphics.attrs.height =
+      s.graphics.attrs.height =
+      w.graphics.attrs.width =
+      e.graphics.attrs.width =
         neswHandleWidth;
 
     const heightTransform = new Matrix()
@@ -208,7 +208,7 @@ export class ControlHandleManager {
     const ctx = this.editor.ctx;
     const rotate = rect ? getTransformAngle(rect.transform) : 0;
     handles.forEach((handle) => {
-      const graph = handle.graph;
+      const graph = handle.graphics;
       if (graph.type === GraphicsType.Path) {
         // TODO:
       } else {
@@ -281,7 +281,7 @@ export class ControlHandleManager {
             handle.padding,
             selectedBox,
           )
-        : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
+        : handle.graphics.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
 
       if (isHit) {
         return {
@@ -315,7 +315,7 @@ export class ControlHandleManager {
       maxY: bottomRight.y,
     };
     return this.customHandles.filter((handle) =>
-      handle.graph.intersectWithBox(box),
+      handle.graphics.intersectWithBox(box),
     );
   }
 
