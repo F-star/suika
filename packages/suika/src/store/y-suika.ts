@@ -16,6 +16,9 @@ export class SuikaBinding {
   // editor --> remote
   private suikaObserve = (ops: IChanges) => {
     const yMap = this.yMap;
+    console.log('[[editor --> remote]]');
+    console.log(ops);
+
     this.doc.transact(() => {
       for (const [id, attrs] of ops.added) {
         yMap.set(id, attrs);
@@ -31,7 +34,6 @@ export class SuikaBinding {
         }
       }
     }, this);
-    console.log('editor --> remote', ops);
   };
 
   // remote --> editor
@@ -40,7 +42,7 @@ export class SuikaBinding {
     if (event.transaction.origin == this) {
       return;
     }
-    console.log('remote --> editor');
+    console.log('[[remote --> editor]]');
     console.log('------ y.js event.changes ------');
     console.log(event.changes);
     const changes: IChanges = {
@@ -53,6 +55,7 @@ export class SuikaBinding {
         const attrs = yMap.get(id);
         changes.added.set(id, attrs as GraphicsAttrs);
       } else if (action === 'update') {
+        // TODO: don't update if attrs is same
         changes.update.set(id, yMap.get(id) as GraphicsAttrs);
       } else if (action === 'delete') {
         changes.deleted.add(id);
