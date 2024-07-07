@@ -9,9 +9,8 @@ export class AddGraphCmd implements ICommand {
     private elements: SuikaGraphics[],
   ) {}
   redo() {
-    // TODO: 放回原来的 parent 下
-    this.editor.sceneGraph.addItems(this.elements);
     for (const el of this.elements) {
+      el.setDeleted(false);
       const parent = el.getParent();
       if (parent) {
         parent.insertChild(el, el.attrs.parentIndex?.position);
@@ -21,12 +20,9 @@ export class AddGraphCmd implements ICommand {
     this.editor.selectedElements.setItems(this.elements);
   }
   undo() {
-    this.editor.sceneGraph.removeItems(this.elements);
     this.elements.forEach((el) => {
-      const parent = el.getParent();
-      if (parent) {
-        parent.removeChild(el);
-      }
+      el.setDeleted(true);
+      el.removeFromParent();
     });
 
     this.editor.selectedElements.clear();

@@ -1,5 +1,5 @@
-import { EventEmitter, forEach, getDevicePixelRatio } from '@suika/common';
-import { type IPoint, type IRect, rectToBox } from '@suika/geo';
+import { EventEmitter, getDevicePixelRatio } from '@suika/common';
+import { type IRect } from '@suika/geo';
 
 import { type Editor } from '../editor';
 import {
@@ -39,7 +39,6 @@ interface Events {
 }
 
 export class SceneGraph {
-  children: SuikaGraphics[] = [];
   selection: {
     x: number;
     y: number;
@@ -57,44 +56,11 @@ export class SceneGraph {
   }
 
   addItems(graphicsArr: SuikaGraphics[]) {
-    this.children.push(...graphicsArr);
-
     for (const graph of graphicsArr) {
-      this.editor.doc.graphicsStore.add(graph);
+      this.editor.doc.addGraphics(graph);
     }
   }
 
-  getItems() {
-    return this.children;
-  }
-
-  /** @deprecated */
-  getVisibleItems() {
-    // TODO: cache if items are not changed
-    return this.children.filter((item) => item.isVisible());
-  }
-
-  getElementById(id: string): SuikaGraphics | undefined {
-    return this.getElementsByIds(new Set([id]))[0];
-  }
-
-  getElementsByIds(ids: Set<string>) {
-    return this.children.filter((item) => ids.has(item.attrs.id));
-  }
-
-  removeItems(elements: SuikaGraphics[]) {
-    if (elements.length > 1) {
-      forEach(elements, (element) => {
-        this.removeItems([element]);
-      });
-    } else {
-      const element = elements[0];
-      const idx = this.children.indexOf(element);
-      if (idx !== -1) {
-        this.children.splice(idx, 1);
-      }
-    }
-  }
   // 全局重渲染
   render = rafThrottle(() => {
     // 获取视口区域
@@ -129,7 +95,7 @@ export class SceneGraph {
 
     const imgManager = this.editor.imgManager;
 
-    const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
+    const canvasGraphics = this.editor.doc.getCanvas();
     if (canvasGraphics) {
       const smooth = zoom <= 1;
       ctx.save();
@@ -254,76 +220,15 @@ export class SceneGraph {
     ctx.restore();
   }
 
-  /**
-   * @deprecated
-   */
-  getTopHitElement(point: IPoint): SuikaGraphics | null {
-    const padding =
-      this.editor.setting.get('selectionHitPadding') /
-      this.editor.zoomManager.getZoom();
-
-    let topHitElement: SuikaGraphics | null = null;
-    const parentIdSet = this.editor.selectedElements.getParentIdSet();
-
-    // TODO: optimize, use r-tree to reduce time complexity
-    for (let i = this.children.length - 1; i >= 0; i--) {
-      const el = this.children[i];
-      if (
-        el.isVisible() &&
-        !el.isLock() &&
-        el.hitTest(point.x, point.y, padding) &&
-        // parent of select graphics can't be hovered
-        !parentIdSet.has(el.attrs.id)
-      ) {
-        topHitElement = el;
-        break;
-      }
-    }
-    return topHitElement;
-  }
   setSelection(partialRect: Partial<IRect>) {
     this.selection = Object.assign({}, this.selection, partialRect);
-  }
-
-  /**
-   * get elements in selection
-   *
-   * reference: https://mp.weixin.qq.com/s/u0PUOeTryZ11eM2P2Kxwsg
-   */
-  getElementsInSelection() {
-    const selection = this.selection;
-    if (selection === null) {
-      console.warn('selection 为 null，请确认在正确的时机调用当前方法');
-      return [];
-    }
-
-    const selectionMode = this.editor.setting.get('selectionMode');
-    const elements = this.getVisibleItems();
-    const containedElements: SuikaGraphics[] = [];
-    // TODO: to optimize, use r-tree to reduce time complexity
-    const selectionBox = rectToBox(selection);
-    for (const el of elements) {
-      if (el.isLock() || el instanceof SuikaCanvas) {
-        continue;
-      }
-      let isSelected = false;
-      if (selectionMode === 'contain') {
-        isSelected = el.containWithBox(selectionBox);
-      } else {
-        isSelected = el.intersectWithBox(selectionBox);
-      }
-      if (isSelected) {
-        containedElements.push(el);
-      }
-    }
-    return containedElements;
   }
 
   /**
    * get tree data with simple info (for layer panel)
    */
   toObjects() {
-    const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
+    const canvasGraphics = this.editor.doc.getCanvas();
     if (!canvasGraphics) {
       return [];
     }
@@ -331,7 +236,8 @@ export class SceneGraph {
   }
 
   toJSON() {
-    const data = this.children
+    const data = this.editor.doc
+      .getAllGraphicsArr()
       .filter((graphics) => !graphics.isDeleted())
       .map((item) => item.toJSON());
     const paperData: IEditorPaperData = {
@@ -357,8 +263,11 @@ export class SceneGraph {
   }
 
   initGraphicsTree(graphicsArr: SuikaGraphics[]) {
-    const canvasGraphics = this.editor.doc.graphicsStore.getCanvas();
+    const canvasGraphics = this.editor.doc.getCanvas();
     for (const graphics of graphicsArr) {
+      if (graphics instanceof SuikaCanvas) {
+        continue;
+      }
       const parent = graphics.getParent() ?? canvasGraphics;
       if (parent && parent !== graphics) {
         parent.insertChild(graphics, graphics.attrs.parentIndex?.position);
@@ -366,9 +275,11 @@ export class SceneGraph {
     }
   }
 
-  load(info: GraphicsAttrs[]) {
-    this.children = [];
+  load(info: GraphicsAttrs[], isApplyChanges?: boolean) {
     const graphicsArr = this.createGraphicsArr(info);
+    if (!isApplyChanges) {
+      this.editor.doc.clear();
+    }
     this.addItems(graphicsArr);
     this.initGraphicsTree(graphicsArr);
   }

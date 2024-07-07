@@ -229,21 +229,23 @@ export const MutateGraphsAndRecord = {
   /**
    * lock / unlock
    */
-  toggleLock(editor: Editor, graphs: SuikaGraphics[]) {
-    if (graphs.length === 0) {
+  toggleLock(editor: Editor, graphicsArr: SuikaGraphics[]) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
     // if at least one graph is unlocked, lock all graphs; otherwise, unlock all graphs
-    const newLock = graphs.some((item) => !item.isLock());
-    const prevAttrs = graphs.map((el) => ({ lock: el.attrs.lock }));
-    graphs.forEach((el) => {
-      el.attrs.lock = newLock;
+    const newLock = graphicsArr.some((item) => !item.isLock());
+    const prevAttrs = graphicsArr.map((el) => ({ lock: el.attrs.lock }));
+    graphicsArr.forEach((el) => {
+      el.updateAttrs({
+        lock: newLock,
+      });
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'update lock of graphs',
-        graphs,
+        graphicsArr,
         { lock: newLock },
         prevAttrs,
       ),
@@ -251,13 +253,15 @@ export const MutateGraphsAndRecord = {
   },
 
   /** set name of graph */
-  setGraphName(editor: Editor, graph: SuikaGraphics, objectName: string) {
-    const prevAttrs = [{ objectName: graph.attrs.objectName }];
-    graph.attrs.objectName = objectName;
+  setGraphName(editor: Editor, graphics: SuikaGraphics, objectName: string) {
+    const prevAttrs = [{ objectName: graphics.attrs.objectName }];
+    graphics.updateAttrs({
+      objectName,
+    });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
         'update name of graph',
-        [graph],
+        [graphics],
         { objectName },
         prevAttrs,
       ),

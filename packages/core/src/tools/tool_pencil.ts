@@ -91,7 +91,7 @@ export class PencilTool implements ITool {
         new AddGraphCmd('Add Path by pencil', this.editor, [path]),
       );
     } else {
-      this.editor.sceneGraph.removeItems([path]);
+      path.setDeleted(true);
     }
   }
 

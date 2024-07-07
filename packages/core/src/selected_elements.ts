@@ -41,7 +41,7 @@ export class SelectedElements {
     return new Set(this.items.map((item) => item.attrs.id));
   }
   setItemsById(ids: Set<string>) {
-    const items = this.editor.sceneGraph.getElementsByIds(ids);
+    const items = this.editor.doc.getGraphicsArrByIds(ids);
 
     if (items.length === 0) {
       console.warn('can not find element by id');
@@ -94,7 +94,7 @@ export class SelectedElements {
     }
   }
   toggleItemById(id: string, opts?: { disableParentAndChildCoexist: boolean }) {
-    const toggledElement = this.editor.sceneGraph.getElementById(id);
+    const toggledElement = this.editor.doc.getGraphicsById(id);
     if (!toggledElement) {
       console.warn('can not find element by id');
       return;

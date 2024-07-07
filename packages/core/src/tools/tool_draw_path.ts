@@ -113,8 +113,8 @@ export class DrawPathTool implements ITool {
       );
       this.path = path;
 
-      this.editor.doc.getCurrCanvas().insertChild(path);
       this.editor.sceneGraph.addItems([path]);
+      this.editor.doc.getCurrCanvas().insertChild(path);
       this.editor.commandManager.batchCommandStart();
       this.editor.commandManager.pushCommand(
         new AddGraphCmd('Add Path', this.editor, [path]),
@@ -322,7 +322,7 @@ export class DrawPathTool implements ITool {
           cy: point.y,
           type: 'path-preview-curve',
           getCursor: () => 'default',
-          graph: new SuikaPath(
+          graphics: new SuikaPath(
             {
               objectName: 'path-preview-curve',
               width: 0,
@@ -380,7 +380,7 @@ export class DrawPathTool implements ITool {
       cy: point.y,
       type: 'path-preview-anchor',
       getCursor: () => 'default',
-      graph: new SuikaEllipse(
+      graphics: new SuikaEllipse(
         {
           objectName: 'path-preview-anchor',
           width: 6,

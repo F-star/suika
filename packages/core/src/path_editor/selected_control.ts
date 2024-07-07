@@ -145,7 +145,7 @@ export class SelectedControl {
           cx: anchor.x,
           cy: anchor.y,
           type: ['anchor', i, j].join('-'),
-          graph: new SuikaEllipse(
+          graphics: new SuikaEllipse(
             {
               objectName: 'anchor',
               width: anchorSize,
@@ -206,7 +206,7 @@ export class SelectedControl {
             cy: rect.y + rect.height / 2,
             type: 'handleLine',
             rotation: rect.rotation,
-            graph: new SuikaLine(
+            graphics: new SuikaLine(
               {
                 objectName: 'handleLine',
                 height: rect.height,
@@ -235,7 +235,7 @@ export class SelectedControl {
             cx: handle.x,
             cy: handle.y,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
-            graph: new SuikaRegularPolygon(
+            graphics: new SuikaRegularPolygon(
               {
                 objectName: 'pathHandle',
                 width: size,
