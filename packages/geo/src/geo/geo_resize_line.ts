@@ -6,7 +6,7 @@ import { distance } from './geo_point';
 
 /**
  * Get the new position of the line when resizing
- * we consider the graph with 0 height as a line
+ * we consider the graphics with 0 height as a line
  *
  * TODO: reuse, this is something same code in tool_draw_graph.ts
  */

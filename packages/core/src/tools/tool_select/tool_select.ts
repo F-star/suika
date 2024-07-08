@@ -38,7 +38,7 @@ export class SelectTool implements ITool {
   private readonly strategySelectRotation: SelectRotationTool;
   private readonly strategySelectResize: SelectResizeTool;
 
-  /** the graph should be removed from selected if not moved */
+  /** the graphics should be removed from selected if not moved */
   private graphShouldRemovedFromSelectedIfNotMoved: SuikaGraphics | null = null;
 
   constructor(private editor: SuikaEditor) {

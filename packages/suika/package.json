@@ -1,7 +1,7 @@
 {
   "name": "@suika/suika",
   "version": "0.0.1",
-  "description": "a graph editor.",
+  "description": "a graphics editor.",
   "private": true,
   "type": "module",
   "scripts": {

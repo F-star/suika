@@ -223,7 +223,7 @@ export class ClipboardManager {
     try {
       pastedData = JSON.parse(dataStr);
     } catch (e) {
-      // TODO: create text graph from pastedData
+      // TODO: create text graphics from pastedData
       return;
     }
 
@@ -236,7 +236,7 @@ export class ClipboardManager {
         pastedData.data
       )
     ) {
-      // TODO: create text graph from pastedData
+      // TODO: create text graphics from pastedData
       return;
     }
 

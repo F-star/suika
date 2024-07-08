@@ -161,7 +161,7 @@ export class ControlHandleManager {
       handle.cy = point.y;
     }
 
-    // update n/s/w/e handle graph size
+    // update n/s/w/e handle graphics size
     const n = this.transformHandles.get('n')!;
     const s = this.transformHandles.get('s')!;
     const w = this.transformHandles.get('w')!;
@@ -208,37 +208,37 @@ export class ControlHandleManager {
     const ctx = this.editor.ctx;
     const rotate = rect ? getTransformAngle(rect.transform) : 0;
     handles.forEach((handle) => {
-      const graph = handle.graphics;
-      if (graph.type === GraphicsType.Path) {
+      const graphics = handle.graphics;
+      if (graphics.type === GraphicsType.Path) {
         // TODO:
       } else {
         const { x, y } = this.editor.sceneCoordsToViewport(
           handle.cx,
           handle.cy,
         );
-        graph.updateAttrs({
+        graphics.updateAttrs({
           transform: [
             1,
             0,
             0,
             1,
-            x - graph.attrs.width / 2,
-            y - graph.attrs.height / 2,
+            x - graphics.attrs.width / 2,
+            y - graphics.attrs.height / 2,
           ],
         });
       }
       if (rect && handle.isTransformHandle) {
-        graph.setRotate(rotate);
+        graphics.setRotate(rotate);
       }
       if (handle.rotation !== undefined) {
-        graph.setRotate(handle.rotation);
+        graphics.setRotate(handle.rotation);
       }
 
-      if (!graph.isVisible()) {
+      if (!graphics.isVisible()) {
         return;
       }
       ctx.save();
-      graph.draw(ctx);
+      graphics.draw(ctx);
       ctx.restore();
     });
   }

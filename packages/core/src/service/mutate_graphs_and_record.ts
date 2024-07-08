@@ -208,7 +208,7 @@ export const MutateGraphsAndRecord = {
   },
 
   /**
-   * show graphs when at least one graph is hidden
+   * show graphs when at least one graphics is hidden
    * and
    * hide graphs when all graphs are shown
    */
@@ -216,7 +216,7 @@ export const MutateGraphsAndRecord = {
     if (graphicsArr.length === 0) {
       return;
     }
-    // if at least one graph is hidden, show all graphs; otherwise, hide all graphs
+    // if at least one graphics is hidden, show all graphs; otherwise, hide all graphs
     const newVal = graphicsArr.some((item) => !item.isVisible());
 
     const transaction = new Transaction(editor);
@@ -242,7 +242,7 @@ export const MutateGraphsAndRecord = {
       return;
     }
 
-    // if at least one graph is unlocked, lock all graphs; otherwise, unlock all graphs
+    // if at least one graphics is unlocked, lock all graphs; otherwise, unlock all graphs
     const newLock = graphicsArr.some((item) => !item.isLock());
     const prevAttrs = graphicsArr.map((el) => ({ lock: el.attrs.lock }));
     graphicsArr.forEach((el) => {
@@ -260,7 +260,7 @@ export const MutateGraphsAndRecord = {
     );
   },
 
-  /** set name of graph */
+  /** set name of graphics */
   setGraphName(
     editor: SuikaEditor,
     graphics: SuikaGraphics,
@@ -272,7 +272,7 @@ export const MutateGraphsAndRecord = {
     });
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
-        'update name of graph',
+        'update name of graphics',
         [graphics],
         { objectName },
         prevAttrs,

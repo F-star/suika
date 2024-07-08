@@ -56,8 +56,8 @@ export class SceneGraph {
   }
 
   addItems(graphicsArr: SuikaGraphics[]) {
-    for (const graph of graphicsArr) {
-      this.editor.doc.addGraphics(graph);
+    for (const graphics of graphicsArr) {
+      this.editor.doc.addGraphics(graphics);
     }
   }
 
@@ -116,7 +116,7 @@ export class SceneGraph {
       this.grid.draw();
     }
 
-    /** draw hover graph outline and its control handle */
+    /** draw hover graphics outline and its control handle */
     if (this.highlightLayersOnHover && setting.get('highlightLayersOnHover')) {
       const hlItem = selectedElements.getHighlightedItem();
       if (hlItem && !selectedElements.hasItem(hlItem)) {
@@ -195,7 +195,7 @@ export class SceneGraph {
   });
 
   private drawGraphsOutline(
-    graphs: SuikaGraphics[],
+    graphicsArr: SuikaGraphics[],
     strokeWidth: number,
     stroke: string,
   ) {
@@ -212,9 +212,9 @@ export class SceneGraph {
     ctx.translate(dx, dy);
 
     strokeWidth /= zoom;
-    for (const graph of graphs) {
+    for (const graphics of graphicsArr) {
       ctx.save();
-      graph.drawOutline(ctx, stroke, strokeWidth);
+      graphics.drawOutline(ctx, stroke, strokeWidth);
       ctx.restore();
     }
     ctx.restore();
@@ -254,7 +254,7 @@ export class SceneGraph {
       const type = attrs.type;
       const Ctor = graphCtorMap[type!];
       if (!Ctor) {
-        console.error(`Unsupported graph type "${attrs.type}", ignore it`);
+        console.error(`Unsupported graphics type "${attrs.type}", ignore it`);
         continue;
       }
       children.push(new Ctor(attrs as any, { doc: this.editor.doc }));

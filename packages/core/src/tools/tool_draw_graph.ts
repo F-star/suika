@@ -28,7 +28,7 @@ export abstract class DrawGraphTool implements ITool {
   /** lastPoint with snap when dragging */
   private lastMousePoint!: IPoint;
   /**
-   * use to calculate the offset, to change the graph's start point
+   * use to calculate the offset, to change the graphics's start point
    */
   private startPointWhenSpaceDown: IPoint | null = null;
   private lastDragPointWhenSpaceDown: IPoint | null = null;
@@ -119,8 +119,8 @@ export abstract class DrawGraphTool implements ITool {
     this.updateRect();
   }
   /**
-   * create graph, and give the original rect (width may be negative)
-   * noMove: if true, the graph will not move when drag
+   * create graphics, and give the original rect (width may be negative)
+   * noMove: if true, the graphics will not move when drag
    */
   protected abstract createGraph(
     rect: IRect,
@@ -137,7 +137,7 @@ export abstract class DrawGraphTool implements ITool {
   }
 
   /**
-   * update graph, and give the original rect (width may be negative)
+   * update graphics, and give the original rect (width may be negative)
    */
   protected updateGraph(rect: IRect) {
     rect = normalizeRect(rect);
@@ -194,9 +194,9 @@ export abstract class DrawGraphTool implements ITool {
       height, // height may be negative
     };
 
-    // whether to set the starting point as the center of the graph
+    // whether to set the starting point as the center of the graphics
     const isStartPtAsCenter = this.editor.hostEventManager.isAltPressing;
-    // whether to keep the graph square
+    // whether to keep the graphics square
     const keepSquare = this.editor.hostEventManager.isShiftPressing;
 
     let cx = 0;

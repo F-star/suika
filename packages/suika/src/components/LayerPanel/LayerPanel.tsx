@@ -46,18 +46,18 @@ export const LayerPanel: FC = () => {
 
   const setEditorHlId = (id: string) => {
     if (editor) {
-      const graph = editor.doc.getGraphicsById(id) ?? null;
+      const graphics = editor.doc.getGraphicsById(id) ?? null;
 
-      editor.selectedElements.setHighlightedItem(graph);
+      editor.selectedElements.setHighlightedItem(graphics);
       editor.render();
     }
   };
 
   const setName = (id: string, newName: string) => {
     if (editor) {
-      const graph = editor.doc.getGraphicsById(id);
-      if (graph && graph.attrs.objectName !== newName) {
-        MutateGraphsAndRecord.setGraphName(editor, graph, newName);
+      const graphics = editor.doc.getGraphicsById(id);
+      if (graphics && graphics.attrs.objectName !== newName) {
+        MutateGraphsAndRecord.setGraphName(editor, graphics, newName);
         editor.render();
       }
     }
@@ -65,9 +65,9 @@ export const LayerPanel: FC = () => {
 
   const toggleVisible = (id: string) => {
     if (editor) {
-      const graph = editor.doc.getGraphicsById(id);
-      if (graph) {
-        MutateGraphsAndRecord.toggleVisible(editor, [graph]);
+      const graphics = editor.doc.getGraphicsById(id);
+      if (graphics) {
+        MutateGraphsAndRecord.toggleVisible(editor, [graphics]);
         editor.render();
       }
     }
@@ -75,9 +75,9 @@ export const LayerPanel: FC = () => {
 
   const toggleLock = (id: string) => {
     if (editor) {
-      const graph = editor.doc.getGraphicsById(id);
-      if (graph) {
-        MutateGraphsAndRecord.toggleLock(editor, [graph]);
+      const graphics = editor.doc.getGraphicsById(id);
+      if (graphics) {
+        MutateGraphsAndRecord.toggleLock(editor, [graphics]);
         editor.render();
       }
     }

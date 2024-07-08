@@ -169,12 +169,12 @@ export class SelectedElements {
     this.setItems(parent.getChildren().filter((item) => !item.isLock()));
   }
 
-  setHoverItem(graph: SuikaGraphics | null) {
+  setHoverItem(graphics: SuikaGraphics | null) {
     const prevHoverItem = this.hoverItem;
-    this.hoverItem = graph;
-    this.setHighlightedItem(graph);
-    if (prevHoverItem !== graph) {
-      this.eventEmitter.emit('hoverItemChange', graph, this.hoverItem);
+    this.hoverItem = graphics;
+    this.setHighlightedItem(graphics);
+    if (prevHoverItem !== graphics) {
+      this.eventEmitter.emit('hoverItemChange', graphics, this.hoverItem);
     }
   }
 
@@ -182,13 +182,13 @@ export class SelectedElements {
     return this.hoverItem;
   }
 
-  setHighlightedItem(graph: SuikaGraphics | null) {
+  setHighlightedItem(graphics: SuikaGraphics | null) {
     const prevHighlightItem = this.highlightedItem;
-    this.highlightedItem = graph;
-    if (prevHighlightItem !== graph) {
+    this.highlightedItem = graphics;
+    if (prevHighlightItem !== graphics) {
       this.eventEmitter.emit(
         'highlightedItemChange',
-        graph,
+        graphics,
         this.highlightedItem,
       );
     }
