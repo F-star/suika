@@ -1,7 +1,7 @@
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 
 export const exportService = {
-  exportOriginFile: (editor: Editor, filename = 'design') => {
+  exportOriginFile: (editor: SuikaEditor, filename = 'design') => {
     const data = editor.sceneGraph.toJSON();
     const blob = new Blob([data], {
       type: 'application/json',

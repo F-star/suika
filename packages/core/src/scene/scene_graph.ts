@@ -1,7 +1,7 @@
 import { EventEmitter, getDevicePixelRatio } from '@suika/common';
 import { type IRect } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
   SuikaEllipse,
@@ -51,7 +51,7 @@ export class SceneGraph {
   showSelectedGraphsOutline = true;
   highlightLayersOnHover = true;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.grid = new Grid(editor);
   }
 

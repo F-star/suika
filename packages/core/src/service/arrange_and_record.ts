@@ -1,12 +1,12 @@
 import { cloneDeep, swap } from '@suika/common';
 import { generateKeyBetween, generateNKeysBetween } from 'fractional-indexing';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaGraphics } from '../graphs';
 import { Transaction } from '../transaction';
 import { ArrangeType } from '../type';
 
-export const arrangeAndRecord = (editor: Editor, type: ArrangeType) => {
+export const arrangeAndRecord = (editor: SuikaEditor, type: ArrangeType) => {
   if (editor.selectedElements.size() === 0) {
     console.warn("can't arrange, no element");
   }

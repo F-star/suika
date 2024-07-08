@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
 
 import { type ControlHandle } from '../control_handle_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics, type SuikaPath } from '../graphs';
 import { removeGraphicsAndRecord } from '../service/remove_service';
 import { DrawPathTool, PathSelectTool } from '../tools';
@@ -22,7 +22,7 @@ export class PathEditor {
 
   selectedControl: SelectedControl;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.selectedControl = new SelectedControl(editor);
   }
 

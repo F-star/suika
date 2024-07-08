@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, mergeBoxes } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics } from '../graphs';
 import { Transaction } from '../transaction';
 import { AlignType } from '../type';
@@ -10,7 +10,7 @@ import { AlignType } from '../type';
  * Align graphics
  * reference: https://mp.weixin.qq.com/s/9mGZYP_EPL7r-JVjOwyotw
  */
-export const alignAndRecord = (editor: Editor, type: AlignType) => {
+export const alignAndRecord = (editor: SuikaEditor, type: AlignType) => {
   if (editor.selectedElements.size() < 2) {
     console.warn('can align zero or two elements, fail silently');
     return;

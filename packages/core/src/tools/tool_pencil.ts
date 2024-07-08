@@ -3,7 +3,7 @@ import { simplePath } from '@suika/geo';
 
 import { AddGraphCmd } from '../commands';
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaPath } from '../graphs';
 import { type ITool } from './type';
 
@@ -22,7 +22,7 @@ export class PencilTool implements ITool {
   private path: SuikaPath | null = null;
   private isFirstDrag = true;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   onActive() {
     this.editor.selectedElements.clear();
   }

@@ -1,11 +1,11 @@
 import { type IBox, type IPoint, rectToBox } from '@suika/geo';
 
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { SuikaFrame, type SuikaGraphics } from '../../graphs';
 
 /********* get top hit element ********/
 export const getTopHitElement = (
-  editor: Editor,
+  editor: SuikaEditor,
   pt: IPoint,
 ): SuikaGraphics | null => {
   const padding =
@@ -49,7 +49,7 @@ const getTopHitElementDFS = (
 
 /****** get elements in selection ******/
 export const getElementsInSelection = (
-  editor: Editor,
+  editor: SuikaEditor,
   parentIdSet: Set<string> = new Set(),
 ): SuikaGraphics[] => {
   const selection = editor.sceneGraph.selection;
@@ -70,7 +70,7 @@ export const getElementsInSelection = (
 };
 
 const getElementsInSelectionDFS = (
-  editor: Editor,
+  editor: SuikaEditor,
   box: IBox,
   node: SuikaGraphics,
   parentIdSet: Set<string>,

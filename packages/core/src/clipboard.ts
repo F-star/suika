@@ -7,7 +7,7 @@ import {
 } from '@suika/geo';
 import { generateNKeysBetween } from 'fractional-indexing';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 import { type GraphicsAttrs, isFrameGraphics, SuikaGraphics } from './graphs';
 import { isCanvasGraphics } from './graphs/canvas';
 import { toSVG } from './to_svg';
@@ -23,7 +23,7 @@ import { getChildNodeSet } from './utils';
 export class ClipboardManager {
   private unbindEvents = noop;
   private hasBindEvents = false;
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   bindEvents() {
     if (this.hasBindEvents) {

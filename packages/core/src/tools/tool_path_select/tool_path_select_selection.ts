@@ -1,7 +1,7 @@
 import { isEqual } from '@suika/common';
 import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type ISelectedIdxInfo, PathEditor } from '../../path_editor';
 import { type IBaseTool } from '../type';
 
@@ -14,7 +14,7 @@ export class DrawPathSelectionTool implements IBaseTool {
   private startSelectedControls: ISelectedIdxInfo[] = [];
   segControlsNeedDrawInStart: { pathIdx: number; segIdx: number }[] = [];
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   onActive() {
     // noop
   }

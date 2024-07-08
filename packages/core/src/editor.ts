@@ -44,7 +44,7 @@ interface Events {
   destroy(): void;
 }
 
-export class Editor {
+export class SuikaEditor {
   containerElement: HTMLDivElement;
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;

@@ -1,4 +1,4 @@
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type GraphicsAttrs } from '../graphs';
 import { type ICommand } from './type';
 
@@ -6,7 +6,7 @@ export class UpdateGraphicsAttrsCmd implements ICommand {
   static readonly type = 'UpdateGraphicsAttrs';
   constructor(
     public desc: string,
-    private editor: Editor,
+    private editor: SuikaEditor,
     private originAttrsMap: Map<string, Partial<GraphicsAttrs>>,
     private updatedAttrsMap: Map<string, Partial<GraphicsAttrs>>,
     private removedIds: Set<string> = new Set(),

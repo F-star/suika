@@ -1,4 +1,4 @@
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import {
   isGroupGraphics,
   type SuikaGraphics,
@@ -18,7 +18,7 @@ import { ArrangeType } from '../type';
 export class CommandKeyBinding {
   private isBound = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   bindKey() {
     if (this.isBound) {

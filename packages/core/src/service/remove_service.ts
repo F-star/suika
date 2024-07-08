@@ -1,5 +1,5 @@
 import { UpdateGraphicsAttrsCmd } from '../commands';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
   type SuikaFrame,
@@ -8,7 +8,7 @@ import {
 import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../utils';
 
 export const removeGraphicsAndRecord = (
-  editor: Editor,
+  editor: SuikaEditor,
   graphicsArray: SuikaGraphics[],
 ) => {
   const removeIdSet = new Set<string>();

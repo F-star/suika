@@ -14,7 +14,7 @@ import {
 import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { HALF_PI } from '../../constant';
 import { isTransformHandle } from '../../control_handle_manager';
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type GraphicsAttrs, type SuikaGraphics } from '../../graphs';
 import { SnapHelper } from '../../snap';
 import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../../utils';
@@ -38,7 +38,7 @@ export class SelectResizeTool implements IBaseTool {
   private prevLastPoint: IPoint | null = null;
   private unbind = noop;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   onActive() {
     const handler = () => {

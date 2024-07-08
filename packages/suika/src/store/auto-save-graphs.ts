@@ -1,10 +1,10 @@
 import { debounce } from '@suika/common';
-import { type Editor, type IEditorPaperData } from '@suika/core';
+import { type IEditorPaperData, type SuikaEditor } from '@suika/core';
 
 const STORE_KEY = 'suika-paper';
 
 export class AutoSaveGraphics {
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     const data = this.load();
     if (data) {
       if (data.appVersion !== editor.appVersion) {

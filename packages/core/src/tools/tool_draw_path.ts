@@ -10,7 +10,7 @@ import {
 import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaEllipse, SuikaPath } from '../graphs';
 import { PaintType } from '../paint';
 import { PathSelectTool } from './tool_path_select';
@@ -34,7 +34,7 @@ export class DrawPathTool implements ITool {
   } | null = null;
   private pathIdx = 0;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   onActive() {
     if (this.editor.pathEditor.isActive()) {
       this.path = this.editor.pathEditor.getPath()!;

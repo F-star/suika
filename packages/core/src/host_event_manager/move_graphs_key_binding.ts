@@ -1,6 +1,6 @@
 import { cloneDeep, debounce, noop } from '@suika/common';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaGraphics } from '../graphs';
 import { Transaction } from '../transaction';
 
@@ -12,7 +12,7 @@ export class MoveGraphsKeyBinding {
   private hadBound = false;
   private transaction: Transaction;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.transaction = new Transaction(editor);
   }
 

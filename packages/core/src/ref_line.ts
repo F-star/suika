@@ -6,7 +6,7 @@ import {
 } from '@suika/common';
 import { type IPoint, isBoxIntersect, rectToBox } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
   bboxToBboxWithMid,
@@ -37,7 +37,7 @@ export class RefLine {
   private toDrawVLines: IVerticalLine[] = []; // 等待绘制的垂直参照线
   private toDrawHLines: IHorizontalLine[] = []; // 等待绘制的水平参照线
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   cacheXYToBbox() {
     this.clear();

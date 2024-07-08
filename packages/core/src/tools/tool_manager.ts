@@ -1,7 +1,7 @@
 import { EventEmitter, noop } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawLineTool } from './tool_draw_line';
@@ -39,7 +39,7 @@ export class ToolManager {
 
   _unbindEvent: () => void;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.registerToolCtor(SelectTool);
     this.registerToolCtor(DrawRectTool);
     this.registerToolCtor(DrawEllipseTool);

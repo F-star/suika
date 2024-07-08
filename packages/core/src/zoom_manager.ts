@@ -1,7 +1,7 @@
 import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
 import { boxToRect, type IPoint, type IRect } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 
 interface IZoomOptions {
   center?: IPoint;
@@ -16,7 +16,7 @@ interface Events {
 export class ZoomManager {
   private zoom = 1;
   private eventEmitter = new EventEmitter<Events>();
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   getZoom() {
     return this.zoom;
   }

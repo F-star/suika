@@ -1,11 +1,11 @@
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics } from '../graphs';
 import { type ICommand } from './type';
 
 export class AddGraphCmd implements ICommand {
   constructor(
     public desc: string,
-    private editor: Editor,
+    private editor: SuikaEditor,
     private elements: SuikaGraphics[],
   ) {}
   redo() {

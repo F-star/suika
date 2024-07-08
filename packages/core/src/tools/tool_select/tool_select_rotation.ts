@@ -7,7 +7,7 @@ import {
 } from '@suika/geo';
 
 import { getRotationCursor } from '../../control_handle_manager';
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
 import { Transaction } from '../../transaction';
 import { type IBaseTool } from '../type';
@@ -35,7 +35,7 @@ export class SelectRotationTool implements IBaseTool {
     this.rotateSelectedGraphics();
   };
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.transaction = new Transaction(editor);
   }
 

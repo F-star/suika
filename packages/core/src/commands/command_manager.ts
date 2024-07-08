@@ -1,6 +1,6 @@
 import { EventEmitter } from '@suika/common';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type ICommand } from './type';
 
 export interface IHistoryStatus {
@@ -35,7 +35,7 @@ export class CommandManager {
   private emitter = new EventEmitter<Events>();
   private isBatching = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   redo() {
     if (!this.isEnableRedoUndo) {

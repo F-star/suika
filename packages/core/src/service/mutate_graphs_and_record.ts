@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics, type SuikaRect } from '../graphs';
 import { type SuikaRegularPolygon } from '../graphs/regular_polygon';
 import { type SuikaStar } from '../graphs/star';
@@ -12,7 +12,7 @@ import { GraphicsType } from '../type';
  * mutate elements and record to history
  */
 export const MutateGraphsAndRecord = {
-  setX(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+  setX(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -36,7 +36,7 @@ export const MutateGraphsAndRecord = {
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update X of Elements');
   },
-  setY(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+  setY(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -60,7 +60,7 @@ export const MutateGraphsAndRecord = {
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update Y of Elements');
   },
-  setWidth(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+  setWidth(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -76,7 +76,7 @@ export const MutateGraphsAndRecord = {
     // FIXME: update children
     transaction.commit('Update Width of Elements');
   },
-  setHeight(editor: Editor, graphicsArr: SuikaGraphics[], val: number) {
+  setHeight(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -94,7 +94,11 @@ export const MutateGraphsAndRecord = {
     // FIXME: update children
     transaction.commit('Update Height of Elements');
   },
-  setRotation(editor: Editor, graphicsArr: SuikaGraphics[], rotation: number) {
+  setRotation(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    rotation: number,
+  ) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -115,7 +119,7 @@ export const MutateGraphsAndRecord = {
     transaction.commit('Update Rotation');
   },
   setCornerRadius(
-    editor: Editor,
+    editor: SuikaEditor,
     graphicsArr: SuikaGraphics[],
     cornerRadius: number,
   ) {
@@ -143,7 +147,7 @@ export const MutateGraphsAndRecord = {
     );
   },
 
-  setCount(editor: Editor, elements: SuikaGraphics[], count: number) {
+  setCount(editor: SuikaEditor, elements: SuikaGraphics[], count: number) {
     if (elements.length === 0) {
       return;
     }
@@ -172,7 +176,11 @@ export const MutateGraphsAndRecord = {
     );
   },
 
-  setStarInnerScale(editor: Editor, elements: SuikaGraphics[], val: number) {
+  setStarInnerScale(
+    editor: SuikaEditor,
+    elements: SuikaGraphics[],
+    val: number,
+  ) {
     if (elements.length === 0) {
       return;
     }
@@ -204,7 +212,7 @@ export const MutateGraphsAndRecord = {
    * and
    * hide graphs when all graphs are shown
    */
-  toggleVisible(editor: Editor, graphicsArr: SuikaGraphics[]) {
+  toggleVisible(editor: SuikaEditor, graphicsArr: SuikaGraphics[]) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -229,7 +237,7 @@ export const MutateGraphsAndRecord = {
   /**
    * lock / unlock
    */
-  toggleLock(editor: Editor, graphicsArr: SuikaGraphics[]) {
+  toggleLock(editor: SuikaEditor, graphicsArr: SuikaGraphics[]) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -253,7 +261,11 @@ export const MutateGraphsAndRecord = {
   },
 
   /** set name of graph */
-  setGraphName(editor: Editor, graphics: SuikaGraphics, objectName: string) {
+  setGraphName(
+    editor: SuikaEditor,
+    graphics: SuikaGraphics,
+    objectName: string,
+  ) {
     const prevAttrs = [{ objectName: graphics.attrs.objectName }];
     graphics.updateAttrs({
       objectName,

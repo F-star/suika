@@ -3,7 +3,7 @@ import './cursor.css';
 import { isEqual } from '@suika/common';
 import { normalizeDegree } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { getIconSvgDataUrl } from './util';
 
 export interface ICursorRotation {
@@ -44,7 +44,7 @@ export class CursorManger {
     'crosshair',
   ]);
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.setCursor('default');
   }
 

@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPoint } from '@suika/geo';
 
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
 import { Transaction } from '../../transaction';
 import { type IBaseTool } from '../type';
@@ -23,7 +23,7 @@ export class SelectMoveTool implements IBaseTool {
   private dy = 0;
   private prevBBoxPos: IPoint = { x: -1, y: -1 };
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.transaction = new Transaction(editor);
   }
   onActive() {

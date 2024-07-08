@@ -1,5 +1,5 @@
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type ITool } from './type';
 
 const TYPE = 'drawText';
@@ -12,7 +12,7 @@ export class DrawTextTool implements ITool {
   readonly hotkey = HOTKEY;
   cursor: ICursor = 'crosshair';
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   onActive() {
     // noop
   }

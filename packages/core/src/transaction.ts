@@ -1,5 +1,5 @@
 import { UpdateGraphicsAttrsCmd } from './commands';
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 import { type GraphicsAttrs, type SuikaGraphics } from './graphs';
 import { getParentIdSet, updateNodeSize } from './utils';
 
@@ -10,7 +10,7 @@ export class Transaction {
   private newIds = new Set<string>();
   private isCommitDone = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   recordOld(id: string, attrs: Partial<GraphicsAttrs>) {
     this.originAttrsMap.set(id, attrs);

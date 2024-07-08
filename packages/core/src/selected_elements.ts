@@ -1,7 +1,7 @@
 import { EventEmitter, isSameArray } from '@suika/common';
 import { boxToRect, type IRect, mergeBoxes } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 import { isGroupGraphics, type SuikaGraphics } from './graphs';
 import { removeGraphicsAndRecord } from './service/remove_service';
 import { getParentIdSet } from './utils';
@@ -25,7 +25,7 @@ export class SelectedElements {
 
   private eventEmitter = new EventEmitter<Events>();
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   setItems(items: SuikaGraphics[]) {
     const prevItems = this.items;
     this.items = items;

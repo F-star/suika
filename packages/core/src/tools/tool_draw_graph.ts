@@ -3,7 +3,7 @@ import { type IPoint, type IRect, type ISize, normalizeRect } from '@suika/geo';
 
 import { AddGraphCmd } from '../commands/add_graphs';
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics } from '../graphs';
 import { SnapHelper } from '../snap';
 import { type ITool } from './type';
@@ -36,7 +36,7 @@ export abstract class DrawGraphTool implements ITool {
   private isDragging = false;
   private unbindEvent: () => void = noop;
 
-  constructor(protected editor: Editor) {}
+  constructor(protected editor: SuikaEditor) {}
   onActive() {
     const editor = this.editor;
     const hotkeysManager = editor.hostEventManager;

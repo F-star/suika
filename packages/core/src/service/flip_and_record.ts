@@ -1,27 +1,27 @@
 import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPoint, Matrix, mergeBoxes } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics } from '../graphs';
 import { Transaction } from '../transaction';
 import { getBoxCenter } from '../utils';
 
 export const flipHorizontalAndRecord = (
-  editor: Editor,
+  editor: SuikaEditor,
   graphicsArr: SuikaGraphics[],
 ) => {
   flipAndRecord(editor, graphicsArr, { x: -1, y: 1 });
 };
 
 export const flipVerticalAndRecord = (
-  editor: Editor,
+  editor: SuikaEditor,
   graphicsArr: SuikaGraphics[],
 ) => {
   flipAndRecord(editor, graphicsArr, { x: 1, y: -1 });
 };
 
 const flipAndRecord = (
-  editor: Editor,
+  editor: SuikaEditor,
   graphicsArr: SuikaGraphics[],
   scale: IPoint,
 ) => {
@@ -50,7 +50,7 @@ const flipAndRecord = (
 };
 
 const prependMatrixAndRecord = (
-  editor: Editor,
+  editor: SuikaEditor,
   graphicsArr: SuikaGraphics[],
   tf: IMatrixArr,
   recordDesc: string,

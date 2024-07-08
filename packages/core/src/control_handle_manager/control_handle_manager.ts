@@ -11,7 +11,7 @@ import {
 
 import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { GraphicsType } from '../type';
 import { type ControlHandle } from './control_handle';
 import { type ITransformHandleType } from './type';
@@ -43,7 +43,7 @@ export class ControlHandleManager {
   private selectedBoxRect: ITransformRect | null = null;
   enableTransformControl = true;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     const setting = editor.setting;
     this.transformHandles = createTransformHandles(
       {

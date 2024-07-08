@@ -1,7 +1,7 @@
 import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
 
 import { HALF_PI } from './constant';
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 import { rotateInCanvas } from './utils';
 
 const getStepByZoom = (zoom: number) => {
@@ -36,7 +36,7 @@ const getStepByZoom = (zoom: number) => {
 class Ruler {
   visible = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   open() {
     this.visible = true;

@@ -2,7 +2,7 @@ import { cloneDeep, parseHexToRGBA, throttle } from '@suika/common';
 import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaEllipse, SuikaLine, SuikaPath } from '../graphs';
 import { SuikaRegularPolygon } from '../graphs/regular_polygon';
 import { PaintType } from '../paint';
@@ -19,7 +19,7 @@ export class SelectedControl {
   /** 需要绘制控制点的 segment */
   private segControlsNeedDraw: { pathIdx: number; segIdx: number }[] = [];
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   getSegControlsNeedDraw() {
     return this.segControlsNeedDraw;

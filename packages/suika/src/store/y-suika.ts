@@ -1,5 +1,9 @@
 import { isEqual, pick } from '@suika/common';
-import { type Editor, type GraphicsAttrs, type IChanges } from '@suika/core';
+import {
+  type GraphicsAttrs,
+  type IChanges,
+  type SuikaEditor,
+} from '@suika/core';
 import type * as Y from 'yjs';
 import { type YMap, type YMapEvent } from 'yjs/dist/src/internals';
 
@@ -7,7 +11,10 @@ export class SuikaBinding {
   private doc: Y.Doc;
   private dataInitialed = false;
 
-  constructor(private yMap: YMap<Record<string, any>>, private suika: Editor) {
+  constructor(
+    private yMap: YMap<Record<string, any>>,
+    private suika: SuikaEditor,
+  ) {
     this.doc = yMap.doc!;
     suika.doc.on('sceneChange', this.suikaObserve);
     yMap.observe(this.yMapObserve);
