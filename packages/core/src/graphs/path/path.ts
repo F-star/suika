@@ -1,6 +1,5 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
-  addPoint,
   type IMatrixArr,
   invertMatrix,
   type IPathItem,
@@ -10,6 +9,7 @@ import {
   type ITransformRect,
   Matrix,
   multiplyMatrix,
+  pointAdd,
   resizeLine,
   resizeRect,
 } from '@suika/geo';
@@ -319,10 +319,10 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
   }
 
   static getHandleIn(seg: ISegment) {
-    return addPoint(seg.point, seg.in);
+    return pointAdd(seg.point, seg.in);
   }
   static getHandleOut(seg: ISegment) {
-    return addPoint(seg.point, seg.out);
+    return pointAdd(seg.point, seg.out);
   }
   static getSeg(pathData: IPathItem[], pathIdx: number, segIdx: number) {
     const pathDataItem = pathData[pathIdx];

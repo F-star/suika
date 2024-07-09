@@ -7,7 +7,7 @@ export const getMidPoint = (p1: IPoint, p2: IPoint) => {
   };
 };
 
-export const addPoint = (p1: IPoint, p2: IPoint) => {
+export const pointAdd = (p1: IPoint, p2: IPoint) => {
   return {
     x: p1.x + p2.x,
     y: p1.y + p2.y,
