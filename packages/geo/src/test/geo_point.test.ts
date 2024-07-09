@@ -50,6 +50,20 @@ test('isPointEqual', () => {
       },
     ),
   ).toBe(true);
+
+  expect(
+    isPointEqual(
+      {
+        x: 1,
+        y: 10,
+      },
+      {
+        x: 1.0001,
+        y: 10,
+      },
+      0.001,
+    ),
+  ).toBe(true);
 });
 
 test('distance', () => {

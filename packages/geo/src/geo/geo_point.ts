@@ -14,8 +14,11 @@ export const pointAdd = (p1: IPoint, p2: IPoint) => {
   };
 };
 
-export const isPointEqual = (p1: IPoint, p2: IPoint) =>
-  p1.x === p2.x && p1.y === p2.y;
+const TOL = 0.0000000001;
+
+export const isPointEqual = (p1: IPoint, p2: IPoint, tol = TOL) => {
+  return Math.abs(p1.x - p2.x) < tol && Math.abs(p1.y - p2.y) < tol;
+};
 
 export const distance = (p1: IPoint, p2: IPoint) => {
   return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
