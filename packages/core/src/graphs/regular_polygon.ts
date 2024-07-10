@@ -98,10 +98,11 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     },
   ) {
     const attrs = this.attrs;
-    const { fill, strokeWidth, stroke } = overrideStyle || this.attrs;
+    const { fill, strokeWidth, stroke, transform } =
+      overrideStyle || this.attrs;
 
     ctx.save();
-    ctx.transform(...attrs.transform);
+    ctx.transform(...(transform ?? attrs.transform));
 
     const points = this.getPoints();
 
@@ -130,6 +131,7 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
         }
       }
     }
+
     if (strokeWidth) {
       ctx.lineWidth = strokeWidth;
       for (const paint of stroke ?? []) {
