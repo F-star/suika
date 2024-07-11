@@ -102,7 +102,6 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
       overrideStyle || this.attrs;
 
     ctx.save();
-    // 优先使用WorldTransform
     ctx.transform(...(transform ?? attrs.transform));
 
     const points = this.getPoints();
