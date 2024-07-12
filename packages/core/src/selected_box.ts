@@ -6,7 +6,7 @@ import {
   rectToVertices,
 } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 
 interface Events {
   hoverChange(isHover: boolean): void;
@@ -17,7 +17,7 @@ export class SelectedBox {
   private eventEmitter = new EventEmitter<Events>();
   private _hover = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   isHover() {
     return this._hover;

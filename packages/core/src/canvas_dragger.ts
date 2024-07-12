@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 
 interface Events {
   activeChange(active: boolean): void;
@@ -45,7 +45,7 @@ export class CanvasDragger {
     }
   };
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
     this.editor.hostEventManager.on(
       'wheelBtnToggle',

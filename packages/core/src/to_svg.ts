@@ -2,9 +2,11 @@ import { boxToRect, mergeBoxes } from '@suika/geo';
 
 import { type SuikaGraphics } from './graphs';
 
-export const toSVG = (graphs: SuikaGraphics[]) => {
+export const toSVG = (graphicsArr: SuikaGraphics[]) => {
   // FIXME: to sort
-  const mergedBbox = mergeBoxes(graphs.map((el) => el.getBboxWithStroke()));
+  const mergedBbox = mergeBoxes(
+    graphicsArr.map((el) => el.getBboxWithStroke()),
+  );
   const mergedRect = boxToRect(mergedBbox);
   const offset = {
     x: -mergedBbox.minX,
@@ -15,8 +17,8 @@ export const toSVG = (graphs: SuikaGraphics[]) => {
   const svgTail = `</svg>`;
 
   let content = '';
-  for (const graph of graphs) {
-    content += graph.toSVGSegment(offset);
+  for (const graphics of graphicsArr) {
+    content += graphics.toSVGSegment(offset);
   }
 
   return svgHead + content + svgTail;

@@ -28,6 +28,13 @@ export const bboxToBboxWithMid = (
   };
 };
 
+export const getBoxCenter = (box: IBox) => {
+  return {
+    x: box.minX / 2 + box.maxX / 2,
+    y: box.minY / 2 + box.maxY / 2,
+  };
+};
+
 export const pointsToVLines = (points: IPoint[]): Map<number, number[]> => {
   const map = new Map<number, number[]>();
   for (const point of points) {

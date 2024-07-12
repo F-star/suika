@@ -1,4 +1,4 @@
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
   isGroupGraphics,
@@ -50,7 +50,7 @@ export const getChildNodeSet = (
 
 // 修正节点的 width/height/transform
 export const updateNodeSize = (
-  editor: Editor,
+  editor: SuikaEditor,
   idSet: Set<string>,
   originAttrsMap: Map<string, Partial<GraphicsAttrs>>,
   updatedAttrsMap: Map<string, Partial<GraphicsAttrs>>,

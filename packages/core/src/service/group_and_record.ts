@@ -7,14 +7,14 @@ import {
   multiplyMatrix,
 } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaFrame, SuikaGraphics } from '../graphs';
 import { Transaction } from '../transaction';
 import { getParentIdSet } from '../utils';
 
 export const groupAndRecord = (
   graphicsArr: SuikaGraphics[],
-  editor: Editor,
+  editor: SuikaEditor,
 ) => {
   if (graphicsArr.length === 0) {
     console.warn('graphics should not be empty');

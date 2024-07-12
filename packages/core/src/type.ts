@@ -86,3 +86,9 @@ export enum ArrangeType {
   Forward = 'Forward',
   Backward = 'Backward',
 }
+
+export interface IChanges {
+  added: Map<string, GraphicsAttrs>;
+  deleted: Set<string>;
+  update: Map<string, Partial<GraphicsAttrs>>;
+}

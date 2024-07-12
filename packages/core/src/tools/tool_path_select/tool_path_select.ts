@@ -1,5 +1,5 @@
 import { type ICursor } from '../../cursor_manager';
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type IBaseTool, type ITool } from '../type';
 import { PathSelectMoveTool } from './tool_path_select_move';
 import { DrawPathSelectionTool } from './tool_path_select_selection';
@@ -18,7 +18,7 @@ export class PathSelectTool implements ITool {
   private readonly strategyMove: PathSelectMoveTool;
   private readonly strategyDrawSelection: DrawPathSelectionTool;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.strategyMove = new PathSelectMoveTool(editor);
     this.strategyDrawSelection = new DrawPathSelectionTool(editor);
   }

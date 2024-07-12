@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaRect } from '../graphs';
 import { DrawGraphTool } from './tool_draw_graph';
 import { type ITool } from './type';
@@ -15,7 +15,7 @@ export class DrawRectTool extends DrawGraphTool implements ITool {
   override readonly type = TYPE;
   override readonly hotkey = HOTKEY;
 
-  constructor(editor: Editor) {
+  constructor(editor: SuikaEditor) {
     super(editor);
     this.commandDesc = 'Add Rect';
   }

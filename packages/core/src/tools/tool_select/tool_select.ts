@@ -2,7 +2,7 @@ import { throttle } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type ICursor, isRotationCursor } from '../../cursor_manager';
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import {
   SuikaFrame,
   type SuikaGraphics,
@@ -38,10 +38,10 @@ export class SelectTool implements ITool {
   private readonly strategySelectRotation: SelectRotationTool;
   private readonly strategySelectResize: SelectResizeTool;
 
-  /** the graph should be removed from selected if not moved */
+  /** the graphics should be removed from selected if not moved */
   private graphShouldRemovedFromSelectedIfNotMoved: SuikaGraphics | null = null;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.strategyMove = new SelectMoveTool(editor);
     this.strategyDrawSelection = new DrawSelectionTool(editor);
     this.strategySelectRotation = new SelectRotationTool(editor);

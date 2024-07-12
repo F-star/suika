@@ -27,8 +27,24 @@ export class GraphicsStore {
     return this.graphicsStore.get(id);
   }
 
+  getAll() {
+    const graphicsArr: SuikaGraphics[] = [];
+    for (const [, graphics] of this.graphicsStore) {
+      if (!graphics.isDeleted()) {
+        graphicsArr.push(graphics);
+      }
+    }
+    return graphicsArr;
+  }
+
   getCanvas() {
     const canvas = Array.from(this.canvasStore.values());
     return canvas[0];
+  }
+
+  clear() {
+    // TODO: modify this.changes
+    this.graphicsStore.clear();
+    this.canvasStore.clear();
   }
 }

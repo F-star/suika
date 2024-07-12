@@ -8,7 +8,7 @@ import {
 
 import { SetGraphsAttrsCmd } from '../../commands';
 import { type ICursor } from '../../cursor_manager';
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type ISelectedIdxInfo, PathEditor } from '../../path_editor';
 import { type ITool } from '../type';
 
@@ -27,7 +27,7 @@ export class PathSelectMoveTool implements ITool {
   private selectedControls: Readonly<ISelectedIdxInfo>[] = [];
   private startSegs: Readonly<ISegment>[] = [];
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   onActive() {
     // noop
   }

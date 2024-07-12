@@ -3,7 +3,7 @@ import { type IPoint } from '@suika/geo';
 
 import { SetGraphsAttrsCmd } from '../commands';
 import { AddGraphCmd } from '../commands/add_graphs';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaText } from '../graphs';
 import { removeGraphicsAndRecord } from '../service/remove_service';
 
@@ -13,7 +13,7 @@ export class TextEditor {
   y = -1;
   private textGraph: SuikaText | null = null;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.textarea = document.createElement('input');
     this.setStyle();
     this.inactive();

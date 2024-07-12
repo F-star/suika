@@ -1,9 +1,9 @@
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 
 export const importService = {
-  importOriginFile: (editor: Editor) => {
+  importOriginFile: (editor: SuikaEditor) => {
     readTextFile('.suika', (content) => {
-      editor.loadData(JSON.parse(content));
+      editor.setContents(JSON.parse(content));
     });
   },
 };

@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
 import { distance, type IPoint } from '@suika/geo';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { CommandKeyBinding } from './command_key_binding';
 import { MoveGraphsKeyBinding } from './move_graphs_key_binding';
 
@@ -36,7 +36,7 @@ export class HostEventManager {
   private eventEmitter = new EventEmitter<Events>();
   private unbindHandlers: Array<() => void> = [];
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.moveGraphsKeyBinding = new MoveGraphsKeyBinding(editor);
     this.commandKeyBinding = new CommandKeyBinding(editor);
   }

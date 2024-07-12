@@ -1,6 +1,6 @@
 import { getRectByTwoPoint, type IPoint } from '@suika/geo';
 
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
 import { getParentIdSet } from '../../utils';
 import { type IBaseTool } from '../type';
@@ -18,7 +18,7 @@ export class DrawSelection implements IBaseTool {
   private lastMouseScenePoint!: IPoint;
   private lastMousePoint!: IPoint;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   onActive() {
     // noop
   }

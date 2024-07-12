@@ -1,6 +1,6 @@
 import { EventEmitter } from '@suika/common';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type ICommand } from './type';
 
 export interface IHistoryStatus {
@@ -35,7 +35,7 @@ export class CommandManager {
   private emitter = new EventEmitter<Events>();
   private isBatching = false;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   redo() {
     if (!this.isEnableRedoUndo) {
@@ -58,7 +58,7 @@ export class CommandManager {
       for (const cmdItem of cmdItems) {
         const command = cmdItem.command;
         console.log(
-          `%c Redo %c ${command.desc}`,
+          `%c Redo %c [${command.desc}]`,
           'background: #f04; color: #ee0',
           '',
         );
@@ -96,7 +96,7 @@ export class CommandManager {
       for (const cmdItem of cmdItems) {
         const command = cmdItem.command;
         console.log(
-          `%c Undo %c ${command.desc}`,
+          `%c Undo %c [${command.desc}]`,
           'background: #40f; color: #eee',
           '',
         );
@@ -134,7 +134,7 @@ export class CommandManager {
   ) {
     this.emitter.emit('beforeExecCmd');
     console.log(
-      `%c Exec %c ${command.desc}`,
+      `%c Exec %c [${command.desc}]`,
       'background: #222; color: #bada55',
       '',
     );

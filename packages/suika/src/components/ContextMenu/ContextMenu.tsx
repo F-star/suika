@@ -4,6 +4,8 @@ import { isWindows } from '@suika/common';
 import {
   arrangeAndRecord,
   ArrangeType,
+  flipHorizontalAndRecord,
+  flipVerticalAndRecord,
   groupAndRecord,
   type IHistoryStatus,
   MutateGraphsAndRecord,
@@ -248,6 +250,36 @@ export const ContextMenu: FC = () => {
           }}
         >
           <FormattedMessage id="lockOrUnlock" />
+        </ContextMenuItem>
+        <ContextMenuSep />
+        {/* flipHorizontal */}
+        <ContextMenuItem
+          suffix={isWindows ? 'Shift+H' : '⇧H'}
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              flipHorizontalAndRecord(
+                editor,
+                editor.selectedElements.getItems(),
+              );
+              editor.render();
+            }
+          }}
+        >
+          <FormattedMessage id="flip.horizontal" />
+        </ContextMenuItem>
+        {/* flipVertical */}
+        <ContextMenuItem
+          suffix={isWindows ? 'Shift+V' : '⇧V'}
+          onClick={() => {
+            setVisible(false);
+            if (editor) {
+              flipVerticalAndRecord(editor, editor.selectedElements.getItems());
+              editor.render();
+            }
+          }}
+        >
+          <FormattedMessage id="flip.vertical" />
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem

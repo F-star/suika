@@ -2,7 +2,7 @@ import { cloneDeep, parseHexToRGBA, throttle } from '@suika/common';
 import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaEllipse, SuikaLine, SuikaPath } from '../graphs';
 import { SuikaRegularPolygon } from '../graphs/regular_polygon';
 import { PaintType } from '../paint';
@@ -19,7 +19,7 @@ export class SelectedControl {
   /** 需要绘制控制点的 segment */
   private segControlsNeedDraw: { pathIdx: number; segIdx: number }[] = [];
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   getSegControlsNeedDraw() {
     return this.segControlsNeedDraw;
@@ -145,7 +145,7 @@ export class SelectedControl {
           cx: anchor.x,
           cy: anchor.y,
           type: ['anchor', i, j].join('-'),
-          graph: new SuikaEllipse(
+          graphics: new SuikaEllipse(
             {
               objectName: 'anchor',
               width: anchorSize,
@@ -206,7 +206,7 @@ export class SelectedControl {
             cy: rect.y + rect.height / 2,
             type: 'handleLine',
             rotation: rect.rotation,
-            graph: new SuikaLine(
+            graphics: new SuikaLine(
               {
                 objectName: 'handleLine',
                 height: rect.height,
@@ -235,7 +235,7 @@ export class SelectedControl {
             cx: handle.x,
             cy: handle.y,
             type: [handleIdx === 0 ? 'in' : 'out', i, j].join('-'),
-            graph: new SuikaRegularPolygon(
+            graphics: new SuikaRegularPolygon(
               {
                 objectName: 'pathHandle',
                 width: size,

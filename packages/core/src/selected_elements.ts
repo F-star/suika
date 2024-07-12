@@ -1,7 +1,7 @@
 import { EventEmitter, isSameArray } from '@suika/common';
 import { boxToRect, type IRect, mergeBoxes } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 import { isGroupGraphics, type SuikaGraphics } from './graphs';
 import { removeGraphicsAndRecord } from './service/remove_service';
 import { getParentIdSet } from './utils';
@@ -25,7 +25,7 @@ export class SelectedElements {
 
   private eventEmitter = new EventEmitter<Events>();
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   setItems(items: SuikaGraphics[]) {
     const prevItems = this.items;
     this.items = items;
@@ -41,7 +41,7 @@ export class SelectedElements {
     return new Set(this.items.map((item) => item.attrs.id));
   }
   setItemsById(ids: Set<string>) {
-    const items = this.editor.sceneGraph.getElementsByIds(ids);
+    const items = this.editor.doc.getGraphicsArrByIds(ids);
 
     if (items.length === 0) {
       console.warn('can not find element by id');
@@ -94,7 +94,7 @@ export class SelectedElements {
     }
   }
   toggleItemById(id: string, opts?: { disableParentAndChildCoexist: boolean }) {
-    const toggledElement = this.editor.sceneGraph.getElementById(id);
+    const toggledElement = this.editor.doc.getGraphicsById(id);
     if (!toggledElement) {
       console.warn('can not find element by id');
       return;
@@ -169,12 +169,12 @@ export class SelectedElements {
     this.setItems(parent.getChildren().filter((item) => !item.isLock()));
   }
 
-  setHoverItem(graph: SuikaGraphics | null) {
+  setHoverItem(graphics: SuikaGraphics | null) {
     const prevHoverItem = this.hoverItem;
-    this.hoverItem = graph;
-    this.setHighlightedItem(graph);
-    if (prevHoverItem !== graph) {
-      this.eventEmitter.emit('hoverItemChange', graph, this.hoverItem);
+    this.hoverItem = graphics;
+    this.setHighlightedItem(graphics);
+    if (prevHoverItem !== graphics) {
+      this.eventEmitter.emit('hoverItemChange', graphics, this.hoverItem);
     }
   }
 
@@ -182,13 +182,13 @@ export class SelectedElements {
     return this.hoverItem;
   }
 
-  setHighlightedItem(graph: SuikaGraphics | null) {
+  setHighlightedItem(graphics: SuikaGraphics | null) {
     const prevHighlightItem = this.highlightedItem;
-    this.highlightedItem = graph;
-    if (prevHighlightItem !== graph) {
+    this.highlightedItem = graphics;
+    if (prevHighlightItem !== graphics) {
       this.eventEmitter.emit(
         'highlightedItemChange',
-        graph,
+        graphics,
         this.highlightedItem,
       );
     }

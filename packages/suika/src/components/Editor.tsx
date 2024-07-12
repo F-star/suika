@@ -1,10 +1,12 @@
 import './Editor.scss';
 
 import { throttle } from '@suika/common';
-import { Editor as GraphEditor } from '@suika/core';
+import { SuikaEditor } from '@suika/core';
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../context';
+import { AutoSaveGraphics } from '../store/auto-save-graphs';
+// import { joinRoom } from '../store/join-room';
 import { ContextMenu } from './ContextMenu';
 import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
@@ -16,11 +18,11 @@ const leftRightMargin = 240 * 2;
 const Editor: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [editor, setEditor] = useState<GraphEditor | null>(null);
+  const [editor, setEditor] = useState<SuikaEditor | null>(null);
 
   useEffect(() => {
     if (containerRef.current) {
-      const editor = new GraphEditor({
+      const editor = new SuikaEditor({
         containerElement: containerRef.current,
         width: document.body.clientWidth - leftRightMargin,
         height: document.body.clientHeight - topMargin,
@@ -29,6 +31,9 @@ const Editor: FC = () => {
         showPerfMonitor: false,
       });
       (window as any).editor = editor;
+
+      new AutoSaveGraphics(editor);
+      // joinRoom(editor);
 
       const changeViewport = throttle(
         () => {

@@ -1,6 +1,6 @@
 import { isWindows } from '@suika/common';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 
 export interface IKey {
   ctrlKey?: boolean;
@@ -51,7 +51,7 @@ export class KeyBindingManager {
   private isBound = false;
   private id = 0;
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
 
   private handleAction = (e: KeyboardEvent) => {
     // There are some default behaviors to prevent editor action

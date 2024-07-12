@@ -86,7 +86,9 @@ export const StrokeCard: FC = () => {
     const selectItems = editor.selectedElements.getItems();
 
     selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
     });
 
     return newStrokes;
@@ -108,7 +110,7 @@ export const StrokeCard: FC = () => {
       });
     });
     pushToHistory('Add Stroke', selectItems, newStrokes, true);
-    editor?.render();
+    editor.render();
   };
 
   const deleteStroke = (index: number) => {
@@ -118,9 +120,11 @@ export const StrokeCard: FC = () => {
     setStrokes(newStrokes);
 
     const selectItems = editor.selectedElements.getItems();
-    selectItems.forEach((item) => {
-      item.attrs.stroke = cloneDeep(newStrokes);
-    });
+    for (const item of selectItems) {
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
+    }
     pushToHistory('Update Stroke', selectItems, newStrokes);
     editor.render();
   };
@@ -152,18 +156,6 @@ export const StrokeCard: FC = () => {
           strokeWidth: defaultStrokeWidth,
         });
         attrs[i].strokeWidth = defaultStrokeWidth;
-      });
-    }
-    // case 2: delete all stroke，change strokeWidth to 0
-    else if (newStroke.length === 0) {
-      selectedElements.forEach((el, i) => {
-        prevAttrs[i].strokeWidth = el.attrs.strokeWidth;
-      });
-
-      forEach(selectedElements, (el) => {
-        el.updateAttrs({
-          strokeWidth: undefined,
-        });
       });
     }
 

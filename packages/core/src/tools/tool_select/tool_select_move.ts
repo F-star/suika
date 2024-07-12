@@ -1,10 +1,11 @@
 import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPoint } from '@suika/geo';
 
-import { type Editor } from '../../editor';
+import { type SuikaEditor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
 import { Transaction } from '../../transaction';
 import { type IBaseTool } from '../type';
+import { getTopHitElement } from './utils';
 
 /**
  * select tool
@@ -22,7 +23,7 @@ export class SelectMoveTool implements IBaseTool {
   private dy = 0;
   private prevBBoxPos: IPoint = { x: -1, y: -1 };
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     this.transaction = new Transaction(editor);
   }
   onActive() {
@@ -164,7 +165,7 @@ export class SelectMoveTool implements IBaseTool {
     if (!isDragHappened) {
       // clear selected elements if click on blank area and not dragging
       const point = this.editor.getSceneCursorXY(e);
-      const topHitElement = this.editor.sceneGraph.getTopHitElement(point);
+      const topHitElement = getTopHitElement(this.editor, point);
       if (!topHitElement && !this.editor.hostEventManager.isShiftPressing) {
         this.editor.selectedElements.clear();
       }

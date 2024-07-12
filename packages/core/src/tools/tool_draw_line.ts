@@ -8,7 +8,7 @@ import {
 } from '@suika/geo';
 
 import { HALF_PI } from '../constant';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { SuikaLine } from '../graphs';
 import { adjustSizeToKeepPolarSnap } from '../utils';
 import { DrawGraphTool } from './tool_draw_graph';
@@ -23,7 +23,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
   override readonly type = TYPE;
   override readonly hotkey = HOTKEY;
 
-  constructor(editor: Editor) {
+  constructor(editor: SuikaEditor) {
     super(editor);
     this.commandDesc = 'Add Line';
   }

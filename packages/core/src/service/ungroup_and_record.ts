@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 import { generateNKeysBetween } from 'fractional-indexing';
 
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import {
   isFrameGraphics,
   type SuikaFrame,
@@ -12,7 +12,7 @@ import { getParentIdSet } from '../utils';
 
 export const ungroupAndRecord = (
   graphicsArr: SuikaGraphics[],
-  editor: Editor,
+  editor: SuikaEditor,
 ) => {
   const frameGraphicsArr = graphicsArr.filter((graphics) =>
     isFrameGraphics(graphics),

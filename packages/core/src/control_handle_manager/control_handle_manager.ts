@@ -11,7 +11,7 @@ import {
 
 import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { GraphicsType } from '../type';
 import { type ControlHandle } from './control_handle';
 import { type ITransformHandleType } from './type';
@@ -43,7 +43,7 @@ export class ControlHandleManager {
   private selectedBoxRect: ITransformRect | null = null;
   enableTransformControl = true;
 
-  constructor(private editor: Editor) {
+  constructor(private editor: SuikaEditor) {
     const setting = editor.setting;
     this.transformHandles = createTransformHandles(
       {
@@ -161,19 +161,19 @@ export class ControlHandleManager {
       handle.cy = point.y;
     }
 
-    // update n/s/w/e handle graph size
+    // update n/s/w/e handle graphics size
     const n = this.transformHandles.get('n')!;
     const s = this.transformHandles.get('s')!;
     const w = this.transformHandles.get('w')!;
     const e = this.transformHandles.get('e')!;
-    n.graph.attrs.width = s.graph.attrs.width =
+    n.graphics.attrs.width = s.graphics.attrs.width =
       rect.width * zoom - handleSize - handleStrokeWidth;
-    w.graph.attrs.height = e.graph.attrs.height =
+    w.graphics.attrs.height = e.graphics.attrs.height =
       rect.height * zoom - handleSize - handleStrokeWidth;
-    n.graph.attrs.height =
-      s.graph.attrs.height =
-      w.graph.attrs.width =
-      e.graph.attrs.width =
+    n.graphics.attrs.height =
+      s.graphics.attrs.height =
+      w.graphics.attrs.width =
+      e.graphics.attrs.width =
         neswHandleWidth;
 
     const heightTransform = new Matrix()
@@ -208,37 +208,37 @@ export class ControlHandleManager {
     const ctx = this.editor.ctx;
     const rotate = rect ? getTransformAngle(rect.transform) : 0;
     handles.forEach((handle) => {
-      const graph = handle.graph;
-      if (graph.type === GraphicsType.Path) {
+      const graphics = handle.graphics;
+      if (graphics.type === GraphicsType.Path) {
         // TODO:
       } else {
         const { x, y } = this.editor.sceneCoordsToViewport(
           handle.cx,
           handle.cy,
         );
-        graph.updateAttrs({
+        graphics.updateAttrs({
           transform: [
             1,
             0,
             0,
             1,
-            x - graph.attrs.width / 2,
-            y - graph.attrs.height / 2,
+            x - graphics.attrs.width / 2,
+            y - graphics.attrs.height / 2,
           ],
         });
       }
       if (rect && handle.isTransformHandle) {
-        graph.setRotate(rotate);
+        graphics.setRotate(rotate);
       }
       if (handle.rotation !== undefined) {
-        graph.setRotate(handle.rotation);
+        graphics.setRotate(handle.rotation);
       }
 
-      if (!graph.isVisible()) {
+      if (!graphics.isVisible()) {
         return;
       }
       ctx.save();
-      graph.draw(ctx);
+      graphics.draw(ctx);
       ctx.restore();
     });
   }
@@ -281,7 +281,7 @@ export class ControlHandleManager {
             handle.padding,
             selectedBox,
           )
-        : handle.graph.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
+        : handle.graphics.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
 
       if (isHit) {
         return {
@@ -315,7 +315,7 @@ export class ControlHandleManager {
       maxY: bottomRight.y,
     };
     return this.customHandles.filter((handle) =>
-      handle.graph.intersectWithBox(box),
+      handle.graphics.intersectWithBox(box),
     );
   }
 

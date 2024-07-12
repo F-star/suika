@@ -1,7 +1,7 @@
 import { EventEmitter, getDevicePixelRatio } from '@suika/common';
 import { type IBox, type IRect } from '@suika/geo';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 
 interface Events {
   xOrYChange(x: number | undefined, y: number): void;
@@ -12,7 +12,7 @@ export class ViewportManager {
   private scrollY = 0;
   private eventEmitter = new EventEmitter<Events>();
 
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   getViewport(): IRect {
     return {
       x: this.scrollX,

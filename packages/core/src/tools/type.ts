@@ -1,5 +1,5 @@
 import { type ICursor } from '../cursor_manager';
-import { type Editor } from '../editor';
+import { type SuikaEditor } from '../editor';
 import { type IKey } from '../key_binding_manager';
 
 export interface ITool extends IBaseTool {
@@ -39,7 +39,7 @@ export interface IBaseTool {
 }
 
 export interface IToolClassConstructor {
-  new (editor: Editor): ITool;
+  new (editor: SuikaEditor): ITool;
   type: string;
   hotkey: string | IKey;
 }

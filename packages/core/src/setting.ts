@@ -71,7 +71,7 @@ export class Setting {
       256,
     ],
 
-    drawGraphDefaultWidth: 100, // drawing graph default width if no drag
+    drawGraphDefaultWidth: 100, // drawing graphics default width if no drag
     drawGraphDefaultHeight: 100, // default height
 
     /**** ruler ****/

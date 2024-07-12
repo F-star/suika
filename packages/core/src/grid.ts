@@ -1,12 +1,12 @@
 import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
 
-import { type Editor } from './editor';
+import { type SuikaEditor } from './editor';
 
 /**
  * draw grid
  */
 class Grid {
-  constructor(private editor: Editor) {}
+  constructor(private editor: SuikaEditor) {}
   draw() {
     const ctx = this.editor.ctx;
 

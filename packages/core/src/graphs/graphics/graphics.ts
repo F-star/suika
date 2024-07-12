@@ -2,9 +2,11 @@ import {
   calcCoverScale,
   cloneDeep,
   genUuid,
+  isEqual,
   objectNameGenerator,
   omit,
   parseRGBToHex,
+  pick,
 } from '@suika/common';
 import {
   boxToRect,
@@ -63,6 +65,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   private _deleted = false;
   private _sortDirty = false;
 
+  private noCollectUpdate: boolean;
+
   constructor(
     attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
     opts: IGraphicsOpts,
@@ -83,12 +87,15 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this.attrs = { ...attrs } as ATTRS;
     this.attrs.id ??= genUuid();
     this.attrs.transform = transform;
+    this.attrs.strokeWidth ??= 1;
 
     if (this.attrs.objectName) {
       objectNameGenerator.setMaxIdx(attrs.objectName);
     } else {
       this.attrs.objectName = objectNameGenerator.gen(this.attrs.type ?? '');
     }
+
+    this.noCollectUpdate = Boolean(opts?.noCollectUpdate);
   }
 
   getAttrs(): ATTRS {
@@ -114,6 +121,14 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this._cacheMinBbox = null;
   }
 
+  private updatedKeys = new Set<string>();
+
+  getUpdatedAttrs() {
+    const attrs = pick(this.attrs, [...this.updatedKeys]);
+    this.updatedKeys.clear();
+    return attrs;
+  }
+
   updateAttrs(
     partialAttrs: Partial<GraphicsAttrs> & IAdvancedAttrs,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -129,15 +144,20 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
       'strokeWidth' in partialAttrs &&
       partialAttrs.strokeWidth === undefined
     ) {
-      delete this.attrs.strokeWidth;
+      partialAttrs.strokeWidth = 1;
     }
 
     if (!partialAttrs.transform) {
-      if (partialAttrs.x !== undefined) {
-        this.attrs.transform[4] = partialAttrs.x;
-      }
-      if (partialAttrs.y !== undefined) {
-        this.attrs.transform[5] = partialAttrs.y;
+      if (partialAttrs.x !== undefined || partialAttrs.y !== undefined) {
+        const tf = cloneDeep(this.attrs.transform);
+        if (partialAttrs.x) {
+          tf[4] = partialAttrs.x;
+        }
+        if (partialAttrs.y) {
+          tf[5] = partialAttrs.y;
+        }
+        this.attrs.transform = tf;
+        this.updatedKeys.add('transform');
       }
     }
 
@@ -146,9 +166,18 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
     partialAttrs = omit(partialAttrs, 'x', 'y', 'rotate');
     for (const key in partialAttrs) {
+      this.updatedKeys.add(key);
       // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
       (this.attrs as any)[key] = partialAttrs[key as keyof typeof partialAttrs];
     }
+
+    if (!this.noCollectUpdate || this.attrs.parentIndex) {
+      this.doc.collectUpdatedGraphics(this.attrs.id);
+    }
+  }
+
+  cancelCollectUpdate() {
+    this.noCollectUpdate = true;
   }
 
   getStrokeWidth() {
@@ -532,6 +561,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
 
   setDeleted(val: boolean) {
     this._deleted = val;
+    this.doc.collectDeletedGraphics(this);
   }
 
   /**
@@ -807,12 +837,16 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
 
     graphics.removeFromParent(); // 这个应该要删除？
-    graphics.updateAttrs({
-      parentIndex: {
-        guid: this.attrs.id,
-        position: sortIdx,
-      },
-    });
+    const newParentIndex = {
+      guid: this.attrs.id,
+      position: sortIdx,
+    };
+    if (!isEqual(graphics.attrs.parentIndex, newParentIndex)) {
+      graphics.updateAttrs({
+        parentIndex: newParentIndex,
+      });
+    }
+
     this.children.push(graphics);
     if (sortIdx) {
       // TODO: 考虑 this._sortDirty 标记为 true，然后找个合适的时机再排序，减少图形重复地调用 sortChildren

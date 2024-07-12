@@ -262,7 +262,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
         cx: x,
         cy: y,
         type: info.type,
-        graph: this.createCornerRadiusHandleGraph(),
+        graphics: this.createCornerRadiusHandleGraph(),
         getCursor: () => 'default',
       });
       handles.push(handle);
