@@ -96,16 +96,35 @@ export class ToolManager {
 
     if (!hotkey) {
       console.log(`${type} has no hotkey`);
-    } else {
+    } else if (typeof hotkey === 'string') {
       if (this.hotkeySet.has(hotkey)) {
         console.log(`register same hotkey: "${hotkey}"`);
       }
       this.hotkeySet.add(hotkey);
 
-      const keyCode = `Key${toolCtor.hotkey.toUpperCase()}`;
-      // TODO: support complex hotkey
+      const keyCode = `Key${toolCtor.hotkey}`;
       const token = this.editor.keybindingManager.register({
         key: { keyCode: keyCode },
+        actionName: type,
+        when: () => this.enableToolTypes.includes(type),
+        action: () => {
+          this.setActiveTool(type);
+        },
+      });
+      this.keyBindingToken.push(token);
+    } else {
+      // support complex hotkey
+      const hotkeyStr = `${hotkey.altKey ? 'alt+' : ''}${
+        hotkey.ctrlKey ? 'ctrl+' : ''
+      }${hotkey.shiftKey ? 'shift+' : ''}${hotkey.metaKey ? 'meta+' : ''}${
+        hotkey.keyCode
+      }`;
+      if (this.hotkeySet.has(hotkeyStr)) {
+        console.log(`register same hotkey: "${hotkey}"`);
+      }
+      this.hotkeySet.add(hotkeyStr);
+      const token = this.editor.keybindingManager.register({
+        key: hotkey,
         actionName: type,
         when: () => this.enableToolTypes.includes(type),
         action: () => {

@@ -1,5 +1,6 @@
 import './Toolbar.scss';
 
+import { isWindows } from '@suika/common';
 import { Button } from '@suika/components';
 import {
   EllipseOutlined,
@@ -92,7 +93,7 @@ export const ToolBar = () => {
     },
     pencil: {
       name: 'pencil',
-      hotkey: '',
+      hotkey: `${isWindows ? 'Shift+' : '⇧'}P`,
       intlId: 'tool.pencil',
       icon: <PencilOutlined />,
     },
