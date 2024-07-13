@@ -31,6 +31,7 @@ export class Setting {
     defaultStarInnerScale: 0.3819660246372223,
 
     guideBBoxStroke: '#1592fe',
+    guideBBoxStrokeWidth: 1.2,
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
     selectionMode: 'intersect' as 'intersect' | 'contain',

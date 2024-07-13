@@ -63,9 +63,11 @@ export class SelectedBox {
 
     const ctx = this.editor.ctx;
     const stroke = this.editor.setting.get('guideBBoxStroke');
+    const strokeWidth = this.editor.setting.get('guideBBoxStrokeWidth');
 
     ctx.save();
     ctx.strokeStyle = stroke;
+    ctx.lineWidth = strokeWidth;
 
     const polygon = rectToVertices(
       {
