@@ -14,7 +14,7 @@ import { CursorManger, type ICursor } from './cursor_manager';
 import { type GraphicsAttrs } from './graphs';
 import { SuikaCanvas } from './graphs/canvas';
 import { SuikaDocument } from './graphs/document';
-import { HostEventManager } from './host_event_manager';
+import { HostEventManager, MouseEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
 import { PathEditor } from './path_editor';
@@ -69,6 +69,7 @@ export class SuikaEditor {
   imgManager: ImgManager;
 
   cursorManager: CursorManger;
+  mouseEventManager: MouseEventManager;
   keybindingManager: KeyBindingManager;
   hostEventManager: HostEventManager;
   clipboard: ClipboardManager;
@@ -96,6 +97,7 @@ export class SuikaEditor {
       this.setting.set('offsetY', options.offsetY);
     }
 
+    this.mouseEventManager = new MouseEventManager(this);
     this.keybindingManager = new KeyBindingManager(this);
     this.keybindingManager.bindEvent();
 

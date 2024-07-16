@@ -9,6 +9,7 @@ import {
   SuikaPath,
   SuikaText,
 } from '../../graphs';
+import { type IMouseEvent } from '../../host_event_manager';
 import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
 import { SelectResizeTool } from './tool_select_resize';
@@ -55,8 +56,8 @@ export class SelectTool implements ITool {
   };
 
   // double click to active path editor
-  private onContinueClick = () => {
-    const point = this.editor.toolManager.getCurrPoint();
+  private onContinueClick = (event: IMouseEvent) => {
+    const point = event.pos;
     const editor = this.editor;
     const handleInfo = editor.controlHandleManager.getHandleInfoByPoint(point);
     if (handleInfo) return;
@@ -92,14 +93,14 @@ export class SelectTool implements ITool {
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.hostEventManager.on('continueClick', this.onContinueClick);
+    this.editor.mouseEventManager.on('comboClick', this.onContinueClick);
   }
   onInactive() {
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.hostEventManager.off('continueClick', this.onContinueClick);
+    this.editor.mouseEventManager.off('comboClick', this.onContinueClick);
     this.editor.render();
   }
 

@@ -2,6 +2,7 @@ import { EventEmitter } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
+import { type IMouseEvent, type IMousemoveEvent } from './host_event_manager';
 
 interface Events {
   activeChange(active: boolean): void;
@@ -17,8 +18,7 @@ export class CanvasDragger {
   private isEnableDragCanvasBySpace = true;
 
   private _isPressing = false;
-  private isDragging = false;
-  private startPoint: IPoint = { x: 0, y: 0 };
+  private startVwPos: IPoint = { x: 0, y: 0 };
   private startViewportPos: IPoint = { x: 0, y: 0 };
 
   private eventEmitter = new EventEmitter<Events>();
@@ -47,7 +47,7 @@ export class CanvasDragger {
 
   constructor(private editor: SuikaEditor) {
     this.editor.hostEventManager.on('spaceToggle', this.handleSpaceToggle);
-    this.editor.hostEventManager.on(
+    this.editor.mouseEventManager.on(
       'wheelBtnToggle',
       this.handleWheelBtnToggle,
     );
@@ -69,18 +69,16 @@ export class CanvasDragger {
     this.eventEmitter.emit('activeChange', true);
     this._active = true;
     this.editor.setCursor('grab');
-    this.bindEvent();
+    this.bindEventWhenActive();
     if (event) {
       this.editor.setCursor('grabbing');
-      this.handlePointerDown(event);
+      const vwPos = this.editor.getCursorXY(event);
+      this.onStart({
+        pos: this.editor.viewportCoordsToScene(vwPos.x, vwPos.y),
+        vwPos,
+        nativeEvent: event,
+      });
     }
-  }
-
-  private bindEvent() {
-    const canvas = this.editor.canvasElement;
-    canvas.addEventListener('pointerdown', this.handlePointerDown);
-    window.addEventListener('pointermove', this.handlePointerMove);
-    window.addEventListener('pointerup', this.handlePointerUp);
   }
 
   inactive() {
@@ -93,16 +91,9 @@ export class CanvasDragger {
       }
       this.eventEmitter.emit('activeChange', false);
       this._active = false;
-      this.unbindEvent();
+      this.unbindEventWhenInactive();
+      this.editor.toolManager.setCursorWhenActive();
     }
-  }
-
-  private unbindEvent() {
-    const canvas = this.editor.canvasElement;
-    canvas.removeEventListener('pointerdown', this.handlePointerDown);
-    window.removeEventListener('pointermove', this.handlePointerMove);
-    window.removeEventListener('pointerup', this.handlePointerUp);
-    this.editor.toolManager.setCursorWhenActive();
   }
 
   enableDragBySpace() {
@@ -112,31 +103,26 @@ export class CanvasDragger {
     this.isEnableDragCanvasBySpace = false;
   }
 
-  private handlePointerDown = (e: PointerEvent) => {
-    if (!(e.button === 0 || e.button === 1)) return;
+  private onStart = (event: IMouseEvent) => {
+    if (event.nativeEvent.button !== 0 && event.nativeEvent.button !== 1) {
+      return;
+    }
     this.editor.cursorManager.setCursor('grabbing');
 
     this._isPressing = true;
-    this.startPoint = this.editor.getCursorXY(e);
+    this.startVwPos = { ...event.vwPos };
     this.startViewportPos = this.editor.viewportManager.getViewport();
   };
 
-  private handlePointerMove = (e: PointerEvent) => {
+  private onDrag = (event: IMousemoveEvent) => {
     if (!this._isPressing) return;
-    const point: IPoint = this.editor.getCursorXY(e);
-    const dx = point.x - this.startPoint.x;
-    const dy = point.y - this.startPoint.y;
+    const dx = event.vwPos.x - this.startVwPos.x;
+    const dy = event.vwPos.y - this.startVwPos.y;
+
+    const dragBlockStep = this.editor.setting.get('dragBlockStep');
 
     const zoom = this.editor.zoomManager.getZoom();
-    const dragBlockStep = this.editor.setting.get('dragBlockStep');
-    if (
-      !this.isDragging &&
-      (Math.abs(dx) > dragBlockStep || Math.abs(dy) > dragBlockStep)
-    ) {
-      this.isDragging = true;
-    }
-
-    if (this.isDragging) {
+    if (event.maxDragDistance > dragBlockStep / zoom) {
       const viewportX = this.startViewportPos.x - dx / zoom;
       const viewportY = this.startViewportPos.y - dy / zoom;
       this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
@@ -144,9 +130,8 @@ export class CanvasDragger {
     }
   };
 
-  private handlePointerUp = () => {
+  private onEnd = () => {
     this.editor.cursorManager.setCursor('grab');
-    this.isDragging = false;
     this._isPressing = false;
     if (this.inactiveAfterPointerUp) {
       this.inactiveAfterPointerUp = false;
@@ -154,13 +139,25 @@ export class CanvasDragger {
     }
   };
 
+  private bindEventWhenActive() {
+    this.editor.mouseEventManager.on('start', this.onStart);
+    this.editor.mouseEventManager.on('drag', this.onDrag);
+    this.editor.mouseEventManager.on('end', this.onEnd);
+  }
+
+  private unbindEventWhenInactive() {
+    this.editor.mouseEventManager.off('start', this.onStart);
+    this.editor.mouseEventManager.off('drag', this.onDrag);
+    this.editor.mouseEventManager.off('end', this.onEnd);
+  }
+
   destroy() {
     this.editor.hostEventManager.off('spaceToggle', this.handleSpaceToggle);
-    this.editor.hostEventManager.off(
+    this.editor.mouseEventManager.off(
       'wheelBtnToggle',
       this.handleWheelBtnToggle,
     );
-    this.unbindEvent();
+    this.unbindEventWhenInactive();
   }
 
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {
