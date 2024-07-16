@@ -1,4 +1,5 @@
 import { type SuikaGraphics } from '@suika/core';
+import { type IPoint } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../context';
@@ -8,6 +9,7 @@ export const DebugPanel: FC = () => {
 
   const [isSelectedBoxHover, setIsSelectedBoxHover] = useState(false);
   const [hoveredGraphName, setHoveredGraphName] = useState('');
+  const [cursorPos, setCursorPos] = useState<IPoint | null>(null);
 
   useEffect(() => {
     if (!editor) return;
@@ -15,12 +17,13 @@ export const DebugPanel: FC = () => {
     const handleSelectedBoxHover = (isHover: boolean) => {
       setIsSelectedBoxHover(isHover);
     };
-    editor.selectedBox.on('hoverChange', handleSelectedBoxHover);
-
     const handleHoverItemChange = (hoveredItem: SuikaGraphics | null) => {
       setHoveredGraphName(hoveredItem?.attrs?.objectName ?? '');
     };
+
+    editor.selectedBox.on('hoverChange', handleSelectedBoxHover);
     editor.selectedElements.on('hoverItemChange', handleHoverItemChange);
+    editor.mouseEventManager.on('cursorPosUpdate', setCursorPos);
 
     return () => {
       editor.selectedBox.off('hoverChange', handleSelectedBoxHover);
@@ -32,6 +35,12 @@ export const DebugPanel: FC = () => {
     <div style={{ padding: 8 }}>
       <div>isSelectedBoxHover: {isSelectedBoxHover ? 'true' : 'false'}</div>
       <div>hoveredGraphName: {hoveredGraphName}</div>
+      {cursorPos && (
+        <>
+          <div>X: {cursorPos.x.toFixed(2)}</div>
+          <div>Y: {cursorPos.y.toFixed(2)}</div>
+        </>
+      )}
     </div>
   );
 };

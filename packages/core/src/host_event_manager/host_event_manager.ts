@@ -1,5 +1,5 @@
 import { EventEmitter } from '@suika/common';
-import { distance, type IPoint } from '@suika/geo';
+import { type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
 import { CommandKeyBinding } from './command_key_binding';
@@ -9,9 +9,7 @@ interface Events {
   shiftToggle(press: boolean): void;
   altToggle(press: boolean): void;
   spaceToggle(press: boolean): void;
-  wheelBtnToggle(press: boolean, event: PointerEvent): void;
   contextmenu(point: IPoint): void;
-  continueClick(): void;
 }
 
 /**
@@ -43,7 +41,6 @@ export class HostEventManager {
   bindHotkeys() {
     this.bindModifiersRecordEvent(); // 记录 isShiftPressing 等值
     this.bindWheelEvent();
-    this.bindMouseRecordEvent();
     this.bindContextMenu();
 
     this.moveGraphsKeyBinding.bindKey();
@@ -81,56 +78,6 @@ export class HostEventManager {
     this.unbindHandlers.push(() => {
       document.removeEventListener('keydown', handler);
       document.removeEventListener('keyup', handler);
-    });
-  }
-
-  private bindMouseRecordEvent() {
-    let pointerDownTimeStamp = -Infinity;
-    let lastPointerDownPos: IPoint = { x: -99, y: -99 };
-
-    const handlePointerEvent = (event: PointerEvent) => {
-      // mouse left
-      if (event.button === 0 && event.type === 'pointerdown') {
-        const now = new Date().getTime();
-        const newPos = {
-          x: event.pageX,
-          y: event.pageY,
-        };
-
-        const interval = now - pointerDownTimeStamp;
-        const clickDistanceDiff = distance(newPos, lastPointerDownPos);
-        if (
-          interval < this.editor.setting.get('continueClickMaxGap') &&
-          clickDistanceDiff <
-            this.editor.setting.get('continueClickDistanceTol')
-        ) {
-          pointerDownTimeStamp = now;
-          this.eventEmitter.emit('continueClick');
-        }
-        pointerDownTimeStamp = now;
-        lastPointerDownPos = newPos;
-      }
-
-      // mouse middle
-      if (event.button === 1) {
-        const prevWheelBtnPressing = this.isWheelBtnPressing;
-        this.isWheelBtnPressing = event.type === 'pointerdown';
-        if (prevWheelBtnPressing !== this.isWheelBtnPressing) {
-          this.eventEmitter.emit(
-            'wheelBtnToggle',
-            this.isWheelBtnPressing,
-            event,
-          );
-        }
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerEvent);
-    document.addEventListener('pointerup', handlePointerEvent);
-
-    this.unbindHandlers.push(() => {
-      document.removeEventListener('pointerdown', handlePointerEvent);
-      document.removeEventListener('pointerup', handlePointerEvent);
     });
   }
 
