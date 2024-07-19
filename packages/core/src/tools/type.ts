@@ -1,8 +1,9 @@
 import { type ICursor } from '../cursor_manager';
 import { type SuikaEditor } from '../editor';
+import { type IKey } from '../key_binding_manager';
 
 export interface ITool extends IBaseTool {
-  hotkey: string;
+  hotkey: string | IKey;
   type: string;
   cursor: ICursor;
   onMoveExcludeDrag: (event: PointerEvent, isOutsideCanvas: boolean) => void;
@@ -40,5 +41,5 @@ export interface IBaseTool {
 export interface IToolClassConstructor {
   new (editor: SuikaEditor): ITool;
   type: string;
-  hotkey: string;
+  hotkey: string | IKey;
 }

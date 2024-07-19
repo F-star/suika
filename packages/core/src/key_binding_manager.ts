@@ -2,7 +2,7 @@ import { isWindows } from '@suika/common';
 
 import { type SuikaEditor } from './editor';
 
-interface IKey {
+export interface IKey {
   ctrlKey?: boolean;
   shiftKey?: boolean;
   altKey?: boolean;

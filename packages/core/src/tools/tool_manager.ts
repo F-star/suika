@@ -2,6 +2,7 @@ import { EventEmitter, noop } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
+import { type IKey } from '../key_binding_manager';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawLineTool } from './tool_draw_line';
@@ -93,27 +94,40 @@ export class ToolManager {
 
     // select and pathSelect tool has same hotkey
     const hotkey = toolCtor.hotkey;
+    let keyCode = '';
+    let hotkeyObj: IKey;
 
     if (!hotkey) {
       console.log(`${type} has no hotkey`);
-    } else {
-      if (this.hotkeySet.has(hotkey)) {
-        console.log(`register same hotkey: "${hotkey}"`);
-      }
-      this.hotkeySet.add(hotkey);
-
-      const keyCode = `Key${toolCtor.hotkey.toUpperCase()}`;
-      // TODO: support complex hotkey
-      const token = this.editor.keybindingManager.register({
-        key: { keyCode: keyCode },
-        actionName: type,
-        when: () => this.enableToolTypes.includes(type),
-        action: () => {
-          this.setActiveTool(type);
-        },
-      });
-      this.keyBindingToken.push(token);
+      return;
     }
+
+    if (typeof hotkey === 'string') {
+      keyCode = `Key${hotkey.toUpperCase()}`;
+      hotkeyObj = { keyCode: keyCode };
+    } else {
+      // support complex hotkey
+      keyCode = `${hotkey.altKey ? 'alt+' : ''}${
+        hotkey.ctrlKey ? 'ctrl+' : ''
+      }${hotkey.shiftKey ? 'shift+' : ''}${hotkey.metaKey ? 'meta+' : ''}${
+        hotkey.keyCode
+      }`;
+      hotkeyObj = hotkey;
+    }
+
+    if (this.hotkeySet.has(keyCode)) {
+      console.log(`register same hotkey: "${keyCode}"`);
+    }
+    this.hotkeySet.add(keyCode);
+    const token = this.editor.keybindingManager.register({
+      key: hotkeyObj,
+      actionName: type,
+      when: () => this.enableToolTypes.includes(type),
+      action: () => {
+        this.setActiveTool(type);
+      },
+    });
+    this.keyBindingToken.push(token);
   }
   getActiveToolName() {
     return this.currentTool?.type;
