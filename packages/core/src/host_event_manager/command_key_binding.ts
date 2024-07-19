@@ -133,7 +133,7 @@ export class CommandKeyBinding {
       editor.render();
     };
     editor.keybindingManager.register({
-      key: { metaKey: true, keyCode: 'Equal' },
+      key: [{ metaKey: true, keyCode: 'Equal' }, { keyCode: 'Equal' }],
       winKey: { ctrlKey: true, keyCode: 'Equal' },
       actionName: 'Zoom In',
       action: zoomInAction,
@@ -145,7 +145,7 @@ export class CommandKeyBinding {
       editor.render();
     };
     editor.keybindingManager.register({
-      key: { metaKey: true, keyCode: 'Minus' },
+      key: [{ metaKey: true, keyCode: 'Minus' }, { keyCode: 'Minus' }],
       winKey: { ctrlKey: true, keyCode: 'Minus' },
       actionName: 'Zoom Out',
       action: zoomOutAction,
