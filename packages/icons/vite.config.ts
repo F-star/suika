@@ -15,7 +15,7 @@ export default defineConfig({
       fileName: (format) => `icons.${format}.js`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'react-dom/client'],
       output: {
         globals: {
           react: 'React',
