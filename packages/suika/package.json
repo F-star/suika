@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
+    "@hocuspocus/provider": "^2.13.5",
     "@suika/common": "workspace:^",
     "@suika/components": "workspace:^",
     "@suika/core": "workspace:^",

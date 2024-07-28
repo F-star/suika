@@ -5,8 +5,8 @@ import { SuikaEditor } from '@suika/core';
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../context';
-import { AutoSaveGraphics } from '../store/auto-save-graphs';
-// import { joinRoom } from '../store/join-room';
+// import { AutoSaveGraphics } from '../store/auto-save-graphs';
+import { joinRoom } from '../store/join-room';
 import { ContextMenu } from './ContextMenu';
 import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
@@ -32,8 +32,17 @@ const Editor: FC = () => {
       });
       (window as any).editor = editor;
 
-      new AutoSaveGraphics(editor);
-      // joinRoom(editor);
+      // new AutoSaveGraphics(editor);
+      let fileId = '';
+      const pathname = location.pathname;
+      const suffix = '/files/';
+      if (pathname.startsWith(suffix)) {
+        fileId = pathname.slice(suffix.length);
+      }
+
+      if (fileId) {
+        joinRoom(editor, fileId);
+      }
 
       const changeViewport = throttle(
         () => {

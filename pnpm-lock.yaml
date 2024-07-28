@@ -284,6 +284,9 @@ importers:
       '@floating-ui/react':
         specifier: ^0.22.3
         version: 0.22.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@hocuspocus/provider':
+        specifier: ^2.13.5
+        version: 2.13.5(y-protocols@1.0.6(yjs@13.6.17))(yjs@13.6.17)
       '@suika/common':
         specifier: workspace:^
         version: link:../common
@@ -1689,6 +1692,15 @@ packages:
       typescript:
         optional: true
 
+  '@hocuspocus/common@2.13.5':
+    resolution: {integrity: sha512-8D9FzhZFlt0WsgXw5yT2zwSxi6z9d4V2vUz6co2vo3Cj+Y2bvGZsdDiTvU/MerGcCLME5k/w6PwLPojLYH/4pg==}
+
+  '@hocuspocus/provider@2.13.5':
+    resolution: {integrity: sha512-G3S0OiFSYkmbOwnbhV7FyJs4OBqB/+1YT9c44Ujux1RKowGm5H8+0p3FUHfXwd/3v9V0jE+E1FnFKoGonJSQwA==}
+    peerDependencies:
+      y-protocols: ^1.0.6
+      yjs: ^13.6.8
+
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
@@ -1924,6 +1936,9 @@ packages:
 
   '@leichtgewicht/ip-codec@2.0.4':
     resolution: {integrity: sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==}
+
+  '@lifeomic/attempt@3.1.0':
+    resolution: {integrity: sha512-QZqem4QuAnAyzfz+Gj5/+SLxqwCAw2qmt7732ZXodr6VDWGeYLG6w1i/vYLa55JQM9wRuBKLmXmiZ2P0LtE5rw==}
 
   '@mdx-js/react@2.3.0':
     resolution: {integrity: sha512-zQH//gdOmuu7nt2oJR29vFhDv88oGPmVw6BggmrHeMI+xgEkp1B2dX9/bMBSYtK0dyLX/aOmesKS09g222K1/g==}
@@ -10664,6 +10679,22 @@ snapshots:
     optionalDependencies:
       typescript: 5.3.3
 
+  '@hocuspocus/common@2.13.5':
+    dependencies:
+      lib0: 0.2.94
+
+  '@hocuspocus/provider@2.13.5(y-protocols@1.0.6(yjs@13.6.17))(yjs@13.6.17)':
+    dependencies:
+      '@hocuspocus/common': 2.13.5
+      '@lifeomic/attempt': 3.1.0
+      lib0: 0.2.94
+      ws: 8.17.1
+      y-protocols: 1.0.6(yjs@13.6.17)
+      yjs: 13.6.17
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.2
@@ -11125,6 +11156,8 @@ snapshots:
   '@juggle/resize-observer@3.4.0': {}
 
   '@leichtgewicht/ip-codec@2.0.4': {}
+
+  '@lifeomic/attempt@3.1.0': {}
 
   '@mdx-js/react@2.3.0(react@18.2.0)':
     dependencies:
