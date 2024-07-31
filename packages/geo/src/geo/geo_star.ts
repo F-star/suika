@@ -1,6 +1,6 @@
 import { type IPoint, type ISize } from '../type';
 import { Matrix } from './geo_matrix_class';
-import { lerp, linearInterpolate } from './geo_point';
+import { lerp, lerpNum } from './geo_point';
 
 export const getStar = (
   size: ISize,
@@ -33,7 +33,7 @@ export const getStar = (
     .translate(-cx, -cy)
     .rotate(rad / 2)
     .translate(cx, cy);
-  prevPoint = linearInterpolate(
+  prevPoint = lerp(
     { x: cx, y: cy },
     innerRotateTf.apply(points[0]),
     innerScale,
@@ -50,7 +50,7 @@ export const getStar = (
   const t = size.width / size.height;
   for (let i = 1; i < points.length; i++) {
     const pt = points[i];
-    pt.x = lerp(cx, pt.x, t);
+    pt.x = lerpNum(cx, pt.x, t);
   }
 
   return points;

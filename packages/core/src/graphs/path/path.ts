@@ -311,6 +311,16 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     ctx.restore();
   }
 
+  override hitTest(x: number, y: number, padding?: number): boolean {
+    // ...
+    if (!super.hitTest(x, y, padding)) {
+      return false;
+    }
+    // TODO: 精准判断
+
+    return true;
+  }
+
   override toJSON() {
     return {
       ...super.toJSON(),

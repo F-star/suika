@@ -24,13 +24,13 @@ export const distance = (p1: IPoint, p2: IPoint) => {
   return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 };
 
-export const lerp = (start: number, end: number, t: number): number => {
+export const lerpNum = (start: number, end: number, t: number): number => {
   return start * (1 - t) + end * t;
 };
 
-export const linearInterpolate = (start: IPoint, end: IPoint, t: number) => {
+export const lerp = (start: IPoint, end: IPoint, t: number) => {
   return {
-    x: lerp(start.x, end.x, t),
-    y: lerp(start.y, end.y, t),
+    x: lerpNum(start.x, end.x, t),
+    y: lerpNum(start.y, end.y, t),
   };
 };

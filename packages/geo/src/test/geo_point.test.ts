@@ -3,7 +3,7 @@ import {
   getMidPoint,
   isPointEqual,
   lerp,
-  linearInterpolate,
+  lerpNum,
   pointAdd,
 } from '../geo';
 
@@ -81,12 +81,12 @@ test('distance', () => {
   ).toBe(5);
 });
 
-test('lerp', () => {
-  expect(lerp(0, 10, 0.6)).toBe(6);
+test('lerpNum', () => {
+  expect(lerpNum(0, 10, 0.6)).toBe(6);
 });
-test('linearInterpolate', () => {
+test('lerp', () => {
   expect(
-    linearInterpolate(
+    lerp(
       {
         x: 0,
         y: 0,
