@@ -28,7 +28,7 @@ pnpm run dev
 ## Build
 
 ```sh
-pnpm all:build
+pnpm build
 ```
 
 The target output folder is `packages/suika/build`.
