@@ -1,6 +1,7 @@
 import { isEqual, pick } from '@suika/common';
 import {
   type GraphicsAttrs,
+  GraphicsType,
   type IChanges,
   type SuikaEditor,
 } from '@suika/core';
@@ -58,14 +59,15 @@ export class SuikaBinding {
       update: new Map(),
     };
     for (const [id, { action }] of event.changes.keys) {
-      if (action === 'add') {
-        const attrs = yMap.get(id);
-        changes.added.set(id, attrs as GraphicsAttrs);
-      } else if (action === 'update') {
-        // TODO: don't update if attrs is same
-        changes.update.set(id, yMap.get(id) as GraphicsAttrs);
-      } else if (action === 'delete') {
+      if (action === 'delete') {
         changes.deleted.add(id);
+        return;
+      }
+      const attrs = yMap.get(id) as GraphicsAttrs;
+      if (action === 'add' && attrs.type !== GraphicsType.Document) {
+        changes.added.set(id, attrs);
+      } else if (action === 'update') {
+        changes.update.set(id, attrs);
       }
     }
 

@@ -5,6 +5,7 @@ import { SuikaEditor } from '@suika/core';
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../context';
+import { MultiCursorManager } from '../plugins/multi-cursor';
 // import { AutoSaveGraphics } from '../store/auto-save-graphs';
 import { joinRoom } from '../store/join-room';
 import { ContextMenu } from './ContextMenu';
@@ -33,6 +34,7 @@ const Editor: FC = () => {
       (window as any).editor = editor;
 
       // new AutoSaveGraphics(editor);
+      // path: `/files/1234`
       let fileId = '';
       const pathname = location.pathname;
       const suffix = '/files/';
@@ -41,7 +43,8 @@ const Editor: FC = () => {
       }
 
       if (fileId) {
-        joinRoom(editor, fileId);
+        const { provider } = joinRoom(editor, fileId);
+        new MultiCursorManager(editor, provider.awareness!);
       }
 
       const changeViewport = throttle(

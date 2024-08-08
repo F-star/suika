@@ -102,6 +102,7 @@ export class SuikaEditor {
     this.keybindingManager.bindEvent();
 
     this.doc = new SuikaDocument({
+      id: '0-0',
       objectName: 'Document',
       width: 0,
       height: 0,
@@ -140,17 +141,17 @@ export class SuikaEditor {
 
     this.paperId = genUuid();
 
-    const canvas = new SuikaCanvas(
-      {
-        objectName: 'Canvas',
-        width: 0,
-        height: 0,
-      },
-      {
-        doc: this.doc,
-      },
-    );
-    this.sceneGraph.addItems([canvas]);
+    // const canvas = new SuikaCanvas(
+    //   {
+    //     objectName: 'Canvas',
+    //     width: 0,
+    //     height: 0,
+    //   },
+    //   {
+    //     doc: this.doc,
+    //   },
+    // );
+    // this.sceneGraph.addItems([canvas]);
 
     this.viewportManager.setViewport({
       x: -options.width / 2,
