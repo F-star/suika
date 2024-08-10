@@ -1,5 +1,5 @@
 import { cloneDeep } from '@suika/common';
-import { type IMatrixArr, type IPoint } from '@suika/geo';
+import { type IMatrixArr, type IPoint, type ITransformRect } from '@suika/geo';
 
 import { type SuikaEditor } from '../../editor';
 import { type SuikaGraphics } from '../../graphs';
@@ -101,6 +101,7 @@ export class SelectMoveTool implements IBaseTool {
     const selectedItems = this.selectedItems;
 
     // 1. update graphics position
+    const record = new Map<string, ITransformRect>();
     for (const graphics of selectedItems) {
       const newWorldTf = cloneDeep(
         this.originWorldTfMap.get(graphics.attrs.id)!,
@@ -108,10 +109,14 @@ export class SelectMoveTool implements IBaseTool {
       newWorldTf[4] += dx;
       newWorldTf[5] += dy;
 
-      graphics.setWorldTransform(newWorldTf);
+      record.set(graphics.attrs.id, {
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+        transform: newWorldTf,
+      });
     }
 
-    const { offsetX, offsetY } = this.editor.refLine.updateRefLine();
+    const { offsetX, offsetY } = this.editor.refLine.updateRefLine(record);
 
     // 2. snap to ref line
     for (const graphics of selectedItems) {

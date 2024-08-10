@@ -4,7 +4,14 @@ import {
   getClosestTimesVal,
   getClosestValInSortedArr,
 } from '@suika/common';
-import { type IPoint, isBoxIntersect, rectToBox } from '@suika/geo';
+import {
+  calcRectBbox,
+  type IPoint,
+  isBoxIntersect,
+  type ITransformRect,
+  mergeBoxes,
+  rectToVertices,
+} from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
 import { type IHorizontalLine, type IVerticalLine } from './type';
@@ -159,19 +166,22 @@ export class RefLine {
     }
   }
 
-  private getTargetPointFromSelect() {
+  private getTargetPointFromSelect(record: Map<string, ITransformRect>) {
     let targetPoints: IPoint[] = [];
     // 选中的为单个图形，要以旋转后的 4 个顶点和中心点为目标线
-    if (this.editor.selectedElements.size() === 1) {
-      const [targetGraph] = this.editor.selectedElements.getItems();
-      targetPoints = [
-        ...targetGraph.getWorldBboxVerts(),
-        targetGraph.getWorldCenter(),
-      ];
+    if (record.size === 1) {
+      const { width, height, transform } = Array.from(record.values())[0];
+      return rectToVertices(
+        { x: 0, y: 0, width: width, height: height },
+        transform,
+      );
     } else {
       const targetBbox = bboxToBboxWithMid(
-        rectToBox(this.editor.selectedElements.getBoundingRect()!),
+        mergeBoxes(
+          Array.from(record.values()).map((item) => calcRectBbox(item)),
+        ),
       );
+
       targetPoints = [
         { x: targetBbox.minX, y: targetBbox.minY },
         { x: targetBbox.minX, y: targetBbox.maxY },
@@ -189,11 +199,11 @@ export class RefLine {
    * update ref line
    * and return offset
    */
-  updateRefLine(): {
+  updateRefLine(record: Map<string, ITransformRect>): {
     offsetX: number;
     offsetY: number;
   } {
-    const targetPoints = this.getTargetPointFromSelect();
+    const targetPoints = this.getTargetPointFromSelect(record);
 
     this.toDrawVLines = [];
     this.toDrawHLines = [];
