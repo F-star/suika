@@ -153,6 +153,7 @@ export const ToolBar = () => {
         <Button
           style={{
             marginLeft: '16px',
+            userSelect: 'none',
           }}
           onClick={() => {
             if (editor) {
