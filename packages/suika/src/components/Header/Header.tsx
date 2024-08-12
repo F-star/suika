@@ -9,10 +9,10 @@ import { ToolBar } from './components/Toolbar';
 
 export const Header: FC = () => {
   return (
-    <div className="header">
+    <div className="sk-header">
       <ToolBar />
       <Title />
-      <div className="right-area">
+      <div className="sk-right-area">
         <LocaleSelector />
         <ZoomActions />
       </div>
