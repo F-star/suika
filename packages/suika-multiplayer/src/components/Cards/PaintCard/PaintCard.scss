@@ -1,0 +1,19 @@
+.suika {
+  .fill-item {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 8px;
+    .color-block {
+      margin: 8px 4px 8px 7px;
+      width: 16px;
+      height: 16px;
+    }
+    .img-block {
+      margin: 8px 4px 15px 12px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

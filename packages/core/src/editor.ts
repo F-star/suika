@@ -102,6 +102,7 @@ export class SuikaEditor {
     this.keybindingManager.bindEvent();
 
     this.doc = new SuikaDocument({
+      id: '0-0',
       objectName: 'Document',
       width: 0,
       height: 0,

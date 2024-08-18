@@ -25,9 +25,7 @@
     "react-intl": "^6.3.2",
     "react-scripts": "5.0.1",
     "sass": "^1.57.1",
-    "stats.js": "^0.17.0",
-    "y-websocket": "^2.0.3",
-    "yjs": "^13.6.17"
+    "stats.js": "^0.17.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.25",

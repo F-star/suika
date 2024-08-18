@@ -1,0 +1,21 @@
+.sk-cursors-view {
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+
+  .sk-multi-cursor-image {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    top: -9px;
+    left: -9px;
+  }
+
+  .sk-multi-cursor-username {
+    position: absolute;
+    top: 18px;
+    left: 14px;
+    padding: 0 4px;
+    box-shadow: 1px 1px 2px 2px #0000000d;
+  }
+}
