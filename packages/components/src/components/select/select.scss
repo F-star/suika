@@ -44,6 +44,7 @@
     font-size: 14px;
     color: #333;
     text-decoration: none;
+    cursor: pointer;
 
     .sk-select-popover-item-icon {
       margin-right: 4px;
@@ -57,7 +58,6 @@
       }
     }
 
-    cursor: pointer;
     &:hover {
       color: #fff;
       background-color: #0f8fff;

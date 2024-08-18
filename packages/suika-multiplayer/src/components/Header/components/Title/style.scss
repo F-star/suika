@@ -1,0 +1,19 @@
+.suika {
+  .suika-header-title {
+    flex-basis: 40%;
+
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #0f8fff;
+    user-select: none;
+
+    .sk-header-title-content {
+      max-width: 315px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

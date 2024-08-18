@@ -129,7 +129,7 @@ export class Setting {
     continueClickMaxGap: 350, // millisecond
     continueClickDistanceTol: 5,
   };
-  toggle<K extends BooleanKeys<Setting['value']>>(key: K) {
+  toggle<K extends BooleanKeys<SettingValue>>(key: K) {
     const value = this.value[key];
     if (typeof value === 'boolean') {
       this.set(key, !value);
@@ -137,21 +137,21 @@ export class Setting {
       console.warn(`toggle ${key} failed, value is not boolean`);
     }
   }
-  set<K extends keyof Setting['value']>(key: K, value: Setting['value'][K]) {
+  set<K extends keyof SettingValue>(key: K, value: SettingValue[K]) {
     this.value[key] = value;
     this.eventEmitter.emit('update', this.getAttrs());
   }
-  get<K extends keyof Setting['value']>(key: K) {
+  get<K extends keyof SettingValue>(key: K) {
     return this.value[key];
   }
-  getAttrs() {
+  getAttrs(): SettingValue {
     return { ...this.value };
   }
 
-  on(eventName: 'update', handler: (value: Setting['value']) => void) {
+  on(eventName: 'update', handler: (value: SettingValue) => void) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'update', handler: (value: Setting['value']) => void) {
+  off(eventName: 'update', handler: (value: SettingValue) => void) {
     this.eventEmitter.off(eventName, handler);
   }
 }

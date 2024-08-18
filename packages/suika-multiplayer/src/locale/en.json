@@ -1,0 +1,65 @@
+{
+  "delete": "Delete",
+  "fill": "Fill",
+  "stroke": "Stroke",
+  "mixed": "Mixed",
+  "noSelectedShapes": "No Selected Shapes",
+
+  "uploadFile": "Upload File",
+
+  "tool.select": "Select",
+  "tool.rectangle": "Rectangle",
+  "tool.ellipse": "Ellipse",
+  "tool.pen": "Pen",
+  "tool.line": "Line",
+  "tool.polygon": "Polygon",
+  "tool.star": "Star",
+  "tool.text": "Text",
+  "tool.hand": "Hand",
+  "tool.pencil": "Pencil",
+  "command.copy": "Copy",
+  "command.copyAsSVG": "Copy as SVG",
+  "command.pasteHere": "Paste here",
+  "command.undo": "Undo",
+  "command.redo": "Redo",
+  "command.selectAll": "Select all",
+  "arrange.forward": "Forward",
+  "arrange.backward": "Backward",
+  "arrange.front": "Bring to Front",
+  "arrange.back": "Send to Back",
+
+  "zoom.zoomIn": "Zoom in",
+  "zoom.zoomOut": "Zoom out",
+  "zoom.zoomToFit": "Zoom to fit",
+  "zoom.zoomToSelection": "Zoom to selection",
+  "zoom.zoomTo50": "Zoom to 50%",
+  "zoom.zoomTo100": "Zoom to 100%",
+  "zoom.zoomTo200": "Zoom to 200%",
+
+  "setting.grid.pixelGrid": "Pixel grid",
+  "setting.grid.snapToPixelGrid": "Snap to pixel grid",
+  "setting.rulers": "rulers",
+
+  "paintType.solid": "Solid",
+  "paintType.image": "Image",
+
+  "group": "Group selection",
+  "ungroup": "Ungroup",
+
+  "showOrHide": "Show/Hide",
+  "lockOrUnlock": "Lock/Unlock",
+
+  "flip.horizontal": "Flip Horizontal",
+  "flip.vertical": "Flip Horizontal",
+
+  "import.originFile": "Import local file",
+  "export.originFile": "Save local copy",
+
+  "preference": "Preference",
+  "keepToolSelectedAfterUse": "Keep tool selected after use",
+  "invertZoomDirection": "Invert zoom direction",
+  "highlightLayersOnHover": "Highlight layers on hover",
+  "flipObjectsWhileResizing": "Flip objects while resizing",
+
+  "done": "Done"
+}

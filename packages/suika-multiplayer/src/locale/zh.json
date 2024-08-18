@@ -1,0 +1,64 @@
+{
+  "delete": "删除",
+  "fill": "填充",
+  "stroke": "描边",
+  "mixed": "多值",
+  "noSelectedShapes": "没有选中的图形",
+
+  "uploadFile": "上传文件",
+
+  "tool.select": "选择",
+  "tool.rectangle": "矩形",
+  "tool.ellipse": "圆",
+  "tool.pen": "钢笔",
+  "tool.line": "直线",
+  "tool.polygon": "多边形",
+  "tool.star": "星形",
+  "tool.text": "文字",
+  "tool.hand": "拖拽画布",
+  "tool.pencil": "铅笔",
+  "command.copy": "复制",
+  "command.copyAsSVG": "复制 SVG 代码",
+  "command.pasteHere": "粘贴到此处",
+  "command.undo": "撤销",
+  "command.redo": "重做",
+  "command.selectAll": "全选",
+  "arrange.forward": "上移一层",
+  "arrange.backward": "下移一层",
+  "arrange.front": "移到顶部",
+  "arrange.back": "移到底部",
+
+  "zoom.zoomIn": "放大",
+  "zoom.zoomOut": "缩小",
+  "zoom.zoomToFit": "适应画布",
+  "zoom.zoomToSelection": "适应选中图形",
+  "zoom.zoomTo50": "50%",
+  "zoom.zoomTo100": "100%",
+  "zoom.zoomTo200": "200%",
+
+  "setting.grid.pixelGrid": "显示像素网格",
+  "setting.grid.snapToPixelGrid": "对齐像素网格",
+  "setting.rulers": "显示标尺",
+
+  "paintType.solid": "纯色",
+  "paintType.image": "图片",
+
+  "group": "创建编组",
+  "ungroup": "取消编组",
+  "showOrHide": "显示/隐藏",
+  "lockOrUnlock": "锁定/解锁",
+
+  "flip.horizontal": "水平翻转",
+  "flip.vertical": "垂直翻转",
+
+  "import.originFile": "从本地导入",
+  "export.originFile": "导出到本地",
+
+  "preference": "偏好设置",
+  "keepToolSelectedAfterUse": "使用工具后保持选中状态",
+  "invertZoomDirection": "反转缩放方向",
+  "highlightLayersOnHover": "鼠标悬停时高亮图层",
+  "flipObjectsWhileResizing": "缩放时对图形进行翻转",
+
+  "done": "完成"
+}

@@ -1,0 +1,22 @@
+.suika {
+  .info-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 40;
+
+    border-left: 1px solid #e6e6e6;
+    width: 240px;
+    height: calc(100vh - 48px);
+
+    font-size: 12px;
+    background-color: #fff;
+    user-select: none;
+
+    .empty-text {
+      color: #b3b3b3;
+      padding: 16px;
+    }
+  
+  }
+}

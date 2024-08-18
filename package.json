@@ -10,8 +10,10 @@
   ],
   "scripts": {
     "dev": "run-p common:dev icons:dev components:dev geo:dev core:dev app:dev",
+    "dev-m": "run-p common:dev icons:dev components:dev geo:dev core:dev app-m:dev",
     "build": "pnpm -r exec pnpm run build",
     "app:dev": "pnpm --filter @suika/suika dev",
+    "app-m:dev": "pnpm --filter @suika/suika-multiplayer dev",
     "app:build": "pnpm --filter @suika/suika build",
     "storybook": "pnpm --filter @suika/components storybook",
     "components:build": "pnpm --filter @suika/components build",

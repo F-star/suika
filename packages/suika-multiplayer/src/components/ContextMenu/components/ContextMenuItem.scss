@@ -1,0 +1,24 @@
+.suika {
+  .suika-context-menu-item {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 0 16px;
+    line-height: 24px;
+    font-size: 12px;
+    cursor: default;
+
+    &:hover {
+      color: #fff;
+      background-color: #0f8fff;
+    }
+    &.suika-is-disable {
+      color: #ccc;
+      pointer-events: none;
+      &:hover {
+        color: #ccc;
+        background-color: transparent;
+      }
+    }
+  }
+}
