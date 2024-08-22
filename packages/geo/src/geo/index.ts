@@ -5,6 +5,7 @@ export * from './geo_line';
 export * from './geo_matrix';
 export * from './geo_matrix_class';
 export * from './geo_path';
+export * from './geo_path_class';
 export * from './geo_point';
 export * from './geo_polygon';
 export * from './geo_rect';

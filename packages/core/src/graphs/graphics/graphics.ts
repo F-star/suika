@@ -281,14 +281,14 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     });
   }
 
-  hitTest(x: number, y: number, padding = 0) {
+  hitTest(x: number, y: number, tol = 0) {
     return isPointInRect(
       { x, y },
       {
         ...this.getSize(),
         transform: this.getWorldTransform(),
       },
-      padding + this.getStrokeWidth() / 2,
+      tol + this.getStrokeWidth() / 2,
     );
   }
 

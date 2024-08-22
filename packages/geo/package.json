@@ -12,6 +12,7 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
+    "@suika/common": "workspace:^",
     "fit-curve": "^0.2.0"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  GeoPath,
   type IMatrixArr,
   invertMatrix,
   type IPathItem,
@@ -13,7 +14,6 @@ import {
   resizeLine,
   resizeRect,
 } from '@suika/geo';
-import { Bezier } from 'bezier-js';
 
 import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
@@ -30,6 +30,7 @@ export interface PathAttrs extends GraphicsAttrs {
 
 export class SuikaPath extends SuikaGraphics<PathAttrs> {
   override type = GraphicsType.Path;
+  private geoPath: GeoPath | null = null;
 
   constructor(
     attrs: Optional<PathAttrs, 'id' | 'transform'>,
@@ -39,39 +40,8 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
   }
 
   static computeRect(pathData: IPathItem[]): IRect {
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const pathItem of pathData) {
-      const segs = pathItem.segs;
-      for (let i = 1; i <= segs.length; i++) {
-        if (i === segs.length && !pathItem.closed) {
-          continue;
-        }
-        const seg = segs[i % segs.length];
-        const prevSeg = segs[i - 1];
-        const bbox = new Bezier(
-          prevSeg.point,
-          SuikaPath.getHandleOut(prevSeg),
-          SuikaPath.getHandleIn(seg),
-          seg.point,
-        ).bbox();
-        minX = Math.min(minX, bbox.x.min);
-        minY = Math.min(minY, bbox.y.min);
-        maxX = Math.max(maxX, bbox.x.max);
-        maxY = Math.max(maxY, bbox.y.max);
-      }
-    }
-    if (minX === Infinity) {
-      return { x: 0, y: 0, width: 100, height: 100 };
-    }
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
+    const geoPath = new GeoPath(pathData);
+    return geoPath.getBbox();
   }
 
   static recomputeAttrs(pathData: IPathItem[], transform: IMatrixArr) {
@@ -105,6 +75,18 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
         'width or height and pathData cannot coexist when updating attribute, removed width and height',
       );
     }
+  }
+
+  protected override clearBboxCache(): void {
+    super.clearBboxCache();
+    this.geoPath = null;
+  }
+
+  private getGeoPath() {
+    if (!this.geoPath) {
+      this.geoPath = new GeoPath(this.attrs.pathData);
+    }
+    return this.geoPath!;
   }
 
   /**
@@ -309,6 +291,22 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     }
     ctx.closePath();
     ctx.restore();
+  }
+
+  override hitTest(x: number, y: number, tol = 0): boolean {
+    if (!super.hitTest(x, y, tol)) {
+      return false;
+    }
+    if (this.attrs.fill?.length) {
+      // TODO: fill hit test
+      return true;
+    }
+
+    const tf = new Matrix(...this.getWorldTransform());
+    const point = tf.applyInverse({ x, y });
+    const geoPath = this.getGeoPath();
+    const { dist } = geoPath.project(point);
+    return dist <= tol + this.getStrokeWidth() / 2;
   }
 
   override toJSON() {

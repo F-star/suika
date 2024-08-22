@@ -2,6 +2,15 @@ import { type IBox, type IPoint, type ITransformRect } from '../type';
 import { applyMatrix } from './geo_matrix';
 import { rectToVertices } from './geo_rect';
 
+export const isPointInBox = (box: IBox, point: IPoint, tol = 0) => {
+  return (
+    point.x >= box.minX - tol &&
+    point.y >= box.minY - tol &&
+    point.x <= box.maxX + tol &&
+    point.y <= box.maxY + tol
+  );
+};
+
 /**
  * get merged rect from rects
  */
