@@ -1,6 +1,6 @@
 import { type IPoint, type ISize } from '../type';
 import { Matrix } from './geo_matrix_class';
-import { lerp } from './geo_point';
+import { lerpNum } from './geo_point';
 
 export const getRegularPolygon = (size: ISize, count: number): IPoint[] => {
   const cx = size.width / 2;
@@ -24,7 +24,7 @@ export const getRegularPolygon = (size: ISize, count: number): IPoint[] => {
   const t = size.width / size.height;
   for (let i = 1; i < count; i++) {
     const pt = points[i];
-    pt.x = lerp(cx, pt.x, t);
+    pt.x = lerpNum(cx, pt.x, t);
   }
 
   return points;
