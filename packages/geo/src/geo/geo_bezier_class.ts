@@ -68,15 +68,45 @@ export class GeoBezier {
     return this._bbox;
   }
 
-  private checkInBbox(point: IPoint, tol = 0) {
-    return isPointInBox(this.getBbox(), point, tol);
-  }
-
-  // TODO:
-  hitTest(point: IPoint, tol: number) {
-    if (!this.checkInBbox(point, tol)) {
+  hitTest(point: IPoint, tol: number): boolean {
+    if (!isPointInBox(this.getBbox(), point, tol)) {
       return false;
     }
+
+    // based on the modification of "project algorithm"
+    const lookupTable = this.getLookupTable();
+
+    let minDist = Number.MAX_SAFE_INTEGER;
+    let minIndex = -1;
+
+    for (let i = 0; i < lookupTable.length; i++) {
+      const item = lookupTable[i];
+      const dist = distance(point, item.pt); // TODO: optimize, no sqrt
+      if (dist <= tol) {
+        return true;
+      }
+      if (dist < minDist) {
+        minDist = dist;
+        minIndex = i;
+      }
+    }
+
+    const minT = lookupTable[minIndex].t;
+
+    const t1 = minIndex > 0 ? lookupTable[minIndex - 1].t : minT;
+    const t2 =
+      minIndex < lookupTable.length - 1 ? lookupTable[minIndex + 1].t : minT;
+
+    const step = 0.001;
+    for (let t = t1; t <= t2; t += step) {
+      const pt = this.compute(t);
+      const dist = distance(point, pt); // TODO: optimize, no sqrt
+      if (dist <= tol) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   getLookupTable() {

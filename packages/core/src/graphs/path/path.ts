@@ -305,8 +305,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     const tf = new Matrix(...this.getWorldTransform());
     const point = tf.applyInverse({ x, y });
     const geoPath = this.getGeoPath();
-    const { dist } = geoPath.project(point);
-    return dist <= tol + this.getStrokeWidth() / 2;
+    return geoPath.hitTest(point, tol + this.getStrokeWidth() / 2);
   }
 
   override toJSON() {
