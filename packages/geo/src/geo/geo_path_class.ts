@@ -68,6 +68,17 @@ export class GeoPath {
     };
   }
 
+  hitTest(point: IPoint, tol: number) {
+    for (const bezierList of this.bezierLists) {
+      for (const bezier of bezierList) {
+        if (bezier.hitTest(point, tol)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   project(point: IPoint) {
     let minDist = Infinity;
     let minDistPoint: IPoint | null = null;
