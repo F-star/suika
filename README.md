@@ -68,7 +68,9 @@ pnpm build
 
 ## suika 编辑器答疑和交流
 
-如果你对 suika 图形编辑器有什么疑问，可以加我微信，备注 “suika”，我拉你到 suika 编辑器交流群。
+如果对 suika 图形编辑器有什么疑问，或是有 bug 要反馈。
+
+可以加我微信，备注 “suika”，我拉你到 suika 编辑器交流群。
 
 ![image](https://github.com/user-attachments/assets/205b2c4f-1408-46a0-8bdc-ea3f54a6e125)
 
