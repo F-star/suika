@@ -8,7 +8,7 @@ import { type ITool } from './type';
 
 const TYPE = 'drawRegularPolygon';
 const HOTKEY = '';
-export class DrawRegularPolygon extends DrawGraphTool implements ITool {
+export class DrawRegularPolygonTool extends DrawGraphTool implements ITool {
   static override readonly type = TYPE;
   static override readonly hotkey = HOTKEY;
   override readonly type = TYPE;

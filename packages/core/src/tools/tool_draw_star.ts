@@ -8,7 +8,7 @@ import { type ITool } from './type';
 
 const TYPE = 'drawStar';
 const HOTKEY = '';
-export class DrawStar extends DrawGraphTool implements ITool {
+export class DrawStarTool extends DrawGraphTool implements ITool {
   static override readonly type = TYPE;
   static override readonly hotkey = HOTKEY;
   override readonly type = TYPE;
