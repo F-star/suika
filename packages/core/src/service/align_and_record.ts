@@ -22,6 +22,8 @@ export const alignAndRecord = (editor: SuikaEditor, type: AlignType) => {
   const worldTfs = graphicsArr.map((item) => item.getWorldTransform());
   const mixedBBox = mergeBoxes(bboxes);
 
+  // TODO: check whether had align
+
   const transaction = new Transaction(editor);
 
   const updateGraphicsPosition = (
