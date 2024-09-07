@@ -6,6 +6,7 @@ import {
   SuikaText,
 } from '../graphs';
 import {
+  alignAndRecord,
   arrangeAndRecord,
   flipHorizontalAndRecord,
   flipVerticalAndRecord,
@@ -13,7 +14,7 @@ import {
   ungroupAndRecord,
 } from '../service';
 import { groupAndRecord } from '../service/group_and_record';
-import { ArrangeType } from '../type';
+import { AlignType, ArrangeType } from '../type';
 
 export class CommandKeyBinding {
   private isBound = false;
@@ -246,6 +247,61 @@ export class CommandKeyBinding {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Backward',
       action: backwardAction,
+    });
+
+    /*************** align **************/
+    editor.keybindingManager.register({
+      key: { altKey: true, keyCode: 'KeyA' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'AlignLeft',
+      action: () => {
+        alignAndRecord(editor, AlignType.Left);
+      },
+    });
+
+    editor.keybindingManager.register({
+      key: { altKey: true, keyCode: 'KeyH' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'AlignHorizontalCenters',
+      action: () => {
+        alignAndRecord(editor, AlignType.HCenter);
+      },
+    });
+
+    editor.keybindingManager.register({
+      key: { altKey: true, keyCode: 'KeyD' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'AlignRight',
+      action: () => {
+        alignAndRecord(editor, AlignType.Right);
+      },
+    });
+
+    editor.keybindingManager.register({
+      key: { altKey: true, keyCode: 'KeyW' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'AlignTop',
+      action: () => {
+        alignAndRecord(editor, AlignType.Top);
+      },
+    });
+
+    editor.keybindingManager.register({
+      key: { altKey: true, keyCode: 'KeyV' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'AlignVerticalCenters',
+      action: () => {
+        alignAndRecord(editor, AlignType.VCenter);
+      },
+    });
+
+    editor.keybindingManager.register({
+      key: { altKey: true, keyCode: 'KeyS' },
+      when: (ctx) => !ctx.isToolDragging,
+      actionName: 'AlignBottom',
+      action: () => {
+        alignAndRecord(editor, AlignType.Bottom);
+      },
     });
 
     /*************** group **************/
