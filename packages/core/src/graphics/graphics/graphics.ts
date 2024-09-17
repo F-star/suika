@@ -20,7 +20,7 @@ import {
   type IPoint,
   isBoxContain,
   isBoxIntersect,
-  isPointInRect,
+  isPointInTransformedRect,
   isRectIntersect,
   type ITransformRect,
   Matrix,
@@ -46,6 +46,7 @@ import {
 } from '../../type';
 import { drawRoundRectPath } from '../../utils';
 import { type SuikaDocument } from '../document';
+import { type IHitOptions } from '../type';
 import {
   type GraphicsAttrs,
   type IAdvancedAttrs,
@@ -281,9 +282,9 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     });
   }
 
-  hitTest(x: number, y: number, tol = 0) {
-    return isPointInRect(
-      { x, y },
+  hitTest(point: IPoint, tol = 0) {
+    return isPointInTransformedRect(
+      point,
       {
         ...this.getSize(),
         transform: this.getWorldTransform(),
@@ -292,17 +293,26 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     );
   }
 
-  hitTestChildren(x: number, y: number, padding = 0): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getHitGraphics(point: IPoint, options: IHitOptions): SuikaGraphics | null {
+    const { tol = 0 } = options;
+    if (this.hitTest(point, tol)) {
+      return this;
+    }
+    return null;
+  }
+
+  hitTestChildren(point: IPoint, padding = 0): boolean {
     if (!this.isContainer) {
-      return this.hitTest(x, y, padding);
+      return this.hitTest(point, padding);
     }
 
-    if (!this.hitTest(x, y, padding)) {
+    if (!this.hitTest(point, padding)) {
       return false;
     }
     const children = this.getChildren();
     for (let i = children.length - 1; i >= 0; i--) {
-      if (children[i].hitTest(x, y, padding)) {
+      if (children[i].hitTest(point, padding)) {
         return true;
       }
     }
@@ -998,23 +1008,42 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     return false;
   }
 
-  getParentIds() {
-    const ids: string[] = [];
+  forEachParent(
+    callback: (
+      graphics: SuikaGraphics,
+      breakLoop: () => void,
+    ) => boolean | void,
+  ) {
+    let breakFlag = false;
+    const breakLoop = () => {
+      breakFlag = true;
+    };
+
     let node = this.getParent();
     while (node) {
-      ids.push(node.attrs.id);
+      callback(node, breakLoop);
+      if (breakFlag) break;
       node = node.getParent();
     }
+  }
+
+  getParentIds() {
+    const ids: string[] = [];
+    this.forEachParent((node) => {
+      ids.push(node.attrs.id);
+    });
     return ids;
   }
 
   getFrameParentIds() {
     const ids: string[] = [];
-    let node = this.getParent();
-    while (node && node.type !== GraphicsType.Canvas) {
+    this.forEachParent((node, breakLoop) => {
+      if (node.type === GraphicsType.Canvas) {
+        breakLoop();
+        return;
+      }
       ids.push(node.attrs.id);
-      node = node.getParent();
-    }
+    });
     return ids;
   }
 
@@ -1026,24 +1055,13 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     });
   }
 
-  getVisibleLeafNodeSet() {
-    const graphicsSet = new Set<SuikaGraphics>();
-    this.forEachVisibleLeafNode((graphics) => {
-      graphicsSet.add(graphics);
-    });
-    return graphicsSet;
-  }
-
-  forEachVisibleLeafNode(cb: (graphics: SuikaGraphics) => void) {
+  forEachVisibleChildNode(callback: (graphics: SuikaGraphics) => void) {
     if (!this.isVisible()) {
       return;
     }
-    if (this.isContainer) {
-      for (const child of this.children) {
-        child.forEachVisibleLeafNode(cb);
-      }
-    } else {
-      cb(this);
+    for (const child of this.children) {
+      child.forEachVisibleChildNode(callback);
     }
+    callback(this);
   }
 }

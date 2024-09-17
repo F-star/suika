@@ -3,8 +3,8 @@ import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type SuikaEditor } from '../editor';
-import { SuikaEllipse, SuikaLine, SuikaPath } from '../graphs';
-import { SuikaRegularPolygon } from '../graphs/regular_polygon';
+import { SuikaEllipse, SuikaLine, SuikaPath } from '../graphics';
+import { SuikaRegularPolygon } from '../graphics/regular_polygon';
 import { PaintType } from '../paint';
 import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
 
@@ -165,7 +165,7 @@ export class SelectedControl {
               strokeWidth: 1,
             },
             {
-              advancedAttrs: this.editor.sceneCoordsToViewport(
+              advancedAttrs: this.editor.toViewportPt(
                 anchor.x + anchorSize / 2,
                 anchor.y + anchorSize / 2,
               ),
@@ -256,7 +256,7 @@ export class SelectedControl {
                 count: 4,
               },
               {
-                advancedAttrs: this.editor.sceneCoordsToViewport(
+                advancedAttrs: this.editor.toViewportPt(
                   handle.x + size / 2,
                   handle.y + size / 2,
                 ),

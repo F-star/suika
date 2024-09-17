@@ -1,8 +1,8 @@
-import { isPointInRect, isPointInRoundRect } from '../geo';
+import { isPointInRoundRect, isPointInTransformedRect } from '../geo';
 
-test('isPointInRect', () => {
+test('isPointInTransformedRect', () => {
   expect(
-    isPointInRect(
+    isPointInTransformedRect(
       { x: 50, y: 50 },
       { width: 100, height: 100, transform: [1, 0, 0, 1, 10, 10] },
     ),

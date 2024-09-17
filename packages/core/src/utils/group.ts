@@ -1,9 +1,9 @@
 import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
-  isGroupGraphics,
+  isFrameGraphics,
   type SuikaGraphics,
-} from '../graphs';
+} from '../graphics';
 
 export const getParentIdSet = (items: SuikaGraphics[]) => {
   return items.reduce((set, graphics) => {
@@ -27,23 +27,25 @@ export const getParentIdSet = (items: SuikaGraphics[]) => {
 };
 
 export const getChildNodeSet = (
-  items: SuikaGraphics[],
+  nodes: SuikaGraphics[],
   includeSelf = false,
 ) => {
   const set = new Set<SuikaGraphics>();
-  for (const item of items) {
-    if (set.has(item)) {
+  for (const node of nodes) {
+    if (set.has(node)) {
       return set;
     }
 
     if (includeSelf) {
-      set.add(item);
+      set.add(node);
     }
 
-    const childSet = getChildNodeSet(item.getChildren(), true);
-    childSet.forEach((node) => {
-      set.add(node);
-    });
+    if (isFrameGraphics(node) && node.isGroup()) {
+      const childSet = getChildNodeSet(node.getChildren(), true);
+      childSet.forEach((node) => {
+        set.add(node);
+      });
+    }
   }
   return set;
 };
@@ -57,7 +59,7 @@ export const updateNodeSize = (
 ) => {
   for (const id of idSet) {
     const node = editor.doc.getGraphicsById(id);
-    if (node && isGroupGraphics(node) && !node.isEmpty()) {
+    if (node && isFrameGraphics(node) && node.isGroup() && !node.isEmpty()) {
       node.updateSizeByChildren(originAttrsMap, updatedAttrsMap);
     }
   }

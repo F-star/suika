@@ -2,8 +2,15 @@ import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPoint, type ITransformRect } from '@suika/geo';
 
 import { type SuikaEditor } from '../../editor';
-import { type SuikaGraphics } from '../../graphs';
+import {
+  type IParentIndex,
+  isFrameGraphics,
+  type SuikaFrame,
+  type SuikaGraphics,
+} from '../../graphics';
+import { type SuikaCanvas } from '../../graphics/canvas';
 import { Transaction } from '../../transaction';
+import { getDeepFrameAtPoint } from '../../utils';
 import { type IBaseTool } from '../type';
 import { getTopHitElement } from './utils';
 
@@ -13,9 +20,12 @@ import { getTopHitElement } from './utils';
  */
 export class SelectMoveTool implements IBaseTool {
   private originWorldTfMap = new Map<string, IMatrixArr>();
+  private originParentIndexMap = new Map<string, IParentIndex>();
 
   private transaction: Transaction;
   private selectedItems: SuikaGraphics[] = [];
+  private selectedFrameIdSet = new Set<string>();
+  private prevParent!: SuikaFrame | SuikaCanvas;
 
   private startPoint: IPoint = { x: -1, y: -1 };
   private dragPoint: IPoint | null = null;
@@ -45,11 +55,26 @@ export class SelectMoveTool implements IBaseTool {
       excludeLocked: true,
     });
     for (const item of this.selectedItems) {
-      this.transaction.recordOld(item.attrs.id, {
+      const id = item.attrs.id;
+      if (isFrameGraphics(item) && !item.isGroup()) {
+        this.selectedFrameIdSet.add(id);
+      }
+      this.transaction.recordOld(id, {
         transform: cloneDeep(item.attrs.transform),
+        parentIndex: cloneDeep(item.attrs.parentIndex),
       });
-      this.originWorldTfMap.set(item.attrs.id, item.getWorldTransform());
+
+      this.originWorldTfMap.set(id, item.getWorldTransform());
+      this.originParentIndexMap.set(id, cloneDeep(item.attrs.parentIndex!));
     }
+
+    const canvasGraphics = this.editor.doc.getCanvas();
+    this.prevParent =
+      getDeepFrameAtPoint(
+        this.startPoint,
+        canvasGraphics.getChildren(),
+        (node) => this.selectedFrameIdSet.has(node.attrs.id),
+      ) ?? canvasGraphics;
 
     const boundingRect = this.editor.selectedElements.getBoundingRect();
     if (!boundingRect) {
@@ -70,13 +95,13 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = false;
     this.editor.sceneGraph.showSelectedGraphsOutline = false;
 
-    const { x, y } = this.editor.viewportCoordsToScene(
+    const currPoint = this.editor.toScenePt(
       this.dragPoint!.x,
       this.dragPoint!.y,
     );
 
-    let dx = x - this.startPoint.x;
-    let dy = y - this.startPoint.y;
+    let dx = currPoint.x - this.startPoint.x;
+    let dy = currPoint.y - this.startPoint.y;
 
     if (this.editor.hostEventManager.isShiftPressing) {
       if (Math.abs(dx) > Math.abs(dy)) {
@@ -118,6 +143,13 @@ export class SelectMoveTool implements IBaseTool {
 
     const { offsetX, offsetY } = this.editor.refLine.updateRefLine(record);
 
+    const canvasGraphics = this.editor.doc.getCanvas();
+    const newParent =
+      getDeepFrameAtPoint(currPoint, canvasGraphics.getChildren(), (node) =>
+        this.selectedFrameIdSet.has(node.attrs.id),
+      ) ?? canvasGraphics;
+    const newParentId = newParent.attrs.id;
+
     // 2. snap to ref line
     for (const graphics of selectedItems) {
       const newWorldTf = cloneDeep(
@@ -126,13 +158,30 @@ export class SelectMoveTool implements IBaseTool {
       newWorldTf[4] += dx + offsetX;
       newWorldTf[5] += dy + offsetY;
 
+      // change parent
+      if (this.prevParent !== newParent) {
+        if (graphics.attrs.id !== newParentId) {
+          if (graphics.getParentId() === newParentId) {
+            graphics.updateAttrs({
+              parentIndex: {
+                guid: newParentId,
+                position: graphics.attrs.parentIndex!.position,
+              },
+            });
+          } else {
+            newParent.insertChild(graphics); // FIXME: should insert after prev parent position
+          }
+        }
+      }
       graphics.setWorldTransform(newWorldTf);
     }
+    this.prevParent = newParent;
 
     // 3. record update attrs
     for (const graphics of selectedItems) {
       this.transaction.update(graphics.attrs.id, {
         transform: cloneDeep(graphics.attrs.transform),
+        parentIndex: cloneDeep(graphics.attrs.parentIndex),
       });
     }
 
@@ -194,6 +243,7 @@ export class SelectMoveTool implements IBaseTool {
   afterEnd() {
     this.transaction = new Transaction(this.editor);
     this.dragPoint = null;
+    this.selectedFrameIdSet.clear();
 
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = true;
     this.editor.sceneGraph.showSelectedGraphsOutline = true;

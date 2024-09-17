@@ -9,15 +9,15 @@ import {
 
 import { HALF_PI } from '../constant';
 import { type SuikaEditor } from '../editor';
-import { SuikaLine } from '../graphs';
+import { SuikaLine } from '../graphics';
 import { adjustSizeToKeepPolarSnap } from '../utils';
-import { DrawGraphTool } from './tool_draw_graph';
+import { DrawGraphicsTool } from './tool_draw_graphics';
 import { type ITool } from './type';
 
 const TYPE = 'drawLine';
 const HOTKEY = 'l';
 
-export class DrawLineTool extends DrawGraphTool implements ITool {
+export class DrawLineTool extends DrawGraphicsTool implements ITool {
   static override readonly type = TYPE;
   static override readonly hotkey = HOTKEY;
   override readonly type = TYPE;
@@ -28,7 +28,7 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
     this.commandDesc = 'Add Line';
   }
 
-  protected createGraph(rect: IRect, noMove: boolean) {
+  protected createGraphics(rect: IRect, noMove: boolean) {
     // do not create line if no drag
     if (noMove) {
       return null;
@@ -52,9 +52,9 @@ export class DrawLineTool extends DrawGraphTool implements ITool {
     return adjustSizeToKeepPolarSnap(rect);
   }
 
-  protected override updateGraph(rect: IRect) {
+  protected override updateGraphics(rect: IRect) {
     const attrs = this.calcAttrs(rect);
-    this.drawingGraph!.updateAttrs(attrs);
+    this.drawingGraphics!.updateAttrs(attrs);
   }
 
   protected override solveWidthOrHeightIsZero(

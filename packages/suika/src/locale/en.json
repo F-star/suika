@@ -8,6 +8,7 @@
   "uploadFile": "Upload File",
 
   "tool.select": "Select",
+  "tool.frame": "Frame",
   "tool.rectangle": "Rectangle",
   "tool.ellipse": "Ellipse",
   "tool.pen": "Pen",

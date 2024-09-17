@@ -1,5 +1,5 @@
 import { type SuikaEditor } from '../editor';
-import { type GraphicsAttrs } from '../graphs';
+import { type GraphicsAttrs } from '../graphics';
 import { type ICommand } from './type';
 
 export class UpdateGraphicsAttrsCmd implements ICommand {

@@ -2,7 +2,7 @@ import { EventEmitter, isSameArray } from '@suika/common';
 import { boxToRect, type IRect, mergeBoxes } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
-import { isGroupGraphics, type SuikaGraphics } from './graphs';
+import { isFrameGraphics, type SuikaGraphics } from './graphics';
 import { removeGraphicsAndRecord } from './service/remove_service';
 import { getParentIdSet } from './utils';
 
@@ -101,7 +101,7 @@ export class SelectedElements {
     }
 
     if (opts?.disableParentAndChildCoexist) {
-      if (isGroupGraphics(toggledElement)) {
+      if (isFrameGraphics(toggledElement) && toggledElement.isGroup()) {
         this.items = this.items.filter((item) => !item.containAncestor(id));
       } else {
         const pathIdSet = new Set(toggledElement.getParentIds());

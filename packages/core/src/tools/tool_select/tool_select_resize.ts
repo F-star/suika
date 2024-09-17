@@ -15,7 +15,7 @@ import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { HALF_PI } from '../../constant';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type SuikaEditor } from '../../editor';
-import { type GraphicsAttrs, type SuikaGraphics } from '../../graphs';
+import { type GraphicsAttrs, type SuikaGraphics } from '../../graphics';
 import { SnapHelper } from '../../snap';
 import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../../utils';
 import { type IBaseTool } from '../type';

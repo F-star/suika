@@ -293,8 +293,8 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     ctx.restore();
   }
 
-  override hitTest(x: number, y: number, tol = 0): boolean {
-    if (!super.hitTest(x, y, tol)) {
+  override hitTest(point: IPoint, tol = 0): boolean {
+    if (!super.hitTest(point, tol)) {
       return false;
     }
     if (this.attrs.fill?.length) {
@@ -303,9 +303,9 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     }
 
     const tf = new Matrix(...this.getWorldTransform());
-    const point = tf.applyInverse({ x, y });
+    const pt = tf.applyInverse(point);
     const geoPath = this.getGeoPath();
-    return geoPath.hitTest(point, tol + this.getStrokeWidth() / 2);
+    return geoPath.hitTest(pt, tol + this.getStrokeWidth() / 2);
   }
 
   override toJSON() {

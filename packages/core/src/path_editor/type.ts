@@ -1,4 +1,4 @@
-import { type PathSegPointType } from '../graphs';
+import { type PathSegPointType } from '../graphics';
 
 export type SelectedIdexType = PathSegPointType | 'curve';
 

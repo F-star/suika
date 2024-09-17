@@ -2,7 +2,7 @@ import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, mergeBoxes } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { type SuikaGraphics } from '../graphs';
+import { type SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
 import { AlignType } from '../type';
 

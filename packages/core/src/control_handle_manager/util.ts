@@ -2,6 +2,7 @@ import { parseHexToRGBA } from '@suika/common';
 import {
   checkTransformFlip,
   getTransformAngle,
+  type IPoint,
   type ITransformRect,
   Matrix,
   normalizeDegree,
@@ -10,8 +11,8 @@ import {
 
 import { HALF_PI } from '../constant';
 import { type ICursor } from '../cursor_manager';
-import { SuikaRect } from '../graphs';
-import { type SuikaDocument } from '../graphs/document';
+import { SuikaRect } from '../graphics';
+import { type SuikaDocument } from '../graphics/document';
 import { type IPaint, PaintType } from '../paint';
 import { ControlHandle } from './control_handle';
 import { type ITransformHandleType } from './type';
@@ -272,15 +273,14 @@ export const createTransformHandles = (
   /************* north/south/west/east ************/
   const hitTest = function (
     this: ControlHandle,
-    x: number,
-    y: number,
+    point: IPoint,
     tol: number,
     rect: ITransformRect | null,
   ) {
     if (!rect || rect.width === 0 || rect.height === 0) {
       return false;
     }
-    return this.graphics.hitTest(x, y, tol);
+    return this.graphics.hitTest(point, tol);
   };
 
   const n = new ControlHandle({

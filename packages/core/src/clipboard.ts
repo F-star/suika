@@ -8,8 +8,8 @@ import {
 import { generateNKeysBetween } from 'fractional-indexing';
 
 import { type SuikaEditor } from './editor';
-import { type GraphicsAttrs, isFrameGraphics, SuikaGraphics } from './graphs';
-import { isCanvasGraphics } from './graphs/canvas';
+import { type GraphicsAttrs, isFrameGraphics, SuikaGraphics } from './graphics';
+import { isCanvasGraphics } from './graphics/canvas';
 import { toSVG } from './to_svg';
 import { Transaction } from './transaction';
 import { type IEditorPaperData } from './type';

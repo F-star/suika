@@ -1,50 +1,25 @@
 import { type IBox, type IPoint, rectToBox } from '@suika/geo';
 
 import { type SuikaEditor } from '../../editor';
-import { SuikaFrame, type SuikaGraphics } from '../../graphs';
+import { type IHitOptions, type SuikaGraphics } from '../../graphics';
 
 /********* get top hit element ********/
 export const getTopHitElement = (
   editor: SuikaEditor,
-  pt: IPoint,
+  point: IPoint,
 ): SuikaGraphics | null => {
-  const padding =
-    editor.setting.get('selectionHitPadding') / editor.zoomManager.getZoom();
+  const zoom = editor.zoomManager.getZoom();
+  const tol = editor.setting.get('selectionHitPadding') / zoom;
   const canvasGraphics = editor.doc.getCurrCanvas();
   const parentIdSet = editor.selectedElements.getParentIdSet();
 
-  return getTopHitElementDFS(pt, padding, canvasGraphics, parentIdSet);
-};
+  const hitOptions: IHitOptions = {
+    tol,
+    parentIdSet,
+    zoom,
+  };
 
-const getTopHitElementDFS = (
-  pt: IPoint,
-  padding: number,
-  parent: SuikaGraphics,
-  parentIdSet: Set<string>,
-): SuikaGraphics | null => {
-  const children = parent.getChildren();
-  for (let i = children.length - 1; i >= 0; i--) {
-    const child = children[i];
-    if (!child.isVisible() || child.isLock()) {
-      continue;
-    }
-    if (child.hitTest(pt.x, pt.y, padding)) {
-      if (child instanceof SuikaFrame) {
-        const target = getTopHitElementDFS(pt, padding, child, parentIdSet);
-        if (target) {
-          const parent = target.getParent();
-          // 找到最近的一个 parent
-          if (parent && !parentIdSet.has(parent.attrs.id)) {
-            return parent;
-          }
-          return target;
-        }
-      } else {
-        return child;
-      }
-    }
-  }
-  return null;
+  return canvasGraphics.getHitGraphics(point, hitOptions);
 };
 
 /****** get elements in selection ******/

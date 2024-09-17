@@ -93,7 +93,7 @@ class Ruler {
     startXInScene = getClosestTimesVal(startXInScene, stepInScene);
 
     const endX = viewport.width;
-    let { x: endXInScene } = this.editor.viewportCoordsToScene(endX, 0);
+    let { x: endXInScene } = this.editor.toScenePt(endX, 0);
     endXInScene = getClosestTimesVal(endXInScene, stepInScene);
 
     ctx.textAlign = 'center';

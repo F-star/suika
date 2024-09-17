@@ -1,5 +1,5 @@
 import { type SuikaEditor } from '../editor';
-import { type SuikaGraphics } from '../graphs';
+import { type SuikaGraphics } from '../graphics';
 import { type ICommand } from './type';
 
 export class AddGraphCmd implements ICommand {

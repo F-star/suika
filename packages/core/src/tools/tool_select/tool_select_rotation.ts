@@ -8,7 +8,7 @@ import {
 
 import { getRotationCursor } from '../../control_handle_manager';
 import { type SuikaEditor } from '../../editor';
-import { type SuikaGraphics } from '../../graphs';
+import { type SuikaGraphics } from '../../graphics';
 import { Transaction } from '../../transaction';
 import { type IBaseTool } from '../type';
 

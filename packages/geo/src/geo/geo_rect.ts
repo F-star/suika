@@ -20,14 +20,14 @@ export const getRectByTwoPoint = (point1: IPoint, point2: IPoint): IRect => {
   };
 };
 
-export const isPointInRect = (
+export const isPointInTransformedRect = (
   point: IPoint,
   rect: {
     width: number;
     height: number;
     transform?: IMatrixArr;
   },
-  padding = 0,
+  tol = 0,
 ) => {
   if (rect.transform) {
     const matrix = new Matrix(...rect.transform);
@@ -35,10 +35,10 @@ export const isPointInRect = (
   }
 
   return (
-    point.x >= -padding &&
-    point.y >= -padding &&
-    point.x <= rect.width + padding &&
-    point.y <= rect.height + padding
+    point.x >= -tol &&
+    point.y >= -tol &&
+    point.x <= rect.width + tol &&
+    point.y <= rect.height + tol
   );
 };
 
@@ -283,7 +283,7 @@ export const getTransformedSize = (rect: ITransformRect): ISize => {
 
 /**
  * 重新计算 width、height 和 transform
- * 确保 transform 后的 size 和 transform 前的 size 相同
+ * 确保 transform 前后的 size 相同
  */
 export const recomputeTransformRect = (
   rect: ITransformRect,

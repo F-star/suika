@@ -1,7 +1,7 @@
 import { EventEmitter } from '@suika/common';
 import {
   type IPoint,
-  isPointInRect,
+  isPointInTransformedRect,
   type ITransformRect,
   rectToVertices,
 } from '@suika/geo';
@@ -77,7 +77,7 @@ export class SelectedBox {
         height: bbox.height,
       },
       bbox.transform,
-    ).map((pt) => this.editor.sceneCoordsToViewport(pt.x, pt.y));
+    ).map((pt) => this.editor.toViewportPt(pt.x, pt.y));
 
     ctx.beginPath();
     ctx.moveTo(polygon[0].x, polygon[0].y);
@@ -96,7 +96,7 @@ export class SelectedBox {
       return false;
     }
     const TOL = 2;
-    return isPointInRect(
+    return isPointInTransformedRect(
       point,
       this.box,
       TOL / this.editor.zoomManager.getZoom(),

@@ -1,4 +1,4 @@
-import { identityMatrix } from '@suika/geo';
+import { identityMatrix, type IPoint } from '@suika/geo';
 
 import { GraphicsType, type Optional } from '../type';
 import {
@@ -6,6 +6,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { type IHitOptions } from './type';
 
 type SuikaCanvasAttrs = GraphicsAttrs;
 
@@ -22,6 +23,18 @@ export class SuikaCanvas extends SuikaGraphics<SuikaCanvasAttrs> {
 
   override getWorldTransform() {
     return identityMatrix();
+  }
+
+  override getHitGraphics(point: IPoint, options: IHitOptions) {
+    const children = this.getChildren();
+    for (let i = children.length - 1; i >= 0; i--) {
+      const child = children[i];
+      const hitGraphics = child.getHitGraphics(point, options);
+      if (hitGraphics) {
+        return hitGraphics;
+      }
+    }
+    return null;
   }
 }
 

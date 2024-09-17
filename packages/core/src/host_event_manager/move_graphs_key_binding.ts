@@ -1,7 +1,7 @@
 import { cloneDeep, debounce, noop } from '@suika/common';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaGraphics } from '../graphs';
+import { SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
 
 /**

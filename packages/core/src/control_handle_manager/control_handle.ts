@@ -1,11 +1,10 @@
-import { type IMatrixArr, type ITransformRect } from '@suika/geo';
+import { type IMatrixArr, type IPoint, type ITransformRect } from '@suika/geo';
 
 import { type ICursor } from '../cursor_manager';
-import { type SuikaGraphics } from '../graphs';
+import { type SuikaGraphics } from '../graphics';
 
 type HitTest = (
-  x: number,
-  y: number,
+  point: IPoint,
   tol: number,
   rect: ITransformRect | null,
 ) => boolean;
