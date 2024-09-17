@@ -1,10 +1,10 @@
 import { type SuikaEditor } from '../editor';
 import {
-  isGroupGraphics,
+  isFrameGraphics,
   type SuikaGraphics,
   SuikaPath,
   SuikaText,
-} from '../graphs';
+} from '../graphics';
 import {
   alignAndRecord,
   arrangeAndRecord,
@@ -395,7 +395,7 @@ export class CommandKeyBinding {
       const newItems: SuikaGraphics[] = [];
       let hasGroup = false;
       for (const item of items) {
-        if (isGroupGraphics(item)) {
+        if (isFrameGraphics(item) && item.isGroup()) {
           newItems.push(...item.getChildren());
           hasGroup = true;
         } else {
@@ -417,7 +417,7 @@ export class CommandKeyBinding {
           editor.pathEditor.active(graphics);
         } else if (graphics instanceof SuikaText) {
           editor.textEditor.active({ textGraph: graphics });
-        } else if (isGroupGraphics(graphics)) {
+        } else if (isFrameGraphics(graphics) && graphics.isGroup()) {
           enterGraphicsEditWithGroup();
         }
       } else {

@@ -8,7 +8,7 @@ import {
 } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaFrame, SuikaGraphics } from '../graphs';
+import { SuikaFrame, SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
 import { getParentIdSet } from '../utils';
 

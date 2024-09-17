@@ -2,9 +2,9 @@ import { cloneDeep } from '@suika/common';
 
 import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type SuikaEditor } from '../editor';
-import { type SuikaGraphics, type SuikaRect } from '../graphs';
-import { type SuikaRegularPolygon } from '../graphs/regular_polygon';
-import { type SuikaStar } from '../graphs/star';
+import { type SuikaGraphics, type SuikaRect } from '../graphics';
+import { type SuikaRegularPolygon } from '../graphics/regular_polygon';
+import { type SuikaStar } from '../graphics/star';
 import { Transaction } from '../transaction';
 import { GraphicsType } from '../type';
 

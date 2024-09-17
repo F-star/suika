@@ -4,6 +4,7 @@ import { isWindows } from '@suika/common';
 import { Button } from '@suika/components';
 import {
   EllipseOutlined,
+  FrameOutlined,
   HandOutlined,
   LineOutlined,
   PencilOutlined,
@@ -66,6 +67,12 @@ export const ToolBar = () => {
       hotkey: 'V',
       intlId: 'tool.select',
       icon: <SelectOutlined />,
+    },
+    drawFrame: {
+      name: 'drawFrame',
+      hotkey: '',
+      intlId: 'tool.frame',
+      icon: <FrameOutlined />,
     },
     drawRect: {
       name: 'drawRect',

@@ -4,7 +4,7 @@ import { simplePath } from '@suika/geo';
 import { AddGraphCmd } from '../commands';
 import { type ICursor } from '../cursor_manager';
 import { type SuikaEditor } from '../editor';
-import { SuikaPath } from '../graphs';
+import { SuikaPath } from '../graphics';
 import { type ITool } from './type';
 
 const TYPE = 'pencil';

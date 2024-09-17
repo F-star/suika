@@ -1,11 +1,11 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   getPointsBbox,
-  getStar,
+  getRegularPolygon,
   type IBox,
   type IMatrixArr,
   type IPoint,
-  isPointInPolygon,
+  isPointInConvexPolygon,
   Matrix,
 } from '@suika/geo';
 
@@ -19,28 +19,27 @@ import {
   SuikaGraphics,
 } from './graphics';
 
-interface StarAttrs extends GraphicsAttrs {
+interface RegularPolygonAttrs extends GraphicsAttrs {
   count: number;
-  starInnerScale: number;
 }
 
-export class SuikaStar extends SuikaGraphics<StarAttrs> {
-  override type = GraphicsType.Star;
+export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
+  override type = GraphicsType.RegularPolygon;
 
   constructor(
-    attrs: Optional<StarAttrs, 'transform' | 'id'>,
+    attrs: Optional<RegularPolygonAttrs, 'transform' | 'id'>,
     opts: IGraphicsOpts,
   ) {
     super(
       {
         ...attrs,
-        type: GraphicsType.Star,
+        type: GraphicsType.RegularPolygon,
       },
       opts,
     );
   }
 
-  override getAttrs(): StarAttrs {
+  override getAttrs(): RegularPolygonAttrs {
     return cloneDeep({ ...this.attrs, count: this.attrs.count });
   }
 
@@ -52,7 +51,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
   }
 
   private getPoints() {
-    return getStar(this.getSize(), this.attrs.count, this.attrs.starInnerScale);
+    return getRegularPolygon(this.getSize(), this.attrs.count);
   }
 
   override getMinBbox(): Readonly<IBox> {
@@ -98,11 +97,12 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
       transform: IMatrixArr;
     },
   ) {
+    const attrs = this.attrs;
     const { fill, strokeWidth, stroke, transform } =
       overrideStyle || this.attrs;
 
     ctx.save();
-    ctx.transform(...transform);
+    ctx.transform(...(transform ?? attrs.transform));
 
     const points = this.getPoints();
 
@@ -131,6 +131,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
         }
       }
     }
+
     if (strokeWidth) {
       ctx.lineWidth = strokeWidth;
       for (const paint of stroke ?? []) {
@@ -161,32 +162,24 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
         max: 60,
         uiType: 'number',
       },
-      {
-        label: 'T',
-        key: 'starInnerScale',
-        value: this.attrs.starInnerScale,
-        min: 0.0010000000474974513,
-        max: 1,
-        uiType: 'number',
-      },
     ];
   }
 
   override updateAttrs(
-    partialAttrs: Partial<StarAttrs> & IAdvancedAttrs,
+    partialAttrs: Partial<RegularPolygonAttrs> & IAdvancedAttrs,
     options?: { finishRecomputed?: boolean },
   ) {
     super.updateAttrs(partialAttrs, options);
   }
 
-  override hitTest(x: number, y: number, _padding?: number) {
+  override hitTest(point: IPoint, _padding?: number) {
     // TODO: solve padding
     const tf = new Matrix(...this.getWorldTransform());
-    const point = tf.applyInverse({ x, y });
-    return isPointInPolygon(this.getPoints(), point);
+    const pt = tf.applyInverse(point);
+    return isPointInConvexPolygon(this.getPoints(), pt);
   }
 
-  protected override getSVGTagHead(offset?: IPoint) {
+  override getSVGTagHead(offset?: IPoint) {
     const tf = [...this.attrs.transform];
     if (offset) {
       tf[4] += offset.x;

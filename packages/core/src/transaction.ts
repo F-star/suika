@@ -1,6 +1,6 @@
 import { UpdateGraphicsAttrsCmd } from './commands';
 import { type SuikaEditor } from './editor';
-import { type GraphicsAttrs, type SuikaGraphics } from './graphs';
+import { type GraphicsAttrs, type SuikaGraphics } from './graphics';
 import { getParentIdSet, updateNodeSize } from './utils';
 
 export class Transaction {

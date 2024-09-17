@@ -5,6 +5,7 @@ import { type SuikaEditor } from '../editor';
 import { type IKey } from '../key_binding_manager';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
+import { DrawFrameTool } from './tool_draw_frame';
 import { DrawLineTool } from './tool_draw_line';
 import { DrawPathTool } from './tool_draw_path';
 import { DrawRectTool } from './tool_draw_rect';
@@ -42,6 +43,7 @@ export class ToolManager {
 
   constructor(private editor: SuikaEditor) {
     this.registerToolCtor(SelectTool);
+    this.registerToolCtor(DrawFrameTool);
     this.registerToolCtor(DrawRectTool);
     this.registerToolCtor(DrawEllipseTool);
     this.registerToolCtor(DrawLineTool);
@@ -55,6 +57,7 @@ export class ToolManager {
 
     this.setEnableHotKeyTools([
       SelectTool.type,
+      DrawFrameTool.type,
       DrawRectTool.type,
       DrawEllipseTool.type,
       DrawPathTool.type,
@@ -304,7 +307,7 @@ export class ToolManager {
   }
 
   getCurrPoint() {
-    return this.editor.viewportCoordsToScene(
+    return this.editor.toScenePt(
       this.currViewportPoint.x,
       this.currViewportPoint.y,
     );

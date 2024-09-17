@@ -1,26 +1,35 @@
 import { noop } from '@suika/common';
-import { type IPoint, type IRect, type ISize, normalizeRect } from '@suika/geo';
+import {
+  applyMatrix,
+  type IMatrixArr,
+  invertMatrix,
+  type IPoint,
+  type IRect,
+  type ISize,
+  normalizeRect,
+} from '@suika/geo';
 
 import { AddGraphCmd } from '../commands/add_graphs';
 import { type ICursor } from '../cursor_manager';
 import { type SuikaEditor } from '../editor';
-import { type SuikaGraphics } from '../graphs';
+import { isFrameGraphics, type SuikaGraphics } from '../graphics';
 import { SnapHelper } from '../snap';
+import { getDeepFrameAtPoint } from '../utils';
 import { type ITool } from './type';
 
 /**
  * Draw Graph Tool
  * reference: https://mp.weixin.qq.com/s/lD1qlGus3pRvT5ZfdH0_lg
  */
-export abstract class DrawGraphTool implements ITool {
+export abstract class DrawGraphicsTool implements ITool {
   static readonly type: string = '';
   static readonly hotkey: string = '';
   readonly type: string = '';
   readonly hotkey: string = '';
   cursor: ICursor = 'crosshair';
-  commandDesc = 'Add Graph';
+  commandDesc = 'Add Graphics';
 
-  protected drawingGraph: SuikaGraphics | null = null;
+  protected drawingGraphics: SuikaGraphics | null = null;
 
   private startPoint: IPoint = { x: -1, y: -1 };
   private lastDragPoint!: IPoint;
@@ -52,7 +61,7 @@ export abstract class DrawGraphTool implements ITool {
         return;
       }
       if (this.isDragging) {
-        this.lastDragPoint = editor.viewportCoordsToScene(
+        this.lastDragPoint = editor.toScenePt(
           this.lastDragPointInViewport.x,
           this.lastDragPointInViewport.y,
           this.editor.setting.get('snapToGrid'),
@@ -97,7 +106,7 @@ export abstract class DrawGraphTool implements ITool {
       this.editor.getSceneCursorXY(e),
       this.editor.setting,
     );
-    this.drawingGraph = null;
+    this.drawingGraphics = null;
     this.isDragging = false;
     this.startPointWhenSpaceDown = null;
     this.lastDragPointWhenSpaceDown = null;
@@ -122,7 +131,7 @@ export abstract class DrawGraphTool implements ITool {
    * create graphics, and give the original rect (width may be negative)
    * noMove: if true, the graphics will not move when drag
    */
-  protected abstract createGraph(
+  protected abstract createGraphics(
     rect: IRect,
     noMove?: boolean,
   ): SuikaGraphics | null;
@@ -139,13 +148,23 @@ export abstract class DrawGraphTool implements ITool {
   /**
    * update graphics, and give the original rect (width may be negative)
    */
-  protected updateGraph(rect: IRect) {
+  protected updateGraphics(rect: IRect) {
     rect = normalizeRect(rect);
-    const drawingShape = this.drawingGraph!;
+    const drawingShape = this.drawingGraphics!;
+
+    const parent = drawingShape.getParent();
+    let x = rect.x;
+    let y = rect.y;
+    if (parent && isFrameGraphics(parent)) {
+      const tf = parent.getWorldTransform();
+      const point = applyMatrix(invertMatrix(tf), rect);
+      x = point.x;
+      y = point.y;
+    }
 
     drawingShape.updateAttrs({
-      x: rect.x,
-      y: rect.y,
+      x: x,
+      y: y,
       width: rect.width,
       height: rect.height,
     });
@@ -222,15 +241,29 @@ export abstract class DrawGraphTool implements ITool {
       rect.y = cy - rect.height / 2;
     }
 
-    if (this.drawingGraph) {
-      this.updateGraph(rect);
+    if (this.drawingGraphics) {
+      this.updateGraphics(rect);
     } else {
-      const element = this.createGraph(rect)!;
-      sceneGraph.addItems([element]);
-      this.editor.doc.getCurrCanvas().insertChild(element);
-      this.drawingGraph = element;
+      const graphics = this.createGraphics(rect)!;
+      const currentCanvas = this.editor.doc.getCurrCanvas();
+      const frame = getDeepFrameAtPoint(
+        this.startPoint,
+        currentCanvas.getChildren(),
+      );
+
+      sceneGraph.addItems([graphics]);
+
+      if (frame) {
+        const tf = [...graphics.attrs.transform] as IMatrixArr;
+        frame.insertChild(graphics);
+        graphics.setWorldTransform(tf);
+      } else {
+        currentCanvas.insertChild(graphics);
+      }
+
+      this.drawingGraphics = graphics;
     }
-    this.editor.selectedElements.setItems([this.drawingGraph]);
+    this.editor.selectedElements.setItems([this.drawingGraphics]);
     sceneGraph.render();
   }
 
@@ -257,12 +290,12 @@ export abstract class DrawGraphTool implements ITool {
       this.editor.setting,
     );
 
-    if (this.drawingGraph === null) {
+    if (this.drawingGraphics === null) {
       const { x: cx, y: cy } = endPoint;
       const width = this.editor.setting.get('drawGraphDefaultWidth');
       const height = this.editor.setting.get('drawGraphDefaultHeight');
 
-      this.drawingGraph = this.createGraph(
+      this.drawingGraphics = this.createGraphics(
         {
           x: cx - width / 2,
           y: cy - height / 2,
@@ -272,18 +305,18 @@ export abstract class DrawGraphTool implements ITool {
         true,
       );
 
-      if (this.drawingGraph) {
-        this.editor.doc.getCurrCanvas().insertChild(this.drawingGraph);
-        this.editor.sceneGraph.addItems([this.drawingGraph]);
+      if (this.drawingGraphics) {
+        this.editor.doc.getCurrCanvas().insertChild(this.drawingGraphics);
+        this.editor.sceneGraph.addItems([this.drawingGraphics]);
 
-        this.editor.selectedElements.setItems([this.drawingGraph]);
+        this.editor.selectedElements.setItems([this.drawingGraphics]);
         this.editor.render();
       }
     }
 
-    if (this.drawingGraph) {
+    if (this.drawingGraphics) {
       this.editor.commandManager.pushCommand(
-        new AddGraphCmd(this.commandDesc, this.editor, [this.drawingGraph]),
+        new AddGraphCmd(this.commandDesc, this.editor, [this.drawingGraphics]),
       );
     }
   }
@@ -293,7 +326,7 @@ export abstract class DrawGraphTool implements ITool {
     this.editor.hostEventManager.enableDelete();
     this.editor.hostEventManager.enableContextmenu();
     if (
-      this.drawingGraph &&
+      this.drawingGraphics &&
       !this.editor.setting.get('keepToolSelectedAfterUse')
     ) {
       this.editor.toolManager.setActiveTool('select');

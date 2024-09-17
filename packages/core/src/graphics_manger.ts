@@ -1,5 +1,5 @@
-import { type SuikaGraphics } from './graphs';
-import { SuikaCanvas } from './graphs/canvas';
+import { SuikaFrame, type SuikaGraphics } from './graphics';
+import { SuikaCanvas } from './graphics/canvas';
 
 /**
  * Graphics Manager
@@ -7,9 +7,10 @@ import { SuikaCanvas } from './graphs/canvas';
  * 1. record "id -> graphics"
  * 2. TODO: search graphics by box (with R-Tree)
  */
-export class GraphicsStore {
+export class GraphicsStoreManager {
   private graphicsStore = new Map<string, SuikaGraphics>();
   private canvasStore = new Map<string, SuikaCanvas>();
+  private frameStore = new Map<string, SuikaFrame>();
 
   add(graphics: SuikaGraphics) {
     const id = graphics.attrs.id;
@@ -19,6 +20,8 @@ export class GraphicsStore {
     }
     if (graphics instanceof SuikaCanvas) {
       this.canvasStore.set(id, graphics);
+    } else if (graphics instanceof SuikaFrame) {
+      this.frameStore.set(id, graphics);
     }
     graphicsStore.set(id, graphics);
   }
@@ -42,9 +45,15 @@ export class GraphicsStore {
     return canvas[0];
   }
 
+  getFrames() {
+    const frames = Array.from(this.frameStore.values());
+    return frames;
+  }
+
   clear() {
     // TODO: modify this.changes
     this.graphicsStore.clear();
     this.canvasStore.clear();
+    this.frameStore.clear();
   }
 }

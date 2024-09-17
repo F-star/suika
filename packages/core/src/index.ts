@@ -1,6 +1,6 @@
 export * from './commands';
 export * from './editor';
-export * from './graphs';
+export * from './graphics';
 export * from './paint';
 export * from './service';
 export * from './service';

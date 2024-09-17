@@ -1,4 +1,4 @@
-import { type GraphicsAttrs } from './graphs';
+import { type GraphicsAttrs } from './graphics';
 
 /**
  * 数组长度必须大于等于 1 的数组

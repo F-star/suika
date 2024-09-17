@@ -4,11 +4,11 @@ import { type IPoint } from '@suika/geo';
 import { type ICursor, isRotationCursor } from '../../cursor_manager';
 import { type SuikaEditor } from '../../editor';
 import {
-  SuikaFrame,
+  isFrameGraphics,
   type SuikaGraphics,
   SuikaPath,
   SuikaText,
-} from '../../graphs';
+} from '../../graphics';
 import { type IMouseEvent } from '../../host_event_manager';
 import { type IBaseTool, type ITool } from '../type';
 import { SelectMoveTool } from './tool_select_move';
@@ -72,10 +72,10 @@ export class SelectTool implements ITool {
       editor.pathEditor.active(topHitElement);
     } else if (topHitElement instanceof SuikaText) {
       editor.textEditor.active({ textGraph: topHitElement });
-    } else if (topHitElement instanceof SuikaFrame) {
+    } else if (isFrameGraphics(topHitElement) && topHitElement.isGroup()) {
       const children = topHitElement.getChildren();
       for (let i = children.length - 1; i >= 0; i--) {
-        if (children[i].hitTestChildren(point.x, point.y)) {
+        if (children[i].hitTestChildren(point)) {
           if (this.editor.hostEventManager.isShiftPressing) {
             this.editor.selectedElements.toggleItems([children[i]]);
           } else {

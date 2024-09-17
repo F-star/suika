@@ -1,6 +1,6 @@
 import { EventEmitter, throttle } from '@suika/common';
 
-import { GraphicsStore } from '../graphics_manger';
+import { GraphicsStoreManager } from '../graphics_manger';
 import { GraphicsType, type Optional } from '../type';
 import {
   type GraphicsAttrs,
@@ -25,7 +25,7 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   override type = GraphicsType.Document;
   protected override isContainer = true;
 
-  private graphicsStore = new GraphicsStore();
+  graphicsStoreManager = new GraphicsStoreManager();
   private emitter = new EventEmitter<Events>();
 
   private changes = {
@@ -40,15 +40,15 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
 
   clear() {
     // TODO: update doc.updateInfo
-    this.graphicsStore.clear();
+    this.graphicsStoreManager.clear();
   }
 
   getCanvas() {
-    return this.graphicsStore.getCanvas();
+    return this.graphicsStoreManager.getCanvas();
   }
 
   getGraphicsById(id: string) {
-    return this.graphicsStore.get(id);
+    return this.graphicsStoreManager.get(id);
   }
 
   getGraphicsArrByIds(ids: Set<string>) {
@@ -65,15 +65,15 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   }
 
   getAllGraphicsArr() {
-    return this.graphicsStore.getAll();
+    return this.graphicsStoreManager.getAll();
   }
 
   getCurrCanvas() {
-    return this.graphicsStore.getCanvas();
+    return this.graphicsStoreManager.getCanvas();
   }
 
   addGraphics(graphics: SuikaGraphics) {
-    this.graphicsStore.add(graphics);
+    this.graphicsStoreManager.add(graphics);
     this.changes.added.set(graphics.attrs.id, graphics.getAttrs());
     this.emitSceneChangeThrottle();
   }

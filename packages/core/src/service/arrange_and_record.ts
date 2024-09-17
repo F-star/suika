@@ -2,7 +2,7 @@ import { cloneDeep, swap } from '@suika/common';
 import { generateKeyBetween, generateNKeysBetween } from 'fractional-indexing';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaGraphics } from '../graphs';
+import { SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
 import { ArrangeType } from '../type';
 

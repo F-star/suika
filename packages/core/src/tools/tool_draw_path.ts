@@ -11,7 +11,7 @@ import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
 import { type SuikaEditor } from '../editor';
-import { SuikaEllipse, SuikaPath } from '../graphs';
+import { SuikaEllipse, SuikaPath } from '../graphics';
 import { PaintType } from '../paint';
 import { PathSelectTool } from './tool_path_select';
 import { type ITool } from './type';
@@ -281,7 +281,7 @@ export class DrawPathTool implements ITool {
         const anchorSize = 5;
         const isInside =
           distance(startAnchorPoint, point) <=
-          this.editor.viewportSizeToScene(anchorSize);
+          this.editor.toSceneSize(anchorSize);
         return isInside ? { ...startAnchorPoint } : null;
       }
     }
@@ -331,24 +331,21 @@ export class DrawPathTool implements ITool {
                 {
                   segs: [
                     {
-                      point: this.editor.sceneCoordsToViewport(
+                      point: this.editor.toViewportPt(
                         lastSeg.point.x,
                         lastSeg.point.y,
                       ),
                       in: {
-                        x: this.editor.sceneSizeToViewport(lastSeg.in.x),
-                        y: this.editor.sceneSizeToViewport(lastSeg.in.y),
+                        x: this.editor.toViewportSize(lastSeg.in.x),
+                        y: this.editor.toViewportSize(lastSeg.in.y),
                       },
                       out: {
-                        x: this.editor.sceneSizeToViewport(lastSeg.out.x),
-                        y: this.editor.sceneSizeToViewport(lastSeg.out.y),
+                        x: this.editor.toViewportSize(lastSeg.out.x),
+                        y: this.editor.toViewportSize(lastSeg.out.y),
                       },
                     },
                     {
-                      point: this.editor.sceneCoordsToViewport(
-                        point.x,
-                        point.y,
-                      ),
+                      point: this.editor.toViewportPt(point.x, point.y),
                       in: { x: 0, y: 0 },
                       out: { x: 0, y: 0 },
                     },

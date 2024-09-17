@@ -166,12 +166,12 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     );
   }
 
-  override hitTest(x: number, y: number, padding = 0): boolean {
+  override hitTest(point: IPoint, padding = 0): boolean {
     const tf = new Matrix(...this.getWorldTransform());
-    const point = tf.applyInverse({ x, y });
+    const pt = tf.applyInverse(point);
     const maxCornerRadius = this.getMaxCornerRadius();
     return isPointInRoundRect(
-      point,
+      pt,
       {
         x: 0,
         y: 0,

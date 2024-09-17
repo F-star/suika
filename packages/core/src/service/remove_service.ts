@@ -4,7 +4,7 @@ import {
   type GraphicsAttrs,
   type SuikaFrame,
   type SuikaGraphics,
-} from '../graphs';
+} from '../graphics';
 import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../utils';
 
 export const removeGraphicsAndRecord = (

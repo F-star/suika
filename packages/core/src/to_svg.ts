@@ -1,6 +1,6 @@
 import { boxToRect, mergeBoxes } from '@suika/geo';
 
-import { type SuikaGraphics } from './graphs';
+import { type SuikaGraphics } from './graphics';
 
 export const toSVG = (graphicsArr: SuikaGraphics[]) => {
   // FIXME: to sort

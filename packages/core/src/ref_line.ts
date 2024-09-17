@@ -14,6 +14,7 @@ import {
 } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
+import { isFrameGraphics, type SuikaGraphics } from './graphics';
 import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
   bboxToBboxWithMid,
@@ -55,13 +56,17 @@ export class RefLine {
     const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox();
 
-    const refGraphicsSet = this.editor.doc
-      .getCurrCanvas()
-      .getVisibleLeafNodeSet();
+    const refGraphicsSet = new Set<SuikaGraphics>();
+    this.editor.doc.getCurrCanvas().forEachVisibleChildNode((graphics) => {
+      if (isFrameGraphics(graphics) && graphics.isGroup()) {
+        return;
+      }
+      refGraphicsSet.add(graphics);
+    });
 
     const selectedItems = this.editor.selectedElements.getItems();
     for (const selectedItem of selectedItems) {
-      selectedItem.forEachVisibleLeafNode((graphics) => {
+      selectedItem.forEachVisibleChildNode((graphics) => {
         if (refGraphicsSet.has(graphics)) {
           refGraphicsSet.delete(graphics);
         }
@@ -349,10 +354,10 @@ export class RefLine {
       let minY = Infinity;
       let maxY = -Infinity;
 
-      const { x } = this.editor.sceneCoordsToViewport(vLine.x, 0);
+      const { x } = this.editor.toViewportPt(vLine.x, 0);
       for (const y_ of vLine.ys) {
         // TODO: optimize
-        const { y } = this.editor.sceneCoordsToViewport(0, y_);
+        const { y } = this.editor.toViewportPt(0, y_);
         minY = Math.min(minY, y);
         maxY = Math.max(maxY, y);
 
@@ -379,10 +384,10 @@ export class RefLine {
       let minX = Infinity;
       let maxX = -Infinity;
 
-      const { y } = this.editor.sceneCoordsToViewport(0, hLine.y);
+      const { y } = this.editor.toViewportPt(0, hLine.y);
 
       for (const x_ of hLine.xs) {
-        const { x } = this.editor.sceneCoordsToViewport(x_, 0);
+        const { x } = this.editor.toViewportPt(x_, 0);
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
 

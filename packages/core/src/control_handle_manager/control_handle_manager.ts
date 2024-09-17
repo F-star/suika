@@ -212,10 +212,7 @@ export class ControlHandleManager {
       if (graphics.type === GraphicsType.Path) {
         // TODO:
       } else {
-        const { x, y } = this.editor.sceneCoordsToViewport(
-          handle.cx,
-          handle.cy,
-        );
+        const { x, y } = this.editor.toViewportPt(handle.cx, handle.cy);
         graphics.updateAttrs({
           transform: [
             1,
@@ -259,10 +256,7 @@ export class ControlHandleManager {
       return null;
     }
 
-    const hitPointVW = this.editor.sceneCoordsToViewport(
-      hitPoint.x,
-      hitPoint.y,
-    );
+    const hitPointVW = this.editor.toViewportPt(hitPoint.x, hitPoint.y);
 
     const selectedBox = this.editor.selectedBox.getBox();
 
@@ -275,13 +269,8 @@ export class ControlHandleManager {
       }
 
       const isHit = handle.hitTest
-        ? handle.hitTest(
-            hitPointVW.x,
-            hitPointVW.y,
-            handle.padding,
-            selectedBox,
-          )
-        : handle.graphics.hitTest(hitPointVW.x, hitPointVW.y, handle.padding);
+        ? handle.hitTest(hitPointVW, handle.padding, selectedBox)
+        : handle.graphics.hitTest(hitPointVW, handle.padding);
 
       if (isHit) {
         return {
@@ -303,8 +292,8 @@ export class ControlHandleManager {
   }
   getCustomHandlesIntersectedWithRect(rect: IRect) {
     // convert rect to viewport
-    const leftTop = this.editor.sceneCoordsToViewport(rect.x, rect.y);
-    const bottomRight = this.editor.sceneCoordsToViewport(
+    const leftTop = this.editor.toViewportPt(rect.x, rect.y);
+    const bottomRight = this.editor.toViewportPt(
       rect.x + rect.width,
       rect.y + rect.height,
     );

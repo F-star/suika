@@ -23,7 +23,7 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     super({ ...attrs, type: GraphicsType.Ellipse }, opts);
   }
 
-  override hitTest(x: number, y: number, padding = 0) {
+  override hitTest(point: IPoint, padding = 0) {
     const attrs = this.attrs;
     const cx = attrs.width / 2;
     const cy = attrs.height / 2;
@@ -33,7 +33,7 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     const h = attrs.height / 2 + padding;
 
     const tf = new Matrix(...this.getWorldTransform());
-    const rotatedHitPoint = tf.applyInverse({ x, y });
+    const rotatedHitPoint = tf.applyInverse(point);
 
     return (
       (rotatedHitPoint.x - cx) ** 2 / w ** 2 +

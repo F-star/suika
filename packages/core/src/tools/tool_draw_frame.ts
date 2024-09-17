@@ -2,14 +2,14 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaRect } from '../graphics';
+import { SuikaFrame } from '../graphics';
 import { DrawGraphicsTool } from './tool_draw_graphics';
 import { type ITool } from './type';
 
-const TYPE = 'drawRect';
-const HOTKEY = 'r';
+const TYPE = 'drawFrame';
+const HOTKEY = 'f';
 
-export class DrawRectTool extends DrawGraphicsTool implements ITool {
+export class DrawFrameTool extends DrawGraphicsTool implements ITool {
   static override readonly type = TYPE;
   static override readonly hotkey = HOTKEY;
   override readonly type = TYPE;
@@ -17,17 +17,18 @@ export class DrawRectTool extends DrawGraphicsTool implements ITool {
 
   constructor(editor: SuikaEditor) {
     super(editor);
-    this.commandDesc = 'Add Rect';
+    this.commandDesc = 'Add Frame';
   }
 
   protected override createGraphics(rect: IRect) {
     rect = normalizeRect(rect);
-    const graphics = new SuikaRect(
+    const graphics = new SuikaFrame(
       {
         objectName: '',
         width: rect.width,
         height: rect.height,
-        fill: [cloneDeep(this.editor.setting.get('firstFill'))],
+        fill: [cloneDeep(this.editor.setting.get('firstFrameFill'))],
+        resizeToFit: false,
       },
       {
         advancedAttrs: {

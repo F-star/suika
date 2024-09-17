@@ -2,7 +2,7 @@ import { EventEmitter } from '@suika/common';
 
 import { type ControlHandle } from '../control_handle_manager';
 import { type SuikaEditor } from '../editor';
-import { type SuikaGraphics, type SuikaPath } from '../graphs';
+import { type SuikaGraphics, type SuikaPath } from '../graphics';
 import { removeGraphicsAndRecord } from '../service/remove_service';
 import { DrawPathTool, PathSelectTool } from '../tools';
 import { SelectTool } from '../tools/tool_select';

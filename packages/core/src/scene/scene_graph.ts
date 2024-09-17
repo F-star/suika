@@ -4,6 +4,7 @@ import { type IRect } from '@suika/geo';
 import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
+  isFrameGraphics,
   SuikaEllipse,
   SuikaFrame,
   SuikaGraphics,
@@ -11,11 +12,11 @@ import {
   SuikaPath,
   SuikaRect,
   SuikaText,
-} from '../graphs';
-import { SuikaCanvas } from '../graphs/canvas';
-import { SuikaDocument } from '../graphs/document';
-import { SuikaRegularPolygon } from '../graphs/regular_polygon';
-import { SuikaStar } from '../graphs/star';
+} from '../graphics';
+import { SuikaCanvas } from '../graphics/canvas';
+import { SuikaDocument } from '../graphics/document';
+import { SuikaRegularPolygon } from '../graphics/regular_polygon';
+import { SuikaStar } from '../graphics/star';
 import Grid from '../grid';
 import { GraphicsType, type IEditorPaperData } from '../type';
 import { rafThrottle } from '../utils';
@@ -154,6 +155,18 @@ export class SceneGraph {
       }
     }
 
+    // draw frame text
+    const padding = 4;
+    const frames = this.editor.doc.graphicsStoreManager.getFrames();
+    for (const frame of frames) {
+      if ((isFrameGraphics(frame) && frame.isGroup()) || frame.isDeleted()) {
+        continue;
+      }
+      const pos = frame.getWorldPosition();
+      const viewportPos = this.editor.toViewportPt(pos.x, pos.y);
+      frame.drawText(ctx, viewportPos.x, viewportPos.y - padding);
+    }
+
     /** draw transform handle */
     if (this.showBoxAndHandleWhenSelected) {
       this.editor.controlHandleManager.draw(selectedTransformBox);
@@ -166,8 +179,7 @@ export class SceneGraph {
       ctx.fillStyle = setting.get('selectionFill');
       const { x, y, width, height } = this.selection;
 
-      const { x: xInViewport, y: yInViewport } =
-        this.editor.sceneCoordsToViewport(x, y);
+      const { x: xInViewport, y: yInViewport } = this.editor.toViewportPt(x, y);
 
       const widthInViewport = width * zoom;
       const heightInViewport = height * zoom;

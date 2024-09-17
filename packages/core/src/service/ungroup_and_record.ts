@@ -6,7 +6,7 @@ import {
   isFrameGraphics,
   type SuikaFrame,
   type SuikaGraphics,
-} from '../graphs';
+} from '../graphics';
 import { Transaction } from '../transaction';
 import { getParentIdSet } from '../utils';
 

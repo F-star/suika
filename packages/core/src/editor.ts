@@ -11,9 +11,9 @@ import { ClipboardManager } from './clipboard';
 import { CommandManager } from './commands/command_manager';
 import { ControlHandleManager } from './control_handle_manager';
 import { CursorManger, type ICursor } from './cursor_manager';
-import { type GraphicsAttrs } from './graphs';
-import { SuikaCanvas } from './graphs/canvas';
-import { SuikaDocument } from './graphs/document';
+import { type GraphicsAttrs } from './graphics';
+import { SuikaCanvas } from './graphics/canvas';
+import { SuikaDocument } from './graphics/document';
 import { HostEventManager, MouseEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
@@ -220,21 +220,21 @@ export class SuikaEditor {
    *
    * reference: https://mp.weixin.qq.com/s/uvVXZKIMn1bjVZvUSyYZXA
    */
-  viewportCoordsToScene(x: number, y: number, round = false) {
+  toScenePt(x: number, y: number, round = false) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
     return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, round);
   }
-  sceneCoordsToViewport(x: number, y: number) {
+  toViewportPt(x: number, y: number) {
     const zoom = this.zoomManager.getZoom();
     const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
     return sceneCoordsToViewportUtil(x, y, zoom, scrollX, scrollY);
   }
-  viewportSizeToScene(size: number) {
+  toSceneSize(size: number) {
     const zoom = this.zoomManager.getZoom();
     return size / zoom;
   }
-  sceneSizeToViewport(size: number) {
+  toViewportSize(size: number) {
     const zoom = this.zoomManager.getZoom();
     return size * zoom;
   }
@@ -248,7 +248,7 @@ export class SuikaEditor {
   /** get cursor scene xy */
   getSceneCursorXY(event: { clientX: number; clientY: number }, round = false) {
     const { x, y } = this.getCursorXY(event);
-    return this.viewportCoordsToScene(x, y, round);
+    return this.toScenePt(x, y, round);
   }
   render() {
     this.sceneGraph.render();

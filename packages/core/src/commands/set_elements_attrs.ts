@@ -1,7 +1,7 @@
 import { cloneDeep } from '@suika/common';
 import { type IMatrixArr, type IPathItem } from '@suika/geo';
 
-import { type IParentIndex, type SuikaGraphics } from '../graphs';
+import { type IParentIndex, type SuikaGraphics } from '../graphics';
 import { type IPaint } from '../paint';
 import { type ICommand } from './type';
 

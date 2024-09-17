@@ -4,7 +4,7 @@ import { type IPoint } from '@suika/geo';
 import { SetGraphsAttrsCmd } from '../commands';
 import { AddGraphCmd } from '../commands/add_graphs';
 import { type SuikaEditor } from '../editor';
-import { SuikaText } from '../graphs';
+import { SuikaText } from '../graphics';
 import { removeGraphicsAndRecord } from '../service/remove_service';
 
 export class TextEditor {
@@ -25,7 +25,7 @@ export class TextEditor {
     const { textGraph, pos } = params;
     if (textGraph) {
       this.textGraph = textGraph;
-      const viewportPos = this.editor.sceneCoordsToViewport(
+      const viewportPos = this.editor.toViewportPt(
         textGraph.getX(),
         textGraph.getY(),
       );
@@ -123,7 +123,7 @@ export class TextEditor {
   private createTextGraph() {
     if (!this.textarea.value) return;
 
-    const sceneXY = this.editor.viewportCoordsToScene(
+    const sceneXY = this.editor.toScenePt(
       this.x,
       this.y,
       this.editor.setting.get('snapToGrid'),
