@@ -120,16 +120,12 @@ export class ZoomManager {
     const { setting, viewportManager } = this.editor;
     const padding = setting.get('zoomToFixPadding');
     const viewport = viewportManager.getViewport();
-
-    // TODO: consider padding from ruler
-    // const rulerWidth = this.editor.setting.get('enableRuler')
-    //   ? this.editor.setting.get('rulerWidth')
-    //   : 0;
-    // const leftPadding = rulerWidth + padding;
-    // const topPadding = rulerWidth + padding;
+    const rulerWidth = this.editor.setting.get('enableRuler')
+      ? this.editor.setting.get('rulerWidth')
+      : 0;
 
     const calculateDimension = (dimension: number): number => {
-      const adjustedDimension = dimension - padding * 2;
+      const adjustedDimension = dimension - padding * 2 - rulerWidth;
       return adjustedDimension > 0 ? adjustedDimension : dimension;
     };
 
@@ -143,8 +139,10 @@ export class ZoomManager {
       viewportRatio > bboxRatio ? vh / rect.height : vw / rect.width;
     newZoom = maxZoom ? Math.min(newZoom, maxZoom) : newZoom;
 
-    const newViewportX = rect.x - (viewport.width / newZoom - rect.width) / 2;
-    const newViewportY = rect.y - (viewport.height / newZoom - rect.height) / 2;
+    const newViewportX =
+      rect.x - ((viewport.width + rulerWidth) / newZoom - rect.width) / 2;
+    const newViewportY =
+      rect.y - ((viewport.height + rulerWidth) / newZoom - rect.height) / 2;
 
     this.setZoom(newZoom);
     viewportManager.setViewport({ x: newViewportX, y: newViewportY });
