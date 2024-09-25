@@ -117,8 +117,9 @@ export class ZoomManager {
     });
   }
   private zoomRectToFit(rect: IRect, maxZoom?: number) {
-    const padding = this.editor.setting.get('zoomToFixPadding');
-    const viewport = this.editor.viewportManager.getViewport();
+    const { setting, viewportManager } = this.editor;
+    const padding = setting.get('zoomToFixPadding');
+    const viewport = viewportManager.getViewport();
 
     // TODO: consider padding from ruler
     // const rulerWidth = this.editor.setting.get('enableRuler')
@@ -127,37 +128,26 @@ export class ZoomManager {
     // const leftPadding = rulerWidth + padding;
     // const topPadding = rulerWidth + padding;
 
-    let vh = viewport.height - padding * 2;
-    if (vh <= 0) {
-      vh = viewport.height;
-    }
-    let vw = viewport.width - padding * 2;
-    if (vw <= 0) {
-      vw = viewport.width;
-    }
+    const calculateDimension = (dimension: number): number => {
+      const adjustedDimension = dimension - padding * 2;
+      return adjustedDimension > 0 ? adjustedDimension : dimension;
+    };
 
-    let newZoom: number;
+    const vh = calculateDimension(viewport.height);
+    const vw = calculateDimension(viewport.width);
+
     const viewportRatio = vw / vh;
     const bboxRatio = rect.width / rect.height;
-    if (viewportRatio > bboxRatio) {
-      // basic height
-      newZoom = vh / rect.height;
-    } else {
-      newZoom = vw / rect.width;
-    }
 
-    if (maxZoom && newZoom > maxZoom) {
-      newZoom = maxZoom;
-    }
+    let newZoom =
+      viewportRatio > bboxRatio ? vh / rect.height : vw / rect.width;
+    newZoom = maxZoom ? Math.min(newZoom, maxZoom) : newZoom;
 
     const newViewportX = rect.x - (viewport.width / newZoom - rect.width) / 2;
     const newViewportY = rect.y - (viewport.height / newZoom - rect.height) / 2;
 
     this.setZoom(newZoom);
-    this.editor.viewportManager.setViewport({
-      x: newViewportX,
-      y: newViewportY,
-    });
+    viewportManager.setViewport({ x: newViewportX, y: newViewportY });
   }
   zoomToSelection() {
     const selectedBoundingRect = this.editor.selectedElements.getBoundingRect();
