@@ -70,7 +70,7 @@ export const ToolBar = () => {
     },
     drawFrame: {
       name: 'drawFrame',
-      hotkey: '',
+      hotkey: 'F',
       intlId: 'tool.frame',
       icon: <FrameOutlined />,
     },
