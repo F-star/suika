@@ -117,7 +117,18 @@ export class PathEditor {
       when: (ctx) => !ctx.isToolDragging,
       actionName: 'Path Delete',
       action: () => {
-        // TODO: 删除选中的控制点
+        const selectedControls = this.selectedControl.getSelectedControls();
+        if (selectedControls.length > 0 && this.path) {
+          const pathData = this.path.attrs.pathData;
+          selectedControls.forEach((control) => {
+            const { pathIdx, segIdx } = control;
+            pathData[pathIdx].segs.splice(segIdx, 1);
+          });
+          this.path.attrs.pathData = pathData;
+          this.selectedControl.clear();
+          this.drawControlHandles();
+          this.editor.render();
+        }
       },
     });
     this.eventTokens.push(token);
