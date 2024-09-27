@@ -40,7 +40,7 @@ export const getChildNodeSet = (
       set.add(node);
     }
 
-    if (isFrameGraphics(node) && node.isGroup()) {
+    if (isFrameGraphics(node)) {
       const childSet = getChildNodeSet(node.getChildren(), true);
       childSet.forEach((node) => {
         set.add(node);
