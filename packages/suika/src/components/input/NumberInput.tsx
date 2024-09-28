@@ -7,6 +7,17 @@ const isNumberStr = (str: string) => {
   return !Number.isNaN(Number(str));
 };
 
+const getScalarBySuffix = (str?: string) => {
+  switch (str) {
+    case '%':
+      return 100;
+    case '‰':
+      return 1000;
+    default:
+      return 1;
+  }
+};
+
 interface INumberInputProps {
   value: string | number;
   min?: number;
@@ -27,6 +38,12 @@ const NumberInput: FC<INumberInputProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const scalar = getScalarBySuffix(suffixValue);
+  const tempValue =
+    scalar !== 1
+      ? Math.round(parseToNumber(String(value)) * scalar * 100) / 100
+      : value;
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.value = String(value);
@@ -43,16 +60,18 @@ const NumberInput: FC<INumberInputProps> = ({
         }
 
         let num = parseToNumber(str);
-        if (!Number.isNaN(num) && num !== value) {
-          num = Math.max(min, num);
-          num = Math.min(max, num);
+        if (!Number.isNaN(num) && num !== tempValue) {
+          num = Math.max(min * scalar, num);
+          num = Math.min(max * scalar, num);
           return String(num);
         } else {
           return false;
         }
       }}
-      value={isNumberStr(String(value)) ? value + suffixValue : value}
-      onBlur={(newVal) => onBlur(Number(newVal))}
+      value={
+        isNumberStr(String(tempValue)) ? tempValue + suffixValue : tempValue
+      }
+      onBlur={(newVal) => onBlur(Number(newVal) / scalar)}
     />
   );
 };
