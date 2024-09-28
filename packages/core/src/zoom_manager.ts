@@ -1,4 +1,8 @@
-import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
+import {
+  EventEmitter,
+  remainDecimal,
+  viewportCoordsToSceneUtil,
+} from '@suika/common';
 import { boxToRect, type IPoint, type IRect } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
@@ -21,6 +25,8 @@ export class ZoomManager {
     return this.zoom;
   }
   setZoom(zoom: number) {
+    zoom = remainDecimal(zoom);
+
     const prevZoom = this.zoom;
 
     // limit zoom range
