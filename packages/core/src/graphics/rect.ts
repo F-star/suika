@@ -166,23 +166,41 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     );
   }
 
-  override hitTest(point: IPoint, padding = 0): boolean {
+  override hitTest(point: IPoint, tol = 0): boolean {
     const tf = new Matrix(...this.getWorldTransform());
     const pt = tf.applyInverse(point);
     const maxCornerRadius = this.getMaxCornerRadius();
-    return isPointInRoundRect(
-      pt,
-      {
-        x: 0,
-        y: 0,
-        width: this.attrs.width,
-        height: this.attrs.height,
-      },
-      new Array(4).fill(
-        Math.min(this.attrs.cornerRadius ?? 0, maxCornerRadius),
-      ),
-      padding + (this.attrs.strokeWidth ?? 0) / 2,
+    const cornerRadii = new Array(4).fill(
+      Math.min(this.attrs.cornerRadius ?? 0, maxCornerRadius),
     );
+    const strokeWidth = this.attrs.strokeWidth ?? 0;
+    const halfStrokeWidth = strokeWidth / 2;
+    const rect = {
+      x: 0,
+      y: 0,
+      width: this.attrs.width,
+      height: this.attrs.height,
+    };
+
+    const hit = isPointInRoundRect(
+      pt,
+      rect,
+      cornerRadii,
+      tol + halfStrokeWidth,
+    );
+    if (this.isFillNoRender()) {
+      if (!hit) {
+        return false;
+      }
+      return !isPointInRoundRect(
+        pt,
+        rect,
+        cornerRadii.map((r) => Math.max(0, r - halfStrokeWidth)),
+        -halfStrokeWidth - tol,
+      );
+    } else {
+      return hit;
+    }
   }
 
   override getControlHandles(zoom: number, initial?: boolean) {

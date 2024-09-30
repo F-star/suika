@@ -37,7 +37,12 @@ import { generateKeyBetween, generateNKeysBetween } from 'fractional-indexing';
 import { HALF_PI } from '../../constant';
 import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
-import { DEFAULT_IMAGE, type PaintImage, PaintType } from '../../paint';
+import {
+  DEFAULT_IMAGE,
+  type IPaint,
+  type PaintImage,
+  PaintType,
+} from '../../paint';
 import {
   GraphicsType,
   type IFillStrokeSVGAttrs,
@@ -280,6 +285,31 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
       x: this.attrs.width / 2,
       y: this.attrs.height / 2,
     });
+  }
+
+  private isPaintNoRender(paints: IPaint[] | undefined) {
+    if (!paints || paints.length === 0) {
+      return true;
+    }
+    let isNoRender = true;
+    for (const paint of paints) {
+      if (
+        (paint.type === PaintType.Solid && paint.attrs.a !== 0) ||
+        (paint.type === PaintType.Image && paint.attrs.opacity !== 0)
+      ) {
+        isNoRender = false;
+        break;
+      }
+    }
+    return isNoRender;
+  }
+
+  protected isStrokeNoRender() {
+    return this.isPaintNoRender(this.attrs.stroke);
+  }
+
+  protected isFillNoRender() {
+    return this.isPaintNoRender(this.attrs.fill);
   }
 
   hitTest(point: IPoint, tol = 0) {
