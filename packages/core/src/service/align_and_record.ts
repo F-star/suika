@@ -1,10 +1,36 @@
 import { cloneDeep } from '@suika/common';
-import { type IMatrixArr, mergeBoxes } from '@suika/geo';
+import {
+  boxToRect,
+  type IBox,
+  type IMatrixArr,
+  type IRect,
+  mergeBoxes,
+} from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
 import { AlignType } from '../type';
+
+const isAlreadyAligned = (bboxes: IBox[], type: AlignType): boolean => {
+  const alignmentFunctions = {
+    [AlignType.Left]: (bbox: IRect) => bbox.x,
+    [AlignType.HCenter]: (bbox: IRect) => bbox.x + bbox.width / 2,
+    [AlignType.Right]: (bbox: IRect) => bbox.x + bbox.width,
+    [AlignType.Top]: (bbox: IRect) => bbox.y,
+    [AlignType.VCenter]: (bbox: IRect) => bbox.y + bbox.height / 2,
+    [AlignType.Bottom]: (bbox: IRect) => bbox.y + bbox.height,
+  };
+
+  const alignmentFunction = alignmentFunctions[type];
+  if (!alignmentFunction) {
+    return false;
+  }
+
+  const rects = bboxes.map((bbox) => boxToRect(bbox));
+  const referenceValue = alignmentFunction(rects[0]);
+  return rects.every((iRect) => alignmentFunction(iRect) === referenceValue);
+};
 
 /**
  * Align graphics
@@ -22,7 +48,10 @@ export const alignAndRecord = (editor: SuikaEditor, type: AlignType) => {
   const worldTfs = graphicsArr.map((item) => item.getWorldTransform());
   const mixedBBox = mergeBoxes(bboxes);
 
-  // TODO: check whether had align
+  // optimize: check if already aligned
+  if (isAlreadyAligned(bboxes, type)) {
+    return;
+  }
 
   const transaction = new Transaction(editor);
 
