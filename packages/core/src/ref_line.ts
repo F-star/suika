@@ -176,10 +176,15 @@ export class RefLine {
     // 选中的为单个图形，要以旋转后的 4 个顶点和中心点为目标线
     if (record.size === 1) {
       const { width, height, transform } = Array.from(record.values())[0];
-      return rectToVertices(
+      const points = rectToVertices(
         { x: 0, y: 0, width: width, height: height },
         transform,
       );
+      points.push({
+        x: (points[0].x + points[1].x) / 2,
+        y: (points[0].y + points[3].y) / 2,
+      });
+      return points;
     } else {
       const targetBbox = bboxToBboxWithMid(
         mergeBoxes(
