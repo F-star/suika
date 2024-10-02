@@ -15,6 +15,7 @@ import {
 
 import { type SuikaEditor } from './editor';
 import { isFrameGraphics, type SuikaGraphics } from './graphics';
+import { isCanvasGraphics } from './graphics/canvas';
 import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
   bboxToBboxWithMid,
@@ -58,7 +59,10 @@ export class RefLine {
 
     const refGraphicsSet = new Set<SuikaGraphics>();
     this.editor.doc.getCurrCanvas().forEachVisibleChildNode((graphics) => {
-      if (isFrameGraphics(graphics) && graphics.isGroup()) {
+      if (
+        isCanvasGraphics(graphics) ||
+        (isFrameGraphics(graphics) && graphics.isGroup())
+      ) {
         return;
       }
       refGraphicsSet.add(graphics);
