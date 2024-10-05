@@ -89,6 +89,16 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     return this.geoPath!;
   }
 
+  private clampSize(partialAttrs: Partial<PathAttrs>) {
+    if (partialAttrs.width !== undefined) {
+      partialAttrs.width = Math.max(partialAttrs.width, 0.0001);
+    }
+
+    if (partialAttrs.height !== undefined) {
+      partialAttrs.height = Math.max(partialAttrs.height, 0.0001);
+    }
+  }
+
   /**
    * update attributes
    * TODO: optimize
@@ -97,12 +107,14 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     partialAttrs: Partial<PathAttrs>,
     opts?: { finishRecomputed?: boolean },
   ) {
+    partialAttrs = cloneDeep(partialAttrs);
+    this.clampSize(partialAttrs);
+
     if (opts?.finishRecomputed) {
       super.updateAttrs(partialAttrs);
       return;
     }
 
-    partialAttrs = cloneDeep(partialAttrs);
     this.checkAndFixUpdatedAttrs(partialAttrs);
 
     const keys = Object.keys(partialAttrs);
@@ -156,6 +168,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
             flip: flipWhenResize,
           });
     rect.transform = multiplyMatrix(invertMatrix(parentTf), rect.transform);
+    this.clampSize(rect);
     const newAttrs: Partial<PathAttrs> = rect;
     const newPathData = this.recomputedPathData(rect.width, rect.height);
     return { ...newAttrs, pathData: newPathData };
