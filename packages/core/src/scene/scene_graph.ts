@@ -40,12 +40,7 @@ interface Events {
 }
 
 export class SceneGraph {
-  selection: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } | null = null;
+  selection: IRect | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private grid: Grid;
   showBoxAndHandleWhenSelected = true;

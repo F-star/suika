@@ -13,7 +13,11 @@ interface Events {
 }
 
 /**
- * 按键、鼠标等事件管理
+ * 对原生事件做一层封装
+ *
+ * 1. 监听 Shift、Alt、Space、Command 的按下释放事件
+ * 2. 滚轮事件
+ * 3. 鼠标右键菜单
  */
 export class HostEventManager {
   isShiftPressing = false;
@@ -39,7 +43,7 @@ export class HostEventManager {
     this.commandKeyBinding = new CommandKeyBinding(editor);
   }
   bindHotkeys() {
-    this.bindModifiersRecordEvent(); // 记录 isShiftPressing 等值
+    this.observeModifiersToggle(); // 记录 isShiftPressing 等值
     this.bindWheelEvent();
     this.bindContextMenu();
 
@@ -47,7 +51,7 @@ export class HostEventManager {
     this.commandKeyBinding.bindKey();
   }
 
-  private bindModifiersRecordEvent() {
+  private observeModifiersToggle() {
     const handler = (event: KeyboardEvent) => {
       const prevShift = this.isShiftPressing;
       const prevAlt = this.isAltPressing;
