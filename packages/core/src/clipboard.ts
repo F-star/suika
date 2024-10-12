@@ -2,6 +2,7 @@ import { genUuid, increaseIdGenerator, noop } from '@suika/common';
 import {
   boxToRect,
   invertMatrix,
+  type IPoint,
   mergeBoxes,
   multiplyMatrix,
 } from '@suika/geo';
@@ -138,9 +139,9 @@ export class ClipboardManager {
   /**
    * paste at special coords
    */
-  pasteAt(x: number, y: number) {
+  pasteAt(point: IPoint) {
     navigator.clipboard.readText().then((pastedData) => {
-      this.addGraphsFromClipboard(pastedData, x, y);
+      this.addGraphsFromClipboard(pastedData, point);
     });
   }
 
@@ -265,8 +266,8 @@ export class ClipboardManager {
   }
 
   private addGraphsFromClipboard(dataStr: string): void;
-  private addGraphsFromClipboard(dataStr: string, x: number, y: number): void;
-  private addGraphsFromClipboard(dataStr: string, x?: number, y?: number) {
+  private addGraphsFromClipboard(dataStr: string, point: IPoint): void;
+  private addGraphsFromClipboard(dataStr: string, point?: IPoint) {
     let pastedData: IEditorPaperData | null = null;
     try {
       pastedData = JSON.parse(dataStr);
@@ -306,18 +307,17 @@ export class ClipboardManager {
     const boundingRect = boxToRect(
       mergeBoxes(selectedItems.map((item) => item.getBbox())),
     );
-    if (
-      (x === undefined || y === undefined) &&
-      pastedData.paperId !== editor.paperId
-    ) {
+    if (!point && pastedData.paperId !== editor.paperId) {
       const vwCenter = this.editor.viewportManager.getCenter();
-      x = vwCenter.x - boundingRect.width / 2;
-      y = vwCenter.y - boundingRect.height / 2;
+      point = {
+        x: vwCenter.x - boundingRect.width / 2,
+        y: vwCenter.y - boundingRect.height / 2,
+      };
     }
 
-    if (x !== undefined && y !== undefined) {
-      const dx = x - boundingRect.x;
-      const dy = y - boundingRect.y;
+    if (point) {
+      const dx = point.x - boundingRect.x;
+      const dy = point.y - boundingRect.y;
       if (dx || dy) {
         SuikaGraphics.dMove(selectedItems, dx, dy);
       }
