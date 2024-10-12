@@ -8,8 +8,14 @@ import {
 import { generateNKeysBetween } from 'fractional-indexing';
 
 import { type SuikaEditor } from './editor';
-import { type GraphicsAttrs, isFrameGraphics, SuikaGraphics } from './graphics';
+import {
+  type GraphicsAttrs,
+  isFrameGraphics,
+  SuikaGraphics,
+  SuikaRect,
+} from './graphics';
 import { isCanvasGraphics } from './graphics/canvas';
+import { PaintType } from './paint';
 import { toSVG } from './to_svg';
 import { Transaction } from './transaction';
 import { type IEditorPaperData } from './type';
@@ -46,6 +52,21 @@ export class ClipboardManager {
       ) {
         return;
       }
+
+      if (clipboardData.files.length > 0) {
+        for (const file of clipboardData.files) {
+          if (file.type.includes('image')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64 = e.target?.result as string;
+              this.createGraphicsWithImg(base64);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+        return;
+      }
+
       const pastedData = clipboardData.getData('Text');
       this.addGraphsFromClipboard(pastedData);
     };
@@ -62,6 +83,33 @@ export class ClipboardManager {
     this.unbindEvents = () => {
       window.removeEventListener('paste', pasteHandler);
     };
+  }
+
+  private async createGraphicsWithImg(imgUrl: string) {
+    const editor = this.editor;
+    await editor.imgManager.addImg(imgUrl);
+    const img = editor.imgManager.getImg(imgUrl);
+    const center = editor.viewportManager.getCenter();
+    if (img) {
+      const rectGraphics = new SuikaRect(
+        {
+          objectName: '',
+          width: img.width,
+          height: img.height,
+          fill: [{ type: PaintType.Image, attrs: { src: imgUrl } }],
+        },
+        {
+          advancedAttrs: {
+            x: center.x - img.width / 2,
+            y: center.y - img.height / 2,
+          },
+          doc: editor.doc,
+        },
+      );
+      editor.sceneGraph.addItems([rectGraphics]);
+      editor.doc.getCanvas().insertChild(rectGraphics);
+      editor.render();
+    }
   }
 
   copy() {
