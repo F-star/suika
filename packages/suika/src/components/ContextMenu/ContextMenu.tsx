@@ -143,7 +143,7 @@ export const ContextMenu: FC = () => {
                 },
                 true,
               );
-              editor.clipboard.pasteAt({ x: scenePos.x, y: scenePos.y });
+              editor.clipboard.pasteAt(scenePos);
             }
           }}
         >
