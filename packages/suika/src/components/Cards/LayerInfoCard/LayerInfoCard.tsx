@@ -59,7 +59,12 @@ export const LayerInfoCard: FC = () => {
   return (
     <BaseCard title={intl.formatMessage({ id: 'layer' })}>
       <div className="suika-layer-info-card">
-        <PercentInput value={opacity} onBlur={recordOpacityChange} />
+        <PercentInput
+          value={opacity}
+          min={0}
+          max={1}
+          onBlur={recordOpacityChange}
+        />
       </div>
     </BaseCard>
   );

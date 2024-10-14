@@ -166,9 +166,9 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
         label: 'T',
         key: 'starInnerScale',
         value: this.attrs.starInnerScale,
-        min: 0.0010000000474974513,
+        min: 0.001,
         max: 1,
-        uiType: 'number',
+        uiType: 'percent',
       },
     ];
   }

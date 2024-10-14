@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../context';
 import NumberInput from '../../input/NumberInput';
+import { PercentInput } from '../../input/PercentInput';
 import { BaseCard } from '../BaseCard';
 
 /**
@@ -41,7 +42,6 @@ export const ElementsInfoCards: FC = () => {
         for (const el of items) {
           const attrs = el.getInfoPanelAttrs();
           for (const attr of attrs) {
-            attr.value = remainDecimal(attr.value, 2);
             const label = attr.label;
             if (!map.has(label)) {
               map.set(label, attr);
@@ -156,15 +156,28 @@ const NumAttrInput: FC<{
   value: string | number;
   onBlur: (newValue: number) => void;
   suffixValue?: string;
+  uiType: string;
 }> = (props) => {
-  return (
-    <NumberInput
-      prefix={<span className="suika-info-attrs-label">{props.label}</span>}
-      value={props.value}
-      min={props.min}
-      max={props.max}
-      onBlur={props.onBlur}
-      suffixValue={props.suffixValue}
-    />
-  );
+  if (props.uiType === 'percent') {
+    return (
+      <PercentInput
+        prefix={<span className="suika-info-attrs-label">{props.label}</span>}
+        value={props.value}
+        min={props.min}
+        max={props.max}
+        onBlur={props.onBlur}
+      />
+    );
+  } else {
+    return (
+      <NumberInput
+        prefix={<span className="suika-info-attrs-label">{props.label}</span>}
+        value={props.value}
+        min={props.min}
+        max={props.max}
+        onBlur={props.onBlur}
+        suffixValue={props.suffixValue}
+      />
+    );
+  }
 };
