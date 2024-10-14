@@ -9,7 +9,6 @@ import {
   mergeBoxes,
 } from '@suika/geo';
 
-import { type ImgManager } from '../../Img_manager';
 import { type IPaint, PaintType } from '../../paint';
 import { GraphicsType, type Optional } from '../../type';
 import {
@@ -17,7 +16,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from '../graphics';
-import { type IHitOptions } from '../type';
+import { type IDrawInfo, type IHitOptions } from '../type';
 
 interface FrameAttrs extends GraphicsAttrs {
   resizeToFit: boolean;
@@ -114,9 +113,7 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
   }
 
   private _realDraw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
+    drawInfo: IDrawInfo,
     overrideStyle?: {
       fill?: IPaint[];
       stroke?: IPaint[];
@@ -128,9 +125,13 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     const { fill, strokeWidth, stroke, transform } =
       overrideStyle || this.attrs;
 
+    const { ctx, imgManager, smooth } = drawInfo;
     ctx.save();
     ctx.transform(...transform);
-
+    const opacity = drawInfo.opacity ?? 1;
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
     ctx.beginPath();
 
     // TODO: support cornerRadius
@@ -196,15 +197,19 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     ctx.restore();
   }
 
-  override draw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
-  ) {
-    if (!this.isVisible()) return;
+  override draw(drawInfo: IDrawInfo) {
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (!this.isVisible() || opacity === 0) return;
+
+    drawInfo = {
+      ...drawInfo,
+      opacity: opacity,
+    };
+
     if (!this.isGroup()) {
-      this._realDraw(ctx, imgManager, smooth);
+      this._realDraw(drawInfo);
     }
+    const { ctx } = drawInfo;
     if (!this.isGroup()) {
       ctx.save();
       // ctx.transform(...this.attrs.transform);
@@ -212,7 +217,7 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
       // ctx.rect(0, 0, this.attrs.width, this.attrs.height);
       ctx.clip();
     }
-    super.draw(ctx, imgManager, smooth);
+    super.draw(drawInfo);
     if (!this.isGroup()) {
       ctx.restore();
     }

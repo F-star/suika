@@ -8,6 +8,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { type IDrawInfo } from './type';
 
 export type LineAttrs = GraphicsAttrs;
 
@@ -29,11 +30,16 @@ export class SuikaLine extends SuikaGraphics<LineAttrs> {
     super({ ...attrs, height: 0, type: GraphicsType.Line }, opts);
   }
 
-  override draw(ctx: CanvasRenderingContext2D) {
-    if (!this.isVisible()) return;
+  override draw(drawInfo: IDrawInfo) {
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (!this.isVisible() || opacity === 0) return;
+    const { ctx } = drawInfo;
     const { width, transform, stroke, strokeWidth } = this.attrs;
     ctx.save();
     ctx.transform(...transform);
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(width, 0);

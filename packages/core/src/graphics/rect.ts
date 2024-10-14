@@ -7,7 +7,6 @@ import {
 } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
-import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
 import { GraphicsType, type Optional } from '../type';
 import { SuikaEllipse } from './ellipse';
@@ -16,6 +15,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { type IDrawInfo } from './type';
 
 export interface RectAttrs extends GraphicsAttrs {
   cornerRadius?: number;
@@ -56,9 +56,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
   }
 
   private _realDraw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
+    drawInfo: IDrawInfo,
     overrideStyle?: {
       fill?: IPaint[];
       stroke?: IPaint[];
@@ -66,6 +64,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       transform: IMatrixArr;
     },
   ) {
+    const { ctx, imgManager, smooth } = drawInfo;
     const attrs = this.attrs;
     const { fill, strokeWidth, stroke, transform } =
       overrideStyle || this.attrs;
@@ -73,6 +72,10 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     ctx.save();
     ctx.transform(...transform);
 
+    const opacity = drawInfo.opacity ?? 1;
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
     ctx.beginPath();
     if (attrs.cornerRadius) {
       ctx.roundRect(0, 0, attrs.width, attrs.height, attrs.cornerRadius);
@@ -120,13 +123,10 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     ctx.restore();
   }
 
-  override draw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
-  ) {
-    if (!this.isVisible()) return;
-    this._realDraw(ctx, imgManager, smooth);
+  override draw(drawInfo: IDrawInfo) {
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (!this.isVisible() || opacity === 0) return;
+    this._realDraw({ ...drawInfo, opacity });
   }
 
   override drawOutline(
@@ -134,11 +134,14 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    this._realDraw(ctx, undefined, undefined, {
-      stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
-      strokeWidth,
-      transform: this.getWorldTransform(),
-    });
+    this._realDraw(
+      { ctx },
+      {
+        stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
+        strokeWidth,
+        transform: this.getWorldTransform(),
+      },
+    );
   }
 
   /**

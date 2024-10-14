@@ -9,7 +9,6 @@ import {
   Matrix,
 } from '@suika/geo';
 
-import { type ImgManager } from '../Img_manager';
 import { type IPaint, PaintType } from '../paint';
 import { GraphicsType, type Optional } from '../type';
 import {
@@ -18,6 +17,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { type IDrawInfo } from './type';
 
 interface RegularPolygonAttrs extends GraphicsAttrs {
   count: number;
@@ -65,13 +65,10 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     return bbox;
   }
 
-  override draw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
-  ) {
-    if (!this.isVisible()) return;
-    this._realDraw(ctx, imgManager, smooth);
+  override draw(drawInfo: IDrawInfo) {
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (!this.isVisible() || opacity === 0) return;
+    this._realDraw({ ...drawInfo, opacity });
   }
 
   override drawOutline(
@@ -79,17 +76,18 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     stroke: string,
     strokeWidth: number,
   ) {
-    this._realDraw(ctx, undefined, undefined, {
-      stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
-      strokeWidth,
-      transform: this.getWorldTransform(),
-    });
+    this._realDraw(
+      { ctx },
+      {
+        stroke: [{ type: PaintType.Solid, attrs: parseHexToRGBA(stroke)! }],
+        strokeWidth,
+        transform: this.getWorldTransform(),
+      },
+    );
   }
 
   private _realDraw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
+    drawInfo: IDrawInfo,
     overrideStyle?: {
       fill?: IPaint[];
       stroke?: IPaint[];
@@ -101,9 +99,13 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     const { fill, strokeWidth, stroke, transform } =
       overrideStyle || this.attrs;
 
+    const { ctx, imgManager, smooth } = drawInfo;
     ctx.save();
     ctx.transform(...(transform ?? attrs.transform));
-
+    const opacity = drawInfo.opacity ?? 1;
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
     const points = this.getPoints();
 
     ctx.beginPath();

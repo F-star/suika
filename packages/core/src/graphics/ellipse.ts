@@ -2,7 +2,6 @@ import { parseRGBAStr } from '@suika/common';
 import { type IPoint, Matrix } from '@suika/geo';
 
 import { DOUBLE_PI } from '../constant';
-import { type ImgManager } from '../Img_manager';
 import { PaintType } from '../paint';
 import { GraphicsType, type Optional } from '../type';
 import {
@@ -10,6 +9,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { type IDrawInfo } from './type';
 
 export type EllipseAttrs = GraphicsAttrs;
 
@@ -42,19 +42,19 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     );
   }
 
-  override draw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
-  ) {
-    if (!this.isVisible()) return;
+  override draw(drawInfo: IDrawInfo) {
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (!this.isVisible() || opacity === 0) return;
+    const { ctx, imgManager, smooth } = drawInfo;
     const attrs = this.attrs;
     const cx = attrs.width / 2;
     const cy = attrs.height / 2;
 
     ctx.save();
     ctx.transform(...attrs.transform);
-
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
     ctx.beginPath();
     ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
     for (const paint of attrs.fill ?? []) {
