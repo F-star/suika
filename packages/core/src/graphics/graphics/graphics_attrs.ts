@@ -17,6 +17,8 @@ export interface GraphicsAttrs {
    */
   transform: IMatrixArr;
 
+  opacity?: number;
+
   fill?: IPaint[];
   stroke?: IPaint[];
   strokeWidth?: number;

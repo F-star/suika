@@ -9,6 +9,7 @@ import {
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { type IDrawInfo } from './type';
 
 export interface TextAttrs extends GraphicsAttrs {
   content: string;
@@ -50,11 +51,16 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     super.updateAttrs(partialAttrs);
   }
 
-  override draw(ctx: CanvasRenderingContext2D) {
-    if (!this.isVisible()) return;
+  override draw(drawInfo: IDrawInfo) {
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (!this.isVisible() || opacity === 0) return;
     const { transform, fill, stroke, fontSize, content } = this.attrs;
+    const { ctx } = drawInfo;
     ctx.save();
     ctx.transform(...transform);
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
     ctx.beginPath();
     ctx.textBaseline = 'top';
     ctx.font = `${fontSize}px sans-serif`;

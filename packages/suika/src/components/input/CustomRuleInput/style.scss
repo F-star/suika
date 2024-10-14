@@ -18,11 +18,8 @@
       outline: 1px solid #0d99ff;
     }
 
-    .suika-input-prefix {
-      display: block;
-      line-height: 28px;
-      text-align: center;
-      color: #b3b3b3;
+    .suika-custom-input-prefix {
+      flex-shrink: 0;
     }
   }
 
@@ -30,7 +27,7 @@
     border: none;
     outline: none;
     box-sizing: border-box;
-    width: 68px;
+    width: 100%;
     font-size: 12px;
   }
 }

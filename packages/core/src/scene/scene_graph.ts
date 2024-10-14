@@ -95,7 +95,7 @@ export class SceneGraph {
     if (canvasGraphics) {
       const smooth = zoom <= 1;
       ctx.save();
-      canvasGraphics.draw(ctx, imgManager, smooth);
+      canvasGraphics.draw({ ctx, imgManager, smooth });
       ctx.restore();
     }
 

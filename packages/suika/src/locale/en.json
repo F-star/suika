@@ -62,5 +62,7 @@
   "highlightLayersOnHover": "Highlight layers on hover",
   "flipObjectsWhileResizing": "Flip objects while resizing",
 
-  "done": "Done"
+  "done": "Done",
+
+  "layer": "Layer"
 }

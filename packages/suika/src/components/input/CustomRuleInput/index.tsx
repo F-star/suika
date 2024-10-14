@@ -26,7 +26,7 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = ({
 
   return (
     <div className="suika-custom-ruler-input-box">
-      {prefix}
+      {prefix && <div className="suika-custom-input-prefix">{prefix}</div>}
       <input
         ref={inputRef}
         className="custom-rule-input"

@@ -51,7 +51,7 @@ import {
 } from '../../type';
 import { drawRoundRectPath } from '../../utils';
 import { type SuikaDocument } from '../document';
-import { type IHitOptions } from '../type';
+import { type IDrawInfo, type IHitOptions } from '../type';
 import {
   type GraphicsAttrs,
   type IAdvancedAttrs,
@@ -257,6 +257,10 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
 
   getSize() {
     return { width: this.attrs.width, height: this.attrs.height };
+  }
+
+  getOpacity() {
+    return this.attrs.opacity ?? 1;
   }
 
   getRect() {
@@ -482,16 +486,15 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this.updateAttrs(rect, { finishRecomputed: true });
   }
 
-  draw(
-    ctx: CanvasRenderingContext2D,
-    imgManager?: ImgManager,
-    smooth?: boolean,
-  ) {
+  draw(drawInfo: IDrawInfo) {
     if (!this.isVisible()) return;
+
+    const { ctx } = drawInfo;
+
     ctx.save();
     ctx.transform(...this.attrs.transform);
     for (const child of this.children) {
-      child.draw(ctx, imgManager, smooth);
+      child.draw(drawInfo);
     }
     ctx.restore();
   }

@@ -235,7 +235,7 @@ export class ControlHandleManager {
         return;
       }
       ctx.save();
-      graphics.draw(ctx);
+      graphics.draw({ ctx });
       ctx.restore();
     });
   }
