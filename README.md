@@ -1,5 +1,7 @@
 **Suika Graphics Editor**, an open-source vector graphics editor based on Canvas, similar to Figma.
 
+**suika 图形编辑器**，一款开源的基于 Canvas 实现的矢量图形编辑器，类似 Figma。
+
 English | [中文](./README_zh.md)
 
 [Experience](https://blog.fstars.wang/app/suika/)
