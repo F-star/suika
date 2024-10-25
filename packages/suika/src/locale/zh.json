@@ -11,6 +11,7 @@
   "tool.frame": "画板",
   "tool.rectangle": "矩形",
   "tool.ellipse": "圆",
+  "tool.image": "图片",
   "tool.pen": "钢笔",
   "tool.line": "直线",
   "tool.polygon": "多边形",

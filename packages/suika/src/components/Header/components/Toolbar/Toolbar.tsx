@@ -6,6 +6,7 @@ import {
   EllipseOutlined,
   FrameOutlined,
   HandOutlined,
+  ImageOutlined,
   LineOutlined,
   PencilOutlined,
   PenOutlined,
@@ -85,6 +86,12 @@ export const ToolBar = () => {
       hotkey: 'O',
       intlId: 'tool.ellipse',
       icon: <EllipseOutlined />,
+    },
+    drawImg: {
+      name: 'drawImg',
+      hotkey: '',
+      intlId: 'tool.image',
+      icon: <ImageOutlined />,
     },
     pathSelect: {
       name: 'pathSelect',

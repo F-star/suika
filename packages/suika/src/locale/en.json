@@ -11,6 +11,7 @@
   "tool.frame": "Frame",
   "tool.rectangle": "Rectangle",
   "tool.ellipse": "Ellipse",
+  "tool.image": "Image",
   "tool.pen": "Pen",
   "tool.line": "Line",
   "tool.polygon": "Polygon",

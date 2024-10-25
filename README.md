@@ -10,20 +10,20 @@ English | [中文](./README_zh.md)
 
 ## Features
 
-1. Creation and editing of graphics, including: rounded rectangles, ellipses, lines, paths (polyline), text, polygons, stars;
+1. Creation and editing of graphics, including: rounded rectangle, ellipse, line, path, text, polygon, star;
 2. Path editing using the pen tool, adjusting control points;
-3. Support tools: selection tool, shape drawing tools, pen tool, canvas tool, hand tool;
+3. Support tools: selection tool, graphics drawing tools, image tool, pen tool, canvas tool, hand tool;
 4. Infinite canvas, with zoom and pan capabilities;
 5. History, with undo and redo;
 6. i18n;
-7. Snap support, currently supports pixel grid snap and shape guide snap;
+7. Snap support, currently supports pixel grid snap and graphics guide snap;
 8. Keyboard shortcuts;
 9. Copy and paste, supports cross-canvas copy and paste, alignment, and arrangement;
 10. Layers panel, properties panel;
 11. Group, Frame;
 12. Multi-user collaborative editing (requires backend implementation);
 13. Ruler;
-14. Import and export JSON;
+14. Import and export JSON data;
 15. User settings;
 
 Next Steps

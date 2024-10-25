@@ -6,6 +6,7 @@ import { type IKey } from '../key_binding_manager';
 import { DragCanvasTool } from './tool_drag_canvas';
 import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawFrameTool } from './tool_draw_frame';
+import { DrawImgTool } from './tool_draw_img';
 import { DrawLineTool } from './tool_draw_line';
 import { DrawPathTool } from './tool_draw_path';
 import { DrawRectTool } from './tool_draw_rect';
@@ -46,6 +47,7 @@ export class ToolManager {
     this.registerToolCtor(DrawFrameTool);
     this.registerToolCtor(DrawRectTool);
     this.registerToolCtor(DrawEllipseTool);
+    this.registerToolCtor(DrawImgTool);
     this.registerToolCtor(DrawLineTool);
     this.registerToolCtor(DrawTextTool);
     this.registerToolCtor(DragCanvasTool);
@@ -60,6 +62,7 @@ export class ToolManager {
       DrawFrameTool.type,
       DrawRectTool.type,
       DrawEllipseTool.type,
+      DrawImgTool.type,
       DrawPathTool.type,
       PencilTool.type,
       DrawLineTool.type,
@@ -265,7 +268,7 @@ export class ToolManager {
     this._unbindEvent = noop;
     this.unbindHotkey();
   }
-  setActiveTool(toolName: string) {
+  async setActiveTool(toolName: string) {
     if (!this.enableSwitchTool || this.getActiveToolName() === toolName) {
       return;
     }
@@ -275,12 +278,20 @@ export class ToolManager {
       return;
     }
 
-    const prevTool = this.currentTool;
     const currentToolCtor = this.toolCtorMap.get(toolName) || null;
     if (!currentToolCtor) {
       throw new Error(`tool "${toolName}" is not registered`);
     }
-    const currentTool = (this.currentTool = new currentToolCtor(this.editor));
+    const currentTool = new currentToolCtor(this.editor);
+
+    if (currentTool.enableActive) {
+      const canActive = await currentTool.enableActive();
+      if (!canActive) {
+        return;
+      }
+    }
+    const prevTool = this.currentTool;
+    this.currentTool = currentTool;
 
     prevTool && prevTool.onInactive();
     this.setCursorWhenActive();
