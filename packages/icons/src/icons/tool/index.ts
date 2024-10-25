@@ -1,6 +1,7 @@
 export * from './ellipse-outlined';
 export * from './frame-outline';
 export * from './hand-outlined';
+export * from './image-outlined';
 export * from './line-outlined';
 export * from './menu-outlined';
 export * from './polygon-outlined';
