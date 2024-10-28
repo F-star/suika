@@ -25,6 +25,7 @@ interface IAttr {
   key: string;
   value: number | string;
   uiType: string;
+  precision?: number;
 }
 
 export const ElementsInfoCards: FC = () => {
@@ -42,6 +43,10 @@ export const ElementsInfoCards: FC = () => {
         for (const el of items) {
           const attrs = el.getInfoPanelAttrs();
           for (const attr of attrs) {
+            if (attr.uiType === 'number') {
+              const precision = 2;
+              attr.value = remainDecimal(attr.value, precision);
+            }
             const label = attr.label;
             if (!map.has(label)) {
               map.set(label, attr);
