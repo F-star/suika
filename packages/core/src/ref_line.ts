@@ -185,8 +185,8 @@ export class RefLine {
         transform,
       );
       points.push({
-        x: (points[0].x + points[1].x) / 2,
-        y: (points[0].y + points[3].y) / 2,
+        x: (points[0].x + points[2].x) / 2,
+        y: (points[0].y + points[2].y) / 2,
       });
       return points;
     } else {
