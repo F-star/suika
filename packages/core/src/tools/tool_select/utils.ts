@@ -53,7 +53,7 @@ const getElementsInSelectionDFS = (
   const graphicsArr: SuikaGraphics[] = [];
   const children = node.getChildren();
   for (const child of children) {
-    if (!child.isVisible()) continue;
+    if (!child.isVisible() || child.isLock()) continue;
     if (parentIdSet.has(child.attrs.id)) {
       graphicsArr.push(
         ...getElementsInSelectionDFS(editor, box, child, parentIdSet),

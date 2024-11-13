@@ -45,10 +45,10 @@ export class DrawSelection implements IBaseTool {
 
     this.lastMousePoint = this.lastMouseScenePoint;
 
-    this.updateSelection();
+    this.updateSelectionAndSelectSet();
   }
 
-  private updateSelection() {
+  private updateSelectionAndSelectSet() {
     const { x, y } = this.lastMouseScenePoint;
 
     if (this.startPointWhenSpaceDown && this.lastDragPointWhenSpaceDown) {
@@ -99,7 +99,7 @@ export class DrawSelection implements IBaseTool {
     if (this.editor.toolManager.isDragging() && isSpacePressing) {
       this.startPointWhenSpaceDown = this.startPoint;
       this.lastDragPointWhenSpaceDown = this.lastMousePoint;
-      this.updateSelection();
+      this.updateSelectionAndSelectSet();
     } else {
       this.startPointWhenSpaceDown = null;
       this.lastDragPointWhenSpaceDown = null;

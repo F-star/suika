@@ -330,6 +330,9 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getHitGraphics(point: IPoint, options: IHitOptions): SuikaGraphics | null {
     const { tol = 0 } = options;
+    if (!this.isVisible() || this.isLock()) {
+      return null;
+    }
     if (this.hitTest(point, tol)) {
       return this;
     }
