@@ -143,7 +143,6 @@ export class TextEditor {
 
     inputDom.addEventListener('input', (_e) => {
       const e = _e as InputEvent;
-      console.log(e.data);
 
       const textGraphics = this.textGraphics;
       if (!textGraphics) return;

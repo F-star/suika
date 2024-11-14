@@ -43,6 +43,7 @@ export class SelectResizeTool implements IBaseTool {
   onActive() {
     const handler = () => {
       this.updateGraphics();
+      this.editor.render();
     };
     this.editor.hostEventManager.on('shiftToggle', handler);
     this.editor.hostEventManager.on('altToggle', handler);
