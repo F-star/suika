@@ -416,7 +416,14 @@ export class CommandKeyBinding {
         if (graphics instanceof SuikaPath) {
           editor.pathEditor.active(graphics);
         } else if (graphics instanceof SuikaText) {
-          editor.textEditor.active({ textGraph: graphics });
+          editor.textEditor.active({
+            textGraphics: graphics,
+            pos: graphics.getWorldPosition(),
+            range: {
+              start: 0,
+              end: graphics.getContentLength(),
+            },
+          });
         } else if (isFrameGraphics(graphics) && graphics.isGroup()) {
           enterGraphicsEditWithGroup();
         }

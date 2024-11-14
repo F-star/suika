@@ -30,7 +30,7 @@ export class DrawTextTool implements ITool {
   }
 
   onEnd(e: PointerEvent) {
-    const pos = this.editor.getCursorXY(e);
+    const pos = this.editor.getSceneCursorXY(e);
 
     // 让一个 input 元素出现在光标位置，然后输入内容回车。
     this.editor.textEditor.active({ pos });

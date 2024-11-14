@@ -120,11 +120,12 @@ export class SuikaEditor {
     this.selectedBox = new SelectedBox(this);
     this.ruler = new Ruler(this);
     this.refLine = new RefLine(this);
-    this.textEditor = new TextEditor(this);
-    this.pathEditor = new PathEditor(this);
 
     this.controlHandleManager = new ControlHandleManager(this);
     this.controlHandleManager.bindEvents();
+
+    this.textEditor = new TextEditor(this);
+    this.pathEditor = new PathEditor(this);
 
     this.hostEventManager = new HostEventManager(this);
     this.hostEventManager.bindHotkeys();

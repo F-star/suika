@@ -58,6 +58,7 @@ export class Setting {
 
     /********* text ********/
     defaultFontSize: 12,
+    defaultFontFamily: 'sans-serif', // 'Smiley Sans'
     textFill: [
       {
         type: PaintType.Solid,
@@ -132,6 +133,10 @@ export class Setting {
 
     continueClickMaxGap: 350, // millisecond
     continueClickDistanceTol: 5,
+
+    textEditorCursorSize: 1.5,
+    textEditorCursorLineStroke: '#000',
+    textEditorSelectionFill: '#0069c433',
   };
   toggle<K extends BooleanKeys<SettingValue>>(key: K) {
     const value = this.value[key];

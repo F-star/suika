@@ -56,7 +56,7 @@ export class SelectTool implements ITool {
   };
 
   // double click to active path editor
-  private onContinueClick = (event: IMouseEvent) => {
+  private onComboClick = (event: IMouseEvent) => {
     const point = event.pos;
     const editor = this.editor;
     const handleInfo = editor.controlHandleManager.getHandleInfoByPoint(point);
@@ -71,7 +71,16 @@ export class SelectTool implements ITool {
     if (topHitElement instanceof SuikaPath) {
       editor.pathEditor.active(topHitElement);
     } else if (topHitElement instanceof SuikaText) {
-      editor.textEditor.active({ textGraph: topHitElement });
+      editor.textEditor.active({
+        textGraphics: topHitElement,
+        pos: topHitElement.getWorldPosition(),
+        range: {
+          start: 0,
+          end: topHitElement.getContentLength(),
+        },
+      });
+      // prevent text editor input DOM from blurring
+      event.nativeEvent.preventDefault();
     } else if (isFrameGraphics(topHitElement) && topHitElement.isGroup()) {
       const children = topHitElement.getChildren();
       for (let i = children.length - 1; i >= 0; i--) {
@@ -93,19 +102,23 @@ export class SelectTool implements ITool {
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.mouseEventManager.on('comboClick', this.onContinueClick);
+    this.editor.mouseEventManager.on('comboClick', this.onComboClick);
   }
   onInactive() {
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
     );
-    this.editor.mouseEventManager.off('comboClick', this.onContinueClick);
+    this.editor.mouseEventManager.off('comboClick', this.onComboClick);
     this.editor.render();
   }
 
   onMoveExcludeDrag(e: PointerEvent, isOutsideCanvas: boolean) {
     if (isOutsideCanvas) return;
+
+    if (this.editor.textEditor.isActive()) {
+      return;
+    }
 
     const point = this.editor.getSceneCursorXY(e);
     this.updateCursorAndHlHoverGraph(point);

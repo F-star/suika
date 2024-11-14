@@ -2,7 +2,11 @@ import { EventEmitter } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
-import { type IMouseEvent, type IMousemoveEvent } from './host_event_manager';
+import {
+  type IMouseEvent,
+  type IMousemoveEvent,
+  MouseKey,
+} from './host_event_manager';
 
 interface Events {
   activeChange(active: boolean): void;
@@ -104,8 +108,16 @@ export class CanvasDragger {
   }
 
   private onStart = (event: IMouseEvent) => {
-    if (event.nativeEvent.button !== 0 && event.nativeEvent.button !== 1) {
+    if (
+      event.nativeEvent.button !== MouseKey.Left &&
+      event.nativeEvent.button !== MouseKey.Mid
+    ) {
       return;
+    }
+
+    // prevent text editor input DOM from blurring
+    if (this.editor.textEditor.isActive()) {
+      event.nativeEvent.preventDefault();
     }
     this.editor.cursorManager.setCursor('grabbing');
 

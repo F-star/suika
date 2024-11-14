@@ -12,3 +12,4 @@ export * from './geo_rect';
 export * from './geo_resize_line';
 export * from './geo_resize_rect';
 export * from './geo_star';
+export * from './geo_text';

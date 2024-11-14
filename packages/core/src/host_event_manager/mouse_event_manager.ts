@@ -3,7 +3,7 @@ import { distance, type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
 
-enum MouseKey {
+export enum MouseKey {
   Left = 0,
   Mid = 1,
 }
@@ -12,6 +12,7 @@ export type IMouseEvent = Readonly<{
   pos: Readonly<IPoint>;
   vwPos: Readonly<IPoint>;
   nativeEvent: PointerEvent;
+  isComboClick?: boolean;
 }>;
 
 export type IMousemoveEvent = Readonly<{
@@ -27,7 +28,7 @@ interface Events {
   cursorPosUpdate(pos: IPoint | null): void;
   start(event: IMouseEvent): void;
   end(event: IMouseEvent): void;
-  move(event: IMousemoveEvent): void;
+  move(event: IMousemoveEvent): void; // move but not dragging
   drag(event: IMousemoveEvent): void;
   comboClick(event: IMouseEvent): void;
 }
@@ -67,13 +68,17 @@ export class MouseEventManager {
 
     const { pos, vwPos } = this.getPosAndVwPos(event);
     this.startPos = { ...pos };
+    const isComboClick = this.checkIfComboClick(event);
     const e = {
       pos,
       vwPos,
       nativeEvent: event,
+      isComboClick,
     };
     this.eventEmitter.emit('start', e);
-    this.handleComboClick(e);
+    if (isComboClick) {
+      this.eventEmitter.emit('comboClick', e);
+    }
   };
 
   private onPointerMove = (event: PointerEvent) => {
@@ -150,10 +155,9 @@ export class MouseEventManager {
   private pointerDownTimeStamp = -Infinity;
   private lastPointerDownPos: IPoint = { x: -99, y: -99 };
 
-  private handleComboClick = (event: IMouseEvent) => {
-    const nativeEvent = event.nativeEvent;
+  private checkIfComboClick = (nativeEvent: PointerEvent) => {
     if (nativeEvent.button !== MouseKey.Left) {
-      return;
+      return false;
     }
     const now = new Date().getTime();
     const newPos = {
@@ -168,10 +172,11 @@ export class MouseEventManager {
       clickDistanceDiff < this.editor.setting.get('continueClickDistanceTol')
     ) {
       this.pointerDownTimeStamp = now;
-      this.eventEmitter.emit('comboClick', event);
+      return true;
     }
     this.pointerDownTimeStamp = now;
     this.lastPointerDownPos = newPos;
+    return false;
   };
 
   private bindEvent() {
