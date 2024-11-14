@@ -12,12 +12,12 @@ export class Transaction {
 
   constructor(private editor: SuikaEditor) {}
 
-  recordOld(id: string, attrs: Partial<GraphicsAttrs>) {
+  recordOld<ATTRS extends GraphicsAttrs>(id: string, attrs: Partial<ATTRS>) {
     this.originAttrsMap.set(id, attrs);
     return this;
   }
 
-  update(id: string, attrs: Partial<GraphicsAttrs>) {
+  update<ATTRS extends GraphicsAttrs>(id: string, attrs: Partial<ATTRS>) {
     this.updatedAttrsMap.set(id, attrs);
     return this;
   }

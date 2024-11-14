@@ -1,8 +1,7 @@
 import { noop } from '@suika/common';
 import {
-  applyMatrix,
+  applyInverseMatrix,
   type IMatrixArr,
-  invertMatrix,
   type IPoint,
   type IRect,
   type ISize,
@@ -157,7 +156,7 @@ export abstract class DrawGraphicsTool implements ITool {
     let y = rect.y;
     if (parent && isFrameGraphics(parent)) {
       const tf = parent.getWorldTransform();
-      const point = applyMatrix(invertMatrix(tf), rect);
+      const point = applyInverseMatrix(tf, rect);
       x = point.x;
       y = point.y;
     }

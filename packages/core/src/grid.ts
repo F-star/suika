@@ -9,6 +9,7 @@ class Grid {
   constructor(private editor: SuikaEditor) {}
   draw() {
     const ctx = this.editor.ctx;
+    ctx.save();
 
     const {
       x: offsetX,
@@ -50,6 +51,8 @@ class Grid {
       ctx.closePath();
       startYInScene += stepY;
     }
+
+    ctx.restore();
   }
 }
 

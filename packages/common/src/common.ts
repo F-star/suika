@@ -224,3 +224,27 @@ export const escapeHtml = (str: string) => {
   }
   return '';
 };
+
+export const getContentLength = (content: string) => {
+  let count = 0;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  for (const _ of content) {
+    count++;
+  }
+  return count;
+};
+
+export const sliceContent = (content: string, start: number, end?: number) => {
+  let res = '';
+  let i = 0;
+  for (const char of content) {
+    if (end !== undefined && i >= end) {
+      break;
+    }
+    if (i >= start) {
+      res += char;
+    }
+    i++;
+  }
+  return res;
+};

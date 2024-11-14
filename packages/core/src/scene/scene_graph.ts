@@ -92,8 +92,8 @@ export class SceneGraph {
     const imgManager = this.editor.imgManager;
 
     const canvasGraphics = this.editor.doc.getCanvas();
+    const smooth = zoom <= 1;
     if (canvasGraphics) {
-      const smooth = zoom <= 1;
       ctx.save();
       canvasGraphics.draw({ ctx, imgManager, smooth });
       ctx.restore();
@@ -166,6 +166,12 @@ export class SceneGraph {
     if (this.showBoxAndHandleWhenSelected) {
       this.editor.controlHandleManager.draw(selectedTransformBox);
     }
+
+    this.editor.textEditor.drawRange({
+      ctx,
+      imgManager,
+      smooth,
+    });
 
     /** draw selection */
     if (this.selection) {
