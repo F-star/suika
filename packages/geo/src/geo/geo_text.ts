@@ -1,8 +1,14 @@
 import { type IPoint } from '../type';
 
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d')!;
-ctx.fontKerning = 'none'; // no kerning
+let _ctx: CanvasRenderingContext2D | null = null;
+
+const getContext = () => {
+  if (_ctx) return _ctx;
+  const canvas = document.createElement('canvas');
+  _ctx = canvas.getContext('2d')!;
+  _ctx.fontKerning = 'none'; // no kerning
+  return _ctx;
+};
 
 export interface ITextMetrics {
   width: number;
@@ -22,6 +28,7 @@ export interface IFontStyle {
 export const calcGlyphInfos = (content: string, fontStyle: IFontStyle) => {
   const glyphs: IGlyph[] = [];
   const position: IPoint = { x: 0, y: 0 };
+  const ctx = getContext();
   ctx.font = `${fontStyle.fontSize}px ${fontStyle.fontFamily}`;
   for (const c of content) {
     const textMetrics = ctx.measureText(c);
@@ -48,6 +55,7 @@ export const calcTextSize = (
   content: string,
   fontStyle: IFontStyle,
 ): ITextMetrics => {
+  const ctx = getContext();
   ctx.font = `${fontStyle.fontSize}px ${fontStyle.fontFamily}`;
   const textMetrics = ctx.measureText(content);
   return {
