@@ -107,6 +107,8 @@ export class SuikaEditor {
       width: 0,
       height: 0,
     });
+    this.doc.setEditor(this);
+
     this.sceneGraph = new SceneGraph(this);
 
     this.cursorManager = new CursorManger(this);

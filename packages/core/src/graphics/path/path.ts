@@ -23,6 +23,7 @@ import {
   SuikaGraphics,
 } from '../graphics';
 import { type IDrawInfo } from '../type';
+import { drawLayer } from '../utils';
 
 export interface PathAttrs extends GraphicsAttrs {
   pathData: IPathItem[];
@@ -224,74 +225,87 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     if (opacity < 1) {
       ctx.globalAlpha = opacity;
     }
-    ctx.beginPath();
-    for (const pathItem of pathData) {
-      const first = pathItem.segs[0];
-      if (!first) continue;
-      ctx.moveTo(first.point.x, first.point.y);
 
-      const segs = pathItem.segs;
-      for (let i = 1; i <= segs.length; i++) {
-        if (i === segs.length && !pathItem.closed) {
-          continue;
-        }
-        const currSeg = segs[i % segs.length];
-        const prevSeg = segs[i - 1];
-        const pointX = currSeg.point.x;
-        const pointY = currSeg.point.y;
-        const handle1 = SuikaPath.getHandleOut(prevSeg);
-        const handle2 = SuikaPath.getHandleIn(currSeg);
-        if (!handle1 && !handle2) {
-          ctx.lineTo(pointX, pointY);
-        } else {
-          ctx.bezierCurveTo(
-            handle1.x,
-            handle1.y,
-            handle2.x,
-            handle2.y,
-            pointX,
-            pointY,
-          );
-        }
-      }
-      if (pathItem.closed) {
-        ctx.closePath();
-      }
-    }
+    const draw = (layerCtx: CanvasRenderingContext2D) => {
+      layerCtx.beginPath();
+      for (const pathItem of pathData) {
+        const first = pathItem.segs[0];
+        if (!first) continue;
+        layerCtx.moveTo(first.point.x, first.point.y);
 
-    for (const paint of fill ?? []) {
-      switch (paint.type) {
-        case PaintType.Solid: {
-          ctx.fillStyle = parseRGBAStr(paint.attrs);
-          ctx.fill();
-          break;
-        }
-        case PaintType.Image: {
-          if (imgManager) {
-            ctx.clip();
-            this.fillImage(ctx, paint, imgManager, smooth);
+        const segs = pathItem.segs;
+        for (let i = 1; i <= segs.length; i++) {
+          if (i === segs.length && !pathItem.closed) {
+            continue;
+          }
+          const currSeg = segs[i % segs.length];
+          const prevSeg = segs[i - 1];
+          const pointX = currSeg.point.x;
+          const pointY = currSeg.point.y;
+          const handle1 = SuikaPath.getHandleOut(prevSeg);
+          const handle2 = SuikaPath.getHandleIn(currSeg);
+          if (!handle1 && !handle2) {
+            layerCtx.lineTo(pointX, pointY);
           } else {
-            console.warn('ImgManager is not provided');
+            layerCtx.bezierCurveTo(
+              handle1.x,
+              handle1.y,
+              handle2.x,
+              handle2.y,
+              pointX,
+              pointY,
+            );
           }
         }
+        if (pathItem.closed) {
+          layerCtx.closePath();
+        }
       }
-    }
-    if (strokeWidth) {
-      ctx.lineWidth = strokeWidth;
-      for (const paint of stroke ?? []) {
+
+      for (const paint of fill ?? []) {
         switch (paint.type) {
           case PaintType.Solid: {
-            ctx.strokeStyle = parseRGBAStr(paint.attrs);
-            ctx.stroke();
+            layerCtx.fillStyle = parseRGBAStr(paint.attrs);
+            layerCtx.fill();
             break;
           }
           case PaintType.Image: {
-            // TODO: stroke image
+            if (imgManager) {
+              layerCtx.clip();
+              this.fillImage(layerCtx, paint, imgManager, smooth);
+            } else {
+              console.warn('ImgManager is not provided');
+            }
           }
         }
       }
+      if (strokeWidth) {
+        layerCtx.lineWidth = strokeWidth;
+        for (const paint of stroke ?? []) {
+          switch (paint.type) {
+            case PaintType.Solid: {
+              layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
+              layerCtx.stroke();
+              break;
+            }
+            case PaintType.Image: {
+              // TODO: stroke image
+            }
+          }
+        }
+      }
+      layerCtx.closePath();
+    };
+
+    if (opacity !== 1) {
+      drawLayer({
+        originCtx: ctx,
+        viewSize: this.doc.getDeviceViewSize(),
+        draw,
+      });
+    } else {
+      draw(ctx);
     }
-    ctx.closePath();
     ctx.restore();
   }
 

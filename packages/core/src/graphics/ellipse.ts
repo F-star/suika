@@ -10,6 +10,7 @@ import {
   SuikaGraphics,
 } from './graphics';
 import { type IDrawInfo } from './type';
+import { drawLayer } from './utils';
 
 export type EllipseAttrs = GraphicsAttrs;
 
@@ -55,35 +56,57 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     if (opacity < 1) {
       ctx.globalAlpha = opacity;
     }
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, attrs.width / 2, attrs.height / 2, 0, 0, DOUBLE_PI);
-    for (const paint of attrs.fill ?? []) {
-      if (paint.type === PaintType.Solid) {
-        ctx.fillStyle = parseRGBAStr(paint.attrs);
-        ctx.fill();
-      } else if (paint.type === PaintType.Image) {
-        if (imgManager) {
-          ctx.clip();
-          this.fillImage(ctx, paint, imgManager, smooth);
-        } else {
-          console.warn('ImgManager is not provided');
-        }
-      }
-    }
 
-    if (attrs.strokeWidth) {
-      ctx.lineWidth = attrs.strokeWidth;
-      for (const paint of attrs.stroke ?? []) {
+    const draw = (layerCtx: CanvasRenderingContext2D) => {
+      layerCtx.beginPath();
+      layerCtx.ellipse(
+        cx,
+        cy,
+        attrs.width / 2,
+        attrs.height / 2,
+        0,
+        0,
+        DOUBLE_PI,
+      );
+      for (const paint of attrs.fill ?? []) {
         if (paint.type === PaintType.Solid) {
-          ctx.strokeStyle = parseRGBAStr(paint.attrs);
-          ctx.stroke();
+          layerCtx.fillStyle = parseRGBAStr(paint.attrs);
+          layerCtx.fill();
         } else if (paint.type === PaintType.Image) {
-          // TODO:
+          if (imgManager) {
+            layerCtx.clip();
+            this.fillImage(layerCtx, paint, imgManager, smooth);
+          } else {
+            console.warn('ImgManager is not provided');
+          }
         }
       }
+
+      if (attrs.strokeWidth) {
+        layerCtx.lineWidth = attrs.strokeWidth;
+        for (const paint of attrs.stroke ?? []) {
+          if (paint.type === PaintType.Solid) {
+            layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
+            layerCtx.stroke();
+          } else if (paint.type === PaintType.Image) {
+            // TODO:
+          }
+        }
+      }
+
+      layerCtx.closePath();
+    };
+
+    if (opacity !== 1) {
+      drawLayer({
+        originCtx: ctx,
+        viewSize: this.doc.getDeviceViewSize(),
+        draw,
+      });
+    } else {
+      draw(ctx);
     }
 
-    ctx.closePath();
     ctx.restore();
   }
 
