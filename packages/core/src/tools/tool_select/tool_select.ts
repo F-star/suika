@@ -105,6 +105,7 @@ export class SelectTool implements ITool {
     this.editor.mouseEventManager.on('comboClick', this.onComboClick);
   }
   onInactive() {
+    this.editor.selectedElements.setHighlightedItem(null);
     this.editor.selectedElements.off(
       'hoverItemChange',
       this.handleHoverItemChange,
