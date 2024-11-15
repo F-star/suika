@@ -16,6 +16,7 @@ import {
   SuikaGraphics,
 } from './graphics';
 import { type IDrawInfo } from './type';
+import { drawLayer } from './utils';
 
 export interface RectAttrs extends GraphicsAttrs {
   cornerRadius?: number;
@@ -72,54 +73,68 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     ctx.save();
     ctx.transform(...transform);
 
+    const draw = (layerCtx: CanvasRenderingContext2D) => {
+      layerCtx.beginPath();
+      if (attrs.cornerRadius) {
+        layerCtx.roundRect(0, 0, attrs.width, attrs.height, attrs.cornerRadius);
+      } else {
+        layerCtx.rect(0, 0, attrs.width, attrs.height);
+      }
+
+      for (const paint of fill ?? []) {
+        switch (paint.type) {
+          case PaintType.Solid: {
+            layerCtx.fillStyle = parseRGBAStr(paint.attrs);
+            layerCtx.fill();
+            break;
+          }
+          case PaintType.Image: {
+            if (imgManager) {
+              const maxCornerRadius = this.getMaxCornerRadius();
+              const cornerRadius = Math.min(
+                attrs.cornerRadius ?? 0,
+                maxCornerRadius,
+              );
+              this.fillImage(layerCtx, paint, imgManager, smooth, cornerRadius);
+            } else {
+              console.warn('ImgManager is not provided');
+            }
+          }
+        }
+      }
+      if (strokeWidth) {
+        layerCtx.lineWidth = strokeWidth;
+        for (const paint of stroke ?? []) {
+          switch (paint.type) {
+            case PaintType.Solid: {
+              layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
+              layerCtx.stroke();
+              break;
+            }
+            case PaintType.Image: {
+              // TODO: stroke image
+            }
+          }
+        }
+      }
+      layerCtx.closePath();
+    };
+
     const opacity = drawInfo.opacity ?? 1;
     if (opacity < 1) {
       ctx.globalAlpha = opacity;
     }
-    ctx.beginPath();
-    if (attrs.cornerRadius) {
-      ctx.roundRect(0, 0, attrs.width, attrs.height, attrs.cornerRadius);
+
+    if (opacity !== 1) {
+      drawLayer({
+        originCtx: ctx,
+        viewSize: this.doc.getDeviceViewSize(),
+        draw,
+      });
     } else {
-      ctx.rect(0, 0, attrs.width, attrs.height);
+      draw(ctx);
     }
 
-    for (const paint of fill ?? []) {
-      switch (paint.type) {
-        case PaintType.Solid: {
-          ctx.fillStyle = parseRGBAStr(paint.attrs);
-          ctx.fill();
-          break;
-        }
-        case PaintType.Image: {
-          if (imgManager) {
-            const maxCornerRadius = this.getMaxCornerRadius();
-            const cornerRadius = Math.min(
-              attrs.cornerRadius ?? 0,
-              maxCornerRadius,
-            );
-            this.fillImage(ctx, paint, imgManager, smooth, cornerRadius);
-          } else {
-            console.warn('ImgManager is not provided');
-          }
-        }
-      }
-    }
-    if (strokeWidth) {
-      ctx.lineWidth = strokeWidth;
-      for (const paint of stroke ?? []) {
-        switch (paint.type) {
-          case PaintType.Solid: {
-            ctx.strokeStyle = parseRGBAStr(paint.attrs);
-            ctx.stroke();
-            break;
-          }
-          case PaintType.Image: {
-            // TODO: stroke image
-          }
-        }
-      }
-    }
-    ctx.closePath();
     ctx.restore();
   }
 

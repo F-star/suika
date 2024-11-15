@@ -1,5 +1,6 @@
 import { EventEmitter, throttle } from '@suika/common';
 
+import { type SuikaEditor } from '../editor';
 import { GraphicsStoreManager } from '../graphics_manger';
 import { GraphicsType, type Optional } from '../type';
 import {
@@ -34,8 +35,14 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
     updatedIds: new Set<string>(),
   };
 
+  private editor!: SuikaEditor;
+
   constructor(attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>) {
     super({ ...attrs, type: GraphicsType.Document }, {} as IGraphicsOpts);
+  }
+
+  setEditor(editor: SuikaEditor) {
+    this.editor = editor;
   }
 
   clear() {
@@ -130,6 +137,14 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
     100,
     // { leading: false },
   );
+
+  getDeviceViewSize() {
+    const canvasEl = this.editor.canvasElement;
+    return {
+      width: canvasEl.width,
+      height: canvasEl.height,
+    };
+  }
 
   on<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.on(eventName, listener);

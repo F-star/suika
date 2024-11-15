@@ -18,6 +18,7 @@ import {
   SuikaGraphics,
 } from './graphics';
 import { type IDrawInfo } from './type';
+import { drawLayer } from './utils';
 
 interface StarAttrs extends GraphicsAttrs {
   count: number;
@@ -106,48 +107,61 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
     if (opacity < 1) {
       ctx.globalAlpha = opacity;
     }
-    const points = this.getPoints();
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      const point = points[i];
-      ctx.lineTo(point.x, point.y);
-    }
-    ctx.closePath();
 
-    for (const paint of fill ?? []) {
-      switch (paint.type) {
-        case PaintType.Solid: {
-          ctx.fillStyle = parseRGBAStr(paint.attrs);
-          ctx.fill();
-          break;
-        }
-        case PaintType.Image: {
-          if (imgManager) {
-            ctx.clip();
-            this.fillImage(ctx, paint, imgManager, smooth);
-          } else {
-            console.warn('ImgManager is not provided');
-          }
-        }
+    const draw = (layerCtx: CanvasRenderingContext2D) => {
+      const points = this.getPoints();
+      layerCtx.beginPath();
+      layerCtx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        const point = points[i];
+        layerCtx.lineTo(point.x, point.y);
       }
-    }
-    if (strokeWidth) {
-      ctx.lineWidth = strokeWidth;
-      for (const paint of stroke ?? []) {
+      layerCtx.closePath();
+
+      for (const paint of fill ?? []) {
         switch (paint.type) {
           case PaintType.Solid: {
-            ctx.strokeStyle = parseRGBAStr(paint.attrs);
-            ctx.stroke();
+            layerCtx.fillStyle = parseRGBAStr(paint.attrs);
+            layerCtx.fill();
             break;
           }
           case PaintType.Image: {
-            // TODO: stroke image
+            if (imgManager) {
+              layerCtx.clip();
+              this.fillImage(layerCtx, paint, imgManager, smooth);
+            } else {
+              console.warn('ImgManager is not provided');
+            }
           }
         }
       }
+      if (strokeWidth) {
+        layerCtx.lineWidth = strokeWidth;
+        for (const paint of stroke ?? []) {
+          switch (paint.type) {
+            case PaintType.Solid: {
+              layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
+              layerCtx.stroke();
+              break;
+            }
+            case PaintType.Image: {
+              // TODO: stroke image
+            }
+          }
+        }
+      }
+      layerCtx.closePath();
+    };
+
+    if (opacity !== 1) {
+      drawLayer({
+        originCtx: ctx,
+        viewSize: this.doc.getDeviceViewSize(),
+        draw,
+      });
+    } else {
+      draw(ctx);
     }
-    ctx.closePath();
     ctx.restore();
   }
 
