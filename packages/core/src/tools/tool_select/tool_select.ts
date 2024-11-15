@@ -110,6 +110,7 @@ export class SelectTool implements ITool {
       this.handleHoverItemChange,
     );
     this.editor.mouseEventManager.off('comboClick', this.onComboClick);
+    this.updateCursorAndHlHoverGraph.cancel();
     this.editor.render();
   }
 
