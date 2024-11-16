@@ -1,4 +1,5 @@
 import {
+  distance,
   getTransformAngle,
   type IPoint,
   type IRect,
@@ -192,9 +193,32 @@ export class ControlHandleManager {
     s.rotation = heightRotate;
   }
 
+  private checkEnableRender(rect: ITransformRect) {
+    const polygon = rectToVertices(
+      {
+        x: 0,
+        y: 0,
+        width: rect.width,
+        height: rect.height,
+      },
+      rect.transform,
+    ).map((pt) => this.editor.toViewportPt(pt.x, pt.y));
+    const minSize = this.editor.setting.get('sizeIndicatorMinSize');
+    if (
+      distance(polygon[0], polygon[1]) < minSize &&
+      distance(polygon[1], polygon[2]) < minSize
+    ) {
+      return false;
+    }
+    return true;
+  }
+
   draw(rect: ITransformRect | null) {
     this.selectedBoxRect = rect;
     if (rect) {
+      if (!this.checkEnableRender(rect)) {
+        return;
+      }
       this.updateTransformHandles(rect);
     }
     const handles: ControlHandle[] = [];

@@ -39,7 +39,7 @@ export class Setting {
     selectBoxStrokeWidth: 1.2,
 
     // size indicator
-    sizeIndicatorMinLength: 12, // if length less this value, not render
+    sizeIndicatorMinSize: 10, // if length less this value, not render
     sizeIndicatorOffset: 10,
     sizeIndicatorRectRadius: 2,
     sizeIndicatorRectPadding: [0, 4, 0, 4],

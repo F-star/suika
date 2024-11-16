@@ -109,6 +109,15 @@ export class SelectedBox {
     polygon: IPoint[],
     size: { width: number; height: number },
   ) {
+    // too small, no render
+    const minSize = this.editor.setting.get('sizeIndicatorMinSize');
+    if (
+      distance(polygon[0], polygon[1]) < minSize &&
+      distance(polygon[1], polygon[2]) < minSize
+    ) {
+      return;
+    }
+
     let bottomPt = polygon[0];
     let bottomPtIndex = 0;
     for (let i = 1; i < polygon.length; i++) {
@@ -139,13 +148,7 @@ export class SelectedBox {
         minAnglePt = polygon[i];
       }
     }
-    // too small, no render
-    if (
-      distance(bottomPt, minAnglePt) <
-      this.editor.setting.get('sizeIndicatorMinLength')
-    ) {
-      return;
-    }
+
     const centerPt = midPoint(bottomPt, minAnglePt);
     const [p1, p2] = getPerpendicularPoints(
       [bottomPt, minAnglePt],
