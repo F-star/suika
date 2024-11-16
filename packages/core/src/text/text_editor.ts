@@ -53,6 +53,7 @@ export class TextEditor {
   active(params: { textGraphics?: SuikaText; pos: IPoint; range?: IRange }) {
     this._active = true;
     this.editor.controlHandleManager.enableTransformControl = false;
+    this.editor.selectedBox.enableDrawSizeIndicator = false;
     this.transaction = new Transaction(this.editor);
 
     let textGraphics = params.textGraphics;
@@ -124,6 +125,7 @@ export class TextEditor {
     }
 
     this.editor.controlHandleManager.enableTransformControl = true;
+    this.editor.selectedBox.enableDrawSizeIndicator = true;
   }
 
   static updateTextContentAndResize(textGraphics: SuikaText, content: string) {

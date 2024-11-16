@@ -24,6 +24,7 @@ export class SelectedBox {
   private box: ITransformRect | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private _hover = false;
+  public enableDrawSizeIndicator = true;
 
   constructor(private editor: SuikaEditor) {}
 
@@ -109,6 +110,10 @@ export class SelectedBox {
     polygon: IPoint[],
     size: { width: number; height: number },
   ) {
+    if (!this.enableDrawSizeIndicator) {
+      return;
+    }
+
     // too small, no render
     const minSize = this.editor.setting.get('sizeIndicatorMinSize');
     if (
