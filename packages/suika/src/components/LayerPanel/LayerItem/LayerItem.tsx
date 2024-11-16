@@ -131,7 +131,9 @@ const LayerItem: FC<IProps> = ({
         )}
         {/* icon button area */}
         <div
-          className="sk-layer-item-actions"
+          className={classNames('sk-layer-item-actions', {
+            'sk-action-visible': finalLock || !finalVisible,
+          })}
           onMouseDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >

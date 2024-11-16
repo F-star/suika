@@ -81,7 +81,7 @@ export class Setting {
     drawGraphDefaultHeight: 100, // default height
 
     /**** ruler ****/
-    enableRuler: true,
+    enableRuler: false,
     minStepInViewport: 50, // 视口区域下的最小步长
     rulerBgColor: '#fff',
     rulerStroke: '#e6e6e6',

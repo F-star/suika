@@ -5,7 +5,6 @@
 
     box-sizing: border-box;
     border: 1px solid transparent;
-    padding-left: 16px;
     padding-right: 4px;
     height: 32px;
     font-size: 12px;
@@ -21,6 +20,9 @@
     &:hover:not(.sk-editing),
     &.sk-hover {
       border-color: #0f8fff;
+      .sk-layer-item-actions {
+        display: flex;
+      }
       span.sk-action-btn {
         visibility: visible;
       }
@@ -49,11 +51,16 @@
       height: 20px;
       width: 20px;
       color: '#ccc';
+      flex-shrink: 0;
     }
 
     .sk-layout-name {
       padding: 0 4px;
       border: 1px solid transparent;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+
       font-family: Arial, sans-serif;
     }
 
@@ -77,9 +84,13 @@
     .sk-layer-item-actions {
       margin-left: auto;
       padding-right: 4px;
-      display: flex;
       align-items: center;
       height: 20px;
+      display: none;
+
+      &.sk-action-visible {
+        display: flex;
+      }
 
       .sk-action-btn {
         visibility: hidden;
