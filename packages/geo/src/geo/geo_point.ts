@@ -1,6 +1,6 @@
 import { type IPoint } from '../type';
 
-export const getMidPoint = (p1: IPoint, p2: IPoint) => {
+export const midPoint = (p1: IPoint, p2: IPoint) => {
   return {
     x: (p1.x + p2.x) / 2,
     y: (p1.y + p2.y) / 2,
@@ -11,6 +11,13 @@ export const pointAdd = (p1: IPoint, p2: IPoint) => {
   return {
     x: p1.x + p2.x,
     y: p1.y + p2.y,
+  };
+};
+
+export const pointSub = (p1: IPoint, p2: IPoint): IPoint => {
+  return {
+    x: p1.x - p2.x,
+    y: p1.y - p2.y,
   };
 };
 
@@ -33,4 +40,38 @@ export const lerp = (start: IPoint, end: IPoint, t: number) => {
     x: lerpNum(start.x, end.x, t),
     y: lerpNum(start.y, end.y, t),
   };
+};
+
+export const normalizeVec = (p: IPoint) => {
+  const len = Math.sqrt(p.x * p.x + p.y * p.y);
+  return {
+    x: p.x / len,
+    y: p.y / len,
+  };
+};
+
+/**
+ * Given a point on a line segment,
+ * find two points that are perpendicular to the line segment and at a given distance
+ */
+export const getPerpendicularPoints = (
+  line: [IPoint, IPoint],
+  p: IPoint,
+  distance: number,
+) => {
+  const vec = pointSub(line[1], line[0]);
+  const perpendicularVec = {
+    x: -vec.y,
+    y: vec.x,
+  };
+  const unitVec = normalizeVec(perpendicularVec);
+  const p1 = {
+    x: p.x + unitVec.x * distance,
+    y: p.y + unitVec.y * distance,
+  };
+  const p2 = {
+    x: p.x - unitVec.x * distance,
+    y: p.y - unitVec.y * distance,
+  };
+  return [p1, p2];
 };

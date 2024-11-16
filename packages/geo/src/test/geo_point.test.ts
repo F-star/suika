@@ -1,15 +1,15 @@
 import {
   distance,
-  getMidPoint,
   isPointEqual,
   lerp,
   lerpNum,
+  midPoint,
   pointAdd,
 } from '../geo';
 
 test('getMidPoint', () => {
   expect(
-    getMidPoint(
+    midPoint(
       {
         x: 0,
         y: 0,

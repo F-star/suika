@@ -34,8 +34,19 @@ export class Setting {
 
     defaultStarInnerScale: 0.3819660246372223,
 
-    guideBBoxStroke: '#1592fe',
-    guideBBoxStrokeWidth: 1.2,
+    // selected box
+    selectBoxStroke: '#1592fe',
+    selectBoxStrokeWidth: 1.2,
+
+    // size indicator
+    sizeIndicatorMinLength: 12, // if length less this value, not render
+    sizeIndicatorOffset: 10,
+    sizeIndicatorRectRadius: 2,
+    sizeIndicatorRectPadding: [0, 4, 0, 4],
+    sizeIndicatorTextColor: '#fff',
+    sizeIndicatorTextFontStyle: '12px sans-serif',
+    sizeIndicatorNumPrecision: 2,
+
     selectionStroke: '#0f8eff',
     selectionFill: '#0f8eff33',
     selectionMode: 'intersect' as 'intersect' | 'contain',

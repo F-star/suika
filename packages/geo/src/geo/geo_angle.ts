@@ -37,7 +37,11 @@ export const normalizeDegree = (degree: number): number => {
  * get sweep angle from vector a to vector b
  * direction is clockwise
  */
-export const getSweepAngle = (a: IPoint, b: IPoint) => {
+export const getSweepAngle = (
+  a: IPoint,
+  b: IPoint,
+  anticlockwise?: boolean,
+) => {
   // 点乘求夹角
   const dot = a.x * b.x + a.y * b.y;
   const d = Math.sqrt(a.x * a.x + a.y * a.y) * Math.sqrt(b.x * b.x + b.y * b.y);
@@ -49,7 +53,9 @@ export const getSweepAngle = (a: IPoint, b: IPoint) => {
   }
 
   let theta = Math.acos(cosTheta);
-  if (a.x * b.y - a.y * b.x < 0) {
+  const cross = a.x * b.y - a.y * b.x;
+  const reverse = anticlockwise ? cross > 0 : cross < 0;
+  if (reverse) {
     theta = DOUBLE_PI - theta;
   }
 
