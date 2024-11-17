@@ -106,7 +106,7 @@ export class CommandKeyBinding {
     });
 
     /*************** Zoom **************/
-    // zoom to fix
+    // zoom to fit
     const zoomToFitAction = () => {
       editor.zoomManager.zoomToFit();
       editor.render();

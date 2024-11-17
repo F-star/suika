@@ -2,6 +2,7 @@ import { EventEmitter, viewportCoordsToSceneUtil } from '@suika/common';
 import { boxToRect, type IPoint, type IRect } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
+import { type SuikaGraphics } from './graphics';
 
 interface IZoomOptions {
   center?: IPoint;
@@ -147,6 +148,9 @@ export class ZoomManager {
     this.setZoom(newZoom);
     viewportManager.setViewport({ x: newViewportX, y: newViewportY });
   }
+  /**
+   * zoom to selection
+   */
   zoomToSelection() {
     const selectedBoundingRect = this.editor.selectedElements.getBoundingRect();
     if (!selectedBoundingRect) {
@@ -155,6 +159,15 @@ export class ZoomManager {
       this.zoomRectToFit(selectedBoundingRect);
     }
   }
+
+  /**
+   * zoom to graphics
+   */
+  zoomToGraphics(graphics: SuikaGraphics) {
+    const rect = boxToRect(graphics.getBbox());
+    this.zoomRectToFit(rect);
+  }
+
   /**
    * zoom to fit all elements
    * reference: https://mp.weixin.qq.com/s/XtNEl1dWCYkTIKStne4A4w

@@ -19,9 +19,12 @@
 
     &.sk-layer-highlight {
       border-color: #0f8fff;
+      color: #333;
     }
     &:hover:not(.sk-editing) {
       border-color: #0f8fff;
+      color: #333;
+
       .sk-layer-item-actions {
         display: flex;
       }
@@ -71,7 +74,10 @@
       overflow: hidden;
       text-overflow: ellipsis;
       flex-shrink: 1;
+      flex-grow: 1;
 
+      height: 32px;
+      line-height: 32px;
       font-family: Arial, sans-serif;
     }
 

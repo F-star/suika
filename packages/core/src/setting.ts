@@ -117,7 +117,7 @@ export class Setting {
     offsetY: 0,
 
     /**** zoom ****/
-    zoomToFixPadding: 32, // base viewport coord
+    zoomToFixPadding: 40, // base viewport coord
     invertZoomDirection: false, // zoom in/out direction
 
     smallNudge: 1,

@@ -51,6 +51,16 @@ export const LayerPanel: FC = () => {
     return graphics ? graphics.getLayerIconPath() : '';
   };
 
+  const zoomGraphicsToFit = (id: string) => {
+    if (editor) {
+      const graphics = editor.doc.getGraphicsById(id);
+      if (graphics) {
+        editor.zoomManager.zoomToGraphics(graphics);
+        editor.render();
+      }
+    }
+  };
+
   const setEditorHlId = (id: string) => {
     if (editor) {
       const graphics = editor.doc.getGraphicsById(id) ?? null;
@@ -102,6 +112,7 @@ export const LayerPanel: FC = () => {
         setName={setName}
         setSelectedGraph={setSelectedGraph}
         getLayerIcon={getLayerIcon}
+        zoomGraphicsToFit={zoomGraphicsToFit}
       />
     </div>
   );

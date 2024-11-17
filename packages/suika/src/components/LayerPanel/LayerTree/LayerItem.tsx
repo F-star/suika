@@ -51,6 +51,7 @@ const LayerItem: FC<IProps> = ({
   setName,
   setSelectedGraph,
   getLayerIcon,
+  zoomGraphicsToFit,
 }) => {
   const indentWidth = level * 16;
   const [isEditing, setIsEditing] = useState(false);
@@ -114,13 +115,17 @@ const LayerItem: FC<IProps> = ({
         onMouseLeave={() => {
           setHlId && setHlId('');
         }}
-        onDoubleClick={handleDbClick}
       >
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
         <div className="sk-group-collapse-btn">
           {children?.length ? <SmallCaretDownSolid /> : undefined}
         </div>
-        <div className="sk-layer-icon">
+        <div
+          className="sk-layer-icon"
+          onDoubleClick={() => {
+            zoomGraphicsToFit(id);
+          }}
+        >
           <LayerIcon
             content={getLayerIcon(id)}
             enableFill={type === 'Text'}
@@ -128,7 +133,11 @@ const LayerItem: FC<IProps> = ({
           />
         </div>
         {!isEditing && (
-          <span key={'span'} className="sk-layout-name">
+          <span
+            key={'span'}
+            className="sk-layout-name"
+            onDoubleClick={handleDbClick}
+          >
             {layoutName}
           </span>
         )}
@@ -216,6 +225,7 @@ const LayerItem: FC<IProps> = ({
               setHlId={setHlId}
               setSelectedGraph={setSelectedGraph}
               getLayerIcon={getLayerIcon}
+              zoomGraphicsToFit={zoomGraphicsToFit}
             />
           ))}
         </div>

@@ -9,6 +9,7 @@ interface IProps extends IBaseEvents {
   activeIds: string[];
   hlId: string;
   getLayerIcon: (id: string) => string;
+  zoomGraphicsToFit: (id: string) => void;
 }
 
 export const LayerTree: FC<IProps> = ({
@@ -21,6 +22,7 @@ export const LayerTree: FC<IProps> = ({
   setName,
   setSelectedGraph,
   getLayerIcon,
+  zoomGraphicsToFit,
 }) => {
   return (
     <div>
@@ -43,6 +45,7 @@ export const LayerTree: FC<IProps> = ({
           setName={setName}
           setSelectedGraph={setSelectedGraph}
           getLayerIcon={getLayerIcon}
+          zoomGraphicsToFit={zoomGraphicsToFit}
         />
       ))}
     </div>
