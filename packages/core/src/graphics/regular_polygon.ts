@@ -209,4 +209,8 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
       .map((p) => `${p.x},${p.y}`)
       .join(' ')}" transform="matrix(${tf.join(' ')})"`;
   }
+
+  override getLayerIconPath() {
+    return 'M6 2L11.1962 11H0.803848L6 2Z';
+  }
 }

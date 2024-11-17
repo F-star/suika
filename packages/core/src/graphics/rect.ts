@@ -403,4 +403,8 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       this.attrs.height
     }" transform="matrix(${tf.join(' ')})"${cornerRadiusStr}`;
   }
+
+  override getLayerIconPath() {
+    return 'M1 1H11V11H1V1Z';
+  }
 }

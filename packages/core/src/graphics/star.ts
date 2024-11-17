@@ -214,4 +214,8 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
       .map((p) => `${p.x},${p.y}`)
       .join(' ')}" transform="matrix(${tf.join(' ')})"`;
   }
+
+  override getLayerIconPath() {
+    return 'M6.5 2L7.51031 5.10942H10.7798L8.13472 7.03115L9.14503 10.1406L6.5 8.21885L3.85497 10.1406L4.86528 7.03115L2.22025 5.10942H5.48969L6.5 2Z';
+  }
 }

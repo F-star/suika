@@ -12,10 +12,12 @@ import {
 import classNames from 'classnames';
 import { type FC, useEffect, useRef, useState } from 'react';
 
+import { LayerIcon } from './LayerIcon';
 import { type IBaseEvents } from './type';
 
 interface IProps extends IBaseEvents {
   id: string;
+  type: string;
   name: string;
   children?: IObject[];
   active?: boolean;
@@ -35,6 +37,7 @@ const LayerItem: FC<IProps> = ({
   active = false,
   activeSecond = false,
   id,
+  type,
   activeIds = [],
   level = 0,
   hlId,
@@ -47,6 +50,7 @@ const LayerItem: FC<IProps> = ({
   setHlId,
   setName,
   setSelectedGraph,
+  getLayerIcon,
 }) => {
   const indentWidth = level * 16;
   const [isEditing, setIsEditing] = useState(false);
@@ -115,6 +119,13 @@ const LayerItem: FC<IProps> = ({
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
         <div className="sk-group-collapse-btn">
           {children?.length ? <SmallCaretDownSolid /> : undefined}
+        </div>
+        <div className="sk-layer-icon">
+          <LayerIcon
+            content={getLayerIcon(id)}
+            enableFill={type === 'Text'}
+            enableStroke={type !== 'Text'}
+          />
         </div>
         {!isEditing && (
           <span key={'span'} className="sk-layout-name">
@@ -187,6 +198,7 @@ const LayerItem: FC<IProps> = ({
             <LayerItem
               key={item.id}
               id={item.id}
+              type={item.type}
               name={item.name}
               active={activeIds.includes(item.id)}
               activeSecond={activeSecond || activeIds.includes(item.id)}
@@ -203,6 +215,7 @@ const LayerItem: FC<IProps> = ({
               toggleLock={toggleLock}
               setHlId={setHlId}
               setSelectedGraph={setSelectedGraph}
+              getLayerIcon={getLayerIcon}
             />
           ))}
         </div>

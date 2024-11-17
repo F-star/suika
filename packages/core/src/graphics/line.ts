@@ -98,4 +98,8 @@ export class SuikaLine extends SuikaGraphics<LineAttrs> {
       strokePaints: this.attrs.stroke ?? [],
     };
   }
+
+  override getLayerIconPath() {
+    return 'M0.5 0.5 L 10.5 10.5';
+  }
 }

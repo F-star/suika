@@ -56,6 +56,15 @@
       flex-shrink: 0;
     }
 
+    .sk-layer-icon {
+      width: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      color: #0000004d;
+    }
+
     .sk-layout-name {
       padding: 0 4px;
       border: 1px solid transparent;

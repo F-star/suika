@@ -823,6 +823,10 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     };
   }
 
+  getLayerIconPath() {
+    return 'M1 1H11V11H1V1Z';
+  }
+
   getWorldTransform(): IMatrixArr {
     const parent = this.getParent();
     if (parent) {

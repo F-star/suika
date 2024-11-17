@@ -149,4 +149,8 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
       )})"`;
     }
   }
+
+  override getLayerIconPath() {
+    return 'M11 6C11 8.76142 8.76142 11 6 11C3.23858 11 1 8.76142 1 6C1 3.23858 3.23858 1 6 1C8.76142 1 11 3.23858 11 6Z';
+  }
 }

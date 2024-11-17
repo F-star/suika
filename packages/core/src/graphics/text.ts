@@ -124,6 +124,10 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     return `>${content}</text>`;
   }
 
+  override getLayerIconPath() {
+    return 'M0 0H11V3H10V1H6V9H7.5V10H3.5V9H5V1H1V3H0V0Z';
+  }
+
   getGlyphs() {
     if (this._glyphs) return this._glyphs;
     this._glyphs = calcGlyphInfos(this.attrs.content, {
