@@ -824,7 +824,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   }
 
   getLayerIconPath() {
-    return 'M1 1H11V11H1V1Z';
+    return 'M0.5 0.5H11.5V11.5H0.5V0.5Z';
   }
 
   getWorldTransform(): IMatrixArr {
