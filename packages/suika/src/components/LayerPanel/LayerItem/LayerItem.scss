@@ -17,8 +17,10 @@
       color: rgba(0, 0, 0, 0.3);
     }
 
-    &:hover:not(.sk-editing),
-    &.sk-hover {
+    &.sk-layer-highlight {
+      border-color: #0f8fff;
+    }
+    &:hover:not(.sk-editing) {
       border-color: #0f8fff;
       .sk-layer-item-actions {
         display: flex;

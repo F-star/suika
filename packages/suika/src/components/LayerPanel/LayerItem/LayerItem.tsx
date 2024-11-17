@@ -98,7 +98,7 @@ const LayerItem: FC<IProps> = ({
           'sk-active': active,
           'sk-active-second': active ? false : activeSecond,
           'sk-hidden': !finalVisible,
-          'sk-hover': isHl,
+          'sk-layer-highlight': isHl,
           'sk-editing': isEditing,
         })}
         onMouseDown={(e) => {
