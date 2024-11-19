@@ -9,6 +9,7 @@ import {
   SmallCaretDownSolid,
   UnlockFilled,
 } from '@suika/icons';
+import { useDebounceEffect } from 'ahooks';
 import classNames from 'classnames';
 import { type FC, useEffect, useRef, useState } from 'react';
 
@@ -96,6 +97,19 @@ const LayerItem: FC<IProps> = ({
   const finalVisible = visible && visibleSecond;
   const finalLock = lock || lockSecond;
 
+  const [layerIcon, setLayerIcon] = useState('');
+
+  useDebounceEffect(
+    () => {
+      setLayerIcon(getLayerIcon(id));
+    },
+    [getLayerIcon, id],
+    {
+      wait: 500,
+      leading: true,
+    },
+  );
+
   return (
     <>
       <div
@@ -127,7 +141,7 @@ const LayerItem: FC<IProps> = ({
           }}
         >
           <LayerIcon
-            content={getLayerIcon(id)}
+            content={layerIcon}
             enableFill={type === 'Text'}
             enableStroke={type !== 'Text'}
           />

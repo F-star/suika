@@ -1,9 +1,12 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  applyMatrix,
+  getPointsBbox,
   type IMatrixArr,
   type IPoint,
   isPointInRoundRect,
   Matrix,
+  rectToVertices,
 } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
@@ -405,6 +408,40 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
   }
 
   override getLayerIconPath() {
-    return 'M0.5 0.5H11.5V11.5H0.5V0.5Z';
+    const containerSize = 12;
+    const padding = 1;
+    const precision = 5;
+
+    const targetSize = containerSize - padding * 2;
+    let vertices = rectToVertices({
+      x: 0,
+      y: 0,
+      width: this.attrs.width,
+      height: this.attrs.height,
+    });
+    const transform = this.getWorldTransform();
+    vertices = vertices.map((pt) => {
+      return applyMatrix(transform, pt);
+    });
+
+    const bbox = getPointsBbox(vertices);
+    const bboxWidth = bbox.maxX - bbox.minX;
+    const bboxHeight = bbox.maxY - bbox.minY;
+    const scale = targetSize / Math.max(bboxWidth, bboxHeight);
+
+    const matrix = new Matrix()
+      .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
+      .scale(scale, scale)
+      .translate(containerSize / 2, containerSize / 2);
+
+    vertices = vertices.map((pt) => {
+      return matrix.apply(pt);
+    });
+
+    return `M${vertices
+      .map(
+        (item) => `${item.x.toFixed(precision)} ${item.y.toFixed(precision)}`,
+      )
+      .join('L')}Z`;
   }
 }

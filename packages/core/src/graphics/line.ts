@@ -1,5 +1,5 @@
 import { parseRGBAStr } from '@suika/common';
-import { type IPoint } from '@suika/geo';
+import { applyMatrix, getPointsBbox, type IPoint, Matrix } from '@suika/geo';
 
 import { PaintType } from '../paint';
 import { GraphicsType, type Optional } from '../type';
@@ -100,6 +100,34 @@ export class SuikaLine extends SuikaGraphics<LineAttrs> {
   }
 
   override getLayerIconPath() {
-    return 'M0.5 0.5 L 10.5 10.5';
+    const containerSize = 12;
+    const padding = 1;
+    const precision = 5;
+
+    const targetSize = containerSize - padding * 2;
+
+    const tf = this.getWorldTransform();
+    let points = [
+      applyMatrix(tf, { x: 0, y: 0 }),
+      applyMatrix(tf, { x: this.attrs.width, y: 0 }),
+    ];
+
+    const bbox = getPointsBbox(points);
+    const bboxWidth = bbox.maxX - bbox.minX;
+    const bboxHeight = bbox.maxY - bbox.minY;
+    const scale = targetSize / Math.max(bboxWidth, bboxHeight);
+
+    const matrix = new Matrix()
+      .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
+      .scale(scale, scale)
+      .translate(targetSize / 2, targetSize / 2);
+
+    points = points.map((pt) => {
+      return matrix.apply(pt);
+    });
+
+    return `M${points[0].x.toFixed(precision)} ${points[0].y.toFixed(
+      precision,
+    )} L${points[1].x.toFixed(precision)} ${points[1].y.toFixed(precision)}`;
   }
 }
