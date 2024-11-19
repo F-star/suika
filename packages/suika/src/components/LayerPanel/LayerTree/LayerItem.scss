@@ -42,6 +42,9 @@
     &.sk-active {
       background-color: #e1f2ff;
       border-color: transparent;
+      .sk-layer-icon {
+        color: #000000e6;
+      }
     }
 
     &.sk-active-second {

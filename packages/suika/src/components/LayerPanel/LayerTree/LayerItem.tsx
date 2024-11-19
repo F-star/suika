@@ -105,7 +105,7 @@ const LayerItem: FC<IProps> = ({
     },
     [getLayerIcon, id],
     {
-      wait: 500,
+      wait: 300,
       leading: true,
     },
   );
