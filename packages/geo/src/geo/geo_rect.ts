@@ -2,11 +2,13 @@ import { transformRotate } from '../transform';
 import {
   type IBox,
   type IMatrixArr,
+  type IPathCommand,
   type IPoint,
   type IRect,
   type ISize,
   type ITransformRect,
 } from '../type';
+import { K } from './constant';
 import { normalizeRadian } from './geo_angle';
 import { Matrix } from './geo_matrix_class';
 import { distance } from './geo_point';
@@ -317,4 +319,103 @@ export const boxToRect = (box: IBox): IRect => {
     width: box.maxX - box.minX,
     height: box.maxY - box.minY,
   };
+};
+
+export const roundRectToPathCmds = (
+  rect: IRect,
+  cornerRadius = 0,
+): IPathCommand[] => {
+  const { minX, minY, maxX, maxY } = rectToBox(rect);
+  if (cornerRadius <= 0) {
+    return [
+      { type: 'M', points: [{ x: minX, y: minY }] },
+      { type: 'L', points: [{ x: maxX, y: minY }] },
+      { type: 'L', points: [{ x: maxX, y: maxY }] },
+      { type: 'L', points: [{ x: minX, y: maxY }] },
+      { type: 'Z', points: [] },
+    ];
+  }
+
+  const halfWidth = rect.width / 2;
+  const halfHeight = rect.height / 2;
+  const r = Math.min(cornerRadius, halfWidth, halfHeight);
+  const isFullWidth = r === halfWidth;
+  const isFullHeight = r === halfHeight;
+
+  const lx = r * K;
+  const ly = r * K;
+
+  const commands: IPathCommand[] = [
+    // left top
+    { type: 'M', points: [{ x: minX, y: minY + r }] },
+    {
+      type: 'C',
+      points: [
+        { x: minX, y: minY + r - ly },
+        { x: minX + r - lx, y: minY },
+        { x: minX + r, y: minY },
+      ],
+    },
+  ];
+  // top line (skip if full width)
+  if (!isFullWidth) {
+    commands.push({
+      type: 'L',
+      points: [{ x: maxX - r, y: minY }],
+    });
+  }
+  // right top
+  commands.push({
+    type: 'C',
+    points: [
+      { x: maxX - r + lx, y: minY },
+      { x: maxX, y: minY + r - ly },
+      { x: maxX, y: minY + r },
+    ],
+  });
+  // right line (skip if full height)
+  if (!isFullHeight) {
+    commands.push({
+      type: 'L',
+      points: [{ x: maxX, y: maxY - r }],
+    });
+  }
+  // right bottom
+  commands.push({
+    type: 'C',
+    points: [
+      { x: maxX, y: maxY - r + ly },
+      { x: maxX - r + lx, y: maxY },
+      { x: maxX - r, y: maxY },
+    ],
+  });
+  // bottom line (skip if full width)
+  if (!isFullWidth) {
+    commands.push({
+      type: 'L',
+      points: [{ x: minX + r, y: maxY }],
+    });
+  }
+  // left bottom
+  commands.push({
+    type: 'C',
+    points: [
+      { x: minX + r - lx, y: maxY },
+      { x: minX, y: maxY - r + ly },
+      { x: minX, y: maxY - r },
+    ],
+  });
+  // left line (skip if full height)
+  if (!isFullHeight) {
+    commands.push({
+      type: 'L',
+      points: [{ x: minX, y: minY + r }],
+    });
+  }
+  commands.push({
+    type: 'Z',
+    points: [],
+  });
+
+  return commands;
 };

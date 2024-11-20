@@ -1,17 +1,11 @@
+import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
-  cloneDeep,
-  parseHexToRGBA,
-  parseRGBAStr,
-  remainDecimal,
-} from '@suika/common';
-import {
-  applyMatrix,
-  getPointsBbox,
+  commandsToStr,
   type IMatrixArr,
   type IPoint,
   isPointInRoundRect,
   Matrix,
-  rectToVertices,
+  roundRectToPathCmds,
 } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
@@ -418,39 +412,34 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     const precision = 5;
 
     const targetSize = containerSize - padding * 2;
-    let vertices = rectToVertices({
-      x: 0,
-      y: 0,
-      width: this.attrs.width,
-      height: this.attrs.height,
-    });
-    const tf = this.getWorldTransform();
-    vertices = vertices.map((pt) => {
-      return applyMatrix(tf, pt);
-    });
 
-    const bbox = getPointsBbox(vertices);
+    const bbox = this.getBbox();
     const bboxWidth = bbox.maxX - bbox.minX;
     const bboxHeight = bbox.maxY - bbox.minY;
     const scale = targetSize / Math.max(bboxWidth, bboxHeight);
 
     const matrix = new Matrix()
+      .prepend(new Matrix(...this.getWorldTransform()))
       .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
       .scale(scale, scale)
       .translate(containerSize / 2, containerSize / 2);
 
-    vertices = vertices.map((pt) => {
-      return matrix.apply(pt);
+    const attrs = this.attrs;
+    const commands = roundRectToPathCmds(
+      {
+        x: 0,
+        y: 0,
+        width: attrs.width,
+        height: attrs.height,
+      },
+      this.attrs.cornerRadius,
+    );
+    commands.forEach((cmd) => {
+      cmd.points.forEach((pt, idx) => {
+        cmd.points[idx] = matrix.apply(pt);
+      });
     });
 
-    return `M${vertices
-      .map(
-        (item) =>
-          `${remainDecimal(item.x, precision)} ${remainDecimal(
-            item.y,
-            precision,
-          )}`,
-      )
-      .join('L')}Z`;
+    return commandsToStr(commands, precision);
   }
 }
