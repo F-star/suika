@@ -419,9 +419,9 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       width: this.attrs.width,
       height: this.attrs.height,
     });
-    const transform = this.getWorldTransform();
+    const tf = this.getWorldTransform();
     vertices = vertices.map((pt) => {
-      return applyMatrix(transform, pt);
+      return applyMatrix(tf, pt);
     });
 
     const bbox = getPointsBbox(vertices);

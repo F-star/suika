@@ -1,5 +1,10 @@
 import { parseRGBAStr } from '@suika/common';
-import { type IPoint, Matrix } from '@suika/geo';
+import {
+  commandsToStr,
+  ellipseToPathCmds,
+  type IPoint,
+  Matrix,
+} from '@suika/geo';
 
 import { DOUBLE_PI } from '../constant';
 import { PaintType } from '../paint';
@@ -151,6 +156,36 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
   }
 
   override getLayerIconPath() {
-    return 'M11.5 6C11.5 8.76142 8.76142 11.5 6 11.5C3.23858 11.5 0.5 8.76142 0.5 6C0.5 3.23858 3.23858 0.5 6 0.5C8.76142 0.5 11.5 3.23858 11.5 6Z';
+    const containerSize = 12;
+    const padding = 1;
+    const precision = 5;
+
+    const targetSize = containerSize - padding * 2;
+
+    const bbox = this.getBbox();
+    const bboxWidth = bbox.maxX - bbox.minX;
+    const bboxHeight = bbox.maxY - bbox.minY;
+    const scale = targetSize / Math.max(bboxWidth, bboxHeight);
+
+    const matrix = new Matrix()
+      .prepend(new Matrix(...this.getWorldTransform()))
+      .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
+      .scale(scale, scale)
+      .translate(containerSize / 2, containerSize / 2);
+
+    const attrs = this.attrs;
+    const commands = ellipseToPathCmds({
+      x: 0,
+      y: 0,
+      width: attrs.width,
+      height: attrs.height,
+    });
+    commands.forEach((cmd) => {
+      cmd.points.forEach((pt, idx) => {
+        cmd.points[idx] = matrix.apply(pt);
+      });
+    });
+
+    return commandsToStr(commands, precision);
   }
 }

@@ -1,5 +1,6 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  commandsToStr,
   GeoPath,
   type IMatrixArr,
   invertMatrix,
@@ -42,7 +43,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
 
   static computeRect(pathData: IPathItem[]): IRect {
     const geoPath = new GeoPath(pathData);
-    return geoPath.getBbox();
+    return geoPath.getBRect();
   }
 
   static recomputeAttrs(pathData: IPathItem[], transform: IMatrixArr) {
@@ -511,5 +512,34 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     }
 
     return `<path d="${d}" transform="matrix(${tf.join(' ')})"`;
+  }
+
+  override getLayerIconPath(): string {
+    const containerSize = 12;
+    const padding = 1;
+    const precision = 5;
+
+    const targetSize = containerSize - padding * 2;
+
+    const bbox = this.getBbox();
+    const bboxWidth = bbox.maxX - bbox.minX;
+    const bboxHeight = bbox.maxY - bbox.minY;
+    const scale = targetSize / Math.max(bboxWidth, bboxHeight);
+
+    const matrix = new Matrix()
+      .prepend(new Matrix(...this.getWorldTransform()))
+      .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
+      .scale(scale, scale)
+      .translate(containerSize / 2, containerSize / 2);
+
+    const geoPath = this.getGeoPath();
+    const commands = geoPath.toCommands();
+    commands.forEach((cmd) => {
+      cmd.points.forEach((pt, idx) => {
+        cmd.points[idx] = matrix.apply(pt);
+      });
+    });
+
+    return commandsToStr(commands, precision);
   }
 }

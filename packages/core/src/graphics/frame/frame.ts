@@ -299,6 +299,13 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     };
     return isPointInTransformedRect(point, titleRect, options.tol);
   }
+
+  override getLayerIconPath() {
+    if (this.isGroup()) {
+      return 'M7 1H5V2H7V1ZM9.5 10H10V9.5H11V11H9.5V10ZM2 5V7H1V5H2ZM10 2.5V2H9.5V1H11V2.5H10ZM10 5V7H11V5H10ZM2 2.5V2H2.5V1H1V2.5H2ZM1 9.5H2V10H2.5V11H1V9.5ZM7 10H5V11H7V10Z';
+    }
+    return 'M4 0.5V3H8V0.5H9V3H11.5V4H9V8H11.5V9H9V11.5H8V9H4V11.5H3V9H0.5V8H3V4H0.5V3H3V0.5H4ZM8 8V4H4V8H8Z';
+  }
 }
 
 export const isFrameGraphics = (

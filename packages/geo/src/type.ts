@@ -55,3 +55,11 @@ export interface IPathItem {
   segs: ISegment[];
   closed: boolean;
 }
+
+/**
+ * only support 'M', 'L' and 'C'
+ */
+export interface IPathCommand {
+  type: string;
+  points: IPoint[];
+}

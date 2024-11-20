@@ -1,5 +1,6 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  commandsToStr,
   getPointsBbox,
   getStar,
   type IBox,
@@ -216,6 +217,33 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
   }
 
   override getLayerIconPath() {
-    return 'M6.5 2L7.51031 5.10942H10.7798L8.13472 7.03115L9.14503 10.1406L6.5 8.21885L3.85497 10.1406L4.86528 7.03115L2.22025 5.10942H5.48969L6.5 2Z';
+    // TODD: to optimize as same as regular polygon, no repeat code
+    const containerSize = 12;
+    const padding = 1;
+    const precision = 5;
+
+    const targetSize = containerSize - padding * 2;
+
+    const bbox = this.getBbox();
+    const bboxWidth = bbox.maxX - bbox.minX;
+    const bboxHeight = bbox.maxY - bbox.minY;
+    const scale = targetSize / Math.max(bboxWidth, bboxHeight);
+
+    const matrix = new Matrix()
+      .prepend(new Matrix(...this.getWorldTransform()))
+      .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
+      .scale(scale, scale)
+      .translate(containerSize / 2, containerSize / 2);
+
+    const points = this.getPoints().map((p) => matrix.apply(p));
+
+    return commandsToStr(
+      [
+        { type: 'M', points: [points[0]] },
+        ...points.slice(1).map((p) => ({ type: 'L', points: [p] })),
+        { type: 'Z', points: [] },
+      ],
+      precision,
+    );
   }
 }

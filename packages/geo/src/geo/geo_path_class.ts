@@ -1,26 +1,39 @@
-import { type IPathItem, type IPoint, type ISegment } from '../type';
+import {
+  type IPathCommand,
+  type IPathItem,
+  type IPoint,
+  type ISegment,
+} from '../type';
 import { GeoBezier } from './geo_bezier_class';
 import { pointAdd } from './geo_point';
+
+interface IBezierCurves {
+  isClosed: boolean;
+  curves: GeoBezier[];
+}
 
 /**
  * Path geometry algorithm
  */
 export class GeoPath {
-  private bezierLists: GeoBezier[][];
+  private bezierLists: IBezierCurves[];
 
   constructor(pathData: IPathItem[]) {
-    const bezierItems: GeoBezier[][] = [];
+    const bezierItems: IBezierCurves[] = [];
     for (let i = 0; i < pathData.length; i++) {
       const pathItem = pathData[i];
       const segs = pathItem.segs;
-      bezierItems[i] = [];
+      bezierItems[i] = {
+        isClosed: pathItem.closed,
+        curves: [],
+      };
       for (let j = 1; j <= segs.length; j++) {
         if (j === segs.length && !pathItem.closed) {
           continue;
         }
         const seg = segs[j % segs.length];
         const prevSeg = segs[j - 1];
-        bezierItems[i].push(
+        bezierItems[i].curves.push(
           new GeoBezier([
             prevSeg.point,
             GeoPath.getHandleOut(prevSeg),
@@ -47,8 +60,8 @@ export class GeoPath {
     let maxX = -Infinity;
     let maxY = -Infinity;
 
-    for (const bezierList of this.bezierLists) {
-      for (const bezier of bezierList) {
+    for (const { curves } of this.bezierLists) {
+      for (const bezier of curves) {
         const bbox = bezier.getBbox();
         minX = Math.min(minX, bbox.minX);
         minY = Math.min(minY, bbox.minY);
@@ -57,20 +70,31 @@ export class GeoPath {
       }
     }
 
-    if (minX === Infinity) {
+    return {
+      minX,
+      minY,
+      maxX,
+      maxY,
+    };
+  }
+
+  getBRect() {
+    const bbox = this.getBbox();
+
+    if (bbox.minX === Infinity) {
       return { x: 0, y: 0, width: 100, height: 100 };
     }
     return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
+      x: bbox.minX,
+      y: bbox.minY,
+      width: bbox.maxX - bbox.minX,
+      height: bbox.maxY - bbox.minY,
     };
   }
 
   hitTest(point: IPoint, tol: number) {
-    for (const bezierList of this.bezierLists) {
-      for (const bezier of bezierList) {
+    for (const { curves } of this.bezierLists) {
+      for (const bezier of curves) {
         if (bezier.hitTest(point, tol)) {
           return true;
         }
@@ -83,8 +107,8 @@ export class GeoPath {
     let minDist = Infinity;
     let minDistPoint: IPoint | null = null;
 
-    for (const bezierList of this.bezierLists) {
-      for (const bezier of bezierList) {
+    for (const { curves } of this.bezierLists) {
+      for (const bezier of curves) {
         const projectInfo = bezier.project(point);
         if (projectInfo.dist === 0) {
           return {
@@ -103,4 +127,38 @@ export class GeoPath {
       point: minDistPoint,
     };
   }
+
+  toCommands(): IPathCommand[] {
+    const retCmds: IPathCommand[] = [];
+    for (const { isClosed, curves } of this.bezierLists) {
+      for (let i = 0; i < curves.length; i++) {
+        const bezier = curves[i];
+        const cmd = bezier.toCommand();
+        if (i === 0) {
+          retCmds.push(...cmd);
+        } else {
+          retCmds.push(...cmd.slice(1));
+        }
+      }
+      if (isClosed) {
+        retCmds.push({
+          type: 'Z',
+          points: [],
+        });
+      }
+    }
+    return retCmds;
+  }
 }
+
+export const commandsToStr = (commands: IPathCommand[], precision: number) => {
+  return commands
+    .map(
+      (cmd) =>
+        cmd.type +
+        cmd.points
+          .map((pt) => pt.x.toFixed(precision) + ' ' + pt.y.toFixed(precision))
+          .join(' '),
+    )
+    .join(' ');
+};

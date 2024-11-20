@@ -1,5 +1,6 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  commandsToStr,
   getPointsBbox,
   getRegularPolygon,
   type IBox,
@@ -211,6 +212,32 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
   }
 
   override getLayerIconPath() {
-    return 'M6 2L11.1962 11H0.803848L6 2Z';
+    const containerSize = 12;
+    const padding = 1;
+    const precision = 5;
+
+    const targetSize = containerSize - padding * 2;
+
+    const bbox = this.getBbox();
+    const bboxWidth = bbox.maxX - bbox.minX;
+    const bboxHeight = bbox.maxY - bbox.minY;
+    const scale = targetSize / Math.max(bboxWidth, bboxHeight);
+
+    const matrix = new Matrix()
+      .prepend(new Matrix(...this.getWorldTransform()))
+      .translate(-bbox.minX - bboxWidth / 2, -bbox.minY - bboxHeight / 2)
+      .scale(scale, scale)
+      .translate(containerSize / 2, containerSize / 2);
+
+    const points = this.getPoints().map((p) => matrix.apply(p));
+
+    return commandsToStr(
+      [
+        { type: 'M', points: [points[0]] },
+        ...points.slice(1).map((p) => ({ type: 'L', points: [p] })),
+        { type: 'Z', points: [] },
+      ],
+      precision,
+    );
   }
 }

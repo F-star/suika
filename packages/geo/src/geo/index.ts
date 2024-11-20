@@ -1,6 +1,7 @@
 export * from './geo_angle';
 export * from './geo_box';
 export * from './geo_circle';
+export * from './geo_ellipse';
 export * from './geo_line';
 export * from './geo_matrix';
 export * from './geo_matrix_class';

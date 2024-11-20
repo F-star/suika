@@ -181,6 +181,21 @@ export class GeoBezier {
       dist: distance(targetPt, projectPt),
     };
   }
+
+  toCommand() {
+    const [p1, cp1, cp2, p2] = this.points;
+    if (p1.x === cp1.x && cp1.x === cp2.x && cp2.x === p2.x) {
+      return [
+        { type: 'M', points: [p1] },
+        { type: 'C', points: [cp1, cp2, p2] },
+      ];
+    } else {
+      return [
+        { type: 'M', points: [p1] },
+        { type: 'C', points: [cp1, cp2, p2] },
+      ];
+    }
+  }
 }
 
 const getRoot = (a: number, b: number, c: number) => {

@@ -142,8 +142,8 @@ const LayerItem: FC<IProps> = ({
         >
           <LayerIcon
             content={layerIcon}
-            enableFill={type === 'Text'}
-            enableStroke={type !== 'Text'}
+            enableFill={['Text', 'Frame'].includes(type)}
+            enableStroke={!['Text', 'Frame'].includes(type)}
           />
         </div>
         {!isEditing && (
