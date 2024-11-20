@@ -219,7 +219,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
   override getLayerIconPath() {
     // TODD: to optimize as same as regular polygon, no repeat code
     const containerSize = 12;
-    const padding = 1;
+    const padding = 0.5;
     const precision = 5;
 
     const targetSize = containerSize - padding * 2;

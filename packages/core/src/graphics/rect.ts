@@ -1,4 +1,9 @@
-import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
+import {
+  cloneDeep,
+  parseHexToRGBA,
+  parseRGBAStr,
+  remainDecimal,
+} from '@suika/common';
 import {
   applyMatrix,
   getPointsBbox,
@@ -409,7 +414,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
 
   override getLayerIconPath() {
     const containerSize = 12;
-    const padding = 1;
+    const padding = 0.5;
     const precision = 5;
 
     const targetSize = containerSize - padding * 2;
@@ -440,7 +445,11 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
 
     return `M${vertices
       .map(
-        (item) => `${item.x.toFixed(precision)} ${item.y.toFixed(precision)}`,
+        (item) =>
+          `${remainDecimal(item.x, precision)} ${remainDecimal(
+            item.y,
+            precision,
+          )}`,
       )
       .join('L')}Z`;
   }

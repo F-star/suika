@@ -1,3 +1,5 @@
+import { remainDecimal } from '@suika/common';
+
 import {
   type IPathCommand,
   type IPathItem,
@@ -157,7 +159,12 @@ export const commandsToStr = (commands: IPathCommand[], precision: number) => {
       (cmd) =>
         cmd.type +
         cmd.points
-          .map((pt) => pt.x.toFixed(precision) + ' ' + pt.y.toFixed(precision))
+          .map(
+            (pt) =>
+              remainDecimal(pt.x, precision) +
+              ' ' +
+              remainDecimal(pt.y, precision),
+          )
           .join(' '),
     )
     .join(' ');

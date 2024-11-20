@@ -516,7 +516,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
 
   override getLayerIconPath(): string {
     const containerSize = 12;
-    const padding = 1;
+    const padding = 0.5;
     const precision = 5;
 
     const targetSize = containerSize - padding * 2;
