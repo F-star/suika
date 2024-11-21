@@ -1,5 +1,6 @@
 import { cloneDeep } from '@suika/common';
 import {
+  applyInverseMatrix,
   getSweepAngle,
   type IPoint,
   type IRect,
@@ -9,7 +10,7 @@ import {
 
 import { HALF_PI } from '../constant';
 import { type SuikaEditor } from '../editor';
-import { SuikaLine } from '../graphics';
+import { isFrameGraphics, SuikaLine } from '../graphics';
 import { adjustSizeToKeepPolarSnap } from '../utils';
 import { DrawGraphicsTool } from './tool_draw_graphics';
 import { type ITool } from './type';
@@ -53,8 +54,26 @@ export class DrawLineTool extends DrawGraphicsTool implements ITool {
   }
 
   protected override updateGraphics(rect: IRect) {
-    const attrs = this.calcAttrs(rect);
-    this.drawingGraphics!.updateAttrs(attrs);
+    const parent = this.drawingGraphics!.getParent();
+    let x = rect.x;
+    let y = rect.y;
+    if (parent && isFrameGraphics(parent)) {
+      const tf = parent.getWorldTransform();
+      const point = applyInverseMatrix(tf, rect);
+      x = point.x;
+      y = point.y;
+    }
+
+    const attrs = this.calcAttrs({
+      x,
+      y,
+      width: rect.width,
+      height: rect.height,
+    });
+    this.drawingGraphics!.updateAttrs({
+      width: attrs.width,
+      transform: attrs.transform,
+    });
   }
 
   protected override solveWidthOrHeightIsZero(
