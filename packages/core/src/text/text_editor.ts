@@ -38,8 +38,13 @@ export class TextEditor {
 
   private createInputDom() {
     const inputDom = document.createElement('input');
+    inputDom.tabIndex = -1;
     Object.assign(inputDom.style, defaultInputStyle);
     return inputDom;
+  }
+
+  isEditorInputDom(dom: HTMLElement) {
+    return dom === this.inputDom;
   }
 
   getTextGraphics() {

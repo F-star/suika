@@ -48,8 +48,10 @@ export class ClipboardManager {
       const clipboardData = event.clipboardData;
       if (
         !clipboardData ||
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
+        this.editor.textEditor.isActive() ||
+        ((e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement) &&
+          !this.editor.textEditor.isEditorInputDom(e.target))
       ) {
         return;
       }
