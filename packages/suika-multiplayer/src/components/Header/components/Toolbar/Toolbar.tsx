@@ -4,7 +4,9 @@ import { isWindows } from '@suika/common';
 import { Button } from '@suika/components';
 import {
   EllipseOutlined,
+  FrameOutlined,
   HandOutlined,
+  ImageOutlined,
   LineOutlined,
   PencilOutlined,
   PenOutlined,
@@ -67,6 +69,12 @@ export const ToolBar = () => {
       intlId: 'tool.select',
       icon: <SelectOutlined />,
     },
+    drawFrame: {
+      name: 'drawFrame',
+      hotkey: 'F',
+      intlId: 'tool.frame',
+      icon: <FrameOutlined />,
+    },
     drawRect: {
       name: 'drawRect',
       hotkey: 'R',
@@ -78,6 +86,12 @@ export const ToolBar = () => {
       hotkey: 'O',
       intlId: 'tool.ellipse',
       icon: <EllipseOutlined />,
+    },
+    drawImg: {
+      name: 'drawImg',
+      hotkey: '',
+      intlId: 'tool.image',
+      icon: <ImageOutlined />,
     },
     pathSelect: {
       name: 'pathSelect',

@@ -8,9 +8,11 @@ interface IProps extends IBaseEvents {
   treeData: IObject[];
   activeIds: string[];
   hlId: string;
+  getLayerIcon: (id: string) => string;
+  zoomGraphicsToFit: (id: string) => void;
 }
 
-export const Tree: FC<IProps> = ({
+export const LayerTree: FC<IProps> = ({
   treeData,
   activeIds = [],
   hlId: hoverId,
@@ -19,11 +21,14 @@ export const Tree: FC<IProps> = ({
   setHlId: setHoverId,
   setName,
   setSelectedGraph,
+  getLayerIcon,
+  zoomGraphicsToFit,
 }) => {
   return (
     <div>
       {[...treeData].reverse().map((item) => (
         <LayerItem
+          type={item.type}
           active={activeIds.includes(item.id)}
           activeSecond={activeIds.includes(item.id)}
           key={item.id}
@@ -39,6 +44,8 @@ export const Tree: FC<IProps> = ({
           setHlId={setHoverId}
           setName={setName}
           setSelectedGraph={setSelectedGraph}
+          getLayerIcon={getLayerIcon}
+          zoomGraphicsToFit={zoomGraphicsToFit}
         />
       ))}
     </div>

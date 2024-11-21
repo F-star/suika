@@ -5,7 +5,6 @@
 
     box-sizing: border-box;
     border: 1px solid transparent;
-    padding-left: 16px;
     padding-right: 4px;
     height: 32px;
     font-size: 12px;
@@ -18,9 +17,17 @@
       color: rgba(0, 0, 0, 0.3);
     }
 
-    &:hover:not(.sk-editing),
-    &.sk-hover {
+    &.sk-layer-highlight {
       border-color: #0f8fff;
+      color: #333;
+    }
+    &:hover:not(.sk-editing) {
+      border-color: #0f8fff;
+      color: #333;
+
+      .sk-layer-item-actions {
+        display: flex;
+      }
       span.sk-action-btn {
         visibility: visible;
       }
@@ -35,6 +42,9 @@
     &.sk-active {
       background-color: #e1f2ff;
       border-color: transparent;
+      .sk-layer-icon {
+        color: #000000e6;
+      }
     }
 
     &.sk-active-second {
@@ -49,11 +59,28 @@
       height: 20px;
       width: 20px;
       color: '#ccc';
+      flex-shrink: 0;
+    }
+
+    .sk-layer-icon {
+      width: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      color: #0000004d;
     }
 
     .sk-layout-name {
       padding: 0 4px;
       border: 1px solid transparent;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+      flex-grow: 1;
+
+      height: 32px;
+      line-height: 32px;
       font-family: Arial, sans-serif;
     }
 
@@ -77,9 +104,13 @@
     .sk-layer-item-actions {
       margin-left: auto;
       padding-right: 4px;
-      display: flex;
       align-items: center;
       height: 20px;
+      display: none;
+
+      &.sk-action-visible {
+        display: flex;
+      }
 
       .sk-action-btn {
         visibility: hidden;

@@ -1,5 +1,6 @@
 import './style.scss';
 
+import { GithubOutlined } from '@suika/icons';
 import { type FC } from 'react';
 
 interface IProps {
@@ -9,7 +10,10 @@ interface IProps {
 const Title: FC<IProps> = ({ value }) => {
   return (
     <div className="suika-header-title">
-      <div className="sk-header-title-content">{value}</div>
+      <GithubOutlined />
+      <a href="https://github.com/F-star/suika" target="_blank">
+        {value}
+      </a>
     </div>
   );
 };

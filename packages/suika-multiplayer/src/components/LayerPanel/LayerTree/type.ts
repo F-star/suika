@@ -8,4 +8,6 @@ export interface IBaseEvents {
     objId: string,
     event: React.MouseEvent<Element, MouseEvent>,
   ) => void;
+  getLayerIcon: (id: string) => string;
+  zoomGraphicsToFit: (id: string) => void;
 }

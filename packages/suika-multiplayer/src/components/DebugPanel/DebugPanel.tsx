@@ -7,6 +7,7 @@ import { EditorContext } from '../../context';
 export const DebugPanel: FC = () => {
   const editor = useContext(EditorContext);
 
+  const [zoom, setZoom] = useState(1);
   const [isSelectedBoxHover, setIsSelectedBoxHover] = useState(false);
   const [hoveredGraphName, setHoveredGraphName] = useState('');
   const [cursorPos, setCursorPos] = useState<IPoint | null>(null);
@@ -20,19 +21,27 @@ export const DebugPanel: FC = () => {
     const handleHoverItemChange = (hoveredItem: SuikaGraphics | null) => {
       setHoveredGraphName(hoveredItem?.attrs?.objectName ?? '');
     };
+    const updateZoom = (val: number) => {
+      setZoom(val);
+    };
+
+    setZoom(editor.zoomManager.getZoom());
 
     editor.selectedBox.on('hoverChange', handleSelectedBoxHover);
     editor.selectedElements.on('hoverItemChange', handleHoverItemChange);
     editor.mouseEventManager.on('cursorPosUpdate', setCursorPos);
+    editor.zoomManager.on('zoomChange', updateZoom);
 
     return () => {
       editor.selectedBox.off('hoverChange', handleSelectedBoxHover);
       editor.selectedElements.off('hoverItemChange', handleHoverItemChange);
+      editor.zoomManager.off('zoomChange', updateZoom);
     };
   }, [editor]);
 
   return (
     <div style={{ padding: 8 }}>
+      <div>zoom: {zoom}</div>
       <div>isSelectedBoxHover: {isSelectedBoxHover ? 'true' : 'false'}</div>
       <div>hoveredGraphName: {hoveredGraphName}</div>
       {cursorPos && (
