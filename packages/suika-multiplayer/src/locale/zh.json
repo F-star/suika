@@ -8,8 +8,10 @@
   "uploadFile": "上传文件",
 
   "tool.select": "选择",
+  "tool.frame": "画板",
   "tool.rectangle": "矩形",
   "tool.ellipse": "圆",
+  "tool.image": "图片",
   "tool.pen": "钢笔",
   "tool.line": "直线",
   "tool.polygon": "多边形",
@@ -60,5 +62,7 @@
   "highlightLayersOnHover": "鼠标悬停时高亮图层",
   "flipObjectsWhileResizing": "缩放时对图形进行翻转",
 
-  "done": "完成"
+  "done": "完成",
+
+  "layer": "图层"
 }

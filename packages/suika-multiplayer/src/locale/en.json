@@ -8,8 +8,10 @@
   "uploadFile": "Upload File",
 
   "tool.select": "Select",
+  "tool.frame": "Frame",
   "tool.rectangle": "Rectangle",
   "tool.ellipse": "Ellipse",
+  "tool.image": "Image",
   "tool.pen": "Pen",
   "tool.line": "Line",
   "tool.polygon": "Polygon",
@@ -61,5 +63,7 @@
   "highlightLayersOnHover": "Highlight layers on hover",
   "flipObjectsWhileResizing": "Flip objects while resizing",
 
-  "done": "Done"
+  "done": "Done",
+
+  "layer": "Layer"
 }
