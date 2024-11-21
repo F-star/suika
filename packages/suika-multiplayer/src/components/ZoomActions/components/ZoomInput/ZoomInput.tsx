@@ -14,6 +14,7 @@ export const ZoomInput: FC<IProps> = ({ defaultValue, onChange }) => {
   const [value, setValue] = useState(
     defaultValue ? `${String(Math.round(defaultValue * 100))}%` : '',
   );
+  const roundValueStr = defaultValue && Math.round(defaultValue * 100);
 
   useMount(() => {
     if (inputRef.current) {
@@ -23,8 +24,8 @@ export const ZoomInput: FC<IProps> = ({ defaultValue, onChange }) => {
 
   const emitChange = () => {
     const newZoom = parseInt(value);
-    if (!Number.isNaN(newZoom)) {
-      onChange && onChange(remainDecimal(newZoom / 100));
+    if (!Number.isNaN(newZoom) && roundValueStr !== newZoom && onChange) {
+      onChange(remainDecimal(newZoom / 100));
     }
   };
 

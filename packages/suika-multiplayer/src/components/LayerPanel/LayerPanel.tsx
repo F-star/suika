@@ -4,7 +4,7 @@ import { type IObject, MutateGraphsAndRecord } from '@suika/core';
 import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../context';
-import { Tree } from './LayerItem/tree';
+import { LayerTree } from './LayerTree/LayerTree';
 
 export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);
@@ -42,6 +42,23 @@ export const LayerPanel: FC = () => {
       editor.selectedElements.setItemsById(new Set([objId]));
     }
     editor.render();
+  };
+
+  const getLayerIcon = (id: string) => {
+    if (!editor) return '';
+
+    const graphics = editor.doc.getGraphicsById(id);
+    return graphics ? graphics.getLayerIconPath() : '';
+  };
+
+  const zoomGraphicsToFit = (id: string) => {
+    if (editor) {
+      const graphics = editor.doc.getGraphicsById(id);
+      if (graphics) {
+        editor.zoomManager.zoomToGraphics(graphics);
+        editor.render();
+      }
+    }
   };
 
   const setEditorHlId = (id: string) => {
@@ -85,7 +102,7 @@ export const LayerPanel: FC = () => {
 
   return (
     <div className="layer-panel">
-      <Tree
+      <LayerTree
         treeData={objects}
         activeIds={Array.from(selectedIds)}
         hlId={hlId}
@@ -94,6 +111,8 @@ export const LayerPanel: FC = () => {
         setHlId={setEditorHlId}
         setName={setName}
         setSelectedGraph={setSelectedGraph}
+        getLayerIcon={getLayerIcon}
+        zoomGraphicsToFit={zoomGraphicsToFit}
       />
     </div>
   );

@@ -9,13 +9,16 @@ import {
   SmallCaretDownSolid,
   UnlockFilled,
 } from '@suika/icons';
+import { useDebounceEffect } from 'ahooks';
 import classNames from 'classnames';
 import { type FC, useEffect, useRef, useState } from 'react';
 
+import { LayerIcon } from './LayerIcon';
 import { type IBaseEvents } from './type';
 
 interface IProps extends IBaseEvents {
   id: string;
+  type: string;
   name: string;
   children?: IObject[];
   active?: boolean;
@@ -35,6 +38,7 @@ const LayerItem: FC<IProps> = ({
   active = false,
   activeSecond = false,
   id,
+  type,
   activeIds = [],
   level = 0,
   hlId,
@@ -47,6 +51,8 @@ const LayerItem: FC<IProps> = ({
   setHlId,
   setName,
   setSelectedGraph,
+  getLayerIcon,
+  zoomGraphicsToFit,
 }) => {
   const indentWidth = level * 16;
   const [isEditing, setIsEditing] = useState(false);
@@ -91,6 +97,19 @@ const LayerItem: FC<IProps> = ({
   const finalVisible = visible && visibleSecond;
   const finalLock = lock || lockSecond;
 
+  const [layerIcon, setLayerIcon] = useState('');
+
+  useDebounceEffect(
+    () => {
+      setLayerIcon(getLayerIcon(id));
+    },
+    [getLayerIcon, id],
+    {
+      wait: 300,
+      leading: true,
+    },
+  );
+
   return (
     <>
       <div
@@ -98,7 +117,7 @@ const LayerItem: FC<IProps> = ({
           'sk-active': active,
           'sk-active-second': active ? false : activeSecond,
           'sk-hidden': !finalVisible,
-          'sk-hover': isHl,
+          'sk-layer-highlight': isHl,
           'sk-editing': isEditing,
         })}
         onMouseDown={(e) => {
@@ -110,14 +129,29 @@ const LayerItem: FC<IProps> = ({
         onMouseLeave={() => {
           setHlId && setHlId('');
         }}
-        onDoubleClick={handleDbClick}
       >
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
         <div className="sk-group-collapse-btn">
           {children?.length ? <SmallCaretDownSolid /> : undefined}
         </div>
+        <div
+          className="sk-layer-icon"
+          onDoubleClick={() => {
+            zoomGraphicsToFit(id);
+          }}
+        >
+          <LayerIcon
+            content={layerIcon}
+            enableFill={['Text', 'Frame'].includes(type)}
+            enableStroke={!['Text', 'Frame'].includes(type)}
+          />
+        </div>
         {!isEditing && (
-          <span key={'span'} className="sk-layout-name">
+          <span
+            key={'span'}
+            className="sk-layout-name"
+            onDoubleClick={handleDbClick}
+          >
             {layoutName}
           </span>
         )}
@@ -131,7 +165,9 @@ const LayerItem: FC<IProps> = ({
         )}
         {/* icon button area */}
         <div
-          className="sk-layer-item-actions"
+          className={classNames('sk-layer-item-actions', {
+            'sk-action-visible': finalLock || !finalVisible,
+          })}
           onMouseDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
@@ -185,6 +221,7 @@ const LayerItem: FC<IProps> = ({
             <LayerItem
               key={item.id}
               id={item.id}
+              type={item.type}
               name={item.name}
               active={activeIds.includes(item.id)}
               activeSecond={activeSecond || activeIds.includes(item.id)}
@@ -201,6 +238,8 @@ const LayerItem: FC<IProps> = ({
               toggleLock={toggleLock}
               setHlId={setHlId}
               setSelectedGraph={setSelectedGraph}
+              getLayerIcon={getLayerIcon}
+              zoomGraphicsToFit={zoomGraphicsToFit}
             />
           ))}
         </div>

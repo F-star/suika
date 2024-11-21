@@ -8,6 +8,7 @@ import { EditorContext } from '../../context';
 import { AlignCard } from '../Cards/AlignCard';
 import { ElementsInfoCards } from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
+import { LayerInfoCard } from '../Cards/LayerInfoCard';
 import { StrokeCard } from '../Cards/StrokeCard';
 import { DebugPanel } from '../DebugPanel';
 
@@ -42,6 +43,7 @@ export const InfoPanel: FC = () => {
         <>
           <AlignCard />
           <ElementsInfoCards />
+          <LayerInfoCard />
           <FillCard key="fill" />
           <StrokeCard key="stroke" />
         </>

@@ -12,7 +12,15 @@ import {
   ungroupAndRecord,
 } from '@suika/core';
 import { type IPoint } from '@suika/geo';
-import { type FC, useContext, useEffect, useState } from 'react';
+import {
+  type FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { EditorContext } from '../../context';
@@ -21,6 +29,7 @@ import ContextMenuSep from './components/ContextMenuSep';
 
 const OFFSET_X = 2;
 const OFFSET_Y = -5;
+const MENU_SPACE_PADDING = 60;
 
 export const ContextMenu: FC = () => {
   const editor = useContext(EditorContext);
@@ -29,6 +38,36 @@ export const ContextMenu: FC = () => {
   const [canRedo, setCanRedo] = useState(false);
   const [canUndo, setCanUdo] = useState(false);
   const [showCopy, setShowCopy] = useState(false);
+  const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // avoid the right-click menu goes off the screen
+  const calculateMenuPosition = useCallback(() => {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let left = pos.x + OFFSET_X;
+    let top = pos.y + OFFSET_Y;
+
+    if (left + menuSize.width > viewportWidth) {
+      left = pos.x - menuSize.width - OFFSET_X;
+    }
+
+    if (top < MENU_SPACE_PADDING) {
+      top = MENU_SPACE_PADDING;
+    } else if (pos.y + menuSize.height + MENU_SPACE_PADDING > viewportHeight) {
+      top = viewportHeight - MENU_SPACE_PADDING - menuSize.height;
+    }
+
+    return { left, top };
+  }, [pos.x, pos.y, menuSize]);
+
+  useLayoutEffect(() => {
+    if (menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      setMenuSize({ width: rect.width, height: rect.height });
+    }
+  }, [visible]);
 
   useEffect(() => {
     if (editor) {
@@ -308,11 +347,11 @@ export const ContextMenu: FC = () => {
         />
       )}
       <div
+        ref={menuRef}
         className="suika-context-menu"
         style={{
           display: visible ? undefined : 'none',
-          left: pos.x + OFFSET_X,
-          top: pos.y + OFFSET_Y,
+          ...calculateMenuPosition(),
         }}
       >
         {renderNoSelectContextMenu()}
