@@ -69,28 +69,28 @@ export const ZoomActions: FC = () => {
             [
               {
                 id: 'zoom.zoomIn',
-                suffix: isWindows ? 'Ctrl++' : '⌘+',
+                suffix: isWindows() ? 'Ctrl++' : '⌘+',
                 action: () => {
                   editor?.zoomManager.zoomIn({ isLevelZoom: true });
                 },
               },
               {
                 id: 'zoom.zoomOut',
-                suffix: isWindows ? 'Ctrl+-' : '⌘-',
+                suffix: isWindows() ? 'Ctrl+-' : '⌘-',
                 action: () => {
                   editor?.zoomManager.zoomOut({ isLevelZoom: true });
                 },
               },
               {
                 id: 'zoom.zoomToFit',
-                suffix: isWindows ? 'Shift+1' : '⇧1',
+                suffix: isWindows() ? 'Shift+1' : '⇧1',
                 action: () => {
                   editor?.zoomManager.zoomToFit();
                 },
               },
               {
                 id: 'zoom.zoomToSelection',
-                suffix: isWindows ? 'Shift+2' : '⇧2',
+                suffix: isWindows() ? 'Shift+2' : '⇧2',
                 action: () => {
                   editor?.zoomManager.zoomToSelection();
                 },
@@ -103,7 +103,7 @@ export const ZoomActions: FC = () => {
               },
               {
                 id: 'zoom.zoomTo100',
-                suffix: isWindows ? 'Ctrl+0' : '⌘0',
+                suffix: isWindows() ? 'Ctrl+0' : '⌘0',
                 action: () => {
                   editor?.zoomManager.setZoomAndUpdateViewport(1);
                 },
@@ -133,7 +133,7 @@ export const ZoomActions: FC = () => {
           <div className="separator" />
           <ActionItem
             check={setting.enablePixelGrid}
-            suffix={isWindows ? "Ctrl+'" : "⌘'"}
+            suffix={isWindows() ? "Ctrl+'" : "⌘'"}
             onClick={() => {
               if (editor) {
                 const enablePixelGrid = editor.setting.get('enablePixelGrid');
@@ -147,7 +147,7 @@ export const ZoomActions: FC = () => {
           </ActionItem>
           <ActionItem
             check={setting.snapToGrid}
-            suffix={isWindows ? "Ctrl+Shift+'" : "⌘⇧'"}
+            suffix={isWindows() ? "Ctrl+Shift+'" : "⌘⇧'"}
             onClick={() => {
               if (editor) {
                 const snapToGrid = editor.setting.get('snapToGrid');
@@ -161,7 +161,7 @@ export const ZoomActions: FC = () => {
           </ActionItem>
           <ActionItem
             check={setting.enableRuler}
-            suffix={isWindows ? 'Shift+R' : '⇧R'}
+            suffix={isWindows() ? 'Shift+R' : '⇧R'}
             onClick={() => {
               if (editor) {
                 const enableRuler = editor.setting.get('enableRuler');

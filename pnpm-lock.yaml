@@ -81,25 +81,52 @@ importers:
 
   packages/common:
     dependencies:
-      '@types/lodash.pick':
-        specifier: ^4.4.9
-        version: 4.4.9
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
+      lodash.clonedeep:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
+      lodash.isequal:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.omit:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.pick:
+        specifier: ^4.4.0
+        version: 4.4.0
+      lodash.throttle:
+        specifier: ^4.1.1
+        version: 4.1.1
       uuid:
         specifier: ^9.0.0
         version: 9.0.0
     devDependencies:
-      '@types/lodash-es':
-        specifier: ^4.17.12
-        version: 4.17.12
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.7
+        version: 4.5.9
+      '@types/lodash.debounce':
+        specifier: ^4.0.7
+        version: 4.0.9
+      '@types/lodash.isequal':
+        specifier: ^4.5.6
+        version: 4.5.8
+      '@types/lodash.omit':
+        specifier: ^4.5.7
+        version: 4.5.9
+      '@types/lodash.pick':
+        specifier: ^4.4.9
+        version: 4.4.9
+      '@types/lodash.throttle':
+        specifier: ^4.1.7
+        version: 4.1.9
       '@types/uuid':
         specifier: ^9.0.2
         version: 9.0.2
       vite:
-        specifier: ^4.2.0
-        version: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+        specifier: ^5.0.8
+        version: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
 
   packages/components:
     dependencies:
@@ -142,7 +169,7 @@ importers:
         version: 7.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)
       '@storybook/react-vite':
         specifier: ^7.0.6
-        version: 7.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
+        version: 7.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
       '@storybook/testing-library':
         specifier: ^0.0.14-next.2
         version: 0.0.14-next.2
@@ -160,7 +187,7 @@ importers:
         version: 5.59.0(eslint@8.39.0)(typescript@5.3.3)
       '@vitejs/plugin-react-swc':
         specifier: ^3.0.0
-        version: 3.3.0(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
+        version: 3.3.0(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
       eslint:
         specifier: ^8.38.0
         version: 8.39.0
@@ -183,8 +210,8 @@ importers:
         specifier: ^7.0.6
         version: 7.0.6
       vite:
-        specifier: ^4.2.0
-        version: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+        specifier: ^5.0.8
+        version: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
 
   packages/core:
     dependencies:
@@ -211,8 +238,8 @@ importers:
         specifier: ^0.17.3
         version: 0.17.3
       vite:
-        specifier: ^4.2.0
-        version: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+        specifier: ^5.0.8
+        version: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
 
   packages/geo:
     dependencies:
@@ -224,8 +251,8 @@ importers:
         version: 0.2.0
     devDependencies:
       vite:
-        specifier: ^4.2.0
-        version: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+        specifier: ^5.0.8
+        version: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
 
   packages/icons:
     dependencies:
@@ -247,13 +274,13 @@ importers:
         version: 18.2.0
       '@vitejs/plugin-react-swc':
         specifier: ^3.0.0
-        version: 3.3.0(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
+        version: 3.3.0(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
       tslib:
         specifier: ^2.5.0
         version: 2.5.0
       vite:
-        specifier: ^4.2.0
-        version: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+        specifier: ^5.0.8
+        version: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
 
   packages/suika:
     dependencies:
@@ -2155,31 +2182,26 @@ packages:
     resolution: {integrity: sha512-dkRscpM+RrR2Ee3eOQmRWFjmV/payHEOrjyq1VZegRUa5OrZJ2MAxBNs05bZuY0YCtpqETDy1Ix4i/hRqX98cA==}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.9.5':
     resolution: {integrity: sha512-QaKFVOzzST2xzY4MAmiDmURagWLFh+zZtttuEnuNn19AiZ0T3fhPyjPPGwLNdiDT82ZE91hnfJsUiDwF9DClIQ==}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.9.5':
     resolution: {integrity: sha512-HeGqmRJuyVg6/X6MpE2ur7GbymBPS8Np0S/vQFHDmocfORT+Zt76qu+69NUoxXzGqVP1pzaY6QIi0FJWLC3OPA==}
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.9.5':
     resolution: {integrity: sha512-Dq1bqBdLaZ1Gb/l2e5/+o3B18+8TI9ANlA1SkejZqDgdU/jK/ThYaMPMJpVMMXy2uRHvGKbkz9vheVGdq3cJfA==}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.9.5':
     resolution: {integrity: sha512-ezyFUOwldYpj7AbkwyW9AJ203peub81CaAIVvckdkyH8EvhEIoKzaMFJj0G4qYJ5sw3BpqhFrsCc30t54HV8vg==}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-win32-arm64-msvc@4.9.5':
     resolution: {integrity: sha512-aHSsMnUw+0UETB0Hlv7B/ZHOGY5bQdwMKJSzGfDfvyhnpmVxLMGnQPGNE9wgqkLUs3+gbG1Qx02S2LLfJ5GaRQ==}
@@ -2571,28 +2593,24 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@swc/core-linux-arm64-musl@1.3.53':
     resolution: {integrity: sha512-VeAgomBr6BVuBRjZjRHmvp5gKp1nZgbbd441ca1AvsPd2c+ZyhyHLxTWeHOzBDa/vYnmi9BCwx3QJzFqbAFPVw==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@swc/core-linux-x64-gnu@1.3.53':
     resolution: {integrity: sha512-LFX5+QpQkESPkmx860C40pIiYf1utEqoA+WDtmKnUz3DucYvw3eGlXCBdyklP7UBWwJktKIcPlIqr7yROY5VlQ==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@swc/core-linux-x64-musl@1.3.53':
     resolution: {integrity: sha512-O0lbJgeaM0VEsG8wFYvpF+Iuf0IENv+LnXHoygkAsv67sVW54+gFxav2sEdkftD5qYe9ku4tmtTVYRZlFgC84Q==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@swc/core-win32-arm64-msvc@1.3.53':
     resolution: {integrity: sha512-7PgvPl0aNLaFZSK+rIi4DB1g0aW2qOsTIJQSJGRszsCP8pze/traXymyuSG2I3y9Hx7Z+bP5ycJydyAgCw88WA==}
@@ -2765,11 +2783,23 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/lodash-es@4.17.12':
-    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+  '@types/lodash.clonedeep@4.5.9':
+    resolution: {integrity: sha512-19429mWC+FyaAhOLzsS8kZUsI+/GmBAQ0HFiCPsKGU+7pBXOQWhyrY6xNNDwUSX8SMZMJvuFVMF9O5dQOlQK9Q==}
+
+  '@types/lodash.debounce@4.0.9':
+    resolution: {integrity: sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==}
+
+  '@types/lodash.isequal@4.5.8':
+    resolution: {integrity: sha512-uput6pg4E/tj2LGxCZo9+y27JNyB2OZuuI/T5F+ylVDYuqICLG2/ktjxx0v6GvVntAf8TvEzeQLcV0ffRirXuA==}
+
+  '@types/lodash.omit@4.5.9':
+    resolution: {integrity: sha512-zuAVFLUPJMOzsw6yawshsYGgq2hWUHtsZgeXHZmSFhaQQFC6EQ021uDKHkSjOpNhSvtNSU9165/o3o/Q51GpTw==}
 
   '@types/lodash.pick@4.4.9':
     resolution: {integrity: sha512-hDpr96x9xHClwy1KX4/RXRejqjDFTEGbEMT3t6wYSYeFDzxmMnSKB/xHIbktRlPj8Nii2g8L5dtFDRaNFBEzUQ==}
+
+  '@types/lodash.throttle@4.1.9':
+    resolution: {integrity: sha512-PCPVfpfueguWZQB7pJQK890F2scYKoDUL3iM522AptHWn7d5NQmeS/LTEHIcLr5PaTzl3dK2Z0xSUHHTHwaL5g==}
 
   '@types/lodash@4.14.194':
     resolution: {integrity: sha512-r22s9tAS7imvBt2lyHC9B8AGwWnXaYb1tY09oyLkXDs4vArpYJzw09nj8MLx5VfciBPGIb+ZwG0ssYnEPJxn/g==}
@@ -5950,8 +5980,14 @@ packages:
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
 
+  lodash.clonedeep@4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
+
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
+
+  lodash.isequal@4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
 
   lodash.isfunction@3.0.9:
     resolution: {integrity: sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==}
@@ -5971,6 +6007,12 @@ packages:
   lodash.mergewith@4.6.2:
     resolution: {integrity: sha512-GK3g5RPZWTRSeLSpgP8Xhra+pnjBC56q9FZYe1d5RN3TJ35dbkGy3YqBSMbyCrlbi+CM9Z3Jk5yTL7RCsqboyQ==}
 
+  lodash.omit@4.5.0:
+    resolution: {integrity: sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==}
+
+  lodash.pick@4.4.0:
+    resolution: {integrity: sha512-hXt6Ul/5yWjfklSGvLQl8vM//l3FtyHZeuelpzK6mm99pNvN9yTDruNZPEJZD1oWrqo+izBmB7oUfWgcCX7s4Q==}
+
   lodash.snakecase@4.1.1:
     resolution: {integrity: sha512-QZ1d4xoBHYUeuouhEq3lk3Uq7ldgyFXGBhg04+oRLnIz8o9T65Eh+8YdroUwn846zchkA9yDsDl5CVVaV2nqYw==}
 
@@ -5979,6 +6021,9 @@ packages:
 
   lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
+
+  lodash.throttle@4.1.1:
+    resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
 
   lodash.uniq@4.5.0:
     resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}
@@ -8311,31 +8356,6 @@ packages:
       vti:
         optional: true
       vue-tsc:
-        optional: true
-
-  vite@4.3.1:
-    resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
         optional: true
 
   vite@5.0.8:
@@ -11214,13 +11234,13 @@ snapshots:
       esbuild: 0.17.18
       typescript: 5.2.2
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.2.1(typescript@5.3.3)(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.2.1(typescript@5.3.3)(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
     dependencies:
       glob: 7.2.3
       glob-promise: 4.2.2(glob@7.2.3)
       magic-string: 0.27.0
       react-docgen-typescript: 2.2.2(typescript@5.3.3)
-      vite: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+      vite: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
     optionalDependencies:
       typescript: 5.3.3
 
@@ -11679,7 +11699,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@storybook/builder-vite@7.0.6(typescript@5.3.3)(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
+  '@storybook/builder-vite@7.0.6(typescript@5.3.3)(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
     dependencies:
       '@storybook/channel-postmessage': 7.0.6
       '@storybook/channel-websocket': 7.0.6
@@ -11701,7 +11721,7 @@ snapshots:
       remark-external-links: 8.0.0
       remark-slug: 6.1.0
       rollup: 3.29.4
-      vite: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+      vite: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
     optionalDependencies:
       typescript: 5.3.3
     transitivePeerDependencies:
@@ -11786,7 +11806,7 @@ snapshots:
       '@storybook/types': 7.0.6
       cross-spawn: 7.0.3
       globby: 11.1.0
-      jscodeshift: 0.14.0(@babel/preset-env@7.21.4(@babel/core@7.21.4))
+      jscodeshift: 0.14.0(@babel/preset-env@7.21.4(@babel/core@7.23.7))
       lodash: 4.17.21
       prettier: 2.8.7
       recast: 0.23.1
@@ -11998,19 +12018,19 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  '@storybook/react-vite@7.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
+  '@storybook/react-vite@7.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.2.1(typescript@5.3.3)(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.2.1(typescript@5.3.3)(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
       '@rollup/pluginutils': 4.2.1
-      '@storybook/builder-vite': 7.0.6(typescript@5.3.3)(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
+      '@storybook/builder-vite': 7.0.6(typescript@5.3.3)(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
       '@storybook/react': 7.0.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)
-      '@vitejs/plugin-react': 3.1.0(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
+      '@vitejs/plugin-react': 3.1.0(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))
       ast-types: 0.14.2
       magic-string: 0.27.0
       react: 18.2.0
       react-docgen: 6.0.0-alpha.3
       react-dom: 18.2.0(react@18.2.0)
-      vite: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+      vite: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
     transitivePeerDependencies:
       - '@preact/preset-vite'
       - supports-color
@@ -12301,11 +12321,11 @@ snapshots:
   '@types/eslint-scope@3.7.4':
     dependencies:
       '@types/eslint': 8.37.0
-      '@types/estree': 1.0.1
+      '@types/estree': 1.0.5
 
   '@types/eslint@8.37.0':
     dependencies:
-      '@types/estree': 1.0.1
+      '@types/estree': 1.0.5
       '@types/json-schema': 7.0.11
 
   '@types/estree@0.0.39': {}
@@ -12379,11 +12399,27 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/lodash-es@4.17.12':
+  '@types/lodash.clonedeep@4.5.9':
+    dependencies:
+      '@types/lodash': 4.14.194
+
+  '@types/lodash.debounce@4.0.9':
+    dependencies:
+      '@types/lodash': 4.14.194
+
+  '@types/lodash.isequal@4.5.8':
+    dependencies:
+      '@types/lodash': 4.14.194
+
+  '@types/lodash.omit@4.5.9':
     dependencies:
       '@types/lodash': 4.14.194
 
   '@types/lodash.pick@4.4.9':
+    dependencies:
+      '@types/lodash': 4.14.194
+
+  '@types/lodash.throttle@4.1.9':
     dependencies:
       '@types/lodash': 4.14.194
 
@@ -12759,21 +12795,21 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react-swc@3.3.0(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
+  '@vitejs/plugin-react-swc@3.3.0(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
     dependencies:
       '@swc/core': 1.3.53
-      vite: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+      vite: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitejs/plugin-react@3.1.0(vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
+  '@vitejs/plugin-react@3.1.0(vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1))':
     dependencies:
       '@babel/core': 7.23.7
       '@babel/plugin-transform-react-jsx-self': 7.21.0(@babel/core@7.23.7)
       '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.23.7)
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
+      vite: 5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -16448,31 +16484,6 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jscodeshift@0.14.0(@babel/preset-env@7.21.4(@babel/core@7.21.4)):
-    dependencies:
-      '@babel/core': 7.23.7
-      '@babel/parser': 7.23.6
-      '@babel/plugin-proposal-class-properties': 7.18.6(@babel/core@7.23.7)
-      '@babel/plugin-proposal-nullish-coalescing-operator': 7.18.6(@babel/core@7.23.7)
-      '@babel/plugin-proposal-optional-chaining': 7.21.0(@babel/core@7.23.7)
-      '@babel/plugin-transform-modules-commonjs': 7.21.2(@babel/core@7.23.7)
-      '@babel/preset-env': 7.21.4(@babel/core@7.21.4)
-      '@babel/preset-flow': 7.21.4(@babel/core@7.23.7)
-      '@babel/preset-typescript': 7.21.4(@babel/core@7.23.7)
-      '@babel/register': 7.21.0(@babel/core@7.23.7)
-      babel-core: 7.0.0-bridge.0(@babel/core@7.23.7)
-      chalk: 4.1.2
-      flow-parser: 0.204.0
-      graceful-fs: 4.2.11
-      micromatch: 4.0.5
-      neo-async: 2.6.2
-      node-dir: 0.1.17
-      recast: 0.21.5
-      temp: 0.8.4
-      write-file-atomic: 2.4.3
-    transitivePeerDependencies:
-      - supports-color
-
   jscodeshift@0.14.0(@babel/preset-env@7.21.4(@babel/core@7.23.7)):
     dependencies:
       '@babel/core': 7.23.7
@@ -16738,7 +16749,11 @@ snapshots:
 
   lodash.camelcase@4.3.0: {}
 
+  lodash.clonedeep@4.5.0: {}
+
   lodash.debounce@4.0.8: {}
+
+  lodash.isequal@4.5.0: {}
 
   lodash.isfunction@3.0.9: {}
 
@@ -16752,11 +16767,17 @@ snapshots:
 
   lodash.mergewith@4.6.2: {}
 
+  lodash.omit@4.5.0: {}
+
+  lodash.pick@4.4.0: {}
+
   lodash.snakecase@4.1.1: {}
 
   lodash.sortby@4.7.0: {}
 
   lodash.startcase@4.4.0: {}
+
+  lodash.throttle@4.1.1: {}
 
   lodash.uniq@4.5.0: {}
 
@@ -19370,17 +19391,6 @@ snapshots:
       eslint: 8.55.0
       optionator: 0.9.3
       typescript: 5.3.3
-
-  vite@4.3.1(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1):
-    dependencies:
-      esbuild: 0.17.18
-      postcss: 8.4.33
-      rollup: 3.29.4
-    optionalDependencies:
-      '@types/node': 20.11.5
-      fsevents: 2.3.3
-      sass: 1.62.0
-      terser: 5.17.1
 
   vite@5.0.8(@types/node@20.11.5)(sass@1.62.0)(terser@5.17.1):
     dependencies:

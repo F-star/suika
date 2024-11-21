@@ -110,7 +110,7 @@ export const ContextMenu: FC = () => {
         {showCopy && (
           <>
             <ContextMenuItem
-              suffix={isWindows ? 'Ctrl+C' : '⌘C'}
+              suffix={isWindows() ? 'Ctrl+C' : '⌘C'}
               onClick={() => {
                 setVisible(false);
                 if (editor) {
@@ -151,7 +151,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+Z' : '⌘Z'}
+          suffix={isWindows() ? 'Ctrl+Z' : '⌘Z'}
           disabled={!canUndo}
           onClick={() => {
             setVisible(false);
@@ -163,7 +163,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="command.undo" />
         </ContextMenuItem>
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+Shift+Z' : '⇧⌘Z'}
+          suffix={isWindows() ? 'Ctrl+Shift+Z' : '⇧⌘Z'}
           disabled={!canRedo}
           onClick={() => {
             setVisible(false);
@@ -176,7 +176,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+A' : '⌘A'}
+          suffix={isWindows() ? 'Ctrl+A' : '⌘A'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -199,7 +199,7 @@ export const ContextMenu: FC = () => {
       <>
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+G' : '⌘G'}
+          suffix={isWindows() ? 'Ctrl+G' : '⌘G'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -210,7 +210,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="group" />
         </ContextMenuItem>
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+Backspace' : '⌘⌫'}
+          suffix={isWindows() ? 'Ctrl+Backspace' : '⌘⌫'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -222,7 +222,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+]' : '⌘]'}
+          suffix={isWindows() ? 'Ctrl+]' : '⌘]'}
           onClick={() => {
             setVisible(false);
             editor && arrangeAndRecord(editor, ArrangeType.Forward);
@@ -231,7 +231,7 @@ export const ContextMenu: FC = () => {
           <FormattedMessage id="arrange.forward" />
         </ContextMenuItem>
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+[' : '⌘['}
+          suffix={isWindows() ? 'Ctrl+[' : '⌘['}
           onClick={() => {
             setVisible(false);
             editor && arrangeAndRecord(editor, ArrangeType.Backward);
@@ -260,7 +260,7 @@ export const ContextMenu: FC = () => {
 
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+Shift+H' : '⇧⌘H'}
+          suffix={isWindows() ? 'Ctrl+Shift+H' : '⇧⌘H'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -276,7 +276,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         {/* lock/unlock */}
         <ContextMenuItem
-          suffix={isWindows ? 'Ctrl+Shift+L' : '⇧⌘L'}
+          suffix={isWindows() ? 'Ctrl+Shift+L' : '⇧⌘L'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -293,7 +293,7 @@ export const ContextMenu: FC = () => {
         <ContextMenuSep />
         {/* flipHorizontal */}
         <ContextMenuItem
-          suffix={isWindows ? 'Shift+H' : '⇧H'}
+          suffix={isWindows() ? 'Shift+H' : '⇧H'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -309,7 +309,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         {/* flipVertical */}
         <ContextMenuItem
-          suffix={isWindows ? 'Shift+V' : '⇧V'}
+          suffix={isWindows() ? 'Shift+V' : '⇧V'}
           onClick={() => {
             setVisible(false);
             if (editor) {
@@ -322,7 +322,7 @@ export const ContextMenu: FC = () => {
         </ContextMenuItem>
         <ContextMenuSep />
         <ContextMenuItem
-          suffix={isWindows ? 'Backspace' : '⌫'}
+          suffix={isWindows() ? 'Backspace' : '⌫'}
           onClick={() => {
             setVisible(false);
             if (editor) {
