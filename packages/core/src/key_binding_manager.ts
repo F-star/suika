@@ -76,7 +76,7 @@ export class KeyBindingManager {
       // match when
       if (!keyBinding.when || keyBinding.when(ctx)) {
         // match windows os
-        if (isWindows && keyBinding.winKey) {
+        if (isWindows() && keyBinding.winKey) {
           if (this.isKeyMatch(keyBinding.winKey, e)) {
             isMatch = true;
           }

@@ -107,7 +107,7 @@ export const ToolBar = () => {
     },
     pencil: {
       name: 'pencil',
-      hotkey: `${isWindows ? 'Shift+' : '⇧'}P`,
+      hotkey: `${isWindows() ? 'Shift+' : '⇧'}P`,
       intlId: 'tool.pencil',
       icon: <PencilOutlined />,
     },

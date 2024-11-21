@@ -1,5 +1,3 @@
-import { remainDecimal } from '@suika/common';
-
 import {
   type IPathCommand,
   type IPathItem,
@@ -168,4 +166,8 @@ export const commandsToStr = (commands: IPathCommand[], precision: number) => {
           .join(' '),
     )
     .join(' ');
+};
+
+const remainDecimal = (num: number, precision = 2) => {
+  return Number(num.toFixed(precision));
 };

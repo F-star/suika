@@ -16,6 +16,6 @@
     "fit-curve": "^0.2.0"
   },
   "devDependencies": {
-    "vite": "^4.2.0"
+    "vite": "^5.0.8"
   }
 }

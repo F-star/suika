@@ -208,9 +208,12 @@ export const getClosestValInSortedArr = (
     : sortedArr[left];
 };
 
-export const isWindows =
-  navigator.platform.toLowerCase().includes('win') ||
-  navigator.userAgent.includes('Windows');
+export const isWindows = () => {
+  return (
+    navigator.platform.toLowerCase().includes('win') ||
+    navigator.userAgent.includes('Windows')
+  );
+};
 
 export const escapeHtml = (str: string) => {
   if (typeof str == 'string') {
