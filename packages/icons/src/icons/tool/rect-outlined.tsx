@@ -10,7 +10,7 @@ export const RectOutlined = React.memo(() => {
       stroke="currentColor"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="4.5" y="6.5" width="16" height="11" rx="0.5" />
+      <rect x="4.5" y="4.5" width="15" height="15" />
     </svg>
   );
 });
