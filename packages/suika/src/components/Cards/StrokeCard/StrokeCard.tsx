@@ -213,7 +213,7 @@ export const StrokeCard: FC = () => {
             }
             value={strokeWidth}
             min={0}
-            onBlur={updateStrokeWidth}
+            onChange={updateStrokeWidth}
           />
         </div>
       }

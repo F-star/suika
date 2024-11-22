@@ -5,11 +5,11 @@ import CustomRuleInput from './CustomRuleInput';
 
 interface IProps {
   value: string;
-  onBlur: (newValue: string) => void;
+  onChange: (newValue: string) => void;
   prefix?: React.ReactNode;
 }
 
-export const ColorHexInput: FC<IProps> = ({ value, onBlur, prefix }) => {
+export const ColorHexInput: FC<IProps> = ({ value, onChange, prefix }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const ColorHexInput: FC<IProps> = ({ value, onBlur, prefix }) => {
         return str;
       }}
       value={value}
-      onBlur={(newVal) => onBlur(newVal)}
+      onChange={(newVal) => onChange(newVal)}
     />
   );
 };

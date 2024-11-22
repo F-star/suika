@@ -63,7 +63,7 @@ export const LayerInfoCard: FC = () => {
           value={opacity}
           min={0}
           max={1}
-          onBlur={recordOpacityChange}
+          onChange={recordOpacityChange}
         />
       </div>
     </BaseCard>

@@ -1,20 +1,18 @@
 import './style.scss';
 
+import classNames from 'classnames';
 import React, { type FC, useEffect, useRef } from 'react';
 
 interface ICustomRuleInputProps {
   parser: (newValue: string, preValue: string | number) => string | false;
   value: string | number;
-  onBlur: (newValue: string) => void;
+  onChange: (newValue: string) => void;
   prefix?: React.ReactNode;
+  classNames?: string[];
 }
 
-const CustomRuleInput: FC<ICustomRuleInputProps> = ({
-  value,
-  onBlur,
-  parser,
-  prefix,
-}) => {
+const CustomRuleInput: FC<ICustomRuleInputProps> = (props) => {
+  const { value, onChange, parser, prefix } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const isActive = useRef(false);
 
@@ -25,7 +23,9 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = ({
   }, [value]);
 
   return (
-    <div className="suika-custom-ruler-input-box">
+    <div
+      className={classNames('suika-custom-ruler-input-box', props.classNames)}
+    >
       {prefix && <div className="suika-custom-input-prefix">{prefix}</div>}
       <input
         ref={inputRef}
@@ -52,7 +52,7 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = ({
             const newValue = parser(str, value);
             if (newValue !== false) {
               e.target.value = String(newValue);
-              onBlur(newValue);
+              onChange(newValue);
             } else {
               e.target.value = String(value);
             }

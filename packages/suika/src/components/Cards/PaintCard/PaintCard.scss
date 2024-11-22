@@ -5,6 +5,22 @@
     justify-content: space-between;
     align-items: center;
     margin: 0 8px;
+
+    .fill-item-left {
+      display: flex;
+      align-items: center;
+
+      .suika-custom-ruler-input-box {
+        margin-right: 0;
+      }
+
+      .paint-card-alpha-input {
+        width: 45px;
+        margin-left: 0;
+        padding-left: 4px;
+      }
+    }
+
     .color-block {
       margin: 8px 4px 8px 7px;
       width: 16px;

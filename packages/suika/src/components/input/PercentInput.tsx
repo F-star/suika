@@ -7,7 +7,8 @@ interface Props {
   value: string | number;
   min?: number;
   max?: number;
-  onBlur: (value: number) => void;
+  onChange: (value: number) => void;
+  classNames?: string[];
 }
 
 export const PercentInput: FC<Props> = (props) => {
@@ -15,7 +16,7 @@ export const PercentInput: FC<Props> = (props) => {
     typeof props.value === 'number'
       ? Number((props.value * 100).toFixed(2))
       : props.value;
-  const onBlur = (value: number) => props.onBlur(value / 100);
+  const onChange = (value: number) => props.onChange(value / 100);
 
   const min = props.min === undefined ? undefined : props.min * 100;
   const max = props.max === undefined ? undefined : props.max * 100;
@@ -26,8 +27,9 @@ export const PercentInput: FC<Props> = (props) => {
       min={min}
       max={max}
       suffixValue="%"
-      onBlur={onBlur}
+      onChange={onChange}
       prefix={props.prefix}
+      classNames={props.classNames}
     />
   );
 };

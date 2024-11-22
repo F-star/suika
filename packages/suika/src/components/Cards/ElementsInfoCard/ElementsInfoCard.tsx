@@ -109,7 +109,7 @@ export const ElementsInfoCards: FC = () => {
           <NumAttrInput
             {...item}
             key={item.key}
-            onBlur={(newVal) => {
+            onChange={(newVal) => {
               execCommand(item.key, newVal);
             }}
           />
@@ -120,7 +120,7 @@ export const ElementsInfoCards: FC = () => {
           <NumAttrInput
             {...item}
             key={item.key}
-            onBlur={(newVal) => {
+            onChange={(newVal) => {
               execCommand(item.key, newVal);
             }}
           />
@@ -131,7 +131,7 @@ export const ElementsInfoCards: FC = () => {
           <NumAttrInput
             {...item}
             key={item.key}
-            onBlur={(newVal) => {
+            onChange={(newVal) => {
               execCommand(item.key, newVal);
             }}
           />
@@ -143,7 +143,7 @@ export const ElementsInfoCards: FC = () => {
             <NumAttrInput
               {...item}
               key={item.key}
-              onBlur={(newVal) => {
+              onChange={(newVal) => {
                 execCommand(item.key, newVal);
               }}
             />
@@ -159,7 +159,7 @@ const NumAttrInput: FC<{
   min?: number;
   max?: number;
   value: string | number;
-  onBlur: (newValue: number) => void;
+  onChange: (newValue: number) => void;
   suffixValue?: string;
   uiType: string;
 }> = (props) => {
@@ -170,7 +170,7 @@ const NumAttrInput: FC<{
         value={props.value}
         min={props.min}
         max={props.max}
-        onBlur={props.onBlur}
+        onChange={props.onChange}
       />
     );
   } else {
@@ -180,7 +180,7 @@ const NumAttrInput: FC<{
         value={props.value}
         min={props.min}
         max={props.max}
-        onBlur={props.onBlur}
+        onChange={props.onChange}
         suffixValue={props.suffixValue}
       />
     );

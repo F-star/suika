@@ -19,6 +19,7 @@ import { type FC, useState } from 'react';
 
 import { PaintPicker } from '../../ColorPicker/PaintPicker';
 import { ColorHexInput } from '../../input/ColorHexInput';
+import { PercentInput } from '../../input/PercentInput';
 import { BaseCard } from '../BaseCard';
 
 const isNearWhite = (rgba: IRGBA, threshold = 85) => {
@@ -112,37 +113,58 @@ export const PaintCard: FC<IProps> = ({
             if (paint.type === PaintType.Solid) {
               return (
                 <div className="fill-item" key={index}>
-                  <ColorHexInput
-                    prefix={
-                      <div
-                        className="color-block"
-                        style={{
-                          backgroundColor: parseRGBAStr(paint.attrs),
-                          boxShadow: isNearWhite(paint.attrs)
-                            ? '0 0 0 1px rgba(0,0,0,0.1) inset'
-                            : undefined,
-                        }}
-                        onMouseDown={() => {
-                          setActiveIndex(index);
-                        }}
-                      />
-                    }
-                    value={parseRGBToHex(paint.attrs)}
-                    onBlur={(newHex) => {
-                      const rgb = parseHexToRGB(newHex);
-
-                      if (rgb) {
-                        const newSolidPaint: PaintSolid = {
-                          type: PaintType.Solid,
-                          attrs: {
-                            ...rgb,
-                            a: paint.attrs.a,
-                          },
-                        };
-                        onChangeComplete(newSolidPaint, index);
+                  <div className="fill-item-left">
+                    <ColorHexInput
+                      prefix={
+                        <div
+                          className="color-block"
+                          style={{
+                            backgroundColor: parseRGBAStr(paint.attrs),
+                            boxShadow: isNearWhite(paint.attrs)
+                              ? '0 0 0 1px rgba(0,0,0,0.1) inset'
+                              : undefined,
+                          }}
+                          onMouseDown={() => {
+                            setActiveIndex(index);
+                          }}
+                        />
                       }
-                    }}
-                  />
+                      value={parseRGBToHex(paint.attrs)}
+                      onChange={(newHex) => {
+                        const rgb = parseHexToRGB(newHex);
+
+                        if (rgb) {
+                          const newSolidPaint: PaintSolid = {
+                            type: PaintType.Solid,
+                            attrs: {
+                              ...rgb,
+                              a: paint.attrs.a,
+                            },
+                          };
+                          onChangeComplete(newSolidPaint, index);
+                        }
+                      }}
+                    />
+                    {/* alpha input */}
+                    <PercentInput
+                      classNames={['paint-card-alpha-input']}
+                      value={paint.attrs.a}
+                      min={0}
+                      max={1}
+                      onChange={(val) => {
+                        onChangeComplete(
+                          {
+                            ...paint,
+                            attrs: {
+                              ...paint.attrs,
+                              a: val,
+                            },
+                          },
+                          index,
+                        );
+                      }}
+                    />
+                  </div>
                   <IconButton onClick={() => onDelete(index)}>
                     <RemoveOutlined />
                   </IconButton>
