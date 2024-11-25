@@ -388,7 +388,7 @@ export class TextEditor {
     const canvasOffsetY = editor.setting.get('offsetY');
 
     const styles = {
-      left: topInViewport.x + canvasOffsetX + 'px',
+      left: bottomInViewport.x + canvasOffsetX + 'px',
       top: bottomInViewport.y - inputDomHeight + canvasOffsetY + 'px',
       height: `${inputDomHeight}px`,
       fontSize: `${inputDomHeight}px`,
