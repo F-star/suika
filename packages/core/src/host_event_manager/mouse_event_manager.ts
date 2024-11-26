@@ -168,8 +168,8 @@ export class MouseEventManager {
     const interval = now - this.pointerDownTimeStamp;
     const clickDistanceDiff = distance(newPos, this.lastPointerDownPos);
     if (
-      interval < this.editor.setting.get('continueClickMaxGap') &&
-      clickDistanceDiff < this.editor.setting.get('continueClickDistanceTol')
+      interval < this.editor.setting.get('comboClickMaxGap') &&
+      clickDistanceDiff < this.editor.setting.get('comboClickDistanceTol')
     ) {
       this.pointerDownTimeStamp = now;
       return true;

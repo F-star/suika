@@ -142,8 +142,8 @@ export class Setting {
 
     flipObjectsWhileResizing: true,
 
-    continueClickMaxGap: 350, // millisecond
-    continueClickDistanceTol: 5,
+    comboClickMaxGap: 350, // millisecond
+    comboClickDistanceTol: 5,
 
     textEditorCursorSize: 1.5,
     textEditorCursorLineStroke: '#000',
