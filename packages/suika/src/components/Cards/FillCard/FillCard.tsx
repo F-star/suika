@@ -74,6 +74,30 @@ export const FillCard: FC = () => {
     editor.render();
   };
 
+  const toggleVisible = (index: number) => {
+    if (!editor) return;
+
+    const newFills = fill.map((paint, i) => {
+      if (i === index) {
+        return {
+          ...paint,
+          visible: !(paint.visible ?? true),
+        };
+      }
+      return paint;
+    });
+    setFill(newFills);
+
+    const selectItems = editor.selectedElements.getItems();
+    selectItems.forEach((item) => {
+      item.updateAttrs({
+        fill: cloneDeep(newFills),
+      });
+    });
+    pushToHistory('Update Fill', selectItems, newFills);
+    editor.render();
+  };
+
   const pushToHistory = (
     cmdDesc: string,
     selectedElements: SuikaGraphics[],
@@ -160,6 +184,7 @@ export const FillCard: FC = () => {
       }}
       onAdd={addFill}
       onDelete={deleteFill}
+      onToggleVisible={toggleVisible}
     />
   );
 };

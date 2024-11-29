@@ -84,6 +84,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       }
 
       for (const paint of fill ?? []) {
+        if (paint.visible === false) continue;
         switch (paint.type) {
           case PaintType.Solid: {
             layerCtx.fillStyle = parseRGBAStr(paint.attrs);
@@ -107,6 +108,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       if (strokeWidth) {
         layerCtx.lineWidth = strokeWidth;
         for (const paint of stroke ?? []) {
+          if (paint.visible === false) continue;
           switch (paint.type) {
             case PaintType.Solid: {
               layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
@@ -208,7 +210,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       cornerRadii,
       tol + halfStrokeWidth,
     );
-    if (this.isFillNoRender()) {
+    if (!this.isFillShouldRender()) {
       if (!hit) {
         return false;
       }

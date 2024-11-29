@@ -63,10 +63,14 @@ export const PaintPicker: FC<IProps> = ({
         <SolidPicker
           color={paint.attrs}
           onChange={(newColor) => {
-            onChange({ type: PaintType.Solid, attrs: newColor });
+            onChange({ type: PaintType.Solid, attrs: newColor, visible: true });
           }}
           onChangeComplete={(color) => {
-            onChangeComplete({ type: PaintType.Solid, attrs: color });
+            onChangeComplete({
+              type: PaintType.Solid,
+              attrs: color,
+              visible: true,
+            });
           }}
         />
       )}
@@ -75,7 +79,11 @@ export const PaintPicker: FC<IProps> = ({
         <ImagePicker
           value={paint.attrs.src || ''}
           onChange={(src) => {
-            onChangeComplete({ type: PaintType.Image, attrs: { src } });
+            onChangeComplete({
+              type: PaintType.Image,
+              attrs: { src },
+              visible: true,
+            });
           }}
         />
       )}
