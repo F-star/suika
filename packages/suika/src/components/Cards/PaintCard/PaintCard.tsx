@@ -14,7 +14,12 @@ import {
   type PaintSolid,
   PaintType,
 } from '@suika/core';
-import { AddOutlined, RemoveOutlined } from '@suika/icons';
+import {
+  AddOutlined,
+  HideOutlined,
+  RemoveOutlined,
+  ShowOutlined,
+} from '@suika/icons';
 import { type FC, useState } from 'react';
 
 import { PaintPicker } from '../../ColorPicker/PaintPicker';
@@ -39,6 +44,7 @@ interface IProps {
 
   onDelete: (index: number) => void;
   onAdd: () => void;
+  onToggleVisible: (index: number) => void;
 
   appendedContent?: React.ReactNode;
 }
@@ -51,6 +57,7 @@ export const PaintCard: FC<IProps> = ({
 
   onDelete,
   onAdd,
+  onToggleVisible,
 
   appendedContent,
 }) => {
@@ -130,6 +137,7 @@ export const PaintCard: FC<IProps> = ({
                         />
                       }
                       value={parseRGBToHex(paint.attrs)}
+                      classNames={[paint.visible === false ? 'disabled' : '']}
                       onChange={(newHex) => {
                         const rgb = parseHexToRGB(newHex);
 
@@ -140,6 +148,7 @@ export const PaintCard: FC<IProps> = ({
                               ...rgb,
                               a: paint.attrs.a,
                             },
+                            visible: true,
                           };
                           onChangeComplete(newSolidPaint, index);
                         }
@@ -147,7 +156,10 @@ export const PaintCard: FC<IProps> = ({
                     />
                     {/* alpha input */}
                     <PercentInput
-                      classNames={['paint-card-alpha-input']}
+                      classNames={[
+                        'paint-card-alpha-input',
+                        paint.visible === false ? 'disabled' : '',
+                      ]}
                       value={paint.attrs.a}
                       min={0}
                       max={1}
@@ -165,9 +177,18 @@ export const PaintCard: FC<IProps> = ({
                       }}
                     />
                   </div>
-                  <IconButton onClick={() => onDelete(index)}>
-                    <RemoveOutlined />
-                  </IconButton>
+                  <div className="suika-paint-card-actions">
+                    <IconButton onClick={() => onToggleVisible(index)}>
+                      {paint.visible === false ? (
+                        <HideOutlined />
+                      ) : (
+                        <ShowOutlined />
+                      )}
+                    </IconButton>
+                    <IconButton onClick={() => onDelete(index)}>
+                      <RemoveOutlined />
+                    </IconButton>
+                  </div>
                 </div>
               );
             }

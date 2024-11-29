@@ -13,6 +13,7 @@ export interface IRGBA {
 export interface PaintSolid {
   type: PaintType.Solid;
   attrs: IRGBA;
+  visible?: boolean;
 }
 
 export interface PaintImage {
@@ -21,6 +22,7 @@ export interface PaintImage {
     src?: string;
     opacity?: number;
   };
+  visible?: boolean;
 }
 
 export type IPaint = PaintSolid | PaintImage;
@@ -28,11 +30,13 @@ export type IPaint = PaintSolid | PaintImage;
 export const DEFAULT_SOLID_PAINT: PaintSolid = {
   type: PaintType.Solid,
   attrs: { r: 217, g: 217, b: 217, a: 1 },
+  visible: true,
 };
 
 export const DEFAULT_IMAGE_PAINT: PaintImage = {
   type: PaintType.Image,
   attrs: {},
+  visible: true,
 };
 
 export const DEFAULT_PAINTS = {
@@ -58,3 +62,25 @@ export const DEFAULT_IMAGE = (() => {
 })();
 
 export const DEFAULT_IMAGE_SRC = DEFAULT_IMAGE.toDataURL();
+
+/**
+ * check if the paints should render
+ */
+export const isPaintsShouldRender = (paints: IPaint[] | undefined) => {
+  if (!paints || paints.length === 0) {
+    return false;
+  }
+
+  for (const paint of paints) {
+    if (paint.visible === false) {
+      continue;
+    }
+    if (
+      (paint.type === PaintType.Solid && paint.attrs.a !== 0) ||
+      (paint.type === PaintType.Image && paint.attrs.opacity !== 0)
+    ) {
+      return true;
+    }
+  }
+  return false;
+};

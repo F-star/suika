@@ -39,7 +39,7 @@ import { type ControlHandle } from '../../control_handle_manager';
 import { type ImgManager } from '../../Img_manager';
 import {
   DEFAULT_IMAGE,
-  type IPaint,
+  isPaintsShouldRender,
   type PaintImage,
   PaintType,
 } from '../../paint';
@@ -291,29 +291,12 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     });
   }
 
-  private isPaintNoRender(paints: IPaint[] | undefined) {
-    if (!paints || paints.length === 0) {
-      return true;
-    }
-    let isNoRender = true;
-    for (const paint of paints) {
-      if (
-        (paint.type === PaintType.Solid && paint.attrs.a !== 0) ||
-        (paint.type === PaintType.Image && paint.attrs.opacity !== 0)
-      ) {
-        isNoRender = false;
-        break;
-      }
-    }
-    return isNoRender;
+  protected isStrokeShouldRender() {
+    return isPaintsShouldRender(this.attrs.stroke);
   }
 
-  protected isStrokeNoRender() {
-    return this.isPaintNoRender(this.attrs.stroke);
-  }
-
-  protected isFillNoRender() {
-    return this.isPaintNoRender(this.attrs.fill);
+  protected isFillShouldRender() {
+    return isPaintsShouldRender(this.attrs.fill);
   }
 
   hitTest(point: IPoint, tol = 0) {
@@ -330,7 +313,11 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getHitGraphics(point: IPoint, options: IHitOptions): SuikaGraphics | null {
     const { tol = 0 } = options;
-    if (!this.isVisible() || this.isLock()) {
+    if (
+      !this.isVisible() ||
+      this.isLock() ||
+      (!this.isFillShouldRender() && !this.isStrokeShouldRender())
+    ) {
       return null;
     }
     if (this.hitTest(point, tol)) {

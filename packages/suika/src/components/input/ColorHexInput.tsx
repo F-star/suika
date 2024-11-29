@@ -7,9 +7,15 @@ interface IProps {
   value: string;
   onChange: (newValue: string) => void;
   prefix?: React.ReactNode;
+  classNames?: string[];
 }
 
-export const ColorHexInput: FC<IProps> = ({ value, onChange, prefix }) => {
+export const ColorHexInput: FC<IProps> = ({
+  value,
+  onChange,
+  prefix,
+  classNames,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -21,6 +27,7 @@ export const ColorHexInput: FC<IProps> = ({ value, onChange, prefix }) => {
   return (
     <CustomRuleInput
       prefix={prefix}
+      classNames={classNames}
       parser={(str, prevStr) => {
         str = str.trim();
         // check if it is a valid hex and normalize it

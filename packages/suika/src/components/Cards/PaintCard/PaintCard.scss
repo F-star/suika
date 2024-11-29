@@ -12,13 +12,29 @@
 
       .suika-custom-ruler-input-box {
         margin-right: 0;
+        &.disabled {
+          input {
+            color: #0000004d;
+          }
+        }
       }
 
       .paint-card-alpha-input {
         width: 45px;
         margin-left: 0;
         padding-left: 4px;
+        &.disabled {
+          input {
+            color: #0000004d;
+          }
+        }
       }
+    }
+
+    .suika-paint-card-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .color-block {
