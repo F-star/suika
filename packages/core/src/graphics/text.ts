@@ -150,6 +150,10 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     return this.getGlyphs().length - 1;
   }
 
+  protected override isFillShouldRender() {
+    return true;
+  }
+
   getCursorIndex(point: IPoint) {
     point = applyInverseMatrix(this.attrs.transform, point);
     const glyphs = this.getGlyphs();
