@@ -74,6 +74,7 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
         DOUBLE_PI,
       );
       for (const paint of attrs.fill ?? []) {
+        if (paint.visible === false) continue;
         if (paint.type === PaintType.Solid) {
           layerCtx.fillStyle = parseRGBAStr(paint.attrs);
           layerCtx.fill();
@@ -90,6 +91,7 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
       if (attrs.strokeWidth) {
         layerCtx.lineWidth = attrs.strokeWidth;
         for (const paint of attrs.stroke ?? []) {
+          if (paint.visible === false) continue;
           if (paint.type === PaintType.Solid) {
             layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
             layerCtx.stroke();

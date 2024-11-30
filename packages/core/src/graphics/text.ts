@@ -151,6 +151,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   protected override isFillShouldRender() {
+    // TODO: optimize
     return true;
   }
 

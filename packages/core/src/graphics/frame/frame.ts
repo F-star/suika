@@ -112,6 +112,11 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     return this.children.length === 0;
   }
 
+  protected override isFillShouldRender() {
+    // TODO: optimize
+    return true;
+  }
+
   private _realDraw(
     drawInfo: IDrawInfo,
     overrideStyle?: {
@@ -144,6 +149,7 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     // ctx.restore();
 
     for (const paint of fill ?? []) {
+      if (paint.visible === false) continue;
       switch (paint.type) {
         case PaintType.Solid: {
           ctx.fillStyle = parseRGBAStr(paint.attrs);
@@ -162,6 +168,7 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     if (strokeWidth) {
       ctx.lineWidth = strokeWidth;
       for (const paint of stroke ?? []) {
+        if (paint.visible === false) continue;
         switch (paint.type) {
           case PaintType.Solid: {
             ctx.strokeStyle = parseRGBAStr(paint.attrs);

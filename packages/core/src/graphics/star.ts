@@ -120,6 +120,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
       layerCtx.closePath();
 
       for (const paint of fill ?? []) {
+        if (paint.visible === false) continue;
         switch (paint.type) {
           case PaintType.Solid: {
             layerCtx.fillStyle = parseRGBAStr(paint.attrs);
@@ -139,6 +140,7 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
       if (strokeWidth) {
         layerCtx.lineWidth = strokeWidth;
         for (const paint of stroke ?? []) {
+          if (paint.visible === false) continue;
           switch (paint.type) {
             case PaintType.Solid: {
               layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
