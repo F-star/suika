@@ -29,8 +29,8 @@ interface ICommandItem {
  * reference: https://mp.weixin.qq.com/s/JBhXeFPTw8O34vOtk05cQg
  */
 export class CommandManager {
-  redoStack: ICommandItem[] = [];
-  undoStack: ICommandItem[] = [];
+  private redoStack: ICommandItem[] = [];
+  private undoStack: ICommandItem[] = [];
   private isEnableRedoUndo = true;
   private emitter = new EventEmitter<Events>();
   private isBatching = false;
