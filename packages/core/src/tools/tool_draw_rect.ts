@@ -2,7 +2,12 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaRect } from '../graphics';
+import {
+  GraphicsObjectSuffix,
+  type SuikaGraphics,
+  SuikaRect,
+} from '../graphics';
+import { getNoConflictObjectName } from '../utils';
 import { DrawGraphicsTool } from './tool_draw_graphics';
 import { type ITool } from './type';
 
@@ -20,11 +25,11 @@ export class DrawRectTool extends DrawGraphicsTool implements ITool {
     this.commandDesc = 'Add Rect';
   }
 
-  protected override createGraphics(rect: IRect) {
+  protected override createGraphics(rect: IRect, parent: SuikaGraphics) {
     rect = normalizeRect(rect);
     const graphics = new SuikaRect(
       {
-        objectName: '',
+        objectName: getNoConflictObjectName(parent, GraphicsObjectSuffix.Rect),
         width: rect.width,
         height: rect.height,
         fill: [cloneDeep(this.editor.setting.get('firstFill'))],

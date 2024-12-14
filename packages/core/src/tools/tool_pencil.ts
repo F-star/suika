@@ -4,7 +4,8 @@ import { simplePath } from '@suika/geo';
 import { AddGraphCmd } from '../commands';
 import { type ICursor } from '../cursor_manager';
 import { type SuikaEditor } from '../editor';
-import { SuikaPath } from '../graphics';
+import { GraphicsObjectSuffix, SuikaPath } from '../graphics';
+import { getNoConflictObjectName } from '../utils';
 import { type ITool } from './type';
 
 const TYPE = 'pencil';
@@ -36,7 +37,10 @@ export class PencilTool implements ITool {
   onStart(e: PointerEvent) {
     this.path = new SuikaPath(
       {
-        objectName: '',
+        objectName: getNoConflictObjectName(
+          this.editor.doc.getCurrCanvas(),
+          GraphicsObjectSuffix.Path,
+        ),
         width: 0,
         height: 0,
         pathData: [

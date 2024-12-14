@@ -12,3 +12,15 @@ export interface IDrawInfo {
   smooth?: boolean;
   opacity?: number;
 }
+
+export const GraphicsObjectSuffix = {
+  Rect: 'Rect',
+  Ellipse: 'Ellipse',
+  Line: 'Line',
+  RegularPolygon: 'Polygon',
+  Star: 'Star',
+  Path: 'Path',
+  Text: 'Text',
+  Group: 'Group',
+  Frame: 'Frame',
+};
