@@ -175,6 +175,7 @@ export class SelectedBox {
 
     const textContent = `${width} x ${height}`;
 
+    ctx.save();
     ctx.font = fontStyle;
     const textMetrics = ctx.measureText(textContent);
     const textWidth = textMetrics.width;
@@ -189,7 +190,6 @@ export class SelectedBox {
 
     const fill = this.editor.setting.get('selectBoxStroke');
     ctx.fillStyle = fill;
-    ctx.save();
     ctx.transform(...matrix.getArray());
     ctx.beginPath();
     const bgRect = offsetRect(
