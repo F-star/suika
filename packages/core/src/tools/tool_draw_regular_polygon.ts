@@ -2,7 +2,12 @@ import { cloneDeep } from '@suika/common';
 import { type IRect, normalizeRect } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaRegularPolygon } from '../graphics/regular_polygon';
+import {
+  GraphicsObjectSuffix,
+  type SuikaGraphics,
+  SuikaRegularPolygon,
+} from '../graphics';
+import { getNoConflictObjectName } from '../utils';
 import { DrawGraphicsTool } from './tool_draw_graphics';
 import { type ITool } from './type';
 
@@ -19,11 +24,14 @@ export class DrawRegularPolygonTool extends DrawGraphicsTool implements ITool {
     this.commandDesc = 'AddRegularPolygon';
   }
 
-  protected createGraphics(rect: IRect) {
+  protected createGraphics(rect: IRect, parent: SuikaGraphics) {
     rect = normalizeRect(rect);
     return new SuikaRegularPolygon(
       {
-        objectName: '',
+        objectName: getNoConflictObjectName(
+          parent,
+          GraphicsObjectSuffix.RegularPolygon,
+        ),
         width: rect.width,
         height: rect.height,
         fill: [cloneDeep(this.editor.setting.get('firstFill'))],

@@ -8,10 +8,9 @@ import {
 } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { SuikaFrame, SuikaGraphics } from '../graphics';
+import { GraphicsObjectSuffix, SuikaFrame, SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
-import { getParentIdSet } from '../utils';
-
+import { getNoConflictObjectName, getParentIdSet } from '../utils';
 export const groupAndRecord = (
   graphicsArr: SuikaGraphics[],
   editor: SuikaEditor,
@@ -45,7 +44,10 @@ export const groupAndRecord = (
 
   const group = new SuikaFrame(
     {
-      objectName: '',
+      objectName: getNoConflictObjectName(
+        parentOfGroup,
+        GraphicsObjectSuffix.Group,
+      ),
       width: boundRect.width,
       height: boundRect.height,
       resizeToFit: true,

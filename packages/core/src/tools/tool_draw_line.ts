@@ -10,8 +10,13 @@ import {
 
 import { HALF_PI } from '../constant';
 import { type SuikaEditor } from '../editor';
-import { isFrameGraphics, SuikaLine } from '../graphics';
-import { adjustSizeToKeepPolarSnap } from '../utils';
+import {
+  GraphicsObjectSuffix,
+  isFrameGraphics,
+  type SuikaGraphics,
+  SuikaLine,
+} from '../graphics';
+import { adjustSizeToKeepPolarSnap, getNoConflictObjectName } from '../utils';
 import { DrawGraphicsTool } from './tool_draw_graphics';
 import { type ITool } from './type';
 
@@ -29,7 +34,11 @@ export class DrawLineTool extends DrawGraphicsTool implements ITool {
     this.commandDesc = 'Add Line';
   }
 
-  protected createGraphics(rect: IRect, noMove: boolean) {
+  protected createGraphics(
+    rect: IRect,
+    parent: SuikaGraphics,
+    noMove: boolean,
+  ) {
     // do not create line if no drag
     if (noMove) {
       return null;
@@ -37,7 +46,7 @@ export class DrawLineTool extends DrawGraphicsTool implements ITool {
     const attrs = this.calcAttrs(rect);
     return new SuikaLine(
       {
-        objectName: '',
+        objectName: getNoConflictObjectName(parent, GraphicsObjectSuffix.Line),
         ...attrs,
         height: 0,
         stroke: [cloneDeep(this.editor.setting.get('firstStroke'))],

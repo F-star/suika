@@ -11,8 +11,9 @@ import { AddGraphCmd, SetGraphsAttrsCmd } from '../commands';
 import { ControlHandle } from '../control_handle_manager';
 import { type ICursor } from '../cursor_manager';
 import { type SuikaEditor } from '../editor';
-import { SuikaEllipse, SuikaPath } from '../graphics';
+import { GraphicsObjectSuffix, SuikaEllipse, SuikaPath } from '../graphics';
 import { PaintType } from '../paint';
+import { getNoConflictObjectName } from '../utils';
 import { PathSelectTool } from './tool_path_select';
 import { type ITool } from './type';
 
@@ -92,9 +93,13 @@ export class DrawPathTool implements ITool {
         },
       ];
 
+      const currCanvas = this.editor.doc.getCurrCanvas();
       const path = new SuikaPath(
         {
-          objectName: '',
+          objectName: getNoConflictObjectName(
+            currCanvas,
+            GraphicsObjectSuffix.Path,
+          ),
           width: 100,
           height: 100,
           strokeWidth: 1,

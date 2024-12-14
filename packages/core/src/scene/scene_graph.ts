@@ -11,12 +11,12 @@ import {
   SuikaLine,
   SuikaPath,
   SuikaRect,
+  SuikaRegularPolygon,
+  SuikaStar,
   SuikaText,
 } from '../graphics';
 import { SuikaCanvas } from '../graphics/canvas';
 import { SuikaDocument } from '../graphics/document';
-import { SuikaRegularPolygon } from '../graphics/regular_polygon';
-import { SuikaStar } from '../graphics/star';
 import Grid from '../grid';
 import { GraphicsType, type IEditorPaperData } from '../type';
 import { rafThrottle } from '../utils';

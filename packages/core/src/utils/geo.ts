@@ -2,22 +2,6 @@ import { getSweepAngle, type IBox, type IPoint, type IRect } from '@suika/geo';
 
 import { HALF_PI } from '../constant';
 
-/**
- * 计算绝对坐标
- */
-export function getAbsoluteCoords(
-  rect: IRect,
-): [x: number, y: number, x2: number, y2: number, cx: number, cy: number] {
-  return [
-    rect.x,
-    rect.y,
-    rect.x + rect.width,
-    rect.y + rect.height,
-    rect.x + rect.width / 2,
-    rect.y + rect.height / 2,
-  ];
-}
-
 export const bboxToBboxWithMid = (
   box: IBox,
 ): IBox & { midX: number; midY: number } => {

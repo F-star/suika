@@ -132,6 +132,7 @@ export abstract class DrawGraphicsTool implements ITool {
    */
   protected abstract createGraphics(
     rect: IRect,
+    parentGraphics: SuikaGraphics,
     noMove?: boolean,
   ): SuikaGraphics | null;
 
@@ -243,27 +244,28 @@ export abstract class DrawGraphicsTool implements ITool {
     if (this.drawingGraphics) {
       this.updateGraphics(rect);
     } else {
-      const graphics = this.createGraphics(rect)!;
       const currentCanvas = this.editor.doc.getCurrCanvas();
       const frame = getDeepFrameAtPoint(
         this.startPoint,
         currentCanvas.getChildren(),
       );
+      const parent = frame || currentCanvas;
+      const graphics = this.createGraphics(rect, parent);
+      this.drawingGraphics = graphics;
 
-      sceneGraph.addItems([graphics]);
-
-      if (frame) {
-        const tf = [...graphics.attrs.transform] as IMatrixArr;
-        frame.insertChild(graphics);
-        graphics.setWorldTransform(tf);
-      } else {
-        currentCanvas.insertChild(graphics);
+      if (!graphics) {
+        return;
       }
 
-      this.drawingGraphics = graphics;
+      sceneGraph.addItems([graphics]);
+      parent.insertChild(graphics);
+      if (frame) {
+        const tf = [...graphics.attrs.transform] as IMatrixArr;
+        graphics.setWorldTransform(tf);
+      }
+      this.editor.selectedElements.setItems([graphics]);
     }
-    this.editor.selectedElements.setItems([this.drawingGraphics]);
-    sceneGraph.render();
+    this.editor.render();
   }
 
   protected solveWidthOrHeightIsZero(size: ISize, delta: IPoint): ISize {
@@ -294,6 +296,13 @@ export abstract class DrawGraphicsTool implements ITool {
       const width = this.editor.setting.get('drawGraphDefaultWidth');
       const height = this.editor.setting.get('drawGraphDefaultHeight');
 
+      const currentCanvas = this.editor.doc.getCurrCanvas();
+      const frame = getDeepFrameAtPoint(
+        this.startPoint,
+        currentCanvas.getChildren(),
+      );
+      const parent = frame || currentCanvas;
+
       this.drawingGraphics = this.createGraphics(
         {
           x: cx - width / 2,
@@ -301,14 +310,19 @@ export abstract class DrawGraphicsTool implements ITool {
           width,
           height,
         },
+        parent,
         true,
       );
 
       if (this.drawingGraphics) {
-        this.editor.doc.getCurrCanvas().insertChild(this.drawingGraphics);
-        this.editor.sceneGraph.addItems([this.drawingGraphics]);
-
-        this.editor.selectedElements.setItems([this.drawingGraphics]);
+        const graphics = this.drawingGraphics;
+        this.editor.sceneGraph.addItems([graphics]);
+        parent.insertChild(graphics);
+        if (frame) {
+          const tf = [...graphics.attrs.transform] as IMatrixArr;
+          graphics.setWorldTransform(tf);
+        }
+        this.editor.selectedElements.setItems([graphics]);
         this.editor.render();
       }
     }

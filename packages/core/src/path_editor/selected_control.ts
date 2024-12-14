@@ -3,8 +3,12 @@ import { getRotatedRectByTwoPoint, isPointEqual } from '@suika/geo';
 
 import { ControlHandle } from '../control_handle_manager';
 import { type SuikaEditor } from '../editor';
-import { SuikaEllipse, SuikaLine, SuikaPath } from '../graphics';
-import { SuikaRegularPolygon } from '../graphics/regular_polygon';
+import {
+  SuikaEllipse,
+  SuikaLine,
+  SuikaPath,
+  SuikaRegularPolygon,
+} from '../graphics';
 import { PaintType } from '../paint';
 import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
 
