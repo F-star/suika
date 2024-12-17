@@ -1,10 +1,10 @@
-import { EventEmitter } from '@suika/common';
+import { EventEmitter, pick } from '@suika/common';
 
 import { type IPaint, PaintType } from './paint';
 import { type BooleanKeys } from './type';
 
 interface Events {
-  update(attrs: SettingValue): void;
+  update(attrs: SettingValue, changedKey: keyof SettingValue): void;
 }
 
 export class Setting {
@@ -149,6 +149,15 @@ export class Setting {
     textEditorCursorLineStroke: '#000',
     textEditorSelectionFill: '#0069c433',
   };
+
+  constructor(partialVal?: Partial<SettingValue>) {
+    partialVal = pick(partialVal, Object.keys(this.value));
+    this.value = {
+      ...this.value,
+      ...partialVal,
+    };
+  }
+
   toggle<K extends BooleanKeys<SettingValue>>(key: K) {
     const value = this.value[key];
     if (typeof value === 'boolean') {
@@ -159,7 +168,7 @@ export class Setting {
   }
   set<K extends keyof SettingValue>(key: K, value: SettingValue[K]) {
     this.value[key] = value;
-    this.eventEmitter.emit('update', this.getAttrs());
+    this.eventEmitter.emit('update', this.getAttrs(), key);
   }
   get<K extends keyof SettingValue>(key: K) {
     return this.value[key];
@@ -168,10 +177,10 @@ export class Setting {
     return { ...this.value };
   }
 
-  on(eventName: 'update', handler: (value: SettingValue) => void) {
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'update', handler: (value: SettingValue) => void) {
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
 }

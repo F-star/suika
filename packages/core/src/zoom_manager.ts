@@ -216,16 +216,12 @@ export class ZoomManager {
       y: newScrollY,
     });
   }
-  on(
-    eventName: 'zoomChange',
-    handler: (zoom: number, prevZoom: number) => void,
-  ) {
+
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(
-    eventName: 'zoomChange',
-    handler: (zoom: number, prevZoom: number) => void,
-  ) {
+
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
 }
