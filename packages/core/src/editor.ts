@@ -24,7 +24,7 @@ import Ruler from './ruler';
 import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
 import { SelectedElements } from './selected_elements';
-import { Setting } from './setting';
+import { Setting, type SettingValue } from './setting';
 import { TextEditor } from './text/text_editor';
 import { ToolManager } from './tools';
 import { type IChanges, type IEditorPaperData } from './type';
@@ -38,6 +38,7 @@ interface IEditorOptions {
   offsetX?: number;
   offsetY?: number;
   showPerfMonitor?: boolean;
+  userPreference?: Partial<SettingValue>;
 }
 
 interface Events {
@@ -89,7 +90,7 @@ export class SuikaEditor {
     this.containerElement.appendChild(this.canvasElement);
     this.ctx = this.canvasElement.getContext('2d')!;
 
-    this.setting = new Setting();
+    this.setting = new Setting(options.userPreference);
     if (options.offsetX) {
       this.setting.set('offsetX', options.offsetX);
     }

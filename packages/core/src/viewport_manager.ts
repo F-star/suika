@@ -68,10 +68,11 @@ export class ViewportManager {
       maxY: y + height / zoom,
     };
   }
-  on(eventName: 'xOrYChange', handler: (x: number, y: number) => void) {
+
+  on<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.on(eventName, handler);
   }
-  off(eventName: 'xOrYChange', handler: (x: number, y: number) => void) {
+  off<K extends keyof Events>(eventName: K, handler: Events[K]) {
     this.eventEmitter.off(eventName, handler);
   }
 }
