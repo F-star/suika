@@ -46,7 +46,7 @@ export class StageManager {
   };
 
   private onViewportSizeChange = (width: number, height: number) => {
-    this.app.renderer.resize(width, height);
+    this.app.renderer.resize(width, height, getDevicePixelRatio());
   };
 
   private bindEvent() {
