@@ -706,6 +706,22 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     ];
   }
 
+  getInfoPanelAttrs_new() {
+    const size = this.getTransformedSize();
+    const pos = this.getWorldPosition();
+    return {
+      x: pos.x,
+      y: pos.y,
+      width: size.width,
+      value: size.height,
+      rotation: this.getRotateDegree(),
+    };
+  }
+
+  setAttrsByInput() {
+    // ...
+  }
+
   toSVGSegment(offset?: IPoint) {
     const tagHead = this.getSVGTagHead(offset);
     if (!tagHead) {

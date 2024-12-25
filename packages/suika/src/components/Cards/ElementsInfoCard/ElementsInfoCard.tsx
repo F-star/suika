@@ -28,6 +28,8 @@ interface IAttr {
   precision?: number;
 }
 
+const attrOrder = ['x', 'y', 'width', 'height', 'rotation', 'cornerRadius'];
+
 export const ElementsInfoCards: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
