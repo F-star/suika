@@ -26,11 +26,6 @@
 
 [编辑器功能清单-脑图](https://f5b8b9lm1y.feishu.cn/mindnotes/ORJabmf7qmYHxqnjtIBcOkhGnNf#mindmap)
 
-下一步计划
-
-- [ ] 路径编辑操作完善，比如删除锚点、新增锚点、减少锚点；
-- [ ] 组件；
-
 ## 文档
 
 [中文文档](https://f-star.github.io/suika-document/)
@@ -72,14 +67,6 @@ pnpm build
 ## 编辑器内核设计
 
 [编辑器内核的类结构设计-脑图](https://f5b8b9lm1y.feishu.cn/mindnotes/DgJRb2GpGmdGdKnfl3rcJzw6n5e#mindmap)
-
-## suika 编辑器答疑和交流
-
-如果对 suika 图形编辑器有什么疑问，或是有 bug 要反馈。
-
-可以加我微信，备注 “suika”，我拉你到 suika 编辑器交流群。
-
-![image](https://github.com/user-attachments/assets/205b2c4f-1408-46a0-8bdc-ea3f54a6e125)
 
 ## 图形编辑器开发交流
 

@@ -26,11 +26,6 @@ English | [中文](./README_zh.md)
 14. Import and export JSON data;
 15. User settings;
 
-Next Steps
-
-- [ ] Improve path editing operations;
-- [ ] Components;
-
 ## Documentation
 
 WIP.
