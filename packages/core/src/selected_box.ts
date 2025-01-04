@@ -173,7 +173,7 @@ export class SelectedBox {
     const width = remainDecimal(size.width, numPrecision);
     const height = remainDecimal(size.height, numPrecision);
 
-    const textContent = `${width} x ${height}`;
+    const textContent = `${width} × ${height}`;
 
     ctx.save();
     ctx.font = fontStyle;
