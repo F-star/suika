@@ -48,7 +48,10 @@ export class RefLine {
 
   constructor(private editor: SuikaEditor) {}
 
-  cacheXYToBbox() {
+  /**
+   * cache reference line of graphics in viewport
+   */
+  cacheGraphicsRefLines() {
     this.clear();
 
     const vRefLineMap = this.vRefLineMap;
@@ -100,9 +103,9 @@ export class RefLine {
       }
 
       // bbox 中水平线
-      this.addBboxToMap(vRefLineMap, bbox.midX, [bbox.minY, bbox.maxY]);
+      RefLine.addRefLinesToMap(vRefLineMap, bbox.midX, [bbox.minY, bbox.maxY]);
       // bbox 中垂直线
-      this.addBboxToMap(hRefLineMap, bbox.midY, [bbox.minX, bbox.maxX]);
+      RefLine.addRefLinesToMap(hRefLineMap, bbox.midY, [bbox.minX, bbox.maxX]);
 
       /**
        * 获取旋转后4个顶点的坐标
@@ -141,11 +144,11 @@ export class RefLine {
 
       // top 和 bottom 要绘制水平参考线，不要绘制垂直参照线
       for (const p of [...top, ...bottom]) {
-        this.addBboxToMap(vRefLineMap, p.x, [p.y]);
+        RefLine.addRefLinesToMap(vRefLineMap, p.x, [p.y]);
       }
       // left 和 right 要绘制垂直参照线，不要绘制水平参照线
       for (const p of [...left, ...right]) {
-        this.addBboxToMap(hRefLineMap, p.y, [p.x]);
+        RefLine.addRefLinesToMap(hRefLineMap, p.y, [p.x]);
       }
     }
 
@@ -160,7 +163,7 @@ export class RefLine {
     this.toDrawVLines = [];
     this.toDrawHLines = [];
   }
-  private addBboxToMap(
+  static addRefLinesToMap(
     m: Map<number, Set<number>>,
     xOrY: number,
     xsOrYs: number[],
@@ -175,7 +178,7 @@ export class RefLine {
     }
   }
 
-  private getTargetPointFromSelect(record: Map<string, ITransformRect>) {
+  static getGraphicsTargetPoints(record: Map<string, ITransformRect>) {
     let targetPoints: IPoint[] = [];
     // 选中的为单个图形，要以旋转后的 4 个顶点和中心点为目标线
     if (record.size === 1) {
@@ -213,12 +216,7 @@ export class RefLine {
    * update ref line
    * and return offset
    */
-  updateRefLine(record: Map<string, ITransformRect>): {
-    offsetX: number;
-    offsetY: number;
-  } {
-    const targetPoints = this.getTargetPointFromSelect(record);
-
+  getGraphicsSnapOffset(targetPoints: IPoint[]): IPoint | undefined {
     this.toDrawVLines = [];
     this.toDrawHLines = [];
 
@@ -234,7 +232,7 @@ export class RefLine {
 
     // there are no reference graphs
     if (sortedXs.length === 0 && sortedYs.length === 0) {
-      return { offsetX: 0, offsetY: 0 };
+      return undefined;
     }
 
     let offsetX: number | undefined = undefined;
@@ -334,7 +332,7 @@ export class RefLine {
       });
     }
 
-    return { offsetX: offsetX ?? 0, offsetY: offsetY ?? 0 };
+    return { x: offsetX ?? 0, y: offsetY ?? 0 };
   }
 
   drawRefLine(ctx: CanvasRenderingContext2D) {
