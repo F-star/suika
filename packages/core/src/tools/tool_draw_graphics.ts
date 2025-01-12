@@ -55,6 +55,14 @@ export abstract class DrawGraphicsTool implements ITool {
     };
     hotkeysManager.on('shiftToggle', updateRect);
 
+    const updateRefLinesWhenViewportTranslate = () => {
+      if (editor.hostEventManager.isDraggingCanvasBySpace) {
+        return;
+      }
+      if (this.isDragging) {
+        this.editor.refLine.cacheGraphicsRefLines();
+      }
+    };
     const updateRectWhenViewportTranslate = () => {
       if (editor.hostEventManager.isDraggingCanvasBySpace) {
         return;
@@ -68,10 +76,18 @@ export abstract class DrawGraphicsTool implements ITool {
         this.updateRect();
       }
     };
+    editor.viewportManager.on(
+      'xOrYChange',
+      updateRefLinesWhenViewportTranslate,
+    );
     editor.viewportManager.on('xOrYChange', updateRectWhenViewportTranslate);
 
     this.unbindEvent = () => {
       hotkeysManager.off('shiftToggle', updateRect);
+      editor.viewportManager.off(
+        'xOrYChange',
+        updateRefLinesWhenViewportTranslate,
+      );
       editor.viewportManager.off('xOrYChange', updateRectWhenViewportTranslate);
     };
   }
@@ -117,13 +133,27 @@ export abstract class DrawGraphicsTool implements ITool {
     if (this.editor.hostEventManager.isDraggingCanvasBySpace) {
       return;
     }
-    this.isDragging = true;
     this.lastDragPointInViewport = this.editor.getCursorXY(e);
 
     this.lastDragPoint = this.lastMousePoint = SnapHelper.getSnapPtBySetting(
       this.editor.getSceneCursorXY(e),
       this.editor.setting,
     );
+
+    if (!this.isDragging) {
+      this.editor.refLine.cacheGraphicsRefLines();
+    }
+    const offset = this.editor.refLine.getGraphicsSnapOffset([
+      this.lastDragPoint,
+    ]);
+    if (offset) {
+      this.lastDragPoint = {
+        x: this.lastDragPoint.x + offset.x,
+        y: this.lastDragPoint.y + offset.y,
+      };
+    }
+    this.isDragging = true;
+
     this.updateRect();
   }
   /**
@@ -346,5 +376,6 @@ export abstract class DrawGraphicsTool implements ITool {
     }
     this.startPointWhenSpaceDown = null;
     this.lastDragPointWhenSpaceDown = null;
+    this.editor.refLine.clear();
   }
 }

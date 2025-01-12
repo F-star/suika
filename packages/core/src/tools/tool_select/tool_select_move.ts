@@ -9,6 +9,7 @@ import {
   type SuikaGraphics,
 } from '../../graphics';
 import { type SuikaCanvas } from '../../graphics/canvas';
+import { RefLine } from '../../ref_line';
 import { Transaction } from '../../transaction';
 import { getDeepFrameAtPoint } from '../../utils';
 import { type IBaseTool } from '../type';
@@ -85,7 +86,7 @@ export class SelectMoveTool implements IBaseTool {
       this.prevBBoxPos = { x: boundingRect.x, y: boundingRect.y };
     }
 
-    this.editor.refLine.cacheXYToBbox();
+    this.editor.refLine.cacheGraphicsRefLines();
   }
   onDrag(e: PointerEvent) {
     this.dragPoint = this.editor.getCursorXY(e);
@@ -141,7 +142,8 @@ export class SelectMoveTool implements IBaseTool {
       });
     }
 
-    const { offsetX, offsetY } = this.editor.refLine.updateRefLine(record);
+    const targetPoints = RefLine.getGraphicsTargetPoints(record);
+    const offset = this.editor.refLine.getGraphicsSnapOffset(targetPoints);
 
     const canvasGraphics = this.editor.doc.getCanvas();
     const newParent =
@@ -155,8 +157,8 @@ export class SelectMoveTool implements IBaseTool {
       const newWorldTf = cloneDeep(
         this.originWorldTfMap.get(graphics.attrs.id)!,
       );
-      newWorldTf[4] += dx + offsetX;
-      newWorldTf[5] += dy + offsetY;
+      newWorldTf[4] += dx + (offset?.x ?? 0);
+      newWorldTf[5] += dy + (offset?.y ?? 0);
 
       // change parent
       if (this.prevParent !== newParent) {
