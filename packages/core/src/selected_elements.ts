@@ -32,6 +32,7 @@ export class SelectedElements {
     this.emitItemsChangeIfChanged(prevItems, items);
   }
   getItems({ excludeLocked = false } = {}): SuikaGraphics[] {
+    // TODO: cache items ?
     if (excludeLocked) {
       return this.items.filter((item) => !item.isLock());
     }

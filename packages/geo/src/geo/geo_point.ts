@@ -21,6 +21,10 @@ export const pointSub = (p1: IPoint, p2: IPoint): IPoint => {
   };
 };
 
+export const isZeroPoint = (p: IPoint) => {
+  return p.x === 0 && p.y === 0;
+};
+
 const TOL = 0.0000000001;
 
 export const isPointEqual = (p1: IPoint, p2: IPoint, tol = TOL) => {

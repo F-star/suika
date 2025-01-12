@@ -146,12 +146,11 @@ export abstract class DrawGraphicsTool implements ITool {
     const offset = this.editor.refLine.getGraphicsSnapOffset([
       this.lastDragPoint,
     ]);
-    if (offset) {
-      this.lastDragPoint = {
-        x: this.lastDragPoint.x + offset.x,
-        y: this.lastDragPoint.y + offset.y,
-      };
-    }
+    this.lastDragPoint = {
+      x: this.lastDragPoint.x + offset.x,
+      y: this.lastDragPoint.y + offset.y,
+    };
+
     this.isDragging = true;
 
     this.updateRect();
