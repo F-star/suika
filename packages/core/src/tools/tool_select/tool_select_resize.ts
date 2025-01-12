@@ -34,7 +34,7 @@ export class SelectResizeTool implements IBaseTool {
 
   private updatedAttrsMap = new Map<string, Partial<GraphicsAttrs>>();
 
-  private lastPoint: IPoint | null = null;
+  private lastDragPoint: IPoint | null = null;
   private prevLastPoint: IPoint | null = null;
   private unbind = noop;
 
@@ -98,24 +98,40 @@ export class SelectResizeTool implements IBaseTool {
     this.editor.commandManager.disableRedoUndo();
     this.editor.hostEventManager.disableDelete();
 
-    const enableGripSnap =
-      this.editor.setting.get('snapToGrid') &&
-      (['nw', 'ne', 'se', 'sw'].includes(this.handleName) ||
-        (['n', 'e', 's', 'w'].includes(this.handleName) &&
-          this.editor.selectedElements.size() > 1) ||
+    const isTwoDirResizeHandle = ['nw', 'ne', 'se', 'sw'].includes(
+      this.handleName,
+    );
+    const isOneDirResizeWithoutRotateHandle =
+      ['n', 'e', 's', 'w'].includes(this.handleName) &&
+      (this.editor.selectedElements.size() > 1 ||
         this.editor.selectedElements.getItems()[0].getRotate() % HALF_PI === 0);
 
-    this.lastPoint = this.editor.getSceneCursorXY(e);
-    if (enableGripSnap) {
-      this.lastPoint = SnapHelper.getSnapPtBySetting(
-        this.lastPoint,
-        this.editor.setting,
-      );
+    if (!this.lastDragPoint) {
+      this.editor.refLine.cacheGraphicsRefLines();
+    }
+    this.lastDragPoint = this.editor.getSceneCursorXY(e);
+
+    if (isTwoDirResizeHandle || isOneDirResizeWithoutRotateHandle) {
+      if (this.editor.setting.get('snapToGrid')) {
+        this.lastDragPoint = SnapHelper.getSnapPtBySetting(
+          this.lastDragPoint,
+          this.editor.setting,
+        );
+      }
+
+      const objectSnapOffset = this.editor.refLine.getGraphicsSnapOffset([
+        this.lastDragPoint,
+      ]);
+
+      this.lastDragPoint = {
+        x: this.lastDragPoint.x + objectSnapOffset.x,
+        y: this.lastDragPoint.y + objectSnapOffset.y,
+      };
     }
 
     const prevLastPoint = this.prevLastPoint;
-    this.prevLastPoint = this.lastPoint;
-    if (isEqual(prevLastPoint, this.lastPoint)) {
+    this.prevLastPoint = this.lastDragPoint;
+    if (isEqual(prevLastPoint, this.lastDragPoint)) {
       return;
     }
 
@@ -150,7 +166,7 @@ export class SelectResizeTool implements IBaseTool {
   private updateSingleGraphics(graphics: SuikaGraphics) {
     const updatedAttrs = graphics.calcNewAttrsByControlHandle(
       this.handleName,
-      this.lastPoint!,
+      this.lastDragPoint!,
       this.originAttrsMap.get(graphics.attrs.id)!,
       this.originWorldTransforms.get(graphics.attrs.id)!,
       this.editor.hostEventManager.isShiftPressing,
@@ -195,7 +211,7 @@ export class SelectResizeTool implements IBaseTool {
   };
 
   private updateGraphics() {
-    if (!this.lastPoint) return;
+    if (!this.lastDragPoint) return;
 
     let prependedTransform: Matrix = new Matrix();
 
@@ -217,7 +233,7 @@ export class SelectResizeTool implements IBaseTool {
 
       const updatedTransformRect = resizeRect(
         this.handleName,
-        this.lastPoint,
+        this.lastDragPoint,
         {
           width: originAttrs.width,
           height: originAttrs.height,
@@ -253,7 +269,7 @@ export class SelectResizeTool implements IBaseTool {
 
       const transformRect = resizeRect(
         this.handleName,
-        this.lastPoint,
+        this.lastDragPoint,
         {
           width: startSelectBbox.width,
           height: startSelectBbox.height,
@@ -361,6 +377,7 @@ export class SelectResizeTool implements IBaseTool {
     this.originAttrsMap = new Map();
     this.updatedAttrsMap = new Map();
 
-    this.lastPoint = null;
+    this.lastDragPoint = null;
+    this.editor.refLine.clear();
   }
 }

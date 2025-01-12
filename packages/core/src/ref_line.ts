@@ -216,7 +216,7 @@ export class RefLine {
    * update ref line
    * and return offset
    */
-  getGraphicsSnapOffset(targetPoints: IPoint[]): IPoint | undefined {
+  getGraphicsSnapOffset(targetPoints: IPoint[]): IPoint {
     this.toDrawVLines = [];
     this.toDrawHLines = [];
 
@@ -232,7 +232,7 @@ export class RefLine {
 
     // there are no reference graphs
     if (sortedXs.length === 0 && sortedYs.length === 0) {
-      return undefined;
+      return { x: 0, y: 0 };
     }
 
     let offsetX: number | undefined = undefined;

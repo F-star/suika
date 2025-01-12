@@ -157,8 +157,8 @@ export class SelectMoveTool implements IBaseTool {
       const newWorldTf = cloneDeep(
         this.originWorldTfMap.get(graphics.attrs.id)!,
       );
-      newWorldTf[4] += dx + (offset?.x ?? 0);
-      newWorldTf[5] += dy + (offset?.y ?? 0);
+      newWorldTf[4] += dx + offset.x;
+      newWorldTf[5] += dy + offset.y;
 
       // change parent
       if (this.prevParent !== newParent) {
