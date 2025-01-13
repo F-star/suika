@@ -51,13 +51,20 @@ export class RefLine {
   /**
    * cache reference line of graphics in viewport
    */
-  cacheGraphicsRefLines() {
+  cacheGraphicsRefLines(
+    options: {
+      excludeItems: SuikaGraphics[];
+    } = {
+      excludeItems: [],
+    },
+  ) {
     this.clear();
+
+    const excludeItems = options.excludeItems;
 
     const vRefLineMap = this.vRefLineMap;
     const hRefLineMap = this.hRefLineMap;
 
-    const selectIdSet = this.editor.selectedElements.getIdSet();
     const viewportBbox = this.editor.viewportManager.getBbox();
 
     const refGraphicsSet = new Set<SuikaGraphics>();
@@ -71,8 +78,7 @@ export class RefLine {
       refGraphicsSet.add(graphics);
     });
 
-    const selectedItems = this.editor.selectedElements.getItems();
-    for (const selectedItem of selectedItems) {
+    for (const selectedItem of excludeItems) {
       selectedItem.forEachVisibleChildNode((graphics) => {
         if (refGraphicsSet.has(graphics)) {
           refGraphicsSet.delete(graphics);
@@ -80,8 +86,9 @@ export class RefLine {
       });
     }
 
+    const excludeIdSet = new Set(excludeItems.map((item) => item.attrs.id));
     for (const graphics of refGraphicsSet) {
-      if (selectIdSet.has(graphics.attrs.id)) {
+      if (excludeIdSet.has(graphics.attrs.id)) {
         continue;
       }
 

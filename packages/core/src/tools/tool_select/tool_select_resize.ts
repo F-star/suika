@@ -107,7 +107,9 @@ export class SelectResizeTool implements IBaseTool {
         this.editor.selectedElements.getItems()[0].getRotate() % HALF_PI === 0);
 
     if (!this.lastDragPoint) {
-      this.editor.refLine.cacheGraphicsRefLines();
+      this.editor.refLine.cacheGraphicsRefLines({
+        excludeItems: this.editor.selectedElements.getItems(),
+      });
     }
     this.lastDragPoint = this.editor.getSceneCursorXY(e);
 
