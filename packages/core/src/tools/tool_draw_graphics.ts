@@ -60,7 +60,9 @@ export abstract class DrawGraphicsTool implements ITool {
         return;
       }
       if (this.isDragging) {
-        this.editor.refLine.cacheGraphicsRefLines();
+        this.editor.refLine.cacheGraphicsRefLines({
+          excludeItems: this.editor.selectedElements.getItems(),
+        });
       }
     };
     const updateRectWhenViewportTranslate = () => {
