@@ -48,6 +48,11 @@ export const Menu: FC = () => {
       label: t({ id: 'preference' }),
       children: [
         {
+          key: 'snapToObjects',
+          check: editorSetting.snapToObjects,
+          label: t({ id: 'snapToObjects' }),
+        },
+        {
           key: 'keepToolSelectedAfterUse',
           check: editorSetting.keepToolSelectedAfterUse,
           label: t({ id: 'keepToolSelectedAfterUse' }),
@@ -87,6 +92,7 @@ export const Menu: FC = () => {
       case 'invertZoomDirection':
       case 'highlightLayersOnHover':
       case 'flipObjectsWhileResizing':
+      case 'snapToObjects':
         editor.setting.toggle(key);
         preventClose = true;
         break;

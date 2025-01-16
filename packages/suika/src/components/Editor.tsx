@@ -24,6 +24,7 @@ const storeKeys: Partial<keyof SettingValue>[] = [
   'invertZoomDirection',
   'highlightLayersOnHover',
   'flipObjectsWhileResizing',
+  'snapToObjects',
 ];
 
 const Editor: FC = () => {

@@ -61,6 +61,7 @@
   "invertZoomDirection": "反转缩放方向",
   "highlightLayersOnHover": "鼠标悬停时高亮图层",
   "flipObjectsWhileResizing": "缩放时对图形进行翻转",
+  "snapToObjects": "吸附到对象",
 
   "done": "完成",
 

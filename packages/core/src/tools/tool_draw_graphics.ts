@@ -45,6 +45,7 @@ export abstract class DrawGraphicsTool implements ITool {
   private unbindEvent: () => void = noop;
 
   constructor(protected editor: SuikaEditor) {}
+
   onActive() {
     const editor = this.editor;
     const hotkeysManager = editor.hostEventManager;
@@ -59,7 +60,7 @@ export abstract class DrawGraphicsTool implements ITool {
       if (editor.hostEventManager.isDraggingCanvasBySpace) {
         return;
       }
-      if (this.isDragging) {
+      if (this.isDragging && this.editor.setting.get('snapToObjects')) {
         this.editor.refLine.cacheGraphicsRefLines({
           excludeItems: this.editor.selectedElements.getItems(),
         });
@@ -142,7 +143,7 @@ export abstract class DrawGraphicsTool implements ITool {
       this.editor.setting,
     );
 
-    if (!this.isDragging) {
+    if (!this.isDragging && this.editor.setting.get('snapToObjects')) {
       this.editor.refLine.cacheGraphicsRefLines();
     }
     const offset = this.editor.refLine.getGraphicsSnapOffset([

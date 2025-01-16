@@ -86,9 +86,11 @@ export class SelectMoveTool implements IBaseTool {
       this.prevBBoxPos = { x: boundingRect.x, y: boundingRect.y };
     }
 
-    this.editor.refLine.cacheGraphicsRefLines({
-      excludeItems: this.selectedItems,
-    });
+    if (this.editor.setting.get('snapToObjects')) {
+      this.editor.refLine.cacheGraphicsRefLines({
+        excludeItems: this.selectedItems,
+      });
+    }
   }
   onDrag(e: PointerEvent) {
     this.dragPoint = this.editor.getCursorXY(e);

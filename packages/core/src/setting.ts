@@ -111,6 +111,8 @@ export class Setting {
     gridSnapX: 1,
     gridSnapY: 1,
 
+    snapToObjects: true,
+
     dragBlockStep: 4, // drag handler will not happen if move distance less this value
 
     offsetX: 0, // mouse offset
