@@ -2,7 +2,7 @@ import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
 
 import { HALF_PI } from './constant';
 import { type SuikaEditor } from './editor';
-import { rotateInCanvas } from './utils';
+import { mergeIntervals, rotateInCanvas } from './utils';
 
 const getStepByZoom = (zoom: number) => {
   /**
@@ -55,6 +55,8 @@ class Ruler {
     ctx.fillRect(0, 0, viewportWidth, setting.get('rulerWidth'));
     ctx.fillRect(0, 0, setting.get('rulerWidth'), viewportHeight);
 
+    this.drawSelectArea();
+
     this.drawXRuler();
     this.drawYRuler();
 
@@ -78,6 +80,40 @@ class Ruler {
     ctx.closePath();
 
     ctx.restore();
+  }
+  private drawSelectArea() {
+    const setting = this.editor.setting;
+    const ctx = this.editor.ctx;
+    const zoom = this.editor.zoomManager.getZoom();
+    const viewport = this.editor.viewportManager.getViewport();
+
+    const bboxes = this.editor.selectedElements
+      .getItems({
+        excludeLocked: true,
+      })
+      .map((item) => item.getBbox());
+
+    ctx.fillStyle = setting.get('rulerSelectedBgColor');
+    for (const [minX, maxX] of mergeIntervals(
+      bboxes.map(({ minX, maxX }) => [minX, maxX]),
+    )) {
+      ctx.fillRect(
+        (minX - viewport.x) * zoom,
+        0,
+        (maxX - minX) * zoom,
+        setting.get('rulerWidth'),
+      );
+    }
+    for (const [minY, maxY] of mergeIntervals(
+      bboxes.map(({ minY, maxY }) => [minY, maxY]),
+    )) {
+      ctx.fillRect(
+        0,
+        (minY - viewport.y) * zoom,
+        setting.get('rulerWidth'),
+        (maxY - minY) * zoom,
+      );
+    }
   }
   private drawXRuler() {
     // 绘制刻度线和刻度值
