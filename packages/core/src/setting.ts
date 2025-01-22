@@ -97,6 +97,7 @@ export class Setting {
     rulerBgColor: '#fff',
     rulerStroke: '#e6e6e6',
     rulerMarkStroke: '#c1c1c1',
+    rulerSelectedBgColor: '#e6f5ff',
     rulerWidth: 20, // 宽度
     rulerMarkSize: 4, // 刻度高度
 
