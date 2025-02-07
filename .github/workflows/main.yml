@@ -54,5 +54,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           server: ${{ secrets.REMOTE_IP }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          local_path: './packages/suika/build/*'
+          local_path: './apps/suika/build/*'
           remote_path: ${{ secrets.DIR }}
