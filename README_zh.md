@@ -62,7 +62,7 @@ pnpm run dev
 pnpm build
 ```
 
-构建产物在目录：`packages/suika/build`.
+构建产物在目录：`apps/suika/build`.
 
 ## 编辑器内核设计
 

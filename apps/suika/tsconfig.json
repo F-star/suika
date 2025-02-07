@@ -17,11 +17,11 @@
     "jsx": "react-jsx",
     "noImplicitOverride": true,
     "paths": {
-      "@suika/common": ["../common/src"],
-      "@suika/icons": ["../icons/src"],
-      "@suika/components": ["../components/src"],
-      "@suika/geo": ["../geo/src"],
-      "@suika/core": ["../core/src"]
+      "@suika/common": ["../../packages/common/src"],
+      "@suika/icons": ["../../packages/icons/src"],
+      "@suika/components": ["../../packages/components/src"],
+      "@suika/geo": ["../../packages/geo/src"],
+      "@suika/core": ["../../packages/core/src"]
     }
   },
   "include": ["src"],

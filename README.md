@@ -56,7 +56,7 @@ pnpm run dev
 pnpm build
 ```
 
-The target output folder is `packages/suika/build`.
+The target output folder is `apps/suika/build`.
 
 ## Icon
 
