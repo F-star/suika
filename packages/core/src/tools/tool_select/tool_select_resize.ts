@@ -145,10 +145,10 @@ export class SelectResizeTool implements IBaseTool {
     originAttrs: ITransformRect,
     updatedAttrs: ITransformRect,
   ) {
-    if (
+    const isNoSizeGraphics =
       (updatedAttrs.width === 0 || updatedAttrs?.transform?.[0] === 0) &&
-      (updatedAttrs.height === 0 || updatedAttrs?.transform?.[3] === 0)
-    ) {
+      (updatedAttrs.height === 0 || updatedAttrs?.transform?.[3] === 0);
+    if (isNoSizeGraphics) {
       return false;
     }
 
@@ -218,20 +218,20 @@ export class SelectResizeTool implements IBaseTool {
     let prependedTransform: Matrix = new Matrix();
 
     const selectedElements = this.editor.selectedElements.getItems();
+    // 1. single object
     if (selectedElements.length === 1) {
+      const singleGraphics = selectedElements[0];
       // 非 resize 操作，比如修改矩形的圆角，修改直线的端点位置
-      if (!this.isResizeOp() || selectedElements[0].attrs.height === 0) {
-        this.updateSingleGraphics(selectedElements[0]);
+      if (!this.isResizeOp() || singleGraphics.attrs.height === 0) {
+        this.updateSingleGraphics(singleGraphics);
         return;
       }
 
       const originWorldTf = this.originWorldTransforms.get(
-        selectedElements[0].attrs.id,
+        singleGraphics.attrs.id,
       )!;
 
-      const originAttrs = this.originAttrsMap.get(
-        selectedElements[0].attrs.id,
-      )!;
+      const originAttrs = this.originAttrsMap.get(singleGraphics.attrs.id)!;
 
       const updatedTransformRect = resizeRect(
         this.handleName,
@@ -262,7 +262,9 @@ export class SelectResizeTool implements IBaseTool {
       );
 
       this.updateControls(selectedElements[0]);
-    } else {
+    }
+    // 2. multi objects
+    else {
       const startSelectBbox = this.startSelectBRect!;
       const startSelectedBoxTf = new Matrix().translate(
         startSelectBbox.x,
@@ -293,7 +295,7 @@ export class SelectResizeTool implements IBaseTool {
     if (this.isResizeOp()) {
       this.resizeGraphicsArray(prependedTransform.getArray());
     } else {
-      console.error('should reach here, please put a issue');
+      console.error('should not reach here, please put a issue');
     }
   }
 
