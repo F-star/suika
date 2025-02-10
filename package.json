@@ -24,7 +24,8 @@
     "components:dev": "pnpm -F @suika/components dev",
     "test": "jest",
     "prepare": "husky install",
-    "eslint:check": "eslint packages"
+    "eslint:check": "eslint packages",
+    "docs:dev": "pnpm -F @suika/docs docs:dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.1",
