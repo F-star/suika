@@ -18,3 +18,18 @@ export const getNoConflictObjectName = (
   }
   return `${objectType} ${maxNum + 1}`;
 };
+
+export const mergeIntervals = (intervals: [number, number][]) => {
+  intervals.sort(([a], [b]) => a - b);
+
+  const result: [number, number][] = [];
+  for (const [prev, next] of intervals) {
+    const cur = result.at(-1);
+    if (cur && cur[1] >= prev) {
+      cur[1] = Math.max(next, cur[1]);
+    } else {
+      result.push([prev, next]);
+    }
+  }
+  return result;
+};
