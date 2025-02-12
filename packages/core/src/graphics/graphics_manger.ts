@@ -1,5 +1,5 @@
-import { SuikaFrame, type SuikaGraphics } from './graphics';
-import { SuikaCanvas } from './graphics/canvas';
+import { SuikaFrame, type SuikaGraphics } from '.';
+import { SuikaCanvas } from './canvas';
 
 /**
  * Graphics Manager

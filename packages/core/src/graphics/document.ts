@@ -1,13 +1,13 @@
 import { EventEmitter, throttle } from '@suika/common';
 
 import { type SuikaEditor } from '../editor';
-import { GraphicsStoreManager } from '../graphics_manger';
 import { GraphicsType, type Optional } from '../type';
 import {
   type GraphicsAttrs,
   type IGraphicsOpts,
   SuikaGraphics,
 } from './graphics';
+import { GraphicsStoreManager } from './graphics_manger';
 
 type SuikaCanvasAttrs = GraphicsAttrs;
 
