@@ -662,6 +662,17 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this.setWorldTransform(newWoldTf);
   }
 
+  getProps() {
+    const size = this.getTransformedSize();
+    const pos = this.getWorldPosition();
+    return {
+      width: size.width,
+      height: size.height,
+      x: pos.x,
+      y: pos.y,
+    };
+  }
+
   getInfoPanelAttrs(): {
     label: string;
     key: string;
