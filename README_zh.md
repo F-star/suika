@@ -32,6 +32,10 @@
 
 文档目前尚不完善。
 
+## 目录结构说明
+
+[链接](https://mp.weixin.qq.com/s/f89iKL0d9cCsbso9bBh2hA)
+
 ## 环境依赖
 
 运行项目，需要安装 Node.js（建议官网 LTS 版本），然后用 Node.js 安装 PNPM 包管理器：
