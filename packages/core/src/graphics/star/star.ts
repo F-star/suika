@@ -10,21 +10,16 @@ import {
   Matrix,
 } from '@suika/geo';
 
-import { type IPaint, PaintType } from '../paint';
-import { GraphicsType, type Optional } from '../type';
+import { type IPaint, PaintType } from '../../paint';
+import { GraphicsType, type Optional } from '../../type';
 import {
-  type GraphicsAttrs,
   type IAdvancedAttrs,
   type IGraphicsOpts,
   SuikaGraphics,
-} from './graphics';
-import { type IDrawInfo } from './type';
-import { drawLayer } from './utils';
-
-interface StarAttrs extends GraphicsAttrs {
-  count: number;
-  starInnerScale: number;
-}
+} from '../graphics';
+import { type IDrawInfo } from '../type';
+import { drawLayer } from '../utils';
+import type { IStarPanelProps, StarAttrs } from './star_type';
 
 export class SuikaStar extends SuikaGraphics<StarAttrs> {
   override type = GraphicsType.Star;
@@ -188,6 +183,14 @@ export class SuikaStar extends SuikaGraphics<StarAttrs> {
         uiType: 'percent',
       },
     ];
+  }
+
+  override getProps(): IStarPanelProps {
+    return {
+      ...super.getProps(),
+      count: this.attrs.count,
+      starInnerScale: this.attrs.starInnerScale,
+    };
   }
 
   override updateAttrs(

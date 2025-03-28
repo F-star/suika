@@ -18,17 +18,10 @@ import {
 
 import { type IPaint, PaintType } from '../../paint';
 import { GraphicsType, type Optional } from '../../type';
-import {
-  type GraphicsAttrs,
-  type IGraphicsOpts,
-  SuikaGraphics,
-} from '../graphics';
+import { type IGraphicsOpts, SuikaGraphics } from '../graphics';
 import { type IDrawInfo } from '../type';
 import { drawLayer } from '../utils';
-
-export interface PathAttrs extends GraphicsAttrs {
-  pathData: IPathItem[];
-}
+import { PathAttrs } from './path_type';
 
 export class SuikaPath extends SuikaGraphics<PathAttrs> {
   override type = GraphicsType.Path;

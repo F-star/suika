@@ -28,6 +28,24 @@ interface IAttr {
   precision?: number;
 }
 
+const radToDegParser = () => {};
+const props = [
+  {
+    x: {
+      label: 'X',
+      value: 'Mixed',
+      precision: 2,
+    },
+    rotation: {
+      label: 'R',
+      inputType: 'number', // 'angleInput'
+      value: 34,
+      precision: 2,
+      parseIn: radToDegParser,
+    },
+  },
+];
+
 export const ElementsInfoCards: FC = () => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
@@ -40,11 +58,12 @@ export const ElementsInfoCards: FC = () => {
         const items = editor.selectedElements.getItems();
         // TODO: 设置顺序
         const map = new Map<string, IAttr>();
+        // 遍历选中图形，对同名属性进行合并
         for (const el of items) {
           const attrs = el.getInfoPanelAttrs();
           for (const attr of attrs) {
             if (attr.uiType === 'number') {
-              const precision = 2;
+              const precision = 2; // 数字要设置精度。
               attr.value = remainDecimal(attr.value, precision);
             }
             const label = attr.label;
@@ -105,6 +124,7 @@ export const ElementsInfoCards: FC = () => {
   return (
     <BaseCard>
       <div className="element-info-attrs-row">
+        {/* x, y */}
         {attrs.slice(0, 2).map((item) => (
           <NumAttrInput
             {...item}
@@ -115,6 +135,7 @@ export const ElementsInfoCards: FC = () => {
           />
         ))}
       </div>
+      {/* width, height */}
       <div className="element-info-attrs-row">
         {attrs.slice(2, 4).map((item) => (
           <NumAttrInput

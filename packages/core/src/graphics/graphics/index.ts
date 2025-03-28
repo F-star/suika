@@ -1,2 +1,2 @@
 export * from './graphics';
-export * from './graphics_attrs';
+export * from './graphics_type';

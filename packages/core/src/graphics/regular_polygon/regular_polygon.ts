@@ -10,20 +10,16 @@ import {
   Matrix,
 } from '@suika/geo';
 
-import { type IPaint, PaintType } from '../paint';
-import { GraphicsType, type Optional } from '../type';
+import { type IPaint, PaintType } from '../../paint';
+import { GraphicsType, type Optional } from '../../type';
 import {
-  type GraphicsAttrs,
   type IAdvancedAttrs,
   type IGraphicsOpts,
   SuikaGraphics,
-} from './graphics';
-import { type IDrawInfo } from './type';
-import { drawLayer } from './utils';
-
-interface RegularPolygonAttrs extends GraphicsAttrs {
-  count: number;
-}
+} from '../graphics';
+import { type IDrawInfo } from '../type';
+import { drawLayer } from '../utils';
+import { RegularPolygonAttrs } from './regular_polygon_type';
 
 export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
   override type = GraphicsType.RegularPolygon;
@@ -183,6 +179,13 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
         uiType: 'number',
       },
     ];
+  }
+
+  override getProps() {
+    return {
+      ...super.getProps(),
+      count: this.attrs.count,
+    };
   }
 
   override updateAttrs(

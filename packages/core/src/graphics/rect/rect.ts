@@ -8,21 +8,14 @@ import {
   roundRectToPathCmds,
 } from '@suika/geo';
 
-import { ControlHandle } from '../control_handle_manager';
-import { type IPaint, PaintType } from '../paint';
-import { GraphicsType, type Optional } from '../type';
-import { SuikaEllipse } from './ellipse';
-import {
-  type GraphicsAttrs,
-  type IGraphicsOpts,
-  SuikaGraphics,
-} from './graphics';
-import { type IDrawInfo } from './type';
-import { drawLayer } from './utils';
-
-export interface RectAttrs extends GraphicsAttrs {
-  cornerRadius?: number;
-}
+import { ControlHandle } from '../../control_handle_manager';
+import { type IPaint, PaintType } from '../../paint';
+import { GraphicsType, type Optional } from '../../type';
+import { SuikaEllipse } from '../ellipse';
+import { type IGraphicsOpts, SuikaGraphics } from '../graphics';
+import { type IDrawInfo } from '../type';
+import { drawLayer } from '../utils';
+import { RectAttrs } from './rect_type';
 
 export class SuikaRect extends SuikaGraphics<RectAttrs> {
   override type = GraphicsType.Rect;

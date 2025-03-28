@@ -1,2 +1,2 @@
 export * from './path';
-export * from './type';
+export * from './path_type';

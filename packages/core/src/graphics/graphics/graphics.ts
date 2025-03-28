@@ -56,7 +56,7 @@ import {
   type GraphicsAttrs,
   type IAdvancedAttrs,
   type IGraphicsOpts,
-} from './graphics_attrs';
+} from './graphics_type';
 
 export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   type = GraphicsType.Graph;
@@ -704,6 +704,18 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
         uiType: 'number',
       },
     ];
+  }
+
+  getProps() {
+    const size = this.getTransformedSize();
+    const pos = this.getWorldPosition();
+    return {
+      x: pos.x,
+      y: pos.y,
+      width: size.width,
+      height: size.height,
+      rotation: this.getRotate(),
+    };
   }
 
   toSVGSegment(offset?: IPoint) {
