@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  nginx-proxy:
+    image: nginx
+    depends_on:
+      - suika-workbench
+      - suika-editor
+      - suika-server
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8080:80
+  suika-workbench:
+    build:
+      context: ../workbench
+      dockerfile: ./Dockerfile
+    depends_on:
+      - suika-server
+    ports:
+      - '8001:8001'
+
+  suika-editor:
+    build:
+      context: ../suika
+      dockerfile: ./Dockerfile
+    ports:
+      - '8002:8002'
+
+  suika-server:
+    container_name: suika-server
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    depends_on:
+      - postgres-container
+    ports:
+      - '5356:5356'
+  # networks:
+  #   - common-network
+
+  postgres-container:
+    image: postgres:16.3
+    restart: always
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    # networks:
+    #   - common-network
+
+volumes:
+  postgres:
+# networks:
+#   common-network:
+#     driver: bridge

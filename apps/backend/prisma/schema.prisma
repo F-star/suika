@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  // email String  @unique
+  // phone String  @unique
+  username String @unique
+  files    File[]
+  // files File[]
+  password String
+  Team     Team[]
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  content     Bytes?
+  body        String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) // @updatedAt
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    Int
+}
+
+model Team {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  members     String[] // 团队成员
+  projects    Project[] // 一个团队有多个项目
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  teamId      String // 外键
+  team        Team     @relation(fields: [teamId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

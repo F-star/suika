@@ -1,0 +1,20 @@
+{
+  "login": "Log in",
+  "username": "Username",
+  "password": "Password",
+  "logInOrCreateAnAccount": "Log in or create an account",
+  "createNew": "Create new",
+  "createAccount": "Create account",
+  "createNewAccount": "Create new account",
+  "welcomeBack": "Welcome back",
+  "createOne": "Create one",
+  "NoAccount?": "No account?",
+  "alreadyHaveAnAccount?": "Already have an account?",
+  "action.delete": "Delete",
+  "action.rename": "Rename",
+  "form.field.name": "Name",
+  "form.field.lastModified": "Last modified",
+  "form.field.createdAt": "CreatedAt",
+  "deleteFile": "Delete file",
+  "logout": "Log out"
+}
