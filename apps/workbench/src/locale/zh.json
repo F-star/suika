@@ -1,0 +1,20 @@
+{
+  "login": "登录",
+  "username": "用户名",
+  "password": "密码",
+  "logInOrCreateAnAccount": "登录或创建账号",
+  "createNew": "创建文件",
+  "createAccount": "创建账号",
+  "createNewAccount": "创建新账号",
+  "welcomeBack": "欢迎回来",
+  "createOne": "创建账号",
+  "NoAccount?": "没有账号？",
+  "alreadyHaveAnAccount?": "已有账号？",
+  "action.delete": "删除",
+  "action.rename": "重命名",
+  "form.field.name": "文件名",
+  "form.field.lastModified": "更新时间",
+  "form.field.createdAt": "创建时间",
+  "deleteFile": "删除文件",
+  "logout": "退出登录"
+}
