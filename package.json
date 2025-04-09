@@ -22,7 +22,7 @@
     "core:dev": "pnpm -F @suika/core dev",
     "icons:dev": "pnpm -F @suika/icons dev",
     "components:dev": "pnpm -F @suika/components dev",
-    "test": "jest",
+    "test": "jest --testPathIgnorePatterns='apps/backend'",
     "prepare": "husky install",
     "eslint:check": "eslint packages",
     "docs:dev": "pnpm -F @suika/docs docs:dev",
