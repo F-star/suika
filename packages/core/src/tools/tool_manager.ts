@@ -17,6 +17,10 @@ import { PathSelectTool } from './tool_path_select/tool_path_select';
 import { PencilTool } from './tool_pencil';
 import { SelectTool } from './tool_select';
 import { type ITool, type IToolClassConstructor } from './type';
+import {
+  IMouseEvent,
+  IMousemoveEvent,
+} from '../host_event_manager/mouse_event_manager';
 
 interface Events {
   switchTool(type: string): void;
@@ -148,7 +152,8 @@ export class ToolManager {
     let startPos: IPoint = { x: 0, y: 0 };
     let startWithLeftMouse = false;
 
-    const handleDown = (e: PointerEvent) => {
+    const handleDown = (event: IMouseEvent) => {
+      const e = event.nativeEvent;
       setTimeout(() => {
         isPressing = false;
         this._isDragging = false;
@@ -170,7 +175,8 @@ export class ToolManager {
         this.currentTool.onStart(e);
       });
     };
-    const handleMove = (e: PointerEvent) => {
+    const handleMove = (event: IMousemoveEvent) => {
+      const e = event.nativeEvent;
       this.currViewportPoint = this.editor.getCursorXY(e);
       if (!this.currentTool) {
         throw new Error('未设置当前使用工具');
@@ -200,8 +206,11 @@ export class ToolManager {
         this.currentTool.onMoveExcludeDrag(e, isOutsideCanvas);
       }
     };
-    const handleUp = (e: PointerEvent) => {
+    const handleUp = (event: IMouseEvent) => {
+      const e = event.nativeEvent;
       this.enableSwitchTool = true;
+
+      debugger;
 
       if (!startWithLeftMouse) {
         return;
@@ -237,10 +246,16 @@ export class ToolManager {
     const handleCanvasDragActiveChange = (active: boolean) => {
       this.currentTool?.onCanvasDragActiveChange?.(active);
     };
-    const canvas = this.editor.canvasElement;
-    canvas.addEventListener('pointerdown', handleDown);
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
+    // const canvas = this.editor.canvasElement;
+    // canvas.addEventListener('pointerdown', handleDown);
+    // window.addEventListener('pointermove', handleMove);
+    // window.addEventListener('pointerup', handleUp);
+
+    this.editor.mouseEventManager.on('start', handleDown);
+    this.editor.mouseEventManager.on('move', handleMove);
+    this.editor.mouseEventManager.on('drag', handleMove);
+    this.editor.mouseEventManager.on('end', handleUp);
+
     this.editor.commandManager.on('change', handleCommandChange);
     this.editor.hostEventManager.on('spaceToggle', handleSpaceToggle);
     this.editor.hostEventManager.on('shiftToggle', handleShiftToggle);
@@ -249,9 +264,14 @@ export class ToolManager {
     this.editor.canvasDragger.on('activeChange', handleCanvasDragActiveChange);
 
     return () => {
-      canvas.removeEventListener('pointerdown', handleDown);
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
+      // canvas.removeEventListener('pointerdown', handleDown);
+      // window.removeEventListener('pointermove', handleMove);
+      // window.removeEventListener('pointerup', handleUp);
+      this.editor.mouseEventManager.off('start', handleDown);
+      this.editor.mouseEventManager.off('move', handleMove);
+      this.editor.mouseEventManager.off('drag', handleMove);
+      this.editor.mouseEventManager.off('end', handleUp);
+
       this.editor.commandManager.off('change', handleCommandChange);
       this.editor.hostEventManager.off('spaceToggle', handleSpaceToggle);
       this.editor.hostEventManager.off('shiftToggle', handleShiftToggle);

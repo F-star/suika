@@ -126,6 +126,8 @@ export class MouseEventManager {
     this.maxDragDistance = 0;
     const isInsideCanvas = event.target === this.editor.canvasElement;
 
+    // FIXME: 这个要在画布内释放，才能出触发，并不好，交给使用者决定是否要用到。
+    // FIXME: this.isPressing 判断写得有问题，前面已经改为 false，是个固定值了
     if (isInsideCanvas || this.isPressing) {
       this.eventEmitter.emit('end', {
         ...this.getPosAndVwPos(event),
