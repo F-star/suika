@@ -93,12 +93,50 @@ pnpm build
 
 [地址](https://www.figma.com/community/file/1224385128783567603/suika-icons)
 
-## 关于多人协同
-
-协同的前端实现逻辑位于 `@suika/suika-multiplayer` 包，该包拷贝了 `@suika/suika`（纯客户端），在其基础上加入了多人协同逻辑，比如多人光标，并调用了一些接口，如获取图纸名、当前用户信息。
+## 多人协同
 
 多人协同基于 yjs 实现，并使用了 hocuspocus 库（对 yjs 的进一步封装）。
 
-如果你要做多人协同，需要 **实现后端 Restful 接口服务**，这里该包用到的后端接口，并提供 **基于 hocuspocus 的 websocket 服务**。
+- `@suika/suika-multiplayer`：协同的编辑器前端实现逻辑，该包拷贝了 `@suika/suika`（纯客户端），在其基础上加入了多人协同逻辑，比如多人光标，并调用了一些接口，如获取图纸名、当前用户信息。
+- `@suika/workbench`：工作台项目，对图纸进行管理，以支持登录注册、创建图纸、打开图纸、删除图纸、授权等操作。
+- `@suika/backend`：如果你要做多人协同，需要 **实现后端 Restful 接口服务**，这里该包用到的后端接口，并提供 **基于 hocuspocus 的 websocket 服务**。
 
-此外要实现一个 **前端的工作台项目** 对图纸进行管理，以支持登录注册、创建图纸、打开图纸、删除图纸、授权等操作。
+### 启动后端服务
+
+首先要启动后端服务器。
+
+先安装数据库 postgres，这里建议用 Docker，然后 backend 包的根目录下创建 .env 文件，配置
+
+```
+DATABASE_URL="postgresql://用户名:密码@localhost:5432/mydb?schema=public"
+```
+
+然后进行 prisma 的迁移初始化。
+
+```sh
+pnpm run -F @suika/backend run migrate:dev
+```
+
+启动后端服务，端口为 5356。
+
+```sh
+pnpm run backend:dev
+```
+
+### 启动工作台
+
+然后是工作台的启动，端口为 5354。
+
+```sh
+pnpm run workbench:dev
+```
+
+需要注册账号并登录，拿到 token，并创建好文档，拿到文档 id。之后在图形编辑器中会使用到。
+
+### 启动编辑器
+
+```sh
+pnpm run dev-m
+```
+
+带上文档 id，打开 `http://localhost:6168/design/{id}`，在 cookies 加上拿到的 token 即可。这样就打开 id 对应的图纸了。
