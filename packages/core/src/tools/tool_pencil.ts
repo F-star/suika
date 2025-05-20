@@ -16,7 +16,7 @@ export class PencilTool implements ITool {
   static readonly hotkey = HOTKEY;
   readonly type = TYPE;
   readonly hotkey = HOTKEY;
-  cursor: ICursor = 'crosshair';
+  cursor: ICursor = 'pencil';
   commandDesc = 'draw by Pencil';
   private unbindEvent: () => void = noop;
 

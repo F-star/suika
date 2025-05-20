@@ -29,7 +29,8 @@ export type ICursor =
   | 'crosshair'
   | 'text'
   | 'pen'
-  | 'pen-close';
+  | 'pen-close'
+  | 'pencil';
 
 export class CursorManger {
   private cursor!: ICursor;
@@ -42,6 +43,7 @@ export class CursorManger {
     'pen',
     'pen-close',
     'crosshair',
+    'pencil',
   ]);
 
   constructor(private editor: SuikaEditor) {
