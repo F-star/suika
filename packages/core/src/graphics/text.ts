@@ -156,7 +156,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   getCursorIndex(point: IPoint) {
-    point = applyInverseMatrix(this.attrs.transform, point);
+    point = applyInverseMatrix(this.getWorldTransform(), point);
     const glyphs = this.getGlyphs();
 
     // binary search, find the nearest but not greater than point.x glyph index
