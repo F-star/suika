@@ -8,12 +8,12 @@ import { DrawEllipseTool } from './tool_draw_ellipse';
 import { DrawFrameTool } from './tool_draw_frame';
 import { DrawImgTool } from './tool_draw_img';
 import { DrawLineTool } from './tool_draw_line';
-import { DrawPathTool } from './tool_draw_path';
 import { DrawRectTool } from './tool_draw_rect';
 import { DrawRegularPolygonTool } from './tool_draw_regular_polygon';
 import { DrawStarTool } from './tool_draw_star';
 import { DrawTextTool } from './tool_draw_text';
 import { PathSelectTool } from './tool_path_select/tool_path_select';
+import { PenTool } from './tool_pen';
 import { PencilTool } from './tool_pencil';
 import { SelectTool } from './tool_select';
 import { type ITool, type IToolClassConstructor } from './type';
@@ -52,7 +52,7 @@ export class ToolManager {
     this.registerToolCtor(DrawTextTool);
     this.registerToolCtor(DragCanvasTool);
     this.registerToolCtor(PathSelectTool);
-    this.registerToolCtor(DrawPathTool);
+    this.registerToolCtor(PenTool);
     this.registerToolCtor(DrawRegularPolygonTool);
     this.registerToolCtor(DrawStarTool);
     this.registerToolCtor(PencilTool);
@@ -63,7 +63,7 @@ export class ToolManager {
       DrawRectTool.type,
       DrawEllipseTool.type,
       DrawImgTool.type,
-      DrawPathTool.type,
+      PenTool.type,
       PencilTool.type,
       DrawLineTool.type,
       DrawRegularPolygonTool.type,
