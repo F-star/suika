@@ -1,6 +1,7 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   commandsToStr,
+  distance,
   GeoPath,
   type IMatrixArr,
   invertMatrix,
@@ -378,6 +379,42 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     return seg;
   }
 
+  getClosestAnchor(params: { point: IPoint; tol: number }) {
+    const tf = new Matrix(...this.getWorldTransform());
+    const point = tf.applyInverse(params.point);
+
+    const pathData = this.attrs.pathData;
+
+    let minDist = Infinity;
+    let minPoint: IPoint | null = null;
+    let minSegIdx = -1;
+    let minPathIdx = -1;
+
+    for (let pathIdx = 0; pathIdx < pathData.length; pathIdx++) {
+      const pathItem = pathData[pathIdx];
+      for (let i = pathItem.segs.length - 1; i >= 0; i--) {
+        const seg = pathItem.segs[i];
+
+        const dist = distance(seg.point, point);
+        if (dist < params.tol) {
+          minDist = dist;
+          minPoint = seg.point;
+          minSegIdx = i;
+          minPathIdx = pathIdx;
+        }
+      }
+    }
+
+    return minPoint !== null
+      ? {
+          pathItemIndex: minPathIdx,
+          segIndex: minSegIdx,
+          dist: minDist,
+          point: tf.apply(minPoint),
+        }
+      : null;
+  }
+
   setSeg(pathIdx: number, segIdx: number, partialSeg: Partial<ISegment>) {
     const pathData = this.attrs.pathData;
     const pathItem = { ...pathData[pathIdx] };
@@ -473,6 +510,20 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
       return 0;
     }
     return pathItem.segs.length;
+  }
+
+  removeSeg(pathIdx: number, segIdx: number) {
+    const seg = SuikaPath.getSeg(this.attrs.pathData, pathIdx, segIdx);
+    if (!seg) {
+      throw new Error(`can not find pathIdx ${pathIdx} segIdx ${segIdx}`);
+    }
+    const pathData = cloneDeep(this.attrs.pathData);
+    if (pathData[pathIdx].segs.length === 1) {
+      pathData.splice(pathIdx, 1);
+    } else {
+      pathData[pathIdx].segs.splice(segIdx, 1);
+    }
+    this.updateAttrs({ pathData });
   }
 
   override getSVGTagHead(offset?: IPoint) {

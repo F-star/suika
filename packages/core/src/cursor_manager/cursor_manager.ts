@@ -30,6 +30,7 @@ export type ICursor =
   | 'text'
   | 'pen'
   | 'pen-close'
+  | 'pen-anchor-remove'
   | 'pencil';
 
 export class CursorManger {
@@ -42,6 +43,7 @@ export class CursorManger {
     'move-ew',
     'pen',
     'pen-close',
+    'pen-anchor-remove',
     'crosshair',
     'pencil',
   ]);

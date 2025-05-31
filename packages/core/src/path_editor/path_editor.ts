@@ -4,7 +4,7 @@ import { type ControlHandle } from '../control_handle_manager';
 import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics, type SuikaPath } from '../graphics';
 import { removeGraphicsAndRecord } from '../service/remove_service';
-import { DrawPathTool, PathSelectTool } from '../tools';
+import { PathSelectTool, PenTool } from '../tools';
 import { SelectTool } from '../tools/tool_select';
 import { SelectedControl } from './selected_control';
 import { type ISelectedIdxInfo, type SelectedIdexType } from './type';
@@ -55,10 +55,10 @@ export class PathEditor {
     this.prevToolKeys = editor.toolManager.getEnableTools();
     editor.toolManager.setEnableHotKeyTools([
       PathSelectTool.type,
-      DrawPathTool.type,
+      PenTool.type,
     ]);
     const currTool = editor.toolManager.getActiveToolName();
-    if (currTool !== PathSelectTool.type && currTool !== DrawPathTool.type) {
+    if (currTool !== PathSelectTool.type && currTool !== PenTool.type) {
       editor.toolManager.setActiveTool(PathSelectTool.type);
     }
 

@@ -99,8 +99,8 @@ export const ToolBar = () => {
       intlId: 'tool.select',
       icon: <SelectOutlined />,
     },
-    drawPath: {
-      name: 'drawPath',
+    pen: {
+      name: 'pen',
       hotkey: 'P',
       intlId: 'tool.pen',
       icon: <PenOutlined />,
