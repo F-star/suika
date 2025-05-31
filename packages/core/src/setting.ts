@@ -125,7 +125,7 @@ export class Setting {
 
     smallNudge: 1,
     bigNudge: 10,
-    moveElementsDelay: 500,
+    moveElementsDelay: 500, // ms
 
     // reference line
     refLineTolerance: 4,

@@ -21,10 +21,14 @@ export class ToolDrawPathAnchorRemove implements IBaseTool {
     const pathEditor = editor.pathEditor;
     const path = this.parentTool.path!;
 
+    const tol = editor.toSceneSize(
+      this.editor.setting.get('selectionHitPadding'),
+    );
+
     const closestAnchorInfo = path
       ? path.getClosestAnchor({
           point: editor.toolManager.getCurrPoint(),
-          tol: editor.toSceneSize(5),
+          tol,
         })
       : null;
 

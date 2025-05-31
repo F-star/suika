@@ -69,7 +69,10 @@ export class PenTool implements ITool {
           editor.render();
           snapPoint = closestAnchor.point;
           return;
-        } else if (closestAnchor.segIndex === 0) {
+        } else if (
+          closestAnchor.segIndex === 0 &&
+          closestAnchor.pathItemIndex === this.pathIdx
+        ) {
           editor.setCursor('pen-close');
           snapPoint = closestAnchor.point;
         } else {
@@ -86,10 +89,14 @@ export class PenTool implements ITool {
   }
 
   onStart(event: PointerEvent) {
+    const tol = this.editor.toSceneSize(
+      this.editor.setting.get('selectionHitPadding'),
+    );
+
     const hitAnchor = this.path
       ? this.path.getClosestAnchor({
           point: this.getCorrectedPoint(),
-          tol: this.editor.toSceneSize(5),
+          tol,
         })
       : null;
 
