@@ -31,6 +31,7 @@ export type ICursor =
   | 'pen'
   | 'pen-close'
   | 'pen-anchor-remove'
+  | 'pen-anchor-add'
   | 'pencil';
 
 export class CursorManger {
@@ -44,6 +45,7 @@ export class CursorManger {
     'pen',
     'pen-close',
     'pen-anchor-remove',
+    'pen-anchor-add',
     'crosshair',
     'pencil',
   ]);
