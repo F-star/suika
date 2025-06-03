@@ -103,29 +103,34 @@ export class GeoPath {
     return false;
   }
 
-  project(point: IPoint) {
-    let minDist = Infinity;
-    let minDistPoint: IPoint | null = null;
+  project(point: IPoint, tol = Infinity) {
+    const result = {
+      dist: tol,
+      point: { x: 0, y: 0 },
+      index: [-1, -1],
+      t: -1,
+    };
 
-    for (const { curves } of this.bezierLists) {
-      for (const bezier of curves) {
+    for (let i = 0; i < this.bezierLists.length; i++) {
+      const { curves } = this.bezierLists[i];
+      for (let j = 0; j < curves.length; j++) {
+        const bezier = curves[j];
         const projectInfo = bezier.project(point);
-        if (projectInfo.dist === 0) {
-          return {
-            dist: projectInfo.dist,
-            point: projectInfo.point,
-          };
+        if (projectInfo.dist < result.dist) {
+          result.dist = projectInfo.dist;
+          result.point = projectInfo.point;
+          result.index = [i, j];
+          result.t = projectInfo.t;
         }
-        if (projectInfo.dist < minDist) {
-          minDist = projectInfo.dist;
-          minDistPoint = projectInfo.point;
+        if (projectInfo.dist === 0) {
+          break;
         }
       }
     }
-    return {
-      dist: minDist,
-      point: minDistPoint,
-    };
+    if (result.index[0] === -1) {
+      return null;
+    }
+    return result;
   }
 
   toCommands(): IPathCommand[] {

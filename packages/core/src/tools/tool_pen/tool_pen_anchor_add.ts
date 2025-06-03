@@ -1,11 +1,11 @@
 import { cloneDeep } from '@suika/common';
 
-import { SetGraphsAttrsCmd } from '../../commands/set_elements_attrs';
+import { SetGraphsAttrsCmd } from '../../commands';
 import { type SuikaEditor } from '../../editor';
 import { type IBaseTool } from '../type';
 import { type PenTool } from './tool_pen';
 
-export class ToolDrawPathAnchorRemove implements IBaseTool {
+export class ToolDrawPathAnchorAdd implements IBaseTool {
   constructor(private editor: SuikaEditor, private parentTool: PenTool) {}
 
   onActive() {
@@ -18,21 +18,14 @@ export class ToolDrawPathAnchorRemove implements IBaseTool {
 
   onStart() {
     const editor = this.editor;
-    const pathEditor = editor.pathEditor;
     const path = this.parentTool.path!;
 
-    const tol = editor.toSceneSize(
-      this.editor.setting.get('selectionHitPadding'),
+    const projectInfo = path.project(
+      this.editor.toolManager.getCurrPoint(),
+      this.editor.toSceneSize(5),
     );
 
-    const closestAnchorInfo = path
-      ? path.getClosestAnchor({
-          point: editor.toolManager.getCurrPoint(),
-          tol,
-        })
-      : null;
-
-    if (!closestAnchorInfo) {
+    if (!projectInfo) {
       return;
     }
 
@@ -41,7 +34,11 @@ export class ToolDrawPathAnchorRemove implements IBaseTool {
       pathData: path.attrs.pathData,
     });
 
-    path.removeSeg(closestAnchorInfo.pathItemIndex, closestAnchorInfo.segIndex);
+    path.insertSeg(
+      projectInfo.pathItemIndex,
+      projectInfo.segIndex,
+      projectInfo.t,
+    );
 
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(
@@ -58,8 +55,7 @@ export class ToolDrawPathAnchorRemove implements IBaseTool {
     );
 
     editor.pathEditor.selectedControl.clear();
-
-    pathEditor.drawControlHandles();
+    editor.pathEditor.drawControlHandles();
     editor.render();
   }
 

@@ -7,6 +7,7 @@ import { type SuikaEditor } from '../../editor';
 import { SuikaEllipse, SuikaPath } from '../../graphics';
 import { PaintType } from '../../paint';
 import { type IBaseTool, type ITool } from '../type';
+import { ToolDrawPathAnchorAdd } from './tool_pen_anchor_add';
 import { ToolDrawPathAnchorAppend } from './tool_pen_anchor_append';
 import { ToolDrawPathClose } from './tool_pen_anchor_close';
 import { ToolDrawPathAnchorRemove } from './tool_pen_anchor_remove';
@@ -32,7 +33,7 @@ export class PenTool implements ITool {
       this.path = this.editor.pathEditor.getPath()!;
       this.pathIdx = this.path.attrs.pathData.length;
     }
-    this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+    this.updatePreviewHandles(this.getCorrectedPoint());
   }
   onInactive() {
     this.editor.commandManager.batchCommandEnd();
@@ -49,7 +50,6 @@ export class PenTool implements ITool {
       return;
     }
 
-    // 画布拖拽模式。。。
     if (this.editor.canvasDragger.isActive()) {
       editor.pathEditor.drawControlHandles();
     } else {
@@ -61,14 +61,15 @@ export class PenTool implements ITool {
         : null;
 
       let snapPoint: IPoint | null = null;
+
+      let noRenderPreviewCurve = false;
+
       if (closestAnchor) {
         // When alt is pressed, clicking will delete the anchor point
         if (editor.hostEventManager.isAltPressing) {
-          editor.setCursor('pen-anchor-remove');
-          editor.pathEditor.drawControlHandles();
-          editor.render();
           snapPoint = closestAnchor.point;
-          return;
+          editor.setCursor('pen-anchor-remove');
+          noRenderPreviewCurve = true;
         } else if (
           closestAnchor.segIndex === 0 &&
           closestAnchor.pathItemIndex === this.pathIdx
@@ -79,11 +80,24 @@ export class PenTool implements ITool {
           editor.setCursor('pen');
         }
       } else {
-        editor.setCursor('pen');
+        const projectInfo = this.path?.project(
+          this.editor.toolManager.getCurrPoint(),
+          this.editor.toSceneSize(5),
+        );
+
+        if (projectInfo && editor.hostEventManager.isAltPressing) {
+          snapPoint = projectInfo.point;
+
+          editor.setCursor('pen-anchor-add');
+          noRenderPreviewCurve = true;
+        } else {
+          editor.setCursor('pen');
+        }
       }
 
-      this.updateControlHandlesWithPreviewHandles(
+      this.updatePreviewHandles(
         snapPoint ?? this.getCorrectedPoint(),
+        noRenderPreviewCurve,
       );
     }
   }
@@ -105,7 +119,15 @@ export class PenTool implements ITool {
     } else if (hitAnchor && hitAnchor.segIndex === 0) {
       this.childTool = new ToolDrawPathClose(this.editor, this);
     } else {
-      this.childTool = new ToolDrawPathAnchorAppend(this.editor, this);
+      const projectInfo = this.path
+        ? this.path.project(this.editor.toolManager.getCurrPoint(), tol)
+        : null;
+
+      if (projectInfo && this.editor.hostEventManager.isAltPressing) {
+        this.childTool = new ToolDrawPathAnchorAdd(this.editor, this);
+      } else {
+        this.childTool = new ToolDrawPathAnchorAppend(this.editor, this);
+      }
     }
 
     this.childTool.onStart(event);
@@ -124,14 +146,14 @@ export class PenTool implements ITool {
   }
 
   onCommandChange() {
-    this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+    this.updatePreviewHandles(this.getCorrectedPoint());
   }
 
   onCanvasDragActiveChange(active: boolean) {
     if (active) {
       this.editor.pathEditor.drawControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+      this.updatePreviewHandles(this.getCorrectedPoint());
     }
     this.editor.render();
   }
@@ -150,12 +172,13 @@ export class PenTool implements ITool {
     if (this.editor.canvasDragger.isActive()) {
       this.editor.pathEditor.drawControlHandles();
     } else {
-      this.updateControlHandlesWithPreviewHandles(this.getCorrectedPoint());
+      this.updatePreviewHandles(this.getCorrectedPoint());
     }
     this.editor.render();
   }
 
-  private updateControlHandlesWithPreviewHandles(point: IPoint) {
+  /** update preview anchor and preview curve */
+  private updatePreviewHandles(point: IPoint, noCurve = false) {
     const previewHandles: ControlHandle[] = [];
 
     if (this.editor.pathEditor.selectedControl.getSelectedControlsSize() > 0) {
@@ -164,7 +187,7 @@ export class PenTool implements ITool {
       const lastSeg = path.getLastSeg(this.pathIdx, {
         applyTransform: true,
       });
-      if (lastSeg) {
+      if (lastSeg && !noCurve) {
         const previewCurve = new ControlHandle({
           cx: point.x,
           cy: point.y,

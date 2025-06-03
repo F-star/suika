@@ -1,4 +1,5 @@
 export * from './geo_angle';
+export * from './geo_bezier';
 export * from './geo_box';
 export * from './geo_circle';
 export * from './geo_ellipse';
