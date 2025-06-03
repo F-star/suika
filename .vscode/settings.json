@@ -21,6 +21,7 @@
     "IRGB",
     "IRGBA",
     "isequal",
+    "lerp",
     "outfile",
     "pixi",
     "segs",

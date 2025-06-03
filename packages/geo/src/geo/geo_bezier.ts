@@ -1,5 +1,5 @@
 import { type IPoint, type ISegment } from '../type';
-import { lerp, pointAdd } from './geo_point';
+import { lerp, pointAdd, pointSub } from './geo_point';
 
 export const getBezierPoint = (points: IPoint[], t: number) => {
   if (points.length === 4) {
@@ -28,7 +28,7 @@ export const getBezierPoint = (points: IPoint[], t: number) => {
   return points[0];
 };
 
-export const breakSegs = (
+export const splitBezierSegs = (
   seg1: ISegment,
   seg2: ISegment,
   t: number,
@@ -51,16 +51,16 @@ export const breakSegs = (
     {
       point: seg1.point,
       in: seg1.in,
-      out: a,
+      out: pointSub(a, seg1.point),
     },
     {
       point: f,
-      in: d,
-      out: e,
+      in: pointSub(d, f),
+      out: pointSub(e, f),
     },
     {
       point: seg2.point,
-      in: e,
+      in: pointSub(c, seg2.point),
       out: seg2.out,
     },
   ];

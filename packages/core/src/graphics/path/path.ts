@@ -15,6 +15,7 @@ import {
   pointAdd,
   resizeLine,
   resizeRect,
+  splitBezierSegs,
 } from '@suika/geo';
 
 import { type IPaint, PaintType } from '../../paint';
@@ -405,14 +406,32 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
       }
     }
 
-    return minPoint !== null
-      ? {
-          pathItemIndex: minPathIdx,
-          segIndex: minSegIdx,
-          dist: minDist,
-          point: tf.apply(minPoint),
-        }
-      : null;
+    if (!minPoint) {
+      return null;
+    }
+    return {
+      pathItemIndex: minPathIdx,
+      segIndex: minSegIdx,
+      dist: minDist,
+      point: tf.apply(minPoint),
+    };
+  }
+
+  project(point: IPoint, tol = Infinity) {
+    const geoPath = this.getGeoPath();
+    const tf = new Matrix(...this.getWorldTransform());
+    point = tf.applyInverse(point);
+    const data = geoPath.project(point, tol);
+    if (!data) {
+      return null;
+    }
+    return {
+      dist: data.dist,
+      point: tf.apply(data.point),
+      pathItemIndex: data.index[0],
+      segIndex: data.index[1],
+      t: data.t,
+    };
   }
 
   setSeg(pathIdx: number, segIdx: number, partialSeg: Partial<ISegment>) {
@@ -522,6 +541,32 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
       pathData.splice(pathIdx, 1);
     } else {
       pathData[pathIdx].segs.splice(segIdx, 1);
+    }
+    this.updateAttrs({ pathData });
+  }
+
+  insertSeg(pathIdx: number, leftSegIdx: number, t: number) {
+    // TODO: fix one segment case
+    const segCount = this.getSegCount(pathIdx);
+    const rightSegIdx = (leftSegIdx + 1) % segCount;
+    const leftSeg = this.getSeg(pathIdx, leftSegIdx);
+    if (!leftSeg) {
+      throw new Error(`can not find pathIdx ${pathIdx} segIdx ${leftSegIdx}`);
+    }
+    const rightSeg = this.getSeg(pathIdx, rightSegIdx);
+    if (!rightSeg) {
+      throw new Error(
+        `can not find pathIdx ${pathIdx} segIdx ${leftSegIdx + 1}`,
+      );
+    }
+    const newSegs = splitBezierSegs(leftSeg, rightSeg, t);
+    const pathData = cloneDeep(this.attrs.pathData);
+    const pathItem = pathData[pathIdx];
+    if (rightSegIdx === 0) {
+      pathItem.segs.splice(leftSegIdx, 1, newSegs[0], newSegs[1]);
+      pathItem.segs.splice(0, 1, newSegs[2]);
+    } else {
+      pathItem.segs.splice(leftSegIdx, 2, ...newSegs);
     }
     this.updateAttrs({ pathData });
   }
