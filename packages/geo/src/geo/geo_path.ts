@@ -1,6 +1,47 @@
 import fitCurve from 'fit-curve';
 
-import { type ISegment } from '../type';
+import { type IPathItem, type ISegment } from '../type';
+import { getBezierPoint } from './geo_bezier';
+
+export const deletePathSegAndHeal = (
+  pathItem: IPathItem,
+  targetIndex: number,
+) => {
+  const segs = pathItem.segs;
+  if (segs.length <= 1) {
+    pathItem.segs = [];
+    return pathItem;
+  }
+
+  let leftSegIndex = targetIndex - 1;
+  let rightSegIndex = targetIndex + 1;
+  if (pathItem.closed) {
+    leftSegIndex %= segs.length;
+    rightSegIndex %= segs.length;
+  }
+
+  const midSeg = segs[targetIndex];
+  const leftSeg = segs[leftSegIndex];
+  const rightSeg = segs[rightSegIndex];
+
+  const leftBezier = [leftSeg.point, leftSeg.out, midSeg.in, midSeg.point];
+  const rightBezier = [midSeg.point, midSeg.out, rightSeg.in, rightSeg.point];
+
+  const p1 = getBezierPoint(leftBezier, 0.33);
+  const p2 = getBezierPoint(leftBezier, 0.66);
+  const p3 = getBezierPoint(rightBezier, 0.33);
+  const p4 = getBezierPoint(rightBezier, 0.66);
+
+  const curves = fitCurve(
+    [leftSeg.point, p1, p2, midSeg.point, p3, p4, rightSeg.point].map(
+      ({ x, y }) => [x, y],
+    ),
+    9999,
+  );
+
+  segs.splice(targetIndex, 1);
+  // segs[]
+};
 
 export const simplePath = (segs: ISegment[], tol: number) => {
   const curves = fitCurve(

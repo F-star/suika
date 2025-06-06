@@ -531,7 +531,7 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     return pathItem.segs.length;
   }
 
-  removeSeg(pathIdx: number, segIdx: number) {
+  deleteSegAndHeal(pathIdx: number, segIdx: number) {
     const seg = SuikaPath.getSeg(this.attrs.pathData, pathIdx, segIdx);
     if (!seg) {
       throw new Error(`can not find pathIdx ${pathIdx} segIdx ${segIdx}`);
