@@ -41,7 +41,10 @@ export class ToolDrawPathAnchorRemove implements IBaseTool {
       pathData: path.attrs.pathData,
     });
 
-    path.removeSeg(closestAnchorInfo.pathItemIndex, closestAnchorInfo.segIndex);
+    path.deleteSegAndHeal(
+      closestAnchorInfo.pathItemIndex,
+      closestAnchorInfo.segIndex,
+    );
 
     editor.commandManager.pushCommand(
       new SetGraphsAttrsCmd(

@@ -1,9 +1,11 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
   commandsToStr,
+  deletePathSegAndHeal,
   distance,
   GeoPath,
   type IMatrixArr,
+  insertPathSeg,
   invertMatrix,
   type IPathItem,
   type IPoint,
@@ -15,7 +17,6 @@ import {
   pointAdd,
   resizeLine,
   resizeRect,
-  splitBezierSegs,
 } from '@suika/geo';
 
 import { type IPaint, PaintType } from '../../paint';
@@ -531,43 +532,24 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     return pathItem.segs.length;
   }
 
-  removeSeg(pathIdx: number, segIdx: number) {
-    const seg = SuikaPath.getSeg(this.attrs.pathData, pathIdx, segIdx);
-    if (!seg) {
-      throw new Error(`can not find pathIdx ${pathIdx} segIdx ${segIdx}`);
-    }
+  deleteSegAndHeal(pathIdx: number, segIdx: number) {
     const pathData = cloneDeep(this.attrs.pathData);
-    if (pathData[pathIdx].segs.length === 1) {
-      pathData.splice(pathIdx, 1);
-    } else {
-      pathData[pathIdx].segs.splice(segIdx, 1);
+    const pathItem = pathData[pathIdx];
+    if (!pathItem) {
+      throw new Error(`can not find pathIdx ${pathIdx}`);
     }
+    deletePathSegAndHeal(pathItem, segIdx);
     this.updateAttrs({ pathData });
   }
 
   insertSeg(pathIdx: number, leftSegIdx: number, t: number) {
     // TODO: fix one segment case
-    const segCount = this.getSegCount(pathIdx);
-    const rightSegIdx = (leftSegIdx + 1) % segCount;
-    const leftSeg = this.getSeg(pathIdx, leftSegIdx);
-    if (!leftSeg) {
-      throw new Error(`can not find pathIdx ${pathIdx} segIdx ${leftSegIdx}`);
-    }
-    const rightSeg = this.getSeg(pathIdx, rightSegIdx);
-    if (!rightSeg) {
-      throw new Error(
-        `can not find pathIdx ${pathIdx} segIdx ${leftSegIdx + 1}`,
-      );
-    }
-    const newSegs = splitBezierSegs(leftSeg, rightSeg, t);
     const pathData = cloneDeep(this.attrs.pathData);
     const pathItem = pathData[pathIdx];
-    if (rightSegIdx === 0) {
-      pathItem.segs.splice(leftSegIdx, 1, newSegs[0], newSegs[1]);
-      pathItem.segs.splice(0, 1, newSegs[2]);
-    } else {
-      pathItem.segs.splice(leftSegIdx, 2, ...newSegs);
+    if (!pathItem) {
+      throw new Error(`can not find pathIdx ${pathIdx}`);
     }
+    insertPathSeg(pathItem, leftSegIdx, t);
     this.updateAttrs({ pathData });
   }
 
