@@ -68,8 +68,9 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
   }
 
   override draw(drawInfo: IDrawInfo) {
+    if (this.shouldSkipDraw(drawInfo)) return;
+
     const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
-    if (!this.isVisible() || opacity === 0) return;
     this._realDraw({ ...drawInfo, opacity });
   }
 

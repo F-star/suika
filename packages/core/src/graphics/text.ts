@@ -74,8 +74,9 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   override draw(drawInfo: IDrawInfo) {
+    if (this.shouldSkipDraw(drawInfo)) return;
+
     const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
-    if (!this.isVisible() || opacity === 0) return;
     const { transform, fill, stroke, fontSize, content, fontFamily } =
       this.attrs;
     const { ctx } = drawInfo;

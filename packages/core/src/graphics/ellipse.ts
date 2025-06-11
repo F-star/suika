@@ -49,8 +49,9 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
   }
 
   override draw(drawInfo: IDrawInfo) {
+    if (this.shouldSkipDraw(drawInfo)) return;
+
     const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
-    if (!this.isVisible() || opacity === 0) return;
     const { ctx, imgManager, smooth } = drawInfo;
     const attrs = this.attrs;
     const cx = attrs.width / 2;

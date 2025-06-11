@@ -359,6 +359,10 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     return false;
   }
 
+  protected strokeAABBIntersectWithBox(box: IBox) {
+    return isBoxIntersect(box, this.getBboxWithStroke());
+  }
+
   /**
    * whether the element intersect with the box
    */
@@ -476,8 +480,22 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this.updateAttrs(rect, { finishRecomputed: true });
   }
 
+  protected shouldSkipDraw(drawInfo: IDrawInfo) {
+    if (!this.isVisible()) return true;
+    const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
+    if (opacity === 0) return true;
+
+    if (
+      drawInfo.viewportArea &&
+      !this.strokeAABBIntersectWithBox(drawInfo.viewportArea)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   draw(drawInfo: IDrawInfo) {
-    if (!this.isVisible()) return;
+    if (this.shouldSkipDraw(drawInfo)) return;
 
     const { ctx } = drawInfo;
 

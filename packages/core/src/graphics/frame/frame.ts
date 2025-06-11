@@ -205,12 +205,12 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
   }
 
   override draw(drawInfo: IDrawInfo) {
+    if (this.shouldSkipDraw(drawInfo)) return;
     const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
-    if (!this.isVisible() || opacity === 0) return;
 
     drawInfo = {
       ...drawInfo,
-      opacity: opacity,
+      opacity,
     };
 
     if (!this.isGroup()) {

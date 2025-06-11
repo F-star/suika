@@ -94,8 +94,9 @@ export class SceneGraph {
     const canvasGraphics = this.editor.doc.getCanvas();
     const smooth = zoom <= 1;
     if (canvasGraphics) {
+      const viewportArea = this.editor.viewportManager.getBbox();
       ctx.save();
-      canvasGraphics.draw({ ctx, imgManager, smooth });
+      canvasGraphics.draw({ ctx, imgManager, smooth, viewportArea });
       ctx.restore();
     }
 

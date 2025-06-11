@@ -1,3 +1,5 @@
+import { type IBox } from '@suika/geo';
+
 import { type ImgManager } from '../Img_manager';
 
 export interface IHitOptions {
@@ -11,6 +13,7 @@ export interface IDrawInfo {
   imgManager?: ImgManager;
   smooth?: boolean;
   opacity?: number;
+  viewportArea?: IBox;
 }
 
 export const GraphicsObjectSuffix = {

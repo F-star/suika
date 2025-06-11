@@ -36,6 +36,10 @@ export class SuikaCanvas extends SuikaGraphics<SuikaCanvasAttrs> {
     }
     return null;
   }
+
+  protected override shouldSkipDraw() {
+    return false;
+  }
 }
 
 export const isCanvasGraphics = (
