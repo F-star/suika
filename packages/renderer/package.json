@@ -1,0 +1,19 @@
+{
+  "name": "@suika/renderer",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/renderer.es.js",
+  "module": "dist/renderer.es.js",
+  "types": "dist/renderer.d.ts",
+  "scripts": {
+    "dev": "node ../../scripts/dev.js renderer",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "canvaskit-wasm": "^0.40.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.8"
+  }
+}
