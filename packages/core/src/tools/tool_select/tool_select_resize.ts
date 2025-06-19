@@ -217,9 +217,15 @@ export class SelectResizeTool implements IBaseTool {
 
     let prependedTransform: Matrix = new Matrix();
 
+    let flip = {
+      x: 1,
+      y: 1,
+    };
+
     const selectedElements = this.editor.selectedElements.getItems();
+    const isSingleObject = selectedElements.length === 1;
     // 1. single object
-    if (selectedElements.length === 1) {
+    if (isSingleObject) {
       const singleGraphics = selectedElements[0];
       // 非 resize 操作，比如修改矩形的圆角，修改直线的端点位置
       if (!this.isResizeOp() || singleGraphics.attrs.height === 0) {
@@ -245,7 +251,7 @@ export class SelectResizeTool implements IBaseTool {
           keepRatio: this.editor.hostEventManager.isShiftPressing,
           scaleFromCenter: this.editor.hostEventManager.isAltPressing,
           noChangeWidthAndHeight: true,
-          flip: this.editor.setting.get('flipObjectsWhileResizing'),
+          flip: false, // this.editor.setting.get('flipObjectsWhileResizing'),
         },
       );
 
@@ -283,9 +289,11 @@ export class SelectResizeTool implements IBaseTool {
           keepRatio: this.editor.hostEventManager.isShiftPressing,
           scaleFromCenter: this.editor.hostEventManager.isAltPressing,
           noChangeWidthAndHeight: true,
-          flip: this.editor.setting.get('flipObjectsWhileResizing'),
+          flip: true, // this.editor.setting.get('flipObjectsWhileResizing'),
         },
       );
+
+      flip = transformRect.flip;
 
       prependedTransform = new Matrix(...transformRect.transform).append(
         startSelectedBoxTf.clone().invert(),
@@ -293,17 +301,37 @@ export class SelectResizeTool implements IBaseTool {
     }
 
     if (this.isResizeOp()) {
-      this.resizeGraphicsArray(prependedTransform.getArray());
+      this.resizeGraphicsArray(prependedTransform.getArray(), flip);
     } else {
       console.error('should not reach here, please put a issue');
     }
   }
 
-  private resizeGraphicsArray(prependedTransform: IMatrixArr) {
+  private resizeGraphicsArray(
+    prependedTransform: IMatrixArr,
+    flip: { x: number; y: number },
+  ) {
+    console.log('flip', flip);
     const selectedItems = this.editor.selectedElements.getItems();
     for (const item of selectedItems) {
       const id = item.attrs.id;
-      const originWorldTf = this.originWorldTransforms.get(id)!;
+      let originWorldTf = this.originWorldTransforms.get(id)!;
+
+      const originAttrs = this.originAttrsMap.get(id)!;
+      const center = new Matrix(...originWorldTf).apply({
+        x: originAttrs.width / 2,
+        y: originAttrs.height / 2,
+      });
+
+      const flipTf = new Matrix()
+        .translate(-center.x, -center.y)
+        .scale(flip.x, flip.y)
+        .translate(center.x, center.y)
+        .getArray();
+
+      // 额外做一个自己翻转回来的行为
+      originWorldTf = multiplyMatrix(flipTf, originWorldTf);
+
       const newWorldTf = multiplyMatrix(prependedTransform, originWorldTf);
       const newLocalTf = multiplyMatrix(
         invertMatrix(item.getParentWorldTransform()),

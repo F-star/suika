@@ -135,7 +135,7 @@ export const resizeRect = (
     noChangeWidthAndHeight?: boolean;
     flip?: boolean;
   },
-): ITransformRect => {
+): ITransformRect & { flip: { x: number; y: number } } => {
   const resizeOp = resizeOps[type];
   if (!resizeOp) {
     throw new Error(`resize type ${type} is invalid`);
@@ -217,5 +217,9 @@ export const resizeRect = (
     width: newRect.width,
     height: newRect.height,
     transform: newRect.transform.getArray(),
+    flip: {
+      x: scaleX > 0 ? 1 : -1,
+      y: scaleY > 0 ? 1 : -1,
+    },
   };
 };
