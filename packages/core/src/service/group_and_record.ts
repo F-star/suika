@@ -11,6 +11,7 @@ import { type SuikaEditor } from '../editor';
 import { GraphicsObjectSuffix, SuikaFrame, SuikaGraphics } from '../graphics';
 import { Transaction } from '../transaction';
 import { getNoConflictObjectName, getParentIdSet } from '../utils';
+
 export const groupAndRecord = (
   graphicsArr: SuikaGraphics[],
   editor: SuikaEditor,

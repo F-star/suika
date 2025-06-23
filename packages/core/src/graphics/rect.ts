@@ -409,6 +409,20 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     }" transform="matrix(${tf.join(' ')})"${cornerRadiusStr}`;
   }
 
+  toLocalPathCmd() {
+    const attrs = this.attrs;
+    const commands = roundRectToPathCmds(
+      {
+        x: 0,
+        y: 0,
+        width: attrs.width,
+        height: attrs.height,
+      },
+      attrs.cornerRadius,
+    );
+    return commands;
+  }
+
   override getLayerIconPath() {
     const containerSize = 12;
     const padding = 0.5;

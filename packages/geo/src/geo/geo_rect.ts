@@ -8,7 +8,7 @@ import {
   type ISize,
   type ITransformRect,
 } from '../type';
-import { K } from './constant';
+import { ARC_FITTING_K } from './constant';
 import { normalizeRadian } from './geo_angle';
 import { Matrix } from './geo_matrix_class';
 import { distance } from './geo_point';
@@ -342,8 +342,8 @@ export const roundRectToPathCmds = (
   const isFullWidth = r === halfWidth;
   const isFullHeight = r === halfHeight;
 
-  const lx = r * K;
-  const ly = r * K;
+  const lx = r * ARC_FITTING_K;
+  const ly = r * ARC_FITTING_K;
 
   const commands: IPathCommand[] = [
     // left top
