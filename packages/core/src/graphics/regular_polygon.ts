@@ -5,9 +5,11 @@ import {
   getRegularPolygon,
   type IBox,
   type IMatrixArr,
+  type IPathCommand,
   type IPoint,
   isPointInConvexPolygon,
   Matrix,
+  roundPolygon,
 } from '@suika/geo';
 
 import { type IPaint, PaintType } from '../paint';
@@ -23,6 +25,7 @@ import { drawLayer } from './utils';
 
 interface RegularPolygonAttrs extends GraphicsAttrs {
   count: number;
+  cornerRadius?: number;
 }
 
 export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
@@ -113,13 +116,41 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     const draw = (layerCtx: CanvasRenderingContext2D) => {
       const points = this.getPoints();
 
-      layerCtx.beginPath();
-      layerCtx.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) {
-        const point = points[i];
-        layerCtx.lineTo(point.x, point.y);
+      let cmds: IPathCommand[] = [];
+      const cornerRadius = 50; //this.attrs.cornerRadius ?? 0;
+      if (cornerRadius > 0) {
+        cmds = roundPolygon(points, cornerRadius);
+      } else {
+        cmds = points.map((p, i) => ({
+          type: i === 0 ? 'M' : 'L',
+          points: [p],
+        }));
+        cmds.push({ type: 'Z', points: [] });
       }
-      layerCtx.closePath();
+
+      layerCtx.beginPath();
+
+      console.log(cmds);
+
+      for (const cmd of cmds) {
+        if (cmd.type === 'M') {
+          layerCtx.moveTo(cmd.points[0].x, cmd.points[0].y);
+        } else if (cmd.type === 'L') {
+          layerCtx.lineTo(cmd.points[0].x, cmd.points[0].y);
+        } else if (cmd.type === 'C') {
+          layerCtx.bezierCurveTo(
+            cmd.points[0].x,
+            cmd.points[0].y,
+            cmd.points[1].x,
+            cmd.points[1].y,
+            cmd.points[2].x,
+            cmd.points[2].y,
+          );
+        } else if (cmd.type === 'Z') {
+          layerCtx.closePath();
+        }
+      }
+      // layerCtx.closePath();
 
       for (const paint of fill ?? []) {
         if (paint.visible === false) continue;

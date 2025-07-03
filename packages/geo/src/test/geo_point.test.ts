@@ -3,13 +3,13 @@ import {
   isPointEqual,
   lerp,
   lerpNum,
-  midPoint,
   pointAdd,
+  pointMid,
 } from '../geo';
 
 test('getMidPoint', () => {
   expect(
-    midPoint(
+    pointMid(
       {
         x: 0,
         y: 0,
