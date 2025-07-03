@@ -51,8 +51,8 @@
   "showOrHide": "Show/Hide",
   "lockOrUnlock": "Lock/Unlock",
 
-  "flip.horizontal": "Flip horizontally",
-  "flip.vertical": "Flip vertically",
+  "flip.horizontal": "Flip horizontal",
+  "flip.vertical": "Flip vertical",
 
   "import.originFile": "Import local file",
   "export.originFile": "Save local copy",
