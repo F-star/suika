@@ -33,8 +33,8 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     const attrs = this.attrs;
     const cx = attrs.width / 2;
     const cy = attrs.height / 2;
-    const strokeWidth = (attrs.strokeWidth || 0) / 2;
-    padding = padding + strokeWidth;
+    const strokeWidth = this.getStrokeWidth();
+    padding = padding + strokeWidth / 2;
     const w = attrs.width / 2 + padding;
     const h = attrs.height / 2 + padding;
 

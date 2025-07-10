@@ -186,10 +186,13 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this.noCollectUpdate = true;
   }
 
-  getStrokeWidth() {
+  /** render stroke width */
+  protected getStrokeWidth() {
+    if (!this.attrs.stroke?.length) {
+      return 0;
+    }
     return this.attrs.strokeWidth ?? 0;
   }
-
   getBboxWithStroke() {
     if (this._cacheBboxWithStroke) {
       return this._cacheBboxWithStroke;
