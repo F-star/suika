@@ -196,7 +196,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     const cornerRadii = new Array(4).fill(
       Math.min(this.attrs.cornerRadius ?? 0, maxCornerRadius),
     );
-    const strokeWidth = this.attrs.strokeWidth ?? 0;
+    const strokeWidth = this.getStrokeWidth();
     const halfStrokeWidth = strokeWidth / 2;
     const rect = {
       x: 0,
