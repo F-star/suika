@@ -8,8 +8,8 @@ import {
   isPointInTransformedRect,
   type ITransformRect,
   Matrix,
-  midPoint,
   offsetRect,
+  pointMid,
   pointSub,
   rectToVertices,
 } from '@suika/geo';
@@ -154,7 +154,7 @@ export class SelectedBox {
       }
     }
 
-    const centerPt = midPoint(bottomPt, minAnglePt);
+    const centerPt = pointMid(bottomPt, minAnglePt);
     const [p1, p2] = getPerpendicularPoints(
       [bottomPt, minAnglePt],
       centerPt,

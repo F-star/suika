@@ -131,8 +131,11 @@ export const MutateGraphsAndRecord = {
     }
 
     const rectGraphics = graphicsArr.filter(
-      (el) => el.type === GraphicsType.Rect,
-    ) as SuikaRect[];
+      (el) =>
+        el.type === GraphicsType.Rect ||
+        el.type === GraphicsType.RegularPolygon ||
+        el.type === GraphicsType.Star,
+    ) as (SuikaRect | SuikaRegularPolygon | SuikaStar)[];
 
     const prevAttrs = rectGraphics.map((el) => ({
       cornerRadius: el.attrs.cornerRadius || 0,

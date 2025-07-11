@@ -33,6 +33,20 @@ export const normalizeDegree = (degree: number): number => {
   return degree;
 };
 
+/** get angle between two vectors */
+export const getAngleBetweenVec = (a: IPoint, b: IPoint) => {
+  const dot = a.x * b.x + a.y * b.y;
+  const d = Math.sqrt(a.x * a.x + a.y * a.y) * Math.sqrt(b.x * b.x + b.y * b.y);
+  let cosTheta = dot / d;
+
+  if (cosTheta > 1) {
+    cosTheta = 1;
+  } else if (cosTheta < -1) {
+    cosTheta = -1;
+  }
+  return Math.acos(cosTheta);
+};
+
 /**
  * get sweep angle from vector a to vector b
  * direction is clockwise
