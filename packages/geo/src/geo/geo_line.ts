@@ -56,3 +56,35 @@ export const getPolarTrackSnapPt = (center: IPoint, p: IPoint, count = 4) => {
   }
   return closestPt;
 };
+
+/** get intersection of two lines */
+export const getLineIntersection = (
+  p1: IPoint,
+  p2: IPoint,
+  p3: IPoint,
+  p4: IPoint,
+): IPoint | null => {
+  const { x: x1, y: y1 } = p1;
+  const { x: x2, y: y2 } = p2;
+  const { x: x3, y: y3 } = p3;
+  const { x: x4, y: y4 } = p4;
+
+  const a = y2 - y1;
+  const b = x1 - x2;
+  const c = x1 * y2 - x2 * y1;
+
+  const d = y4 - y3;
+  const e = x3 - x4;
+  const f = x3 * y4 - x4 * y3;
+
+  const denominator = a * e - b * d;
+
+  if (Math.abs(denominator) < 0.000000001) {
+    return null;
+  }
+
+  const px = (c * e - f * b) / denominator;
+  const py = (a * f - c * d) / denominator;
+
+  return { x: px, y: py };
+};

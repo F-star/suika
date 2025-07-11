@@ -5,9 +5,11 @@ import {
   getRegularPolygon,
   type IBox,
   type IMatrixArr,
+  type IPathCommand,
   type IPoint,
   isPointInConvexPolygon,
   Matrix,
+  roundPolygon,
 } from '@suika/geo';
 
 import { type IPaint, PaintType } from '../paint';
@@ -23,6 +25,7 @@ import { drawLayer } from './utils';
 
 interface RegularPolygonAttrs extends GraphicsAttrs {
   count: number;
+  cornerRadius?: number;
 }
 
 export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
@@ -111,15 +114,27 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
     }
 
     const draw = (layerCtx: CanvasRenderingContext2D) => {
-      const points = this.getPoints();
+      const cmds = this.toPathCmds();
 
       layerCtx.beginPath();
-      layerCtx.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) {
-        const point = points[i];
-        layerCtx.lineTo(point.x, point.y);
+      for (const cmd of cmds) {
+        if (cmd.type === 'M') {
+          layerCtx.moveTo(cmd.points[0].x, cmd.points[0].y);
+        } else if (cmd.type === 'L') {
+          layerCtx.lineTo(cmd.points[0].x, cmd.points[0].y);
+        } else if (cmd.type === 'C') {
+          layerCtx.bezierCurveTo(
+            cmd.points[0].x,
+            cmd.points[0].y,
+            cmd.points[1].x,
+            cmd.points[1].y,
+            cmd.points[2].x,
+            cmd.points[2].y,
+          );
+        } else if (cmd.type === 'Z') {
+          layerCtx.closePath();
+        }
       }
-      layerCtx.closePath();
 
       for (const paint of fill ?? []) {
         if (paint.visible === false) continue;
@@ -183,6 +198,14 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
         max: 60,
         uiType: 'number',
       },
+      {
+        label: 'C',
+        key: 'cornerRadius',
+        value: this.attrs.cornerRadius ?? 0,
+        min: 0,
+        max: 100,
+        uiType: 'number',
+      },
     ];
   }
 
@@ -207,11 +230,33 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
       tf[5] += offset.y;
     }
 
+    const cornerRadius = this.attrs.cornerRadius ?? 0;
+    if (cornerRadius > 0) {
+      return `<path d="${commandsToStr(
+        this.toPathCmds(),
+        10,
+      )}" transform="matrix(${tf.join(' ')})"`;
+    }
     const points = this.getPoints();
-
     return `<polygon points="${points
       .map((p) => `${p.x},${p.y}`)
       .join(' ')}" transform="matrix(${tf.join(' ')})"`;
+  }
+
+  private toPathCmds() {
+    let cmds: IPathCommand[] = [];
+    const points = this.getPoints();
+    const cornerRadius = this.attrs.cornerRadius ?? 0;
+    if (cornerRadius > 0) {
+      cmds = roundPolygon(points, cornerRadius);
+    } else {
+      cmds = points.map((p, i) => ({
+        type: i === 0 ? 'M' : 'L',
+        points: [p],
+      }));
+      cmds.push({ type: 'Z', points: [] });
+    }
+    return cmds;
   }
 
   override getLayerIconPath() {
@@ -232,15 +277,10 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
       .scale(scale, scale)
       .translate(containerSize / 2, containerSize / 2);
 
-    const points = this.getPoints().map((p) => matrix.apply(p));
-
-    return commandsToStr(
-      [
-        { type: 'M', points: [points[0]] },
-        ...points.slice(1).map((p) => ({ type: 'L', points: [p] })),
-        { type: 'Z', points: [] },
-      ],
-      precision,
-    );
+    const cmds = this.toPathCmds();
+    for (const cmd of cmds) {
+      cmd.points = cmd.points.map((p) => matrix.apply(p));
+    }
+    return commandsToStr(cmds, precision);
   }
 }

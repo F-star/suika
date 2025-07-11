@@ -38,7 +38,7 @@ export const ElementsInfoCards: FC = () => {
     if (editor) {
       const updateInfo = () => {
         const items = editor.selectedElements.getItems();
-        // TODO: 设置顺序
+        // TODO: config attr order
         const map = new Map<string, IAttr>();
         for (const el of items) {
           const attrs = el.getInfoPanelAttrs();
