@@ -7,8 +7,10 @@ interface Props {
   value: string | number;
   min?: number;
   max?: number;
-  onChange: (value: number) => void;
   classNames?: string[];
+  onChange: (value: number) => void;
+  // onIncrement?: () => void;
+  // onDecrement?: () => void;
 }
 
 export const PercentInput: FC<Props> = (props) => {

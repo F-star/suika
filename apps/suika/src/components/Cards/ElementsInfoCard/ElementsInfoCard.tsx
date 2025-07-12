@@ -72,22 +72,27 @@ export const ElementsInfoCards: FC = () => {
     }
   }, [editor, MIXED]);
 
-  const execCommand = (key: string, newVal: number) => {
+  const execCommand = (
+    key: string,
+    newVal: number,
+    isDelta: boolean = false,
+  ) => {
     if (editor) {
       const elements = editor.selectedElements.getItems();
       if (key === 'x') {
-        MutateGraphsAndRecord.setX(editor, elements, newVal);
+        MutateGraphsAndRecord.setX(editor, elements, newVal, isDelta);
       } else if (key === 'y') {
-        MutateGraphsAndRecord.setY(editor, elements, newVal);
+        MutateGraphsAndRecord.setY(editor, elements, newVal, isDelta);
       } else if (key === 'width') {
-        MutateGraphsAndRecord.setWidth(editor, elements, newVal);
+        MutateGraphsAndRecord.setWidth(editor, elements, newVal, isDelta);
       } else if (key === 'height') {
-        MutateGraphsAndRecord.setHeight(editor, elements, newVal);
+        MutateGraphsAndRecord.setHeight(editor, elements, newVal, isDelta);
       } else if (key === 'rotation') {
         MutateGraphsAndRecord.setRotation(
           editor,
           elements,
           normalizeRadian(deg2Rad(newVal)),
+          isDelta,
         );
       } else if (key === 'cornerRadius') {
         // 特定图形特有属性要做特殊处理。。。遍历图形时需要判断当前图形是否支持某个属性
@@ -112,6 +117,12 @@ export const ElementsInfoCards: FC = () => {
             onChange={(newVal) => {
               execCommand(item.key, newVal);
             }}
+            onIncrement={() => {
+              execCommand(item.key, 1, true);
+            }}
+            onDecrement={() => {
+              execCommand(item.key, -1, true);
+            }}
           />
         ))}
       </div>
@@ -123,6 +134,12 @@ export const ElementsInfoCards: FC = () => {
             onChange={(newVal) => {
               execCommand(item.key, newVal);
             }}
+            onIncrement={() => {
+              execCommand(item.key, 1, true);
+            }}
+            onDecrement={() => {
+              execCommand(item.key, -1, true);
+            }}
           />
         ))}
       </div>
@@ -133,6 +150,12 @@ export const ElementsInfoCards: FC = () => {
             key={item.key}
             onChange={(newVal) => {
               execCommand(item.key, newVal);
+            }}
+            onIncrement={() => {
+              execCommand(item.key, 1, true);
+            }}
+            onDecrement={() => {
+              execCommand(item.key, -1, true);
             }}
           />
         ))}
@@ -159,9 +182,11 @@ const NumAttrInput: FC<{
   min?: number;
   max?: number;
   value: string | number;
-  onChange: (newValue: number) => void;
   suffixValue?: string;
   uiType: string;
+  onChange: (newValue: number) => void;
+  onIncrement?: () => void;
+  onDecrement?: () => void;
 }> = (props) => {
   if (props.uiType === 'percent') {
     return (
@@ -182,6 +207,8 @@ const NumAttrInput: FC<{
         max={props.max}
         onChange={props.onChange}
         suffixValue={props.suffixValue}
+        onIncrement={props.onIncrement}
+        onDecrement={props.onDecrement}
       />
     );
   }

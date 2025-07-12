@@ -15,92 +15,11 @@ import { GraphicsType } from '../type';
  * mutate elements and record to history
  */
 export const MutateGraphsAndRecord = {
-  setX(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
-    if (graphicsArr.length === 0) {
-      return;
-    }
-
-    const transaction = new Transaction(editor);
-
-    for (const graphics of graphicsArr) {
-      transaction.recordOld(graphics.attrs.id, {
-        transform: cloneDeep(graphics.attrs.transform),
-      });
-
-      const tf = graphics.getWorldTransform();
-      tf[4] = val;
-
-      graphics.setWorldTransform(tf);
-      transaction.update(graphics.attrs.id, {
-        transform: cloneDeep(graphics.attrs.transform),
-      });
-    }
-
-    transaction.updateParentSize(graphicsArr);
-    transaction.commit('Update X of Elements');
-  },
-  setY(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
-    if (graphicsArr.length === 0) {
-      return;
-    }
-
-    const transaction = new Transaction(editor);
-
-    for (const graphics of graphicsArr) {
-      transaction.recordOld(graphics.attrs.id, {
-        transform: cloneDeep(graphics.attrs.transform),
-      });
-
-      const tf = graphics.getWorldTransform();
-      tf[5] = val;
-
-      graphics.setWorldTransform(tf);
-      transaction.update(graphics.attrs.id, {
-        transform: cloneDeep(graphics.attrs.transform),
-      });
-    }
-
-    transaction.updateParentSize(graphicsArr);
-    transaction.commit('Update Y of Elements');
-  },
-  setWidth(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
-    if (graphicsArr.length === 0) {
-      return;
-    }
-
-    const transaction = new Transaction(editor);
-    for (const graphics of graphicsArr) {
-      transaction.recordOld(graphics.attrs.id, { width: graphics.attrs.width });
-      graphics.updateAttrs({ width: val });
-      transaction.update(graphics.attrs.id, { width: graphics.attrs.width });
-    }
-
-    transaction.updateParentSize(graphicsArr);
-    // FIXME: update children
-    transaction.commit('Update Width of Elements');
-  },
-  setHeight(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
-    if (graphicsArr.length === 0) {
-      return;
-    }
-
-    const transaction = new Transaction(editor);
-    for (const graphics of graphicsArr) {
-      transaction.recordOld(graphics.attrs.id, {
-        height: graphics.attrs.height,
-      });
-      graphics.updateAttrs({ height: val });
-      transaction.update(graphics.attrs.id, { height: graphics.attrs.height });
-    }
-
-    transaction.updateParentSize(graphicsArr);
-    // FIXME: update children
-    transaction.commit('Update Height of Elements');
-  },
-  setRotation(
+  setX(
     editor: SuikaEditor,
     graphicsArr: SuikaGraphics[],
-    rotation: number,
+    val: number,
+    isDelta: boolean = false,
   ) {
     if (graphicsArr.length === 0) {
       return;
@@ -112,7 +31,114 @@ export const MutateGraphsAndRecord = {
       transaction.recordOld(graphics.attrs.id, {
         transform: cloneDeep(graphics.attrs.transform),
       });
-      graphics.setRotate(rotation);
+
+      const tf = graphics.getWorldTransform();
+      const newVal = isDelta ? tf[4] + val : val;
+      tf[4] = newVal;
+
+      graphics.setWorldTransform(tf);
+      transaction.update(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update X of Elements');
+  },
+  setY(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    val: number,
+    isDelta: boolean = false,
+  ) {
+    if (graphicsArr.length === 0) {
+      return;
+    }
+
+    const transaction = new Transaction(editor);
+
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+
+      const tf = graphics.getWorldTransform();
+      const newVal = isDelta ? tf[5] + val : val;
+      tf[5] = newVal;
+
+      graphics.setWorldTransform(tf);
+      transaction.update(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update Y of Elements');
+  },
+  setWidth(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    val: number,
+    isDelta: boolean = false,
+  ) {
+    if (graphicsArr.length === 0) {
+      return;
+    }
+
+    const transaction = new Transaction(editor);
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, { width: graphics.attrs.width });
+      const newVal = isDelta ? graphics.attrs.width + val : val;
+      graphics.updateAttrs({ width: newVal });
+      transaction.update(graphics.attrs.id, { width: graphics.attrs.width });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    // FIXME: update children
+    transaction.commit('Update Width of Elements');
+  },
+  setHeight(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    val: number,
+    isDelta: boolean = false,
+  ) {
+    if (graphicsArr.length === 0) {
+      return;
+    }
+
+    const transaction = new Transaction(editor);
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        height: graphics.attrs.height,
+      });
+      const newVal = isDelta ? graphics.attrs.height + val : val;
+      graphics.updateAttrs({ height: newVal });
+      transaction.update(graphics.attrs.id, { height: graphics.attrs.height });
+    }
+
+    transaction.updateParentSize(graphicsArr);
+    // FIXME: update children
+    transaction.commit('Update Height of Elements');
+  },
+  setRotation(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    rotation: number,
+    isDelta: boolean = false,
+  ) {
+    if (graphicsArr.length === 0) {
+      return;
+    }
+
+    const transaction = new Transaction(editor);
+
+    for (const graphics of graphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        transform: cloneDeep(graphics.attrs.transform),
+      });
+      const newVal = isDelta ? graphics.getRotate() + rotation : rotation;
+      graphics.setRotate(newVal);
       transaction.update(graphics.attrs.id, {
         transform: cloneDeep(graphics.attrs.transform),
       });
