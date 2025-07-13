@@ -15,7 +15,17 @@ import { GraphicsType } from '../type';
  * mutate elements and record to history
  */
 export const MutateGraphsAndRecord = {
-  setX(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
+  setX({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -28,7 +38,8 @@ export const MutateGraphsAndRecord = {
       });
 
       const tf = graphics.getWorldTransform();
-      tf[4] = val;
+      const newVal = isDelta ? tf[4] + val : val;
+      tf[4] = newVal;
 
       graphics.setWorldTransform(tf);
       transaction.update(graphics.attrs.id, {
@@ -39,7 +50,17 @@ export const MutateGraphsAndRecord = {
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update X of Elements');
   },
-  setY(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
+  setY({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -52,7 +73,8 @@ export const MutateGraphsAndRecord = {
       });
 
       const tf = graphics.getWorldTransform();
-      tf[5] = val;
+      const newVal = isDelta ? tf[5] + val : val;
+      tf[5] = newVal;
 
       graphics.setWorldTransform(tf);
       transaction.update(graphics.attrs.id, {
@@ -63,45 +85,97 @@ export const MutateGraphsAndRecord = {
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update Y of Elements');
   },
-  setWidth(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
+  setWidth({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
+    let updateSuccess = false;
+
     if (graphicsArr.length === 0) {
-      return;
+      return false;
     }
 
     const transaction = new Transaction(editor);
     for (const graphics of graphicsArr) {
       transaction.recordOld(graphics.attrs.id, { width: graphics.attrs.width });
-      graphics.updateAttrs({ width: val });
+      let newVal = isDelta ? graphics.attrs.width + val : val;
+      if (newVal <= 0) {
+        newVal = 0.0000001;
+      }
+      if (newVal !== graphics.attrs.width) {
+        updateSuccess = true;
+      }
+      graphics.updateAttrs({ width: newVal });
       transaction.update(graphics.attrs.id, { width: graphics.attrs.width });
     }
 
-    transaction.updateParentSize(graphicsArr);
-    // FIXME: update children
-    transaction.commit('Update Width of Elements');
-  },
-  setHeight(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
-    if (graphicsArr.length === 0) {
-      return;
+    if (updateSuccess) {
+      transaction.updateParentSize(graphicsArr);
+      // FIXME: update group children
+      transaction.commit('Update Width of Elements');
     }
+
+    return updateSuccess;
+  },
+  setHeight({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
+    if (graphicsArr.length === 0) {
+      return false;
+    }
+
+    let updateSuccess = false;
 
     const transaction = new Transaction(editor);
     for (const graphics of graphicsArr) {
       transaction.recordOld(graphics.attrs.id, {
         height: graphics.attrs.height,
       });
-      graphics.updateAttrs({ height: val });
+      let newVal = isDelta ? graphics.attrs.height + val : val;
+      if (newVal <= 0) {
+        newVal = 0;
+      }
+      if (newVal !== graphics.attrs.height) {
+        updateSuccess = true;
+      }
+      graphics.updateAttrs({ height: newVal });
       transaction.update(graphics.attrs.id, { height: graphics.attrs.height });
     }
 
-    transaction.updateParentSize(graphicsArr);
-    // FIXME: update children
-    transaction.commit('Update Height of Elements');
+    if (updateSuccess) {
+      transaction.updateParentSize(graphicsArr);
+      // FIXME: update children
+      transaction.commit('Update Height of Elements');
+    }
+
+    return updateSuccess;
   },
-  setRotation(
-    editor: SuikaEditor,
-    graphicsArr: SuikaGraphics[],
-    rotation: number,
-  ) {
+  setRotation({
+    editor,
+    graphicsArr,
+    rotation,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    rotation: number;
+    isDelta: boolean;
+  }) {
     if (graphicsArr.length === 0) {
       return;
     }
@@ -112,7 +186,8 @@ export const MutateGraphsAndRecord = {
       transaction.recordOld(graphics.attrs.id, {
         transform: cloneDeep(graphics.attrs.transform),
       });
-      graphics.setRotate(rotation);
+      const newVal = isDelta ? graphics.getRotate() + rotation : rotation;
+      graphics.setRotate(newVal);
       transaction.update(graphics.attrs.id, {
         transform: cloneDeep(graphics.attrs.transform),
       });
@@ -121,96 +196,141 @@ export const MutateGraphsAndRecord = {
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update Rotation');
   },
-  setCornerRadius(
-    editor: SuikaEditor,
-    graphicsArr: SuikaGraphics[],
-    cornerRadius: number,
-  ) {
+  setCornerRadius({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
     if (graphicsArr.length === 0) {
-      return;
+      return false;
     }
 
-    const rectGraphics = graphicsArr.filter(
+    let updateSuccess = false;
+    const matchGraphicsArr = graphicsArr.filter(
       (el) =>
         el.type === GraphicsType.Rect ||
         el.type === GraphicsType.RegularPolygon ||
         el.type === GraphicsType.Star,
     ) as (SuikaRect | SuikaRegularPolygon | SuikaStar)[];
 
-    const prevAttrs = rectGraphics.map((el) => ({
-      cornerRadius: el.attrs.cornerRadius || 0,
-    }));
-    rectGraphics.forEach((el) => {
-      el.attrs.cornerRadius = cornerRadius;
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'update Corner Radius',
-        rectGraphics,
-        { cornerRadius },
-        prevAttrs,
-      ),
-    );
+    const transaction = new Transaction(editor);
+    for (const graphics of matchGraphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        cornerRadius: graphics.attrs.cornerRadius,
+      });
+      const oldVal = graphics.attrs.cornerRadius ?? 0;
+      let newVal = isDelta ? oldVal + val : val;
+      if (newVal <= 0) {
+        newVal = 0;
+      }
+      if (newVal !== oldVal) {
+        updateSuccess = true;
+      }
+      graphics.updateAttrs({ cornerRadius: newVal });
+      transaction.update(graphics.attrs.id, {
+        cornerRadius: graphics.attrs.cornerRadius,
+      });
+    }
+    if (updateSuccess) {
+      transaction.commit('Update CornerRadius of Elements');
+    }
+    return updateSuccess;
   },
 
-  setCount(editor: SuikaEditor, elements: SuikaGraphics[], count: number) {
-    if (elements.length === 0) {
+  setCount({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
+    if (graphicsArr.length === 0) {
       return;
     }
+    let updateSuccess = false;
 
-    const rectGraphics = elements.filter(
+    const matchGraphicsArr = graphicsArr.filter(
       (el) =>
         el.type === GraphicsType.RegularPolygon ||
         el.type === GraphicsType.Star,
-    ) as SuikaRegularPolygon[];
+    ) as (SuikaRegularPolygon | SuikaStar)[];
 
-    const prevAttrs = rectGraphics.map((el) => ({
-      count: el.attrs.count,
-    }));
-    rectGraphics.forEach((el) => {
-      el.updateAttrs({
-        count,
+    const transaction = new Transaction(editor);
+    for (const graphics of matchGraphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        count: graphics.attrs.count,
       });
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'update Count',
-        rectGraphics,
-        { count: count },
-        prevAttrs,
-      ),
-    );
+      const oldVal = graphics.attrs.count ?? 0;
+      let newVal = isDelta ? oldVal + val : val;
+      if (newVal <= 0) {
+        newVal = 0;
+      }
+      if (newVal !== oldVal) {
+        updateSuccess = true;
+      }
+      graphics.updateAttrs({ count: newVal });
+      transaction.update(graphics.attrs.id, {
+        count: graphics.attrs.count,
+      });
+    }
+    if (updateSuccess) {
+      transaction.commit('Update Count of Elements');
+    }
+    return updateSuccess;
   },
 
-  setStarInnerScale(
-    editor: SuikaEditor,
-    elements: SuikaGraphics[],
-    val: number,
-  ) {
-    if (elements.length === 0) {
+  setStarInnerScale({
+    editor,
+    graphicsArr,
+    val,
+    isDelta = false,
+  }: {
+    editor: SuikaEditor;
+    graphicsArr: SuikaGraphics[];
+    val: number;
+    isDelta: boolean;
+  }) {
+    if (graphicsArr.length === 0) {
       return;
     }
 
-    const rectGraphics = elements.filter(
+    let updateSuccess = false;
+    const matchGraphicsArr = graphicsArr.filter(
       (el) => el.type === GraphicsType.Star,
     ) as SuikaStar[];
 
-    const prevAttrs = rectGraphics.map((el) => ({
-      starInnerScale: el.attrs.starInnerScale,
-    }));
-    rectGraphics.forEach((el) => {
-      el.updateAttrs({
-        starInnerScale: val,
+    const transaction = new Transaction(editor);
+    for (const graphics of matchGraphicsArr) {
+      transaction.recordOld(graphics.attrs.id, {
+        starInnerScale: graphics.attrs.starInnerScale,
       });
-    });
-    editor.commandManager.pushCommand(
-      new SetGraphsAttrsCmd(
-        'update Star InnerScale',
-        rectGraphics,
-        { count: val },
-        prevAttrs,
-      ),
-    );
+      const oldVal = graphics.attrs.starInnerScale ?? 0;
+      let newVal = isDelta ? oldVal + val : val;
+      if (newVal <= 0.001) {
+        newVal = 0.001;
+      }
+      if (newVal !== oldVal) {
+        updateSuccess = true;
+      }
+      graphics.updateAttrs({ starInnerScale: newVal });
+      transaction.update(graphics.attrs.id, {
+        starInnerScale: graphics.attrs.starInnerScale,
+      });
+    }
+    if (updateSuccess) {
+      transaction.commit('Update StarInnerScale of Elements');
+    }
+    return updateSuccess;
   },
 
   /**

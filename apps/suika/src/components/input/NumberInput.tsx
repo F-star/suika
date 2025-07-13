@@ -16,6 +16,8 @@ interface INumberInputProps {
   /** suffix string after input value, such like ° => 12.34° */
   suffixValue?: string;
   classNames?: string[];
+  onIncrement?: () => void;
+  onDecrement?: () => void;
 }
 
 const NumberInput: FC<INumberInputProps> = (props) => {
@@ -27,6 +29,8 @@ const NumberInput: FC<INumberInputProps> = (props) => {
     prefix,
     suffixValue = '',
     classNames,
+    onIncrement,
+    onDecrement,
   } = props;
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +62,15 @@ const NumberInput: FC<INumberInputProps> = (props) => {
       value={isNumberStr(String(value)) ? value + suffixValue : value}
       classNames={classNames}
       onChange={(newVal) => onChange(Number(newVal))}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          onIncrement?.();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          onDecrement?.();
+        }
+      }}
     />
   );
 };

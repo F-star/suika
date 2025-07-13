@@ -27,6 +27,10 @@ export interface GraphicsAttrs {
   lock?: boolean;
 
   parentIndex?: IParentIndex;
+
+  cornerRadius?: number;
+  count?: number;
+  starInnerScale?: number;
 }
 
 export interface IParentIndex {
