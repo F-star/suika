@@ -7,8 +7,10 @@ interface Props {
   value: string | number;
   min?: number;
   max?: number;
-  onChange: (value: number) => void;
   classNames?: string[];
+  onChange: (value: number) => void;
+  onIncrement?: () => void;
+  onDecrement?: () => void;
 }
 
 export const PercentInput: FC<Props> = (props) => {
@@ -30,6 +32,8 @@ export const PercentInput: FC<Props> = (props) => {
       onChange={onChange}
       prefix={props.prefix}
       classNames={props.classNames}
+      onIncrement={props.onIncrement}
+      onDecrement={props.onDecrement}
     />
   );
 };

@@ -6,13 +6,14 @@ import React, { type FC, useEffect, useRef } from 'react';
 interface ICustomRuleInputProps {
   parser: (newValue: string, preValue: string | number) => string | false;
   value: string | number;
-  onChange: (newValue: string) => void;
   prefix?: React.ReactNode;
   classNames?: string[];
+  onChange: (newValue: string) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const CustomRuleInput: FC<ICustomRuleInputProps> = (props) => {
-  const { value, onChange, parser, prefix } = props;
+  const { value, parser, prefix, onChange, onKeyDown } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const isActive = useRef(false);
 
@@ -39,6 +40,7 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = (props) => {
           isActive.current = true;
         }}
         onKeyDown={(e) => {
+          onKeyDown?.(e);
           if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
             e.currentTarget.blur();
           }
