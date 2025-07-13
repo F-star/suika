@@ -272,8 +272,8 @@ export const MutateGraphsAndRecord = {
       });
       const oldVal = graphics.attrs.count ?? 0;
       let newVal = isDelta ? oldVal + val : val;
-      if (newVal <= 0) {
-        newVal = 0;
+      if (newVal <= 3) {
+        newVal = 3;
       }
       if (newVal !== oldVal) {
         updateSuccess = true;
