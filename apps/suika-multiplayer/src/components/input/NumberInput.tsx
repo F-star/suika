@@ -11,20 +11,28 @@ interface INumberInputProps {
   value: string | number;
   min?: number;
   max?: number;
-  onBlur: (newValue: number) => void;
+  onChange: (newValue: number) => void;
   prefix?: React.ReactNode;
   /** suffix string after input value, such like ° => 12.34° */
   suffixValue?: string;
+  classNames?: string[];
+  onIncrement?: () => void;
+  onDecrement?: () => void;
 }
 
-const NumberInput: FC<INumberInputProps> = ({
-  value,
-  min = -Infinity,
-  max = Infinity,
-  onBlur,
-  prefix,
-  suffixValue = '',
-}) => {
+const NumberInput: FC<INumberInputProps> = (props) => {
+  const {
+    value,
+    min = -Infinity,
+    max = Infinity,
+    onChange,
+    prefix,
+    suffixValue = '',
+    classNames,
+    onIncrement,
+    onDecrement,
+  } = props;
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -52,7 +60,17 @@ const NumberInput: FC<INumberInputProps> = ({
         }
       }}
       value={isNumberStr(String(value)) ? value + suffixValue : value}
-      onBlur={(newVal) => onBlur(Number(newVal))}
+      classNames={classNames}
+      onChange={(newVal) => onChange(Number(newVal))}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          onIncrement?.();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          onDecrement?.();
+        }
+      }}
     />
   );
 };

@@ -129,6 +129,30 @@ export const StrokeCard: FC = () => {
     editor.render();
   };
 
+  const toggleVisible = (index: number) => {
+    if (!editor) return;
+
+    const newStrokes = strokes.map((paint, i) => {
+      if (i === index) {
+        return {
+          ...paint,
+          visible: !(paint.visible ?? true),
+        };
+      }
+      return paint;
+    });
+    setStrokes(newStrokes);
+
+    const selectItems = editor.selectedElements.getItems();
+    selectItems.forEach((item) => {
+      item.updateAttrs({
+        stroke: cloneDeep(newStrokes),
+      });
+    });
+    pushToHistory('Update Stroke', selectItems, newStrokes);
+    editor.render();
+  };
+
   const pushToHistory = (
     cmdDesc: string,
     selectedElements: SuikaGraphics[],
@@ -213,7 +237,7 @@ export const StrokeCard: FC = () => {
             }
             value={strokeWidth}
             min={0}
-            onBlur={updateStrokeWidth}
+            onChange={updateStrokeWidth}
           />
         </div>
       }
@@ -235,6 +259,7 @@ export const StrokeCard: FC = () => {
       }}
       onAdd={addStroke}
       onDelete={deleteStroke}
+      onToggleVisible={toggleVisible}
     />
   );
 };

@@ -38,7 +38,7 @@ export const ElementsInfoCards: FC = () => {
     if (editor) {
       const updateInfo = () => {
         const items = editor.selectedElements.getItems();
-        // TODO: 设置顺序
+        // TODO: config attr order
         const map = new Map<string, IAttr>();
         for (const el of items) {
           const attrs = el.getInfoPanelAttrs();
@@ -72,34 +72,67 @@ export const ElementsInfoCards: FC = () => {
     }
   }, [editor, MIXED]);
 
-  const execCommand = (key: string, newVal: number) => {
-    if (editor) {
-      const elements = editor.selectedElements.getItems();
-      if (key === 'x') {
-        MutateGraphsAndRecord.setX(editor, elements, newVal);
-      } else if (key === 'y') {
-        MutateGraphsAndRecord.setY(editor, elements, newVal);
-      } else if (key === 'width') {
-        MutateGraphsAndRecord.setWidth(editor, elements, newVal);
-      } else if (key === 'height') {
-        MutateGraphsAndRecord.setHeight(editor, elements, newVal);
-      } else if (key === 'rotation') {
-        MutateGraphsAndRecord.setRotation(
-          editor,
-          elements,
-          normalizeRadian(deg2Rad(newVal)),
-        );
-      } else if (key === 'cornerRadius') {
-        // 特定图形特有属性要做特殊处理。。。遍历图形时需要判断当前图形是否支持某个属性
-        MutateGraphsAndRecord.setCornerRadius(editor, elements, newVal);
-      } else if (key === 'count') {
-        /// count must to ben integer
-        MutateGraphsAndRecord.setCount(editor, elements, Math.round(newVal));
-      } else if (key === 'starInnerScale') {
-        MutateGraphsAndRecord.setStarInnerScale(editor, elements, newVal);
-      }
-      editor.render();
+  const execCommand = (
+    key: string,
+    newVal: number,
+    isDelta: boolean = false,
+  ) => {
+    if (!editor) {
+      return false;
     }
+    const elements = editor.selectedElements.getItems();
+    const params = {
+      editor,
+      graphicsArr: elements,
+      val: newVal,
+      isDelta,
+    };
+    if (key === 'x') {
+      MutateGraphsAndRecord.setX(params);
+    } else if (key === 'y') {
+      MutateGraphsAndRecord.setY(params);
+    } else if (key === 'width') {
+      MutateGraphsAndRecord.setWidth(params);
+    } else if (key === 'height') {
+      MutateGraphsAndRecord.setHeight(params);
+    } else if (key === 'rotation') {
+      MutateGraphsAndRecord.setRotation({
+        editor,
+        graphicsArr: elements,
+        rotation: normalizeRadian(deg2Rad(newVal)),
+        isDelta,
+      });
+    } else if (key === 'cornerRadius') {
+      // 特定图形特有属性要做特殊处理。。。遍历图形时需要判断当前图形是否支持某个属性
+      MutateGraphsAndRecord.setCornerRadius(params);
+    } else if (key === 'count') {
+      /// count must to be integer
+      MutateGraphsAndRecord.setCount({
+        editor,
+        graphicsArr: elements,
+        val: Math.round(newVal),
+        isDelta,
+      });
+    } else if (key === 'starInnerScale') {
+      MutateGraphsAndRecord.setStarInnerScale(params);
+    }
+    editor.render();
+  };
+
+  const getEventHandlers = (key: string) => {
+    return {
+      onChange: (newVal: number) => {
+        execCommand(key, newVal);
+      },
+      onIncrement: () => {
+        const step = key === 'starInnerScale' ? 0.01 : 1;
+        execCommand(key, step, true);
+      },
+      onDecrement: () => {
+        const step = key === 'starInnerScale' ? -0.01 : -1;
+        execCommand(key, step, true);
+      },
+    };
   };
 
   return (
@@ -109,9 +142,7 @@ export const ElementsInfoCards: FC = () => {
           <NumAttrInput
             {...item}
             key={item.key}
-            onBlur={(newVal) => {
-              execCommand(item.key, newVal);
-            }}
+            {...getEventHandlers(item.key)}
           />
         ))}
       </div>
@@ -120,9 +151,7 @@ export const ElementsInfoCards: FC = () => {
           <NumAttrInput
             {...item}
             key={item.key}
-            onBlur={(newVal) => {
-              execCommand(item.key, newVal);
-            }}
+            {...getEventHandlers(item.key)}
           />
         ))}
       </div>
@@ -131,9 +160,7 @@ export const ElementsInfoCards: FC = () => {
           <NumAttrInput
             {...item}
             key={item.key}
-            onBlur={(newVal) => {
-              execCommand(item.key, newVal);
-            }}
+            {...getEventHandlers(item.key)}
           />
         ))}
       </div>
@@ -143,9 +170,7 @@ export const ElementsInfoCards: FC = () => {
             <NumAttrInput
               {...item}
               key={item.key}
-              onBlur={(newVal) => {
-                execCommand(item.key, newVal);
-              }}
+              {...getEventHandlers(item.key)}
             />
           ))}
         </div>
@@ -159,9 +184,11 @@ const NumAttrInput: FC<{
   min?: number;
   max?: number;
   value: string | number;
-  onBlur: (newValue: number) => void;
   suffixValue?: string;
   uiType: string;
+  onChange: (newValue: number) => void;
+  onIncrement?: () => void;
+  onDecrement?: () => void;
 }> = (props) => {
   if (props.uiType === 'percent') {
     return (
@@ -170,7 +197,9 @@ const NumAttrInput: FC<{
         value={props.value}
         min={props.min}
         max={props.max}
-        onBlur={props.onBlur}
+        onChange={props.onChange}
+        onIncrement={props.onIncrement}
+        onDecrement={props.onDecrement}
       />
     );
   } else {
@@ -180,8 +209,10 @@ const NumAttrInput: FC<{
         value={props.value}
         min={props.min}
         max={props.max}
-        onBlur={props.onBlur}
+        onChange={props.onChange}
         suffixValue={props.suffixValue}
+        onIncrement={props.onIncrement}
+        onDecrement={props.onDecrement}
       />
     );
   }

@@ -14,11 +14,17 @@ import {
   type PaintSolid,
   PaintType,
 } from '@suika/core';
-import { AddOutlined, RemoveOutlined } from '@suika/icons';
+import {
+  AddOutlined,
+  HideOutlined,
+  RemoveOutlined,
+  ShowOutlined,
+} from '@suika/icons';
 import { type FC, useState } from 'react';
 
 import { PaintPicker } from '../../ColorPicker/PaintPicker';
 import { ColorHexInput } from '../../input/ColorHexInput';
+import { PercentInput } from '../../input/PercentInput';
 import { BaseCard } from '../BaseCard';
 
 const isNearWhite = (rgba: IRGBA, threshold = 85) => {
@@ -38,6 +44,7 @@ interface IProps {
 
   onDelete: (index: number) => void;
   onAdd: () => void;
+  onToggleVisible: (index: number) => void;
 
   appendedContent?: React.ReactNode;
 }
@@ -50,6 +57,7 @@ export const PaintCard: FC<IProps> = ({
 
   onDelete,
   onAdd,
+  onToggleVisible,
 
   appendedContent,
 }) => {
@@ -112,40 +120,75 @@ export const PaintCard: FC<IProps> = ({
             if (paint.type === PaintType.Solid) {
               return (
                 <div className="fill-item" key={index}>
-                  <ColorHexInput
-                    prefix={
-                      <div
-                        className="color-block"
-                        style={{
-                          backgroundColor: parseRGBAStr(paint.attrs),
-                          boxShadow: isNearWhite(paint.attrs)
-                            ? '0 0 0 1px rgba(0,0,0,0.1) inset'
-                            : undefined,
-                        }}
-                        onMouseDown={() => {
-                          setActiveIndex(index);
-                        }}
-                      />
-                    }
-                    value={parseRGBToHex(paint.attrs)}
-                    onBlur={(newHex) => {
-                      const rgb = parseHexToRGB(newHex);
-
-                      if (rgb) {
-                        const newSolidPaint: PaintSolid = {
-                          type: PaintType.Solid,
-                          attrs: {
-                            ...rgb,
-                            a: paint.attrs.a,
-                          },
-                        };
-                        onChangeComplete(newSolidPaint, index);
+                  <div className="fill-item-left">
+                    <ColorHexInput
+                      prefix={
+                        <div
+                          className="color-block"
+                          style={{
+                            backgroundColor: parseRGBAStr(paint.attrs),
+                            boxShadow: isNearWhite(paint.attrs)
+                              ? '0 0 0 1px rgba(0,0,0,0.1) inset'
+                              : undefined,
+                          }}
+                          onMouseDown={() => {
+                            setActiveIndex(index);
+                          }}
+                        />
                       }
-                    }}
-                  />
-                  <IconButton onClick={() => onDelete(index)}>
-                    <RemoveOutlined />
-                  </IconButton>
+                      value={parseRGBToHex(paint.attrs)}
+                      classNames={[paint.visible === false ? 'disabled' : '']}
+                      onChange={(newHex) => {
+                        const rgb = parseHexToRGB(newHex);
+
+                        if (rgb) {
+                          const newSolidPaint: PaintSolid = {
+                            type: PaintType.Solid,
+                            attrs: {
+                              ...rgb,
+                              a: paint.attrs.a,
+                            },
+                            visible: true,
+                          };
+                          onChangeComplete(newSolidPaint, index);
+                        }
+                      }}
+                    />
+                    {/* alpha input */}
+                    <PercentInput
+                      classNames={[
+                        'paint-card-alpha-input',
+                        paint.visible === false ? 'disabled' : '',
+                      ]}
+                      value={paint.attrs.a}
+                      min={0}
+                      max={1}
+                      onChange={(val) => {
+                        onChangeComplete(
+                          {
+                            ...paint,
+                            attrs: {
+                              ...paint.attrs,
+                              a: val,
+                            },
+                          },
+                          index,
+                        );
+                      }}
+                    />
+                  </div>
+                  <div className="suika-paint-card-actions">
+                    <IconButton onClick={() => onToggleVisible(index)}>
+                      {paint.visible === false ? (
+                        <HideOutlined />
+                      ) : (
+                        <ShowOutlined />
+                      )}
+                    </IconButton>
+                    <IconButton onClick={() => onDelete(index)}>
+                      <RemoveOutlined />
+                    </IconButton>
+                  </div>
                 </div>
               );
             }
