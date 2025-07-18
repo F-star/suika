@@ -147,7 +147,7 @@ export class SuikaEditor {
 
     const canvas = new SuikaCanvas(
       {
-        objectName: 'Canvas',
+        objectName: 'Page 1',
         width: 0,
         height: 0,
       },
@@ -186,7 +186,7 @@ export class SuikaEditor {
     if (!this.doc.getCurrCanvas()) {
       const canvas = new SuikaCanvas(
         {
-          objectName: 'Canvas',
+          objectName: 'Page 1',
           width: 0,
           height: 0,
         },

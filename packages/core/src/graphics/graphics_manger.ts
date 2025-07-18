@@ -45,6 +45,21 @@ export class GraphicsStoreManager {
     return canvas[0];
   }
 
+  getCanvasItemsData() {
+    const canvasItems = Array.from(this.canvasStore.values());
+
+    canvasItems.sort((a, b) => {
+      const aIndex = a.attrs.parentIndex?.position ?? '';
+      const bIndex = b.attrs.parentIndex?.position ?? '';
+      return aIndex < bIndex ? -1 : 1;
+    });
+
+    return canvasItems.map((canvas) => ({
+      id: canvas.attrs.id,
+      name: canvas.attrs.objectName,
+    }));
+  }
+
   getFrames() {
     const frames = Array.from(this.frameStore.values());
     return frames;
