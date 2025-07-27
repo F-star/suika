@@ -9,25 +9,13 @@ type IBezierPoints = [IPoint, IPoint, IPoint, IPoint];
  */
 export class GeoBezier {
   private points: IBezierPoints;
-  private dpoints: IPoint[] = []; // control points of derivative
+  private dpoints: IPoint[][] = []; // control points of derivative
   private _bbox: IBox | null = null;
   private lut: { t: number; pt: IPoint }[] = []; // lookup table
 
   constructor(points: IBezierPoints) {
     this.points = points;
-
-    this.dpoints[0] = {
-      x: 3 * (points[1].x - points[0].x),
-      y: 3 * (points[1].y - points[0].y),
-    };
-    this.dpoints[1] = {
-      x: 3 * (points[2].x - points[1].x),
-      y: 3 * (points[2].y - points[1].y),
-    };
-    this.dpoints[2] = {
-      x: 3 * (points[3].x - points[2].x),
-      y: 3 * (points[3].y - points[2].y),
-    };
+    this.dpoints = derive(points);
   }
 
   compute(t: number) {
@@ -50,8 +38,10 @@ export class GeoBezier {
   extrema() {
     const dpoints = this.dpoints;
     const extrema = [
-      ...getRoot(dpoints[0].x, dpoints[1].x, dpoints[2].x),
-      ...getRoot(dpoints[0].y, dpoints[1].y, dpoints[2].y),
+      ...getRoot(dpoints[0].map((p) => p.x)),
+      ...getRoot(dpoints[1].map((p) => p.x)),
+      ...getRoot(dpoints[0].map((p) => p.y)),
+      ...getRoot(dpoints[1].map((p) => p.y)),
     ].filter((t) => t >= 0 && t <= 1);
     return Array.from(new Set(extrema));
   }
@@ -198,31 +188,53 @@ export class GeoBezier {
   }
 }
 
-const getRoot = (a: number, b: number, c: number) => {
-  // denominator
-  const d = a - 2 * b + c;
+const getRoot = (nums: number[]) => {
+  const [a, b, c] = nums;
+  if (nums.length === 3) {
+    // denominator
+    const d = a - 2 * b + c;
 
-  if (d !== 0) {
-    // quadratic equation
-    const deltaSquare = b * b - a * c;
-    if (deltaSquare < 0) {
-      // no real roots
-      return [];
+    if (d !== 0) {
+      // quadratic equation
+      const deltaSquare = b * b - a * c;
+      if (deltaSquare < 0) {
+        // no real roots
+        return [];
+      }
+      const delta = Math.sqrt(deltaSquare);
+      const m = a - b;
+      if (delta === 0) {
+        // one real root
+        return [(m - delta) / d];
+      } else {
+        // two distinct roots
+        return [(m - delta) / d, (m + delta) / d];
+      }
+    } else if (a !== b) {
+      // linear equation
+      return [a / (a - b) / 2];
     }
-    const delta = Math.sqrt(deltaSquare);
-    const m = a - b;
-    if (delta === 0) {
-      // one real root
-      return [(m - delta) / d];
-    } else {
-      // two distinct roots
-      return [(m - delta) / d, (m + delta) / d];
+  } else if (nums.length === 2) {
+    if (a !== b) {
+      return [a / (a - b)];
     }
-  } else if (a !== b) {
-    // linear equation
-    return [a / (a - b) / 2];
-  } else {
-    // no equation
-    return [];
   }
+  return [];
+};
+
+const derive = (points: IPoint[]) => {
+  const dpoints = [];
+  for (let p = points, len = p.length, c = len - 1; len > 1; len--, c--) {
+    const list = [];
+    for (let i = 0, dpt; i < c; i++) {
+      dpt = {
+        x: c * (p[i + 1].x - p[i].x),
+        y: c * (p[i + 1].y - p[i].y),
+      };
+      list.push(dpt);
+    }
+    dpoints.push(list);
+    p = list;
+  }
+  return dpoints;
 };
