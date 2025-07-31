@@ -15,10 +15,13 @@ export class SuikaCanvas extends SuikaGraphics<SuikaCanvasAttrs> {
   protected override isContainer = true;
 
   constructor(
-    attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>,
+    attrs: Optional<
+      Omit<SuikaCanvasAttrs, 'width' | 'height'>,
+      'id' | 'transform'
+    >,
     opts: IGraphicsOpts,
   ) {
-    super({ ...attrs, type: GraphicsType.Canvas }, opts);
+    super({ ...attrs, width: 0, height: 0, type: GraphicsType.Canvas }, opts);
   }
 
   override getWorldTransform() {

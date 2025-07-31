@@ -83,7 +83,7 @@ export class TextEditor {
       this.textGraphics = textGraphics;
 
       this.editor.sceneGraph.addItems([textGraphics]);
-      this.editor.doc.getCurrCanvas().insertChild(textGraphics);
+      this.editor.doc.getCurrentCanvas().insertChild(textGraphics);
     }
     this.textGraphics = textGraphics!;
     this.editor.selectedElements.setItems([textGraphics!]);

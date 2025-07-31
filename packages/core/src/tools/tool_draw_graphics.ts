@@ -276,7 +276,7 @@ export abstract class DrawGraphicsTool implements ITool {
     if (this.drawingGraphics) {
       this.updateGraphics(rect);
     } else {
-      const currentCanvas = this.editor.doc.getCurrCanvas();
+      const currentCanvas = this.editor.doc.getCurrentCanvas();
       const frame = getDeepFrameAtPoint(
         this.startPoint,
         currentCanvas.getChildren(),
@@ -328,7 +328,7 @@ export abstract class DrawGraphicsTool implements ITool {
       const width = this.editor.setting.get('drawGraphDefaultWidth');
       const height = this.editor.setting.get('drawGraphDefaultHeight');
 
-      const currentCanvas = this.editor.doc.getCurrCanvas();
+      const currentCanvas = this.editor.doc.getCurrentCanvas();
       const frame = getDeepFrameAtPoint(
         this.startPoint,
         currentCanvas.getChildren(),

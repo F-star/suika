@@ -38,7 +38,7 @@ export class PencilTool implements ITool {
     this.path = new SuikaPath(
       {
         objectName: getNoConflictObjectName(
-          this.editor.doc.getCurrCanvas(),
+          this.editor.doc.getCurrentCanvas(),
           GraphicsObjectSuffix.Path,
         ),
         width: 0,
@@ -76,7 +76,7 @@ export class PencilTool implements ITool {
 
     if (this.isFirstDrag) {
       this.editor.sceneGraph.addItems([path]);
-      this.editor.doc.getCurrCanvas().insertChild(path);
+      this.editor.doc.getCurrentCanvas().insertChild(path);
       this.isFirstDrag = false;
     }
     this.editor.render();

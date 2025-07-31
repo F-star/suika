@@ -110,7 +110,7 @@ export class ClipboardManager {
         },
       );
       editor.sceneGraph.addItems([rectGraphics]);
-      editor.doc.getCanvas().insertChild(rectGraphics);
+      editor.doc.getCurrentCanvas().insertChild(rectGraphics);
       editor.render();
     }
   }
@@ -211,7 +211,7 @@ export class ClipboardManager {
     const firstGraphics =
       SuikaGraphics.sortGraphics(this.editor.selectedElements.getItems()).at(
         -1,
-      ) ?? this.editor.doc.getCurrCanvas();
+      ) ?? this.editor.doc.getCurrentCanvas();
     let parent = firstGraphics;
 
     if (isCanvasGraphics(firstGraphics) || isFrameGraphics(firstGraphics)) {

@@ -1,5 +1,6 @@
 export * from './align_and_record';
 export * from './arrange_and_record';
+export * from './canvas_service';
 export * from './export_service';
 export * from './flip_and_record';
 export * from './group_and_record';

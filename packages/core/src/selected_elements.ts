@@ -159,7 +159,7 @@ export class SelectedElements {
     // 如果是，将父节点下的子节点全部选中
     // 如果不是，不做任何操作。
     const parent =
-      this.items[0]?.getParent?.() ?? this.editor.doc.getCurrCanvas();
+      this.items[0]?.getParent?.() ?? this.editor.doc.getCurrentCanvas();
 
     for (let i = 1; i < this.items.length; i++) {
       if (parent !== this.items[i].getParent()) {

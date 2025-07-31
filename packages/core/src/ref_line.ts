@@ -68,7 +68,7 @@ export class RefLine {
     const viewportBbox = this.editor.viewportManager.getBbox();
 
     const refGraphicsSet = new Set<SuikaGraphics>();
-    this.editor.doc.getCurrCanvas().forEachVisibleChildNode((graphics) => {
+    this.editor.doc.getCurrentCanvas().forEachVisibleChildNode((graphics) => {
       if (
         isCanvasGraphics(graphics) ||
         (isFrameGraphics(graphics) && graphics.isGroup())

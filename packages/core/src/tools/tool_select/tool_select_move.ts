@@ -69,7 +69,7 @@ export class SelectMoveTool implements IBaseTool {
       this.originParentIndexMap.set(id, cloneDeep(item.attrs.parentIndex!));
     }
 
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     this.prevParent =
       getDeepFrameAtPoint(
         this.startPoint,
@@ -149,7 +149,7 @@ export class SelectMoveTool implements IBaseTool {
     const targetPoints = RefLine.getGraphicsTargetPoints(record);
     const offset = this.editor.refLine.getGraphicsSnapOffset(targetPoints);
 
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     const newParent =
       getDeepFrameAtPoint(currPoint, canvasGraphics.getChildren(), (node) =>
         this.selectedFrameIdSet.has(node.attrs.id),

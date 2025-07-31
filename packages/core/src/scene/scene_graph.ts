@@ -91,7 +91,7 @@ export class SceneGraph {
 
     const imgManager = this.editor.imgManager;
 
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     const smooth = zoom <= 1;
     if (canvasGraphics) {
       const viewportArea = this.editor.viewportManager.getBbox();
@@ -242,7 +242,7 @@ export class SceneGraph {
    * get tree data with simple info (for layer panel)
    */
   toObjects() {
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     if (!canvasGraphics) {
       return [];
     }
@@ -277,7 +277,7 @@ export class SceneGraph {
   }
 
   initGraphicsTree(graphicsArr: SuikaGraphics[]) {
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     for (const graphics of graphicsArr) {
       if (graphics instanceof SuikaCanvas) {
         continue;

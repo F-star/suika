@@ -147,15 +147,15 @@ export class SuikaEditor {
 
     const canvas = new SuikaCanvas(
       {
-        objectName: 'Canvas',
-        width: 0,
-        height: 0,
+        objectName: 'Page 1',
       },
       {
         doc: this.doc,
       },
     );
     this.sceneGraph.addItems([canvas]);
+    this.doc.insertChild(canvas);
+    this.doc.setCurrentCanvas(canvas.attrs.id);
 
     this.viewportManager.setViewport({
       x: -options.width / 2,
@@ -183,18 +183,18 @@ export class SuikaEditor {
     this.commandManager.clearRecords();
     this.paperId = data.paperId ?? genUuid();
 
-    if (!this.doc.getCurrCanvas()) {
+    if (!this.doc.getCurrentCanvas()) {
       const canvas = new SuikaCanvas(
         {
-          objectName: 'Canvas',
-          width: 0,
-          height: 0,
+          objectName: 'Page 1',
         },
         {
           doc: this.doc,
         },
       );
       this.sceneGraph.addItems([canvas]);
+      this.doc.insertChild(canvas);
+      this.doc.setCurrentCanvas(canvas.attrs.id);
     }
 
     this.zoomManager.zoomToFit(1);
@@ -259,7 +259,7 @@ export class SuikaEditor {
   }
 
   getCanvasBbox() {
-    const canvasGraphics = this.doc.getCurrCanvas();
+    const canvasGraphics = this.doc.getCurrentCanvas();
     const children = canvasGraphics
       .getChildren()
       .filter((item) => item.isVisible());

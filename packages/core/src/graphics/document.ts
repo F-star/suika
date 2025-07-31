@@ -2,6 +2,7 @@ import { EventEmitter, throttle } from '@suika/common';
 
 import { type SuikaEditor } from '../editor';
 import { GraphicsType, type Optional } from '../type';
+import { SuikaCanvas } from './canvas';
 import {
   type GraphicsAttrs,
   type IGraphicsOpts,
@@ -20,6 +21,7 @@ interface Events {
     },
     source: string,
   ): void;
+  currentCanvasChange(canvasId: string): void;
 }
 
 export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
@@ -36,6 +38,7 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   };
 
   private editor!: SuikaEditor;
+  private currentCanvasId: string = '';
 
   constructor(attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>) {
     super({ ...attrs, type: GraphicsType.Document }, {} as IGraphicsOpts);
@@ -48,10 +51,6 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   clear() {
     // TODO: update doc.updateInfo
     this.graphicsStoreManager.clear();
-  }
-
-  getCanvas() {
-    return this.graphicsStoreManager.getCanvas();
   }
 
   getGraphicsById(id: string) {
@@ -75,8 +74,29 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
     return this.graphicsStoreManager.getAll();
   }
 
-  getCurrCanvas() {
-    return this.graphicsStoreManager.getCanvas();
+  // createNewCanvas() {
+  //   const canvas = new SuikaCanvas(
+  //     {
+  //       objectName: '',
+  //     },
+  //     {
+  //       doc: this,
+  //     },
+  //   );
+  //   return canvas;
+  // }
+
+  getCurrentCanvas() {
+    const canvasItems = this.graphicsStoreManager.getCanvasItems();
+    return canvasItems.find(
+      (canvas) => canvas.attrs.id === this.currentCanvasId,
+    )!;
+  }
+
+  setCurrentCanvas(canvasId: string) {
+    this.currentCanvasId = canvasId;
+    this.emitter.emit('currentCanvasChange', canvasId);
+    // 基于新的 canvas 再渲染。
   }
 
   addGraphics(graphics: SuikaGraphics) {

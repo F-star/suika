@@ -2,7 +2,7 @@ import { type IBox, type IPoint, type ITransformRect } from '../type';
 import { applyMatrix } from './geo_matrix';
 import { rectToVertices } from './geo_rect';
 
-export const isPointInBox = (box: IBox, point: IPoint, tol = 0) => {
+export const isPointInBox = (box: IBox, point: IPoint, tol = 0.00000001) => {
   return (
     point.x >= box.minX - tol &&
     point.y >= box.minY - tol &&
