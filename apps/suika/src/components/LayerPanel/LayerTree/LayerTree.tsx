@@ -25,7 +25,7 @@ export const LayerTree: FC<IProps> = ({
   zoomGraphicsToFit,
 }) => {
   return (
-    <div>
+    <div className="suika-layer-tree">
       {[...treeData].reverse().map((item) => (
         <LayerItem
           type={item.type}

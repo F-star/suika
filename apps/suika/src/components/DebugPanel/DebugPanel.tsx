@@ -25,17 +25,17 @@ export const DebugPanel: FC = () => {
       setZoom(val);
     };
 
-    setZoom(editor.zoomManager.getZoom());
+    setZoom(editor.viewportManager.getZoom());
 
     editor.selectedBox.on('hoverChange', handleSelectedBoxHover);
     editor.selectedElements.on('hoverItemChange', handleHoverItemChange);
     editor.mouseEventManager.on('cursorPosUpdate', setCursorPos);
-    editor.zoomManager.on('zoomChange', updateZoom);
+    editor.viewportManager.on('zoomChange', updateZoom);
 
     return () => {
       editor.selectedBox.off('hoverChange', handleSelectedBoxHover);
       editor.selectedElements.off('hoverItemChange', handleHoverItemChange);
-      editor.zoomManager.off('zoomChange', updateZoom);
+      editor.viewportManager.off('zoomChange', updateZoom);
     };
   }, [editor]);
 

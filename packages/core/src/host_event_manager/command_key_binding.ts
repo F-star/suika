@@ -108,7 +108,7 @@ export class CommandKeyBinding {
     /*************** Zoom **************/
     // zoom to fit
     const zoomToFitAction = () => {
-      editor.zoomManager.zoomToFit();
+      editor.viewportManager.zoomToFit();
       editor.render();
     };
     editor.keybindingManager.register({
@@ -119,7 +119,7 @@ export class CommandKeyBinding {
 
     // zoom to selection
     const zoomToSelectionAction = () => {
-      editor.zoomManager.zoomToSelection();
+      editor.viewportManager.zoomToSelection();
       editor.render();
     };
     editor.keybindingManager.register({
@@ -130,7 +130,7 @@ export class CommandKeyBinding {
 
     // zoom in
     const zoomInAction = () => {
-      editor.zoomManager.zoomIn({ isLevelZoom: true });
+      editor.viewportManager.zoomIn({ isLevelZoom: true });
       editor.render();
     };
     editor.keybindingManager.register({
@@ -142,7 +142,7 @@ export class CommandKeyBinding {
 
     // zoom out
     const zoomOutAction = () => {
-      editor.zoomManager.zoomOut({ isLevelZoom: true });
+      editor.viewportManager.zoomOut({ isLevelZoom: true });
       editor.render();
     };
     editor.keybindingManager.register({
@@ -154,7 +154,7 @@ export class CommandKeyBinding {
 
     // zoom to 100%
     const zoomTo100 = () => {
-      editor.zoomManager.setZoomAndUpdateViewport(1);
+      editor.viewportManager.setZoomAndUpdateViewport(1);
       editor.render();
     };
     editor.keybindingManager.register({

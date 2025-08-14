@@ -1,9 +1,4 @@
-import {
-  EventEmitter,
-  genUuid,
-  sceneCoordsToViewportUtil,
-  viewportCoordsToSceneUtil,
-} from '@suika/common';
+import { EventEmitter, genUuid } from '@suika/common';
 import { mergeBoxes } from '@suika/geo';
 
 import { CanvasDragger } from './canvas_dragger';
@@ -11,8 +6,7 @@ import { ClipboardManager } from './clipboard';
 import { CommandManager } from './commands/command_manager';
 import { ControlHandleManager } from './control_handle_manager';
 import { CursorManger, type ICursor } from './cursor_manager';
-import { type GraphicsAttrs } from './graphics';
-import { SuikaCanvas } from './graphics/canvas';
+import { type GraphicsAttrs, SuikaCanvas } from './graphics';
 import { SuikaDocument } from './graphics/document';
 import { HostEventManager, MouseEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
@@ -20,7 +14,7 @@ import { KeyBindingManager } from './key_binding_manager';
 import { PathEditor } from './path_editor';
 import { PerfMonitor } from './perf_monitor';
 import { RefLine } from './ref_line';
-import Ruler from './ruler';
+import { Ruler } from './ruler';
 import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
 import { SelectedElements } from './selected_elements';
@@ -29,7 +23,6 @@ import { TextEditor } from './text/text_editor';
 import { ToolManager } from './tools';
 import { type IChanges, type IEditorPaperData } from './type';
 import { ViewportManager } from './viewport_manager';
-import { ZoomManager } from './zoom_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
@@ -50,7 +43,7 @@ export class SuikaEditor {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
-  appVersion = 'suika-editor_0.0.2';
+  appVersion = 'suika-editor_0.0.3';
   paperId: string;
 
   private emitter = new EventEmitter<Events>();
@@ -66,7 +59,6 @@ export class SuikaEditor {
   canvasDragger: CanvasDragger;
   toolManager: ToolManager;
   commandManager: CommandManager;
-  zoomManager: ZoomManager;
   imgManager: ImgManager;
 
   cursorManager: CursorManger;
@@ -116,7 +108,6 @@ export class SuikaEditor {
     this.viewportManager = new ViewportManager(this);
 
     this.commandManager = new CommandManager(this);
-    this.zoomManager = new ZoomManager(this);
     this.imgManager = new ImgManager();
 
     this.selectedElements = new SelectedElements(this);
@@ -147,19 +138,17 @@ export class SuikaEditor {
 
     const canvas = new SuikaCanvas(
       {
-        objectName: 'Canvas',
-        width: 0,
-        height: 0,
+        objectName: 'Page 1',
       },
       {
         doc: this.doc,
       },
     );
     this.sceneGraph.addItems([canvas]);
+    this.doc.insertChild(canvas);
+    this.doc.setCurrentCanvas(canvas.attrs.id);
 
-    this.viewportManager.setViewport({
-      x: -options.width / 2,
-      y: -options.height / 2,
+    this.viewportManager.setViewportSize({
       width: options.width,
       height: options.height,
     });
@@ -183,21 +172,24 @@ export class SuikaEditor {
     this.commandManager.clearRecords();
     this.paperId = data.paperId ?? genUuid();
 
-    if (!this.doc.getCurrCanvas()) {
+    const firstCanvas = this.doc.getChildren()[0];
+    this.doc.setCurrentCanvas(firstCanvas.attrs.id);
+
+    if (!this.doc.getChildren().length) {
       const canvas = new SuikaCanvas(
         {
-          objectName: 'Canvas',
-          width: 0,
-          height: 0,
+          objectName: 'Page 1',
         },
         {
           doc: this.doc,
         },
       );
       this.sceneGraph.addItems([canvas]);
+      this.doc.insertChild(canvas);
+      this.doc.setCurrentCanvas(canvas.attrs.id);
     }
 
-    this.zoomManager.zoomToFit(1);
+    this.viewportManager.zoomToFit(1);
   }
 
   destroy() {
@@ -225,21 +217,24 @@ export class SuikaEditor {
    * reference: https://mp.weixin.qq.com/s/uvVXZKIMn1bjVZvUSyYZXA
    */
   toScenePt(x: number, y: number, round = false) {
-    const zoom = this.zoomManager.getZoom();
-    const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return viewportCoordsToSceneUtil(x, y, zoom, scrollX, scrollY, round);
+    const viewMatrix = this.viewportManager.getViewMatrix();
+    const scenePt = viewMatrix.applyInverse({ x, y });
+    if (round) {
+      scenePt.x = Math.round(scenePt.x);
+      scenePt.y = Math.round(scenePt.y);
+    }
+    return scenePt;
   }
   toViewportPt(x: number, y: number) {
-    const zoom = this.zoomManager.getZoom();
-    const { x: scrollX, y: scrollY } = this.viewportManager.getViewport();
-    return sceneCoordsToViewportUtil(x, y, zoom, scrollX, scrollY);
+    const viewMatrix = this.viewportManager.getViewMatrix();
+    return viewMatrix.apply({ x, y });
   }
   toSceneSize(size: number) {
-    const zoom = this.zoomManager.getZoom();
+    const zoom = this.viewportManager.getZoom();
     return size / zoom;
   }
   toViewportSize(size: number) {
-    const zoom = this.zoomManager.getZoom();
+    const zoom = this.viewportManager.getZoom();
     return size * zoom;
   }
   /** get cursor viewport xy */
@@ -258,8 +253,11 @@ export class SuikaEditor {
     this.sceneGraph.render();
   }
 
-  getCanvasBbox() {
-    const canvasGraphics = this.doc.getCurrCanvas();
+  getCanvasChildrenBbox() {
+    const canvasGraphics = this.doc.getCurrentCanvas();
+    if (!canvasGraphics) {
+      return null;
+    }
     const children = canvasGraphics
       .getChildren()
       .filter((item) => item.isVisible());

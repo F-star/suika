@@ -104,7 +104,7 @@ export class SuikaBinding {
 
     this.editor.applyChanges(changes);
     if (!this.dataInitialed) {
-      this.editor.zoomManager.zoomToFit(1);
+      this.editor.viewportManager.zoomToFit(1);
     }
     this.dataInitialed = true;
     this.editor.render();

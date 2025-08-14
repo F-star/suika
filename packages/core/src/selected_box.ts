@@ -215,7 +215,7 @@ export class SelectedBox {
     return isPointInTransformedRect(
       point,
       this.box,
-      TOL / this.editor.zoomManager.getZoom(),
+      TOL / this.editor.viewportManager.getZoom(),
     );
   }
 

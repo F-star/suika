@@ -30,6 +30,8 @@
   "arrange.front": "Bring to Front",
   "arrange.back": "Send to Back",
 
+  "page.delete": "Delete page",
+
   "zoom.zoomIn": "Zoom in",
   "zoom.zoomOut": "Zoom out",
   "zoom.zoomToFit": "Zoom to fit",

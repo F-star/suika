@@ -71,7 +71,7 @@ export class ControlHandleManager {
         selectedGraph &&
         (hoverItem === selectedGraph || isSelectedBoxHovered)
       ) {
-        const zoom = this.editor.zoomManager.getZoom();
+        const zoom = this.editor.viewportManager.getZoom();
         this.setCustomHandles(selectedGraph.getControlHandles(zoom, true));
       } else {
         this.setCustomHandles([]);
@@ -82,19 +82,19 @@ export class ControlHandleManager {
   bindEvents() {
     this.editor.selectedElements.on('hoverItemChange', this.onHoverItemChange);
     this.editor.selectedBox.on('hoverChange', this.onHoverItemChange);
-    this.editor.zoomManager.on('zoomChange', this.onHoverItemChange);
+    this.editor.viewportManager.on('zoomChange', this.onHoverItemChange);
     this.editor.commandManager.on('change', this.onHoverItemChange);
   }
 
   unbindEvents() {
     this.editor.selectedElements.off('hoverItemChange', this.onHoverItemChange);
     this.editor.selectedBox.off('hoverChange', this.onHoverItemChange);
-    this.editor.zoomManager.off('zoomChange', this.onHoverItemChange);
+    this.editor.viewportManager.off('zoomChange', this.onHoverItemChange);
     this.editor.commandManager.off('change', this.onHoverItemChange);
   }
 
   private updateTransformHandles(rect: ITransformRect) {
-    const zoom = this.editor.zoomManager.getZoom();
+    const zoom = this.editor.viewportManager.getZoom();
     const handleSize = this.editor.setting.get('handleSize');
     const handleStrokeWidth = this.editor.setting.get('handleStrokeWidth');
     const neswHandleWidth = this.editor.setting.get('neswHandleWidth');

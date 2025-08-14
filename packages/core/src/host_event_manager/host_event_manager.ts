@@ -102,6 +102,7 @@ export class HostEventManager {
     const editor = this.editor;
     const onWheel = (event: WheelEvent) => {
       if (event.ctrlKey || event.metaKey) {
+        // zoom viewport
         event.preventDefault();
         const point = this.editor.getCursorXY(event);
         let isZoomOut = event.deltaY > 0;
@@ -109,29 +110,26 @@ export class HostEventManager {
           isZoomOut = !isZoomOut;
         }
         if (isZoomOut) {
-          editor.zoomManager.zoomOut({
+          editor.viewportManager.zoomOut({
             center: point,
             deltaY: event.deltaY,
           });
         } else {
-          editor.zoomManager.zoomIn({
+          editor.viewportManager.zoomIn({
             center: point,
             deltaY: event.deltaY,
           });
         }
         editor.render();
       } else {
+        // translate viewport
         if (
           this.editor.canvasDragger.isActive() &&
           this.editor.canvasDragger.isPressing()
         ) {
           return;
         }
-        const zoom = editor.zoomManager.getZoom();
-        editor.viewportManager.translate(
-          event.deltaX / zoom,
-          event.deltaY / zoom,
-        );
+        editor.viewportManager.translate(-event.deltaX, -event.deltaY);
         editor.render();
       }
     };

@@ -33,7 +33,7 @@ const getStepByZoom = (zoom: number) => {
  *
  * reference: https://mp.weixin.qq.com/s/RlNTitV3XTEKHfwpOKAQ0g
  */
-class Ruler {
+export class Ruler {
   visible = false;
 
   constructor(private editor: SuikaEditor) {}
@@ -49,8 +49,8 @@ class Ruler {
     const rulerWidth = setting.get('rulerWidth');
 
     const ctx = this.editor.ctx;
-    const viewport = this.editor.viewportManager.getViewport();
-    const { width: viewportWidth, height: viewportHeight } = viewport;
+    const { width: viewportWidth, height: viewportHeight } =
+      this.editor.viewportManager.getPageSize();
     ctx.save();
     // 绘制背景
     ctx.fillStyle = setting.get('rulerBgColor');
@@ -86,10 +86,7 @@ class Ruler {
   private drawSelectArea() {
     const setting = this.editor.setting;
     const rulerWidth = setting.get('rulerWidth');
-
     const ctx = this.editor.ctx;
-    const zoom = this.editor.zoomManager.getZoom();
-    const viewport = this.editor.viewportManager.getViewport();
 
     const bboxes = this.editor.selectedElements
       .getItems()
@@ -100,9 +97,9 @@ class Ruler {
       bboxes.map(({ minX, maxX }) => [minX, maxX]),
     )) {
       ctx.fillRect(
-        (minX - viewport.x) * zoom,
+        this.editor.toViewportPt(minX, 0).x,
         0,
-        (maxX - minX) * zoom,
+        this.editor.toViewportSize(maxX - minX),
         rulerWidth,
       );
     }
@@ -111,9 +108,9 @@ class Ruler {
     )) {
       ctx.fillRect(
         0,
-        (minY - viewport.y) * zoom,
+        this.editor.toViewportPt(0, minY).y,
         rulerWidth,
-        (maxY - minY) * zoom,
+        this.editor.toViewportSize(maxY - minY),
       );
     }
   }
@@ -124,67 +121,60 @@ class Ruler {
     const rulerWidth = setting.get('rulerWidth');
 
     const ctx = this.editor.ctx;
-    const zoom = this.editor.zoomManager.getZoom();
-    const viewport = this.editor.viewportManager.getViewport();
+    const zoom = this.editor.viewportManager.getZoom();
     const stepInScene = getStepByZoom(zoom);
 
-    const startX = rulerWidth;
-    let startXInScene = viewport.x + startX / zoom;
-    startXInScene = getClosestTimesVal(startXInScene, stepInScene);
+    const viewBbox = this.editor.viewportManager.getSceneBbox();
 
-    const endX = viewport.width;
-    let { x: endXInScene } = this.editor.toScenePt(endX, 0);
-    endXInScene = getClosestTimesVal(endXInScene, stepInScene);
+    const startXInScene = getClosestTimesVal(viewBbox.minX, stepInScene);
+
+    const endXInScene = getClosestTimesVal(viewBbox.maxX, stepInScene);
 
     ctx.textAlign = 'center';
     const y = rulerWidth - setting.get('rulerMarkSize');
-    while (startXInScene <= endXInScene) {
+    let x = startXInScene;
+    while (x <= endXInScene) {
       ctx.strokeStyle = setting.get('rulerMarkStroke');
       ctx.fillStyle = setting.get('rulerMarkStroke');
-      const x = nearestPixelVal((startXInScene - viewport.x) * zoom);
+      // 转为视口坐标
+
+      const intX = nearestPixelVal(this.editor.toViewportPt(x, 0).x);
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + setting.get('rulerMarkSize'));
+      ctx.moveTo(intX, y);
+      ctx.lineTo(intX, y + setting.get('rulerMarkSize'));
       ctx.stroke();
       ctx.closePath();
-      ctx.fillText(String(startXInScene), x, y - 4);
-      startXInScene += stepInScene;
+      ctx.fillText(String(x), intX, y - 4);
+      x += stepInScene;
     }
   }
   private drawYRuler() {
-    // 绘制刻度线和刻度值
     const setting = this.editor.setting;
     const rulerWidth = setting.get('rulerWidth');
 
     const ctx = this.editor.ctx;
-    const zoom = this.editor.zoomManager.getZoom();
-    const viewport = this.editor.viewportManager.getViewport();
+    const zoom = this.editor.viewportManager.getZoom();
     const stepInScene = getStepByZoom(zoom);
 
-    const startY = rulerWidth;
-    let startYInScene = viewport.y + startY / zoom;
-    startYInScene = getClosestTimesVal(startYInScene, stepInScene);
-
-    const endY = viewport.height;
-    let endYInScene = viewport.y + endY / zoom;
-    endYInScene = getClosestTimesVal(endYInScene, stepInScene);
+    const viewBbox = this.editor.viewportManager.getSceneBbox();
+    const startYInScene = getClosestTimesVal(viewBbox.minY, stepInScene);
+    const endYInScene = getClosestTimesVal(viewBbox.maxY, stepInScene);
 
     const x = rulerWidth - setting.get('rulerMarkSize');
     ctx.textAlign = 'center';
     ctx.fillStyle = setting.get('rulerMarkStroke');
-    while (startYInScene <= endYInScene) {
-      const y = nearestPixelVal((startYInScene - viewport.y) * zoom);
+    let y = startYInScene;
+    while (y <= endYInScene) {
+      const intY = nearestPixelVal(this.editor.toViewportPt(0, y).y);
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + setting.get('rulerMarkSize'), y);
+      ctx.moveTo(x, intY);
+      ctx.lineTo(x + setting.get('rulerMarkSize'), intY);
       ctx.stroke();
       ctx.closePath();
-      rotateInCanvas(ctx, -HALF_PI, x, y);
-      ctx.fillText(String(startYInScene), x, y - 3);
-      rotateInCanvas(ctx, HALF_PI, x, y);
-      startYInScene += stepInScene;
+      rotateInCanvas(ctx, -HALF_PI, x, intY);
+      ctx.fillText(String(y), x, intY - 3);
+      rotateInCanvas(ctx, HALF_PI, x, intY);
+      y += stepInScene;
     }
   }
 }
-
-export default Ruler;

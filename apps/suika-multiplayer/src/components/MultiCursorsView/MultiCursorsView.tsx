@@ -45,8 +45,7 @@ export const MultiCursorsView: FC<IProps> = ({
       setViewportId({});
     };
 
-    editor.viewportManager.on('xOrYChange', changeViewportId);
-    editor.zoomManager.on('zoomChange', changeViewportId);
+    editor.viewportManager.on('viewMatrixChange', changeViewportId);
 
     const updateRulerWidth = (attrs: SettingValue) => {
       setRulerWidth(attrs.enableRuler ? attrs.rulerWidth : 0);
@@ -55,8 +54,7 @@ export const MultiCursorsView: FC<IProps> = ({
     updateRulerWidth(editor.setting.getAttrs());
 
     return () => {
-      editor.viewportManager.off('xOrYChange', changeViewportId);
-      editor.zoomManager.off('zoomChange', changeViewportId);
+      editor.viewportManager.off('viewMatrixChange', changeViewportId);
       editor.setting.off('update', updateRulerWidth);
     };
   }, [editor]);

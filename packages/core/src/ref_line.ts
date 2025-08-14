@@ -14,8 +14,11 @@ import {
 } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
-import { isFrameGraphics, type SuikaGraphics } from './graphics';
-import { isCanvasGraphics } from './graphics/canvas';
+import {
+  isCanvasGraphics,
+  isFrameGraphics,
+  type SuikaGraphics,
+} from './graphics';
 import { type IHorizontalLine, type IVerticalLine } from './type';
 import {
   bboxToBboxWithMid,
@@ -65,10 +68,10 @@ export class RefLine {
     const vRefLineMap = this.vRefLineMap;
     const hRefLineMap = this.hRefLineMap;
 
-    const viewportBbox = this.editor.viewportManager.getBbox();
+    const viewportBbox = this.editor.viewportManager.getSceneBbox();
 
     const refGraphicsSet = new Set<SuikaGraphics>();
-    this.editor.doc.getCurrCanvas().forEachVisibleChildNode((graphics) => {
+    this.editor.doc.getCurrentCanvas().forEachVisibleChildNode((graphics) => {
       if (
         isCanvasGraphics(graphics) ||
         (isFrameGraphics(graphics) && graphics.isGroup())
@@ -267,7 +270,7 @@ export class RefLine {
 
     const tol =
       this.editor.setting.get('refLineTolerance') /
-      this.editor.zoomManager.getZoom();
+      this.editor.viewportManager.getZoom();
 
     // 确定最终偏移值 offsetX
     if (closestXDist <= tol) {

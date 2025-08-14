@@ -54,7 +54,6 @@ export abstract class DrawGraphicsTool implements ITool {
         this.updateRect();
       }
     };
-    hotkeysManager.on('shiftToggle', updateRect);
 
     const updateRefLinesWhenViewportTranslate = () => {
       if (editor.hostEventManager.isDraggingCanvasBySpace) {
@@ -79,19 +78,27 @@ export abstract class DrawGraphicsTool implements ITool {
         this.updateRect();
       }
     };
+
+    hotkeysManager.on('shiftToggle', updateRect);
     editor.viewportManager.on(
-      'xOrYChange',
+      'viewMatrixChange',
       updateRefLinesWhenViewportTranslate,
     );
-    editor.viewportManager.on('xOrYChange', updateRectWhenViewportTranslate);
+    editor.viewportManager.on(
+      'viewMatrixChange',
+      updateRectWhenViewportTranslate,
+    );
 
     this.unbindEvent = () => {
       hotkeysManager.off('shiftToggle', updateRect);
       editor.viewportManager.off(
-        'xOrYChange',
+        'viewMatrixChange',
         updateRefLinesWhenViewportTranslate,
       );
-      editor.viewportManager.off('xOrYChange', updateRectWhenViewportTranslate);
+      editor.viewportManager.off(
+        'viewMatrixChange',
+        updateRectWhenViewportTranslate,
+      );
     };
   }
 
@@ -276,7 +283,7 @@ export abstract class DrawGraphicsTool implements ITool {
     if (this.drawingGraphics) {
       this.updateGraphics(rect);
     } else {
-      const currentCanvas = this.editor.doc.getCurrCanvas();
+      const currentCanvas = this.editor.doc.getCurrentCanvas();
       const frame = getDeepFrameAtPoint(
         this.startPoint,
         currentCanvas.getChildren(),
@@ -328,7 +335,7 @@ export abstract class DrawGraphicsTool implements ITool {
       const width = this.editor.setting.get('drawGraphDefaultWidth');
       const height = this.editor.setting.get('drawGraphDefaultHeight');
 
-      const currentCanvas = this.editor.doc.getCurrCanvas();
+      const currentCanvas = this.editor.doc.getCurrentCanvas();
       const frame = getDeepFrameAtPoint(
         this.startPoint,
         currentCanvas.getChildren(),

@@ -1,4 +1,4 @@
-import { identityMatrix, type IPoint } from '@suika/geo';
+import { identityMatrix, type IPoint, type Matrix } from '@suika/geo';
 
 import { GraphicsType, type Optional } from '../type';
 import {
@@ -14,11 +14,17 @@ export class SuikaCanvas extends SuikaGraphics<SuikaCanvasAttrs> {
   override type = GraphicsType.Canvas;
   protected override isContainer = true;
 
+  lastSelectedIds = new Set<string>();
+  lastMatrix: Matrix | null = null;
+
   constructor(
-    attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>,
+    attrs: Optional<
+      Omit<SuikaCanvasAttrs, 'width' | 'height'>,
+      'id' | 'transform'
+    >,
     opts: IGraphicsOpts,
   ) {
-    super({ ...attrs, type: GraphicsType.Canvas }, opts);
+    super({ ...attrs, width: 0, height: 0, type: GraphicsType.Canvas }, opts);
   }
 
   override getWorldTransform() {

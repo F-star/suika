@@ -30,6 +30,8 @@
   "arrange.front": "移到顶部",
   "arrange.back": "移到底部",
 
+  "page.delete": "删除页面",
+
   "zoom.zoomIn": "放大",
   "zoom.zoomOut": "缩小",
   "zoom.zoomToFit": "适应画布",

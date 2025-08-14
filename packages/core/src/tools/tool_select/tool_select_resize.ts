@@ -204,7 +204,7 @@ export class SelectResizeTool implements IBaseTool {
       controlHandleManager.hasCustomHandles()
     ) {
       const controlHandle = graphics.getControlHandles(
-        this.editor.zoomManager.getZoom(),
+        this.editor.viewportManager.getZoom(),
       );
       if (controlHandle) {
         controlHandleManager.setCustomHandles(controlHandle);
@@ -370,7 +370,7 @@ export class SelectResizeTool implements IBaseTool {
     // update custom control handles
     if (items.length === 1) {
       this.editor.controlHandleManager.setCustomHandles(
-        items[0].getControlHandles(this.editor.zoomManager.getZoom(), true),
+        items[0].getControlHandles(this.editor.viewportManager.getZoom(), true),
       );
       this.editor.render();
     }

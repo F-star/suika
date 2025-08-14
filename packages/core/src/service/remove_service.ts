@@ -2,7 +2,7 @@ import { UpdateGraphicsAttrsCmd } from '../commands';
 import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
-  type SuikaFrame,
+  isFrameGraphics,
   type SuikaGraphics,
 } from '../graphics';
 import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../utils';
@@ -22,8 +22,8 @@ export const removeGraphicsAndRecord = (
 
   // remove empty group
   for (const id of parentIdSet) {
-    const parent = editor.doc.getGraphicsById(id) as SuikaFrame;
-    if (parent.isEmpty()) {
+    const parent = editor.doc.getGraphicsById(id);
+    if (parent && isFrameGraphics(parent) && parent.isEmpty()) {
       parent.removeFromParent();
       parent.setDeleted(true);
       removeIdSet.add(id);
