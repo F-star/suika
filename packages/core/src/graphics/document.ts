@@ -20,6 +20,7 @@ interface Events {
     },
     source: string,
   ): void;
+  currentCanvasChange(canvasId: string, prevCanvasId: string): void;
 }
 
 export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
@@ -36,6 +37,7 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   };
 
   private editor!: SuikaEditor;
+  private currentCanvasId: string = '';
 
   constructor(attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>) {
     super({ ...attrs, type: GraphicsType.Document }, {} as IGraphicsOpts);
@@ -48,10 +50,7 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   clear() {
     // TODO: update doc.updateInfo
     this.graphicsStoreManager.clear();
-  }
-
-  getCanvas() {
-    return this.graphicsStoreManager.getCanvas();
+    this.currentCanvasId = '';
   }
 
   getGraphicsById(id: string) {
@@ -75,8 +74,43 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
     return this.graphicsStoreManager.getAll();
   }
 
-  getCurrCanvas() {
-    return this.graphicsStoreManager.getCanvas();
+  getCurrentCanvas() {
+    const canvasItems = this.graphicsStoreManager.getCanvasItems();
+    return canvasItems.find(
+      (canvas) => canvas.attrs.id === this.currentCanvasId,
+    )!;
+  }
+
+  setCurrentCanvas(canvasId: string) {
+    if (canvasId === this.currentCanvasId) {
+      console.log('Same canvas, switch canvas failed');
+      return;
+    }
+
+    const prevCanvasId = this.currentCanvasId;
+    // record selected elements on previous canvas
+    const prevCanvas = this.getCurrentCanvas();
+    if (prevCanvas) {
+      prevCanvas.lastSelectedIds = this.editor.selectedElements.getIdSet();
+      prevCanvas.lastMatrix = this.editor.viewportManager.getViewMatrix();
+    }
+
+    // switch to new canvas
+    this.currentCanvasId = canvasId;
+
+    // restore selected elements on current canvas
+    const currentCanvas = this.getCurrentCanvas();
+    if (currentCanvas) {
+      this.editor.selectedElements.setItemsById(currentCanvas.lastSelectedIds);
+      if (currentCanvas.lastMatrix) {
+        this.editor.viewportManager.setViewMatrix(currentCanvas.lastMatrix);
+      } else {
+        // for the first time to switch canvas, reset viewport
+        this.editor.viewportManager.resetViewport();
+      }
+    }
+
+    this.emitter.emit('currentCanvasChange', canvasId, prevCanvasId);
   }
 
   addGraphics(graphics: SuikaGraphics) {
@@ -153,3 +187,9 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
     this.emitter.off(eventName, listener);
   }
 }
+
+export const isDocGraphics = (
+  graphics: SuikaGraphics,
+): graphics is SuikaDocument => {
+  return graphics instanceof SuikaDocument;
+};

@@ -52,7 +52,7 @@ export class ToolDrawPathAnchorAppend implements IBaseTool {
         },
       ];
 
-      const currCanvas = this.editor.doc.getCurrCanvas();
+      const currCanvas = this.editor.doc.getCurrentCanvas();
       const path = new SuikaPath(
         {
           objectName: getNoConflictObjectName(
@@ -78,7 +78,7 @@ export class ToolDrawPathAnchorAppend implements IBaseTool {
       this.parentTool.path = path;
 
       this.editor.sceneGraph.addItems([path]);
-      this.editor.doc.getCurrCanvas().insertChild(path);
+      this.editor.doc.getCurrentCanvas().insertChild(path);
       this.editor.commandManager.batchCommandStart();
       this.editor.commandManager.pushCommand(
         new AddGraphCmd('Add Path', this.editor, [path]),

@@ -11,11 +11,11 @@ import { generateNKeysBetween } from 'fractional-indexing';
 import { type SuikaEditor } from './editor';
 import {
   type GraphicsAttrs,
+  isCanvasGraphics,
   isFrameGraphics,
   SuikaGraphics,
   SuikaRect,
 } from './graphics';
-import { isCanvasGraphics } from './graphics/canvas';
 import { PaintType } from './paint';
 import { toSVG } from './to_svg';
 import { Transaction } from './transaction';
@@ -92,7 +92,7 @@ export class ClipboardManager {
     const editor = this.editor;
     await editor.imgManager.addImg(imgUrl);
     const img = editor.imgManager.getImg(imgUrl);
-    const center = editor.viewportManager.getCenter();
+    const center = editor.viewportManager.getSceneCenter();
     if (img) {
       const rectGraphics = new SuikaRect(
         {
@@ -110,7 +110,7 @@ export class ClipboardManager {
         },
       );
       editor.sceneGraph.addItems([rectGraphics]);
-      editor.doc.getCanvas().insertChild(rectGraphics);
+      editor.doc.getCurrentCanvas().insertChild(rectGraphics);
       editor.render();
     }
   }
@@ -211,7 +211,7 @@ export class ClipboardManager {
     const firstGraphics =
       SuikaGraphics.sortGraphics(this.editor.selectedElements.getItems()).at(
         -1,
-      ) ?? this.editor.doc.getCurrCanvas();
+      ) ?? this.editor.doc.getCurrentCanvas();
     let parent = firstGraphics;
 
     if (isCanvasGraphics(firstGraphics) || isFrameGraphics(firstGraphics)) {
@@ -267,14 +267,12 @@ export class ClipboardManager {
     return topGraphicsCount;
   }
 
-  private addGraphsFromClipboard(dataStr: string): void;
-  private addGraphsFromClipboard(dataStr: string, point: IPoint): void;
   private addGraphsFromClipboard(dataStr: string, point?: IPoint) {
     let pastedData: IEditorPaperData | null = null;
     try {
       pastedData = JSON.parse(dataStr);
     } catch (e) {
-      // TODO: create text graphics from pastedData
+      console.log('parse pastedData failed', e);
       return;
     }
 
@@ -287,7 +285,6 @@ export class ClipboardManager {
         pastedData.data
       )
     ) {
-      // TODO: create text graphics from pastedData
       return;
     }
 
@@ -310,7 +307,7 @@ export class ClipboardManager {
       mergeBoxes(selectedItems.map((item) => item.getBbox())),
     );
     if (!point && pastedData.paperId !== editor.paperId) {
-      const vwCenter = this.editor.viewportManager.getCenter();
+      const vwCenter = this.editor.viewportManager.getSceneCenter();
       point = {
         x: vwCenter.x - boundingRect.width / 2,
         y: vwCenter.y - boundingRect.height / 2,

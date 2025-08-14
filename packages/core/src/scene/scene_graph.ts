@@ -1,10 +1,12 @@
 import { EventEmitter, getDevicePixelRatio } from '@suika/common';
-import { type IRect } from '@suika/geo';
+import { type IRect, Matrix } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
 import {
   type GraphicsAttrs,
   isFrameGraphics,
+  SuikaCanvas,
+  SuikaDocument,
   SuikaEllipse,
   SuikaFrame,
   SuikaGraphics,
@@ -15,9 +17,7 @@ import {
   SuikaStar,
   SuikaText,
 } from '../graphics';
-import { SuikaCanvas } from '../graphics/canvas';
-import { SuikaDocument } from '../graphics/document';
-import Grid from '../grid';
+import { Grid } from '../grid';
 import { GraphicsType, type IEditorPaperData } from '../type';
 import { rafThrottle } from '../utils';
 
@@ -60,14 +60,8 @@ export class SceneGraph {
   // 全局重渲染
   render = rafThrottle(() => {
     // 获取视口区域
-    const {
-      viewportManager,
-      canvasElement: canvas,
-      ctx,
-      setting,
-    } = this.editor;
-    const viewport = viewportManager.getViewport();
-    const zoom = this.editor.zoomManager.getZoom();
+    const { canvasElement: canvas, ctx, setting } = this.editor;
+    const zoom = this.editor.viewportManager.getZoom();
     const selectedElements = this.editor.selectedElements;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -84,17 +78,17 @@ export class SceneGraph {
     // 场景坐标转换为视口坐标
     const dpr = getDevicePixelRatio();
 
-    const dx = -viewport.x;
-    const dy = -viewport.y;
-    ctx.scale(dpr * zoom, dpr * zoom);
-    ctx.translate(dx, dy);
+    const viewMatrix = new Matrix()
+      .scale(dpr, dpr)
+      .append(this.editor.viewportManager.getViewMatrix());
+    ctx.setTransform(...viewMatrix.getArray());
 
     const imgManager = this.editor.imgManager;
 
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     const smooth = zoom <= 1;
     if (canvasGraphics) {
-      const viewportArea = this.editor.viewportManager.getBbox();
+      const viewportArea = this.editor.viewportManager.getSceneBbox();
       ctx.save();
       canvasGraphics.draw({ ctx, imgManager, smooth, viewportArea });
       ctx.restore();
@@ -215,15 +209,13 @@ export class SceneGraph {
   ) {
     const ctx = this.editor.ctx;
     const dpr = getDevicePixelRatio();
-    const viewport = this.editor.viewportManager.getViewport();
-    const zoom = this.editor.zoomManager.getZoom();
-    const dx = -viewport.x;
-    const dy = -viewport.y;
+    const zoom = this.editor.viewportManager.getZoom();
 
     ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr * zoom, dpr * zoom);
-    ctx.translate(dx, dy);
+    const viewMatrix = new Matrix()
+      .scale(dpr, dpr)
+      .append(this.editor.viewportManager.getViewMatrix());
+    ctx.setTransform(...viewMatrix.getArray());
 
     strokeWidth /= zoom;
     for (const graphics of graphicsArr) {
@@ -242,7 +234,7 @@ export class SceneGraph {
    * get tree data with simple info (for layer panel)
    */
   toObjects() {
-    const canvasGraphics = this.editor.doc.getCanvas();
+    const canvasGraphics = this.editor.doc.getCurrentCanvas();
     if (!canvasGraphics) {
       return [];
     }
@@ -250,10 +242,14 @@ export class SceneGraph {
   }
 
   toJSON() {
-    const data = this.editor.doc
-      .getAllGraphicsArr()
-      .filter((graphics) => !graphics.isDeleted())
-      .map((item) => item.toJSON());
+    const docJSON = this.editor.doc.toJSON();
+    const data = [
+      docJSON,
+      ...this.editor.doc
+        .getAllGraphicsArr()
+        .filter((graphics) => !graphics.isDeleted())
+        .map((item) => item.toJSON()),
+    ];
     const paperData: IEditorPaperData = {
       appVersion: this.editor.appVersion,
       paperId: this.editor.paperId,
@@ -264,8 +260,23 @@ export class SceneGraph {
 
   createGraphicsArr(data: GraphicsAttrs[]) {
     const children: SuikaGraphics[] = [];
+
+    /** document need to be handled separately */
+    for (const item of data) {
+      if (item.type === GraphicsType.Document) {
+        const doc = new SuikaDocument(item);
+        doc.setEditor(this.editor);
+        this.editor.doc = doc;
+        children.push(doc);
+        break;
+      }
+    }
+
     for (const attrs of data) {
       const type = attrs.type;
+      if (type === GraphicsType.Document) {
+        continue;
+      }
       const Ctor = graphCtorMap[type!];
       if (!Ctor) {
         console.error(`Unsupported graphics type "${attrs.type}", ignore it`);
@@ -277,12 +288,8 @@ export class SceneGraph {
   }
 
   initGraphicsTree(graphicsArr: SuikaGraphics[]) {
-    const canvasGraphics = this.editor.doc.getCanvas();
     for (const graphics of graphicsArr) {
-      if (graphics instanceof SuikaCanvas) {
-        continue;
-      }
-      const parent = graphics.getParent() ?? canvasGraphics;
+      const parent = graphics.getParent();
       if (parent && parent !== graphics) {
         parent.insertChild(graphics, graphics.attrs.parentIndex?.position);
       }

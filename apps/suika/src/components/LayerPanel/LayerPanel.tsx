@@ -4,7 +4,7 @@ import { type IObject, MutateGraphsAndRecord } from '@suika/core';
 import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../context';
-import { LayerTree } from './LayerTree/LayerTree';
+import { LayerTree } from './LayerTree';
 
 export const LayerPanel: FC = () => {
   const editor = useContext(EditorContext);
@@ -55,7 +55,7 @@ export const LayerPanel: FC = () => {
     if (editor) {
       const graphics = editor.doc.getGraphicsById(id);
       if (graphics) {
-        editor.zoomManager.zoomToGraphics(graphics);
+        editor.viewportManager.zoomToGraphics(graphics);
         editor.render();
       }
     }

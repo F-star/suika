@@ -10,6 +10,7 @@ import { ContextMenu } from './ContextMenu';
 import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
 import { LayerPanel } from './LayerPanel';
+import { Pages } from './Pages';
 
 const topMargin = 48;
 const leftRightMargin = 240 * 2;
@@ -67,7 +68,7 @@ const Editor: FC = () => {
 
       const changeViewport = throttle(
         () => {
-          editor.viewportManager.setViewport({
+          editor.viewportManager.setViewportSize({
             width: document.body.clientWidth - leftRightMargin,
             height: document.body.clientHeight - topMargin,
           });
@@ -93,7 +94,10 @@ const Editor: FC = () => {
         <Header title="suika" />
         {/* body */}
         <div className="body">
-          <LayerPanel />
+          <div className="suika-editor-left-area">
+            <Pages />
+            <LayerPanel />
+          </div>{' '}
           <div
             ref={containerRef}
             style={{ position: 'absolute', left: 240, top: 0 }}

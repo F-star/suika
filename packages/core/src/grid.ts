@@ -2,51 +2,45 @@ import { getClosestTimesVal, nearestPixelVal } from '@suika/common';
 
 import { type SuikaEditor } from './editor';
 
-/**
- * draw grid
- */
-class Grid {
+export class Grid {
   constructor(private editor: SuikaEditor) {}
   draw() {
     const ctx = this.editor.ctx;
     ctx.save();
 
-    const {
-      x: offsetX,
-      y: offsetY,
-      width,
-      height,
-    } = this.editor.viewportManager.getViewport();
-    const zoom = this.editor.zoomManager.getZoom();
     const setting = this.editor.setting;
     const stepX = this.editor.setting.get('gridViewX');
     const stepY = this.editor.setting.get('gridViewY');
 
     /*** draw vertical lines ***/
-    let startXInScene = getClosestTimesVal(offsetX, stepX);
-    const endXInScene = getClosestTimesVal(offsetX + width / zoom, stepX);
+    const bbox = this.editor.viewportManager.getSceneBbox();
+    const pageSize = this.editor.viewportManager.getPageSize();
 
-    while (startXInScene <= endXInScene) {
+    const startXInScene = getClosestTimesVal(bbox.minX, stepX);
+    const endXInScene = getClosestTimesVal(bbox.maxX, stepX);
+
+    let x = startXInScene;
+    while (x <= endXInScene) {
       ctx.strokeStyle = setting.get('pixelGridLineColor');
-      const x = nearestPixelVal((startXInScene - offsetX) * zoom);
+      const pixelX = nearestPixelVal(this.editor.toViewportPt(x, 0).x);
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
+      ctx.moveTo(pixelX, 0);
+      ctx.lineTo(pixelX, pageSize.height);
       ctx.stroke();
       ctx.closePath();
-      startXInScene += stepX;
+      x += stepX;
     }
 
     /*** draw horizontal lines ***/
-    let startYInScene = getClosestTimesVal(offsetY, stepY);
-    const endYInScene = getClosestTimesVal(offsetY + height / zoom, stepY);
+    let startYInScene = getClosestTimesVal(bbox.minY, stepY);
+    const endYInScene = getClosestTimesVal(bbox.maxY, stepY);
 
     while (startYInScene <= endYInScene) {
       ctx.strokeStyle = setting.get('pixelGridLineColor');
-      const y = nearestPixelVal((startYInScene - offsetY) * zoom);
+      const y = nearestPixelVal(this.editor.toViewportPt(0, startYInScene).y);
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
+      ctx.lineTo(pageSize.width, y);
       ctx.stroke();
       ctx.closePath();
       startYInScene += stepY;
@@ -55,5 +49,3 @@ class Grid {
     ctx.restore();
   }
 }
-
-export default Grid;

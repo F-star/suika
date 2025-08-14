@@ -1,5 +1,5 @@
 import { EventEmitter } from '@suika/common';
-import { type IPoint } from '@suika/geo';
+import { type IPoint, Matrix } from '@suika/geo';
 
 import { type SuikaEditor } from './editor';
 import {
@@ -23,7 +23,7 @@ export class CanvasDragger {
 
   private _isPressing = false;
   private startVwPos: IPoint = { x: 0, y: 0 };
-  private startViewportPos: IPoint = { x: 0, y: 0 };
+  private startViewMatrix = new Matrix();
 
   private eventEmitter = new EventEmitter<Events>();
 
@@ -123,7 +123,7 @@ export class CanvasDragger {
 
     this._isPressing = true;
     this.startVwPos = { ...event.vwPos };
-    this.startViewportPos = this.editor.viewportManager.getViewport();
+    this.startViewMatrix = this.editor.viewportManager.getViewMatrix();
   };
 
   private onDrag = (event: IMousemoveEvent) => {
@@ -133,11 +133,10 @@ export class CanvasDragger {
 
     const dragBlockStep = this.editor.setting.get('dragBlockStep');
 
-    const zoom = this.editor.zoomManager.getZoom();
+    const zoom = this.editor.viewportManager.getZoom();
     if (event.maxDragDistance > dragBlockStep / zoom) {
-      const viewportX = this.startViewportPos.x - dx / zoom;
-      const viewportY = this.startViewportPos.y - dy / zoom;
-      this.editor.viewportManager.setViewport({ x: viewportX, y: viewportY });
+      const newViewMatrix = this.startViewMatrix.clone().translate(dx, dy);
+      this.editor.viewportManager.setViewMatrix(newViewMatrix);
       this.editor.render();
     }
   };

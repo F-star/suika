@@ -1,7 +1,12 @@
 .suika {
-  .layer-panel {
-    box-sizing: border-box;
-    width: 100%;
+  .suika-page-list {
+    .info-card {
+      padding-bottom: 0;
+    }
+  }
+  .suika-page-list-content {
+    padding-bottom: 8px;
+    max-height: 268px;
     overflow: auto;
 
     // hide scrollbar by default

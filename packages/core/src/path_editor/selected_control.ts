@@ -115,7 +115,7 @@ export class SelectedControl {
     const padding = 4;
     const handleInOutSize = 6;
     const handleStroke = this.editor.setting.get('handleStroke');
-    const zoom = this.editor.zoomManager.getZoom();
+    const zoom = this.editor.viewportManager.getZoom();
     const pathData = path.attrs.pathData;
 
     const { segControlsNeedDrawMap, segControlsNeedDraw } =

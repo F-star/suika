@@ -1013,8 +1013,33 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     const index = children.findIndex((item) => item === this);
     if (index == -1) {
       console.warn('index should not be -1!');
+      return null;
     }
-    return children[index + 1] ?? null;
+    for (let i = index + 1; i < children.length; i++) {
+      if (!children[i].isDeleted()) {
+        return children[i];
+      }
+    }
+    return null;
+  }
+
+  getPrevSibling() {
+    const parent = this.getParent();
+    if (!parent) {
+      return null;
+    }
+    const children = parent.getChildren();
+    const index = children.findIndex((item) => item === this);
+    if (index == -1) {
+      console.warn('index should not be -1!');
+      return null;
+    }
+    for (let i = index - 1; i >= 0; i--) {
+      if (!children[i].isDeleted()) {
+        return children[i];
+      }
+    }
+    return null;
   }
 
   getSortIndexPath() {

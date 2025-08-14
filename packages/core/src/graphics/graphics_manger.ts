@@ -40,9 +40,25 @@ export class GraphicsStoreManager {
     return graphicsArr;
   }
 
-  getCanvas() {
-    const canvas = Array.from(this.canvasStore.values());
-    return canvas[0];
+  getCanvasItems() {
+    return Array.from(this.canvasStore.values());
+  }
+
+  getCanvasItemsData() {
+    const canvasItems = Array.from(this.canvasStore.values()).filter(
+      (canvas) => !canvas.isDeleted(),
+    );
+
+    canvasItems.sort((a, b) => {
+      const aIndex = a.attrs.parentIndex?.position ?? '';
+      const bIndex = b.attrs.parentIndex?.position ?? '';
+      return aIndex < bIndex ? -1 : 1;
+    });
+
+    return canvasItems.map((canvas) => ({
+      id: canvas.attrs.id,
+      name: canvas.attrs.objectName,
+    }));
   }
 
   getFrames() {

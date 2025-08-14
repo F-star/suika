@@ -55,7 +55,7 @@ export const LayerPanel: FC = () => {
     if (editor) {
       const graphics = editor.doc.getGraphicsById(id);
       if (graphics) {
-        editor.zoomManager.zoomToGraphics(graphics);
+        editor.viewportManager.zoomToGraphics(graphics);
         editor.render();
       }
     }

@@ -8,9 +8,9 @@ export const getTopHitElement = (
   editor: SuikaEditor,
   point: IPoint,
 ): SuikaGraphics | null => {
-  const zoom = editor.zoomManager.getZoom();
+  const zoom = editor.viewportManager.getZoom();
   const tol = editor.setting.get('selectionHitPadding') / zoom;
-  const canvasGraphics = editor.doc.getCurrCanvas();
+  const canvasGraphics = editor.doc.getCurrentCanvas();
   const parentIdSet = editor.selectedElements.getParentIdSet();
 
   const hitOptions: IHitOptions = {
@@ -37,7 +37,7 @@ export const getElementsInSelection = (
   const graphicsArr = getElementsInSelectionDFS(
     editor,
     selectionBox,
-    editor.doc.getCurrCanvas(),
+    editor.doc.getCurrentCanvas(),
     parentIdSet,
   );
 

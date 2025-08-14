@@ -1,3 +1,5 @@
+export * from './canvas';
+export * from './document';
 export * from './ellipse';
 export * from './frame';
 export * from './graphics';

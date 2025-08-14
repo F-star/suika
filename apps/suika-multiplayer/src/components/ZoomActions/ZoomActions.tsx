@@ -26,18 +26,18 @@ export const ZoomActions: FC = () => {
 
   useEffect(() => {
     if (editor) {
-      setZoom(editor.zoomManager.getZoom());
+      setZoom(editor.viewportManager.getZoom());
       setSetting(editor.setting.getAttrs());
 
       const handler = (zoom: number) => {
         setZoom(zoom);
       };
-      editor.zoomManager.on('zoomChange', handler);
+      editor.viewportManager.on('zoomChange', handler);
       editor.setting.on('update', (setting) => {
         setSetting(setting);
       });
       return () => {
-        editor.zoomManager.off('zoomChange', handler);
+        editor.viewportManager.off('zoomChange', handler);
       };
     }
   }, [editor]);
@@ -59,7 +59,7 @@ export const ZoomActions: FC = () => {
             <ZoomInput
               defaultValue={zoom}
               onChange={(newZoom) => {
-                editor?.zoomManager.setZoomAndUpdateViewport(newZoom);
+                editor?.viewportManager.setZoomAndUpdateViewport(newZoom);
                 editor?.render();
               }}
             />
@@ -71,47 +71,47 @@ export const ZoomActions: FC = () => {
                 id: 'zoom.zoomIn',
                 suffix: isWindows() ? 'Ctrl++' : '⌘+',
                 action: () => {
-                  editor?.zoomManager.zoomIn({ isLevelZoom: true });
+                  editor?.viewportManager.zoomIn({ isLevelZoom: true });
                 },
               },
               {
                 id: 'zoom.zoomOut',
                 suffix: isWindows() ? 'Ctrl+-' : '⌘-',
                 action: () => {
-                  editor?.zoomManager.zoomOut({ isLevelZoom: true });
+                  editor?.viewportManager.zoomOut({ isLevelZoom: true });
                 },
               },
               {
                 id: 'zoom.zoomToFit',
                 suffix: isWindows() ? 'Shift+1' : '⇧1',
                 action: () => {
-                  editor?.zoomManager.zoomToFit();
+                  editor?.viewportManager.zoomToFit();
                 },
               },
               {
                 id: 'zoom.zoomToSelection',
                 suffix: isWindows() ? 'Shift+2' : '⇧2',
                 action: () => {
-                  editor?.zoomManager.zoomToSelection();
+                  editor?.viewportManager.zoomToSelection();
                 },
               },
               {
                 id: 'zoom.zoomTo50',
                 action: () => {
-                  editor?.zoomManager.setZoomAndUpdateViewport(0.5);
+                  editor?.viewportManager.setZoomAndUpdateViewport(0.5);
                 },
               },
               {
                 id: 'zoom.zoomTo100',
                 suffix: isWindows() ? 'Ctrl+0' : '⌘0',
                 action: () => {
-                  editor?.zoomManager.setZoomAndUpdateViewport(1);
+                  editor?.viewportManager.setZoomAndUpdateViewport(1);
                 },
               },
               {
                 id: 'zoom.zoomTo200',
                 action: () => {
-                  editor?.zoomManager.setZoomAndUpdateViewport(2);
+                  editor?.viewportManager.setZoomAndUpdateViewport(2);
                 },
               },
             ] as { id: MessageIds; suffix?: string; action(): void }[]

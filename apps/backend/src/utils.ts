@@ -16,7 +16,7 @@ export const generateInitialDoc = () => {
     strokeWidth: 1,
   };
   const suikaCanvas = {
-    objectName: 'Canvas',
+    objectName: 'Page 1',
     width: 0,
     height: 0,
     type: 'Canvas',
