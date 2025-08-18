@@ -86,7 +86,7 @@ const Editor: FC = () => {
         const height = document.body.clientHeight - topMargin;
         setViewWidth(width);
         setViewHeight(height);
-        editor.viewportManager.setViewport({
+        editor.viewportManager.setViewportSize({
           width,
           height,
         });
