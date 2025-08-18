@@ -242,9 +242,7 @@ export class SceneGraph {
   }
 
   toJSON() {
-    const docJSON = this.editor.doc.toJSON();
     const data = [
-      docJSON,
       ...this.editor.doc
         .getAllGraphicsArr()
         .filter((graphics) => !graphics.isDeleted())

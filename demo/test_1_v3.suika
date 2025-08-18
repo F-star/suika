@@ -1,9 +1,25 @@
 {
-  "appVersion": "suika-editor_0.0.2",
+  "appVersion": "suika-editor_0.0.3",
   "paperId": "dafc5453-f922-4968-aaeb-c85c145d65e0",
   "data": [
     {
-      "objectName": "Canvas",
+      "id": "0-0",
+      "objectName": "Document",
+      "width": 0,
+      "height": 0,
+      "type": "Document",
+      "transform": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "strokeWidth": 1
+    },
+    {
+      "objectName": "Page 1",
       "width": 0,
       "height": 0,
       "type": "Canvas",
@@ -16,7 +32,11 @@
         0,
         0
       ],
-      "strokeWidth": 1
+      "strokeWidth": 1,
+      "parentIndex": {
+        "guid": "0-0",
+        "position": "a0"
+      }
     },
     {
       "objectName": "Rect 1",
@@ -86,8 +106,8 @@
         0.5853745124667606,
         -0.5853745124667608,
         0.8107630234256508,
-        161.5618586917545,
-        21
+        180.5618586917545,
+        10.412626501451143
       ],
       "strokeWidth": 1,
       "parentIndex": {
@@ -223,8 +243,8 @@
         0,
         0,
         1,
-        -303,
-        -409.3154605875602
+        -389.51973250057574,
+        -425.3154605875602
       ],
       "parentIndex": {
         "guid": "fcd55dff-aa59-462d-a939-a8ceb9b3a6a0",
@@ -1643,6 +1663,26 @@
       "parentIndex": {
         "guid": "fcd55dff-aa59-462d-a939-a8ceb9b3a6a0",
         "position": "aQ"
+      }
+    },
+    {
+      "objectName": "Page 2",
+      "width": 0,
+      "height": 0,
+      "type": "Canvas",
+      "id": "299e3917-246b-47ad-9be1-71ad972f85a4",
+      "transform": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "strokeWidth": 1,
+      "parentIndex": {
+        "guid": "0-0",
+        "position": "a1"
       }
     }
   ]

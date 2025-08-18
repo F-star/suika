@@ -94,14 +94,6 @@ export class SuikaEditor {
     this.keybindingManager = new KeyBindingManager(this);
     this.keybindingManager.bindEvent();
 
-    this.doc = new SuikaDocument({
-      id: '0-0',
-      objectName: 'Document',
-      width: 0,
-      height: 0,
-    });
-    this.doc.setEditor(this);
-
     this.sceneGraph = new SceneGraph(this);
 
     this.cursorManager = new CursorManger(this);
@@ -136,6 +128,14 @@ export class SuikaEditor {
 
     this.paperId = genUuid();
 
+    this.doc = new SuikaDocument({
+      id: '0-0',
+      objectName: 'Document',
+      width: 0,
+      height: 0,
+    });
+    this.doc.setEditor(this);
+
     const canvas = new SuikaCanvas(
       {
         objectName: 'Page 1',
@@ -144,14 +144,15 @@ export class SuikaEditor {
         doc: this.doc,
       },
     );
-    this.sceneGraph.addItems([canvas]);
+    this.sceneGraph.addItems([this.doc, canvas]);
     this.doc.insertChild(canvas);
-    this.doc.setCurrentCanvas(canvas.attrs.id);
 
     this.viewportManager.setViewportSize({
       width: options.width,
       height: options.height,
     });
+
+    this.doc.setCurrentCanvas(canvas.attrs.id);
 
     this.perfMonitor = new PerfMonitor();
     if (options.showPerfMonitor) {
