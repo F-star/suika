@@ -176,7 +176,7 @@ export class ViewportManager {
    */
   resetViewport() {
     const center = this.getViewportCenter();
-    const newViewMatrix = new Matrix().clone().translate(center.x, center.y);
+    const newViewMatrix = new Matrix().translate(center.x, center.y);
     this.setViewMatrix(newViewMatrix);
   }
 
