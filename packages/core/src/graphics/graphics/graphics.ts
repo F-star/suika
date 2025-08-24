@@ -924,6 +924,14 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     );
   }
 
+  hasAncestor(id: string): boolean {
+    const parent = this.getParent();
+    if (!parent) {
+      return false;
+    }
+    return parent.attrs.id === id || parent.hasAncestor(id);
+  }
+
   markSortDirty() {
     this._sortDirty = true;
   }

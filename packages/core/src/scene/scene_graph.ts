@@ -149,7 +149,12 @@ export class SceneGraph {
     const padding = 4;
     const frames = this.editor.doc.graphicsStoreManager.getFrames();
     for (const frame of frames) {
-      if ((isFrameGraphics(frame) && frame.isGroup()) || frame.isDeleted()) {
+      if (
+        (isFrameGraphics(frame) && frame.isGroup()) ||
+        frame.isDeleted() ||
+        // check canvas
+        !frame.hasAncestor(canvasGraphics.attrs.id)
+      ) {
         continue;
       }
       const pos = frame.getWorldPosition();
