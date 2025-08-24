@@ -139,17 +139,15 @@ export class ViewportManager {
       : 0;
 
     const pageSize = this.getPageSize();
-    const viewRect = boxToRect({
-      minX: 0,
-      minY: 0,
-      maxX: pageSize.width,
-      maxY: pageSize.height,
-    });
+    const targetCenter = {
+      x: targetRect.x + targetRect.width / 2,
+      y: targetRect.y + targetRect.height / 2,
+    };
 
     const zoomX =
-      (viewRect.width - padding * 2 - rulerWidth) / targetRect.width;
+      (pageSize.width - padding * 2 - rulerWidth) / targetRect.width;
     const zoomY =
-      (viewRect.height - padding * 2 - rulerWidth) / targetRect.height;
+      (pageSize.height - padding * 2 - rulerWidth) / targetRect.height;
     let zoom = Math.min(zoomX, zoomY);
 
     if (maxZoom) {
@@ -157,12 +155,7 @@ export class ViewportManager {
     }
 
     const newViewMatrix = new Matrix()
-      .translate(
-        -(targetRect.x + targetRect.width / 2),
-        -(targetRect.y + targetRect.height / 2),
-      )
-      .translate(viewRect.width / 2, viewRect.height / 2)
-      .translate(-pageSize.width / 2, -pageSize.height / 2)
+      .translate(-targetCenter.x, -targetCenter.y)
       .scale(zoom, zoom)
       .translate(pageSize.width / 2, pageSize.height / 2)
       .translate(rulerWidth / 2, rulerWidth / 2);
@@ -244,6 +237,29 @@ export class ViewportManager {
       y: height,
     });
     return { minX, minY, maxX, maxY };
+  }
+
+  toScenePt(x: number, y: number, round = false) {
+    const scenePt = this.viewMatrix.applyInverse({ x, y });
+    if (round) {
+      scenePt.x = Math.round(scenePt.x);
+      scenePt.y = Math.round(scenePt.y);
+    }
+    return scenePt;
+  }
+
+  toViewportPt(x: number, y: number) {
+    return this.viewMatrix.apply({ x, y });
+  }
+
+  toSceneSize(size: number) {
+    const zoom = this.getZoom();
+    return size / zoom;
+  }
+
+  toViewportSize(size: number) {
+    const zoom = this.getZoom();
+    return size * zoom;
   }
 
   on<K extends keyof Events>(eventName: K, handler: Events[K]) {

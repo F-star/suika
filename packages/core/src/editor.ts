@@ -212,31 +212,18 @@ export class SuikaEditor {
   getCursor() {
     return this.cursorManager.getCursor();
   }
-  /**
-   * viewport coords to scene coords
-   *
-   * reference: https://mp.weixin.qq.com/s/uvVXZKIMn1bjVZvUSyYZXA
-   */
+
   toScenePt(x: number, y: number, round = false) {
-    const viewMatrix = this.viewportManager.getViewMatrix();
-    const scenePt = viewMatrix.applyInverse({ x, y });
-    if (round) {
-      scenePt.x = Math.round(scenePt.x);
-      scenePt.y = Math.round(scenePt.y);
-    }
-    return scenePt;
+    return this.viewportManager.toScenePt(x, y, round);
   }
   toViewportPt(x: number, y: number) {
-    const viewMatrix = this.viewportManager.getViewMatrix();
-    return viewMatrix.apply({ x, y });
+    return this.viewportManager.toViewportPt(x, y);
   }
   toSceneSize(size: number) {
-    const zoom = this.viewportManager.getZoom();
-    return size / zoom;
+    return this.viewportManager.toSceneSize(size);
   }
   toViewportSize(size: number) {
-    const zoom = this.viewportManager.getZoom();
-    return size * zoom;
+    return this.viewportManager.toViewportSize(size);
   }
   /** get cursor viewport xy */
   getCursorXY(event: { clientX: number; clientY: number }) {
