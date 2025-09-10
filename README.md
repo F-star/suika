@@ -4,7 +4,7 @@
 
 English | [中文](./README_zh.md)
 
-[Experience](https://blog.fstars.wang/app/suika/)
+[Experience](https://f-star.github.io/suika/)
 
 ![Screenshot](screenshot.png)
 
