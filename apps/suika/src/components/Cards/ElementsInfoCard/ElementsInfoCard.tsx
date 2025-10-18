@@ -43,9 +43,13 @@ export const ElementsInfoCards: FC = () => {
         for (const el of items) {
           const attrs = el.getInfoPanelAttrs();
           for (const attr of attrs) {
+            // filter typography attributes
+            if (attr.key === 'fontSize' || attr.key === 'fontFamily') {
+              continue;
+            }
             if (attr.uiType === 'number') {
               const precision = 2;
-              attr.value = remainDecimal(attr.value, precision);
+              attr.value = remainDecimal(attr.value as number, precision);
             }
             const label = attr.label;
             if (!map.has(label)) {
