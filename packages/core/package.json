@@ -14,9 +14,11 @@
     "@suika/common": "workspace:^",
     "@suika/geo": "workspace:^",
     "fractional-indexing": "^3.2.0",
+    "opentype.js": "^1.3.4",
     "stats.js": "^0.17.0"
   },
   "devDependencies": {
+    "@types/opentype.js": "^1.3.8",
     "@types/stats.js": "^0.17.3",
     "vite": "^5.0.8"
   }

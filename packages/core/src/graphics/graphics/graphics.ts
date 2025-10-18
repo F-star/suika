@@ -686,7 +686,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
   getInfoPanelAttrs(): {
     label: string;
     key: string;
-    value: number;
+    value: number | string;
     uiType: string;
     suffixValue?: string;
   }[] {

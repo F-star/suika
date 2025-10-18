@@ -1,5 +1,6 @@
 export * from './commands';
 export * from './editor';
+export * from './font_manager';
 export * from './graphics';
 export * from './paint';
 export * from './service';

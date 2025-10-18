@@ -10,6 +10,7 @@ import { ElementsInfoCards } from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
 import { LayerInfoCard } from '../Cards/LayerInfoCard';
 import { StrokeCard } from '../Cards/StrokeCard';
+import { TypographyCard } from '../Cards/TypographyCard';
 import { DebugPanel } from '../DebugPanel';
 
 enum PanelType {
@@ -43,6 +44,7 @@ export const InfoPanel: FC = () => {
         <>
           <AlignCard />
           <ElementsInfoCards />
+          <TypographyCard />
           <LayerInfoCard />
           <FillCard key="fill" />
           <StrokeCard key="stroke" />

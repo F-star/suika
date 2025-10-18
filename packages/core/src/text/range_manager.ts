@@ -1,6 +1,7 @@
-import { applyMatrix, type IPoint } from '@suika/geo';
+import { applyMatrix, type IPoint, Matrix } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
+import { fontManager } from '../font_manager';
 import { type IDrawInfo, type SuikaText } from '../graphics';
 
 export interface IRange {
@@ -86,17 +87,32 @@ export class RangeManager {
     this.moveRangeEnd(delta);
   }
 
-  getCursorLinePos(textGraphics: SuikaText) {
+  private getGlyphByIndex(textGraphics: SuikaText, index: number) {
     const glyphInfos = textGraphics.getGlyphs();
-
-    const range = this.getRange();
     const { height: contentHeight } = textGraphics.getContentMetrics();
-    const startGlyphInfo = glyphInfos[range.start] ?? {
+    const glyphInfo = glyphInfos[index] ?? {
       position: { x: 0, y: 0 },
       width: 0,
       height: contentHeight,
     };
+
+    const font = fontManager.getFont(textGraphics.attrs.fontFamily);
+    const fontSizeScale = textGraphics.attrs.fontSize / font.unitsPerEm;
+    const fontSizeTf = new Matrix().scale(fontSizeScale, fontSizeScale);
+    const position = fontSizeTf.apply(glyphInfo.position);
+
+    return {
+      ...glyphInfo,
+      position,
+    };
+  }
+
+  getCursorLinePos(textGraphics: SuikaText) {
+    const range = this.getRange();
+    const { height: contentHeight } = textGraphics.getContentMetrics();
+    const startGlyphInfo = this.getGlyphByIndex(textGraphics, range.start);
     const cursorPosInText = startGlyphInfo.position;
+
     const textMatrix = textGraphics.getWorldTransform();
 
     const top = applyMatrix(textMatrix, cursorPosInText);
@@ -111,11 +127,7 @@ export class RangeManager {
     let rightInViewport: IPoint | null = null;
 
     if (range.end !== range.start) {
-      const endGlyphInfo = glyphInfos[range.end] ?? {
-        position: { x: 0, y: 0 },
-        width: 0,
-        height: contentHeight,
-      };
+      const endGlyphInfo = this.getGlyphByIndex(textGraphics, range.end);
       const endPosInText = endGlyphInfo.position;
       const right = applyMatrix(textMatrix, endPosInText);
       rightInViewport = this.editor.toViewportPt(right.x, right.y);

@@ -405,4 +405,33 @@ export const MutateGraphsAndRecord = {
       ),
     );
   },
+
+  setFontSize(editor: SuikaEditor, graphicsArr: SuikaGraphics[], val: number) {
+    const transaction = new Transaction(editor);
+
+    let hasTextElement = false;
+
+    for (const graphics of graphicsArr) {
+      if (graphics.type !== GraphicsType.Text) {
+        continue;
+      }
+      hasTextElement = true;
+      transaction.recordOld(graphics.attrs.id, {
+        fontSize: graphics.attrs.fontSize,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+      });
+      graphics.updateAttrs({ fontSize: val });
+      transaction.update(graphics.attrs.id, {
+        fontSize: graphics.attrs.fontSize,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+      });
+    }
+    if (!hasTextElement) {
+      return;
+    }
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update FontSize of Elements');
+  },
 };

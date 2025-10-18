@@ -1,7 +1,7 @@
 import './Editor.scss';
 
 import { pick, throttle } from '@suika/common';
-import { type SettingValue, SuikaEditor } from '@suika/core';
+import { fontManager, type SettingValue, SuikaEditor } from '@suika/core';
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../context';
@@ -31,7 +31,7 @@ const storeKeys: Partial<keyof SettingValue>[] = [
 const Editor: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [editor, setEditor] = useState<SuikaEditor | null>(null);
+  const [suikaEditor, setEditor] = useState<SuikaEditor | null>(null);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -40,34 +40,16 @@ const Editor: FC = () => {
         ? (JSON.parse(userPreferenceEncoded) as Partial<SettingValue>)
         : undefined;
 
-      const editor = new SuikaEditor({
-        containerElement: containerRef.current,
-        width: document.body.clientWidth - leftRightMargin,
-        height: document.body.clientHeight - topMargin,
-        offsetY: 48,
-        offsetX: 240,
-        showPerfMonitor: false,
-        userPreference: userPreference,
-      });
+      const editorReference: { value: SuikaEditor | null } = {
+        value: null,
+      };
 
-      editor.setting.on(
-        'update',
-        (value: SettingValue, changedKey: keyof SettingValue) => {
-          if (!storeKeys.includes(changedKey)) return;
-
-          localStorage.setItem(
-            USER_PREFERENCE_KEY,
-            JSON.stringify(pick(value, storeKeys)),
-          );
-        },
-      );
-
-      (window as any).editor = editor;
-
-      new AutoSaveGraphics(editor);
+      let isCanceled = false;
 
       const changeViewport = throttle(
         () => {
+          const editor = editorReference.value;
+          if (!editor) return;
           editor.viewportManager.setViewportSize({
             width: document.body.clientWidth - leftRightMargin,
             height: document.body.clientHeight - topMargin,
@@ -77,11 +59,50 @@ const Editor: FC = () => {
         10,
         { leading: false },
       );
-      window.addEventListener('resize', changeViewport);
-      setEditor(editor);
+
+      (async () => {
+        await fontManager.loadAllFonts({
+          'Smiley Sans': './font_files/smiley-sans-oblique.otf',
+          'Source Han Sans CN': './font_files/SourceHanSansCN-Regular.otf',
+        });
+        if (isCanceled) return;
+
+        const editor = new SuikaEditor({
+          containerElement: containerRef.current!,
+          width: document.body.clientWidth - leftRightMargin,
+          height: document.body.clientHeight - topMargin,
+          offsetY: 48,
+          offsetX: 240,
+          showPerfMonitor: false,
+          userPreference: userPreference,
+        });
+        editorReference.value = editor;
+
+        editor.setting.on(
+          'update',
+          (value: SettingValue, changedKey: keyof SettingValue) => {
+            if (!storeKeys.includes(changedKey)) return;
+
+            localStorage.setItem(
+              USER_PREFERENCE_KEY,
+              JSON.stringify(pick(value, storeKeys)),
+            );
+          },
+        );
+
+        (window as any).editor = editor;
+
+        new AutoSaveGraphics(editor);
+
+        window.addEventListener('resize', changeViewport);
+
+        setEditor(editor);
+      })();
 
       return () => {
-        editor.destroy(); // 注销事件
+        isCanceled = true;
+
+        editorReference.value?.destroy();
         window.removeEventListener('resize', changeViewport);
         changeViewport.cancel();
       };
@@ -90,7 +111,7 @@ const Editor: FC = () => {
 
   return (
     <div>
-      <EditorContext.Provider value={editor}>
+      <EditorContext.Provider value={suikaEditor}>
         <Header title="suika" />
         {/* body */}
         <div className="body">

@@ -5,17 +5,19 @@
 
     box-sizing: border-box;
     border: 1px solid transparent;
-    margin: 2px 4px;
-    border-radius: 2px;
+    margin: 4px;
+    border-radius: 4px;
     width: 100px;
     height: 28px;
     text-align: center;
+
+    background-color: #f5f5f5;
+
     &:hover {
       border-color: #e6e6e6;
     }
     &:focus-within {
       border-color: #0d99ff;
-      outline: 1px solid #0d99ff;
     }
 
     .suika-custom-input-prefix {
@@ -29,5 +31,6 @@
     box-sizing: border-box;
     width: 100%;
     font-size: 12px;
+    background-color: transparent;
   }
 }

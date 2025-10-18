@@ -1,7 +1,7 @@
 import { type IMatrixArr } from '@suika/geo';
 
 import { type IPaint } from '../../paint';
-import { type GraphicsType as GraphicsType } from '../../type';
+import { type GraphicsType } from '../../type';
 import { type SuikaDocument } from '../document';
 
 export interface GraphicsAttrs {
@@ -29,8 +29,14 @@ export interface GraphicsAttrs {
   parentIndex?: IParentIndex;
 
   cornerRadius?: number;
+
+  // star and regular polygon
   count?: number;
+  // star
   starInnerScale?: number;
+  // text
+  fontSize?: number;
+  fontFamily?: string;
 }
 
 export interface IParentIndex {

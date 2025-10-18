@@ -1,5 +1,5 @@
 import { getContentLength, sliceContent } from '@suika/common';
-import { calcTextSize, type IPoint } from '@suika/geo';
+import { type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
 import { type IDrawInfo, SuikaText, type TextAttrs } from '../graphics';
@@ -74,6 +74,7 @@ export class TextEditor {
           fontFamily: defaultFontFamily,
           width: 0,
           height: fontSize,
+          autoFit: true,
         },
         {
           advancedAttrs: params.pos,
@@ -134,11 +135,8 @@ export class TextEditor {
   }
 
   static updateTextContentAndResize(textGraphics: SuikaText, content: string) {
-    const { width, height } = calcTextSize(content, {
-      fontSize: textGraphics.attrs.fontSize,
-      fontFamily: textGraphics.attrs.fontFamily,
-    });
-    textGraphics.updateAttrs({ content, width, height });
+    textGraphics.updateAttrs({ content });
+    textGraphics.fitContent();
   }
 
   private bindEvent() {

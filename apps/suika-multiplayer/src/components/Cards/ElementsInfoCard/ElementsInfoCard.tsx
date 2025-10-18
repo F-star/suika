@@ -45,7 +45,7 @@ export const ElementsInfoCards: FC = () => {
           for (const attr of attrs) {
             if (attr.uiType === 'number') {
               const precision = 2;
-              attr.value = remainDecimal(attr.value, precision);
+              attr.value = remainDecimal(attr.value as number, precision);
             }
             const label = attr.label;
             if (!map.has(label)) {
