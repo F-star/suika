@@ -14,6 +14,8 @@ export const TypographyCard = () => {
   const [fontSize, setFontSize] = useState(12);
   const [fontFamily, setFontFamily] = useState('Smiley Sans');
 
+  const [hasTextSelected, setHasTextSelected] = useState(false);
+
   useEffect(() => {
     if (!editor) return;
 
@@ -24,6 +26,7 @@ export const TypographyCard = () => {
       let _fontFamily: string | undefined;
       for (const item of items) {
         if (item instanceof SuikaText) {
+          setHasTextSelected(true);
           const fontSize = item.attrs.fontSize;
           if (_fontSize === undefined) {
             _fontSize = fontSize;
@@ -62,6 +65,10 @@ export const TypographyCard = () => {
     MutateGraphsAndRecord.setFontSize(editor, items, value);
     editor.render();
   };
+
+  if (!hasTextSelected) {
+    return null;
+  }
 
   return (
     <BaseCard title={intl.formatMessage({ id: 'typography' })}>
