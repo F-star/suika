@@ -12,20 +12,28 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.22.3",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.3",
     "@suika/common": "workspace:^",
     "@suika/components": "workspace:^",
     "@suika/core": "workspace:^",
     "@suika/geo": "workspace:^",
     "@suika/icons": "workspace:^",
+    "@tailwindcss/vite": "^4.1.15",
     "ahooks": "^3.7.4",
+    "class-variance-authority": "^0.7.1",
     "classnames": "^2.3.2",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.546.0",
     "react": "^18.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "react-intl": "^6.3.2",
     "react-scripts": "5.0.1",
     "sass": "^1.57.1",
-    "stats.js": "^0.17.0"
+    "stats.js": "^0.17.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.15"
   },
   "devDependencies": {
     "@types/react": "^18.2.25",
@@ -37,6 +45,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "sass": "^1.70.0",
+    "tw-animate-css": "^1.4.0",
     "vite": "^5.0.8",
     "vite-plugin-checker": "^0.6.4"
   }

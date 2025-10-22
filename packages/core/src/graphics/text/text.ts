@@ -79,18 +79,6 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       this.contentMetrics = null;
     }
     super.updateAttrs(partialAttrs);
-
-    // TODO: 待优化，不能在这里实现。
-    // 属性 A 的修改会导致属性 B 的修改。。。。这也太坑了。。。
-    // 我需要把这个额外的属性 B 也记录保存到历史记录中，如何交出去？
-    // 这个返回被修改属性和它的修改前后值？
-
-    // 字号修改且为 autoFit 才触发。
-    if ('fontSize' in partialAttrs && this.attrs.autoFit) {
-      const { width } = this.getContentMetrics();
-      this.attrs.width = width;
-      this.attrs.height = this.attrs.fontSize;
-    }
   }
 
   fitContent() {
