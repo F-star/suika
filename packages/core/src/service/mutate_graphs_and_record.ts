@@ -7,6 +7,7 @@ import {
   type SuikaRect,
   type SuikaRegularPolygon,
   type SuikaStar,
+  SuikaText,
 } from '../graphics';
 import { Transaction } from '../transaction';
 import { GraphicsType } from '../type';
@@ -412,7 +413,7 @@ export const MutateGraphsAndRecord = {
     let hasTextElement = false;
 
     for (const graphics of graphicsArr) {
-      if (graphics.type !== GraphicsType.Text) {
+      if (!(graphics instanceof SuikaText)) {
         continue;
       }
       hasTextElement = true;
@@ -421,7 +422,10 @@ export const MutateGraphsAndRecord = {
         width: graphics.attrs.width,
         height: graphics.attrs.height,
       });
+
       graphics.updateAttrs({ fontSize: val });
+      graphics.fitContent();
+
       transaction.update(graphics.attrs.id, {
         fontSize: graphics.attrs.fontSize,
         width: graphics.attrs.width,
@@ -433,5 +437,37 @@ export const MutateGraphsAndRecord = {
     }
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update FontSize of Elements');
+  },
+
+  setFontFamily(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    val: string,
+  ) {
+    const transaction = new Transaction(editor);
+
+    let hasTextElement = false;
+
+    for (const graphics of graphicsArr) {
+      if (!(graphics instanceof SuikaText)) {
+        continue;
+      }
+      hasTextElement = true;
+      transaction.recordOld(graphics.attrs.id, {
+        fontFamily: graphics.attrs.fontFamily,
+      });
+
+      graphics.updateAttrs({ fontFamily: val });
+      graphics.fitContent();
+
+      transaction.update(graphics.attrs.id, {
+        fontFamily: graphics.attrs.fontFamily,
+      });
+    }
+    if (!hasTextElement) {
+      return;
+    }
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update FontFamily of Elements');
   },
 };

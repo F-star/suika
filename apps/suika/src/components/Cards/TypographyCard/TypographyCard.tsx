@@ -2,6 +2,14 @@ import { MutateGraphsAndRecord, SuikaText } from '@suika/core';
 import { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 import { EditorContext } from '../../../context';
 import NumberInput from '../../input/NumberInput';
 import { BaseCard } from '../BaseCard';
@@ -24,9 +32,10 @@ export const TypographyCard = () => {
 
       let _fontSize: number | string | undefined;
       let _fontFamily: string | undefined;
+      let _hasTextSelected = false;
       for (const item of items) {
         if (item instanceof SuikaText) {
-          setHasTextSelected(true);
+          _hasTextSelected = true;
           const fontSize = item.attrs.fontSize;
           if (_fontSize === undefined) {
             _fontSize = fontSize;
@@ -51,6 +60,7 @@ export const TypographyCard = () => {
 
       setFontSize(_fontSize as number);
       setFontFamily(_fontFamily as string);
+      setHasTextSelected(_hasTextSelected);
     };
 
     updateFontInfo(); // init
@@ -66,22 +76,35 @@ export const TypographyCard = () => {
     editor.render();
   };
 
+  const execUpdateFontFamilyCommand = (value: string) => {
+    if (!editor) return;
+    const items = editor.selectedElements.getItems();
+    MutateGraphsAndRecord.setFontFamily(editor, items, value);
+    editor.render();
+  };
+
   if (!hasTextSelected) {
     return null;
   }
 
   return (
     <BaseCard title={intl.formatMessage({ id: 'typography' })}>
-      <div style={{ marginLeft: 8 }}>
-        <div
-          style={{
-            marginLeft: 8,
-            marginBottom: 4,
-            color: '#b3b3b3',
-            lineHeight: '28px',
-          }}
-        >
-          {fontFamily}
+      <div className="mx-2">
+        <div className="mx-[4px] mb-2">
+          <Select
+            value={fontFamily}
+            onValueChange={execUpdateFontFamilyCommand}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select font family" />
+            </SelectTrigger>
+            <SelectContent className="w-full">
+              <SelectItem value="Smiley Sans">Smiley Sans</SelectItem>
+              <SelectItem value="Source Han Sans CN">
+                Source Han Sans CN
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <NumberInput
