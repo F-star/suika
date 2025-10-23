@@ -455,6 +455,8 @@ export const MutateGraphsAndRecord = {
       hasTextElement = true;
       transaction.recordOld(graphics.attrs.id, {
         fontFamily: graphics.attrs.fontFamily,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
       });
 
       graphics.updateAttrs({ fontFamily: val });
@@ -462,6 +464,8 @@ export const MutateGraphsAndRecord = {
 
       transaction.update(graphics.attrs.id, {
         fontFamily: graphics.attrs.fontFamily,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
       });
     }
     if (!hasTextElement) {

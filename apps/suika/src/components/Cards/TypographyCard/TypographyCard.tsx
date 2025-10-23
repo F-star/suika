@@ -103,6 +103,9 @@ export const TypographyCard = () => {
               <SelectItem value="Source Han Sans CN">
                 Source Han Sans CN
               </SelectItem>
+              <SelectItem className="hidden" value={MIXED}>
+                Mixed
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
