@@ -5,39 +5,16 @@
     align-items: center;
     position: relative;
 
-    margin: 0 2px;
+    margin: 0 4px;
     border-radius: 4px;
-    width: 36px;
-    height: 32px;
+    width: 32px;
+    height: 30px;
     color: #333;
 
     cursor: pointer;
 
-    .tooltip {
-      display: none;
-      position: absolute;
-      bottom: -30px;
-
-      border-radius: 4px;
-      padding: 4px 8px;
-
-      color: #fff;
-      font-size: 12px;
-      background-color: #333333ee;
-      white-space: nowrap;
-      z-index: 2;
-
-      .tool-hotkey {
-        margin-left: 8px;
-        color: #ccc;
-      }
-    }
-
     &:hover {
       background-color: #f2f2f2;
-      .tooltip {
-        display: block;
-      }
     }
     &.active {
       background-color: #0f8fff;
