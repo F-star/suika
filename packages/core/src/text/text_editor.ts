@@ -229,6 +229,8 @@ export class TextEditor {
         }
         this.editor.render();
       } else if (e.key === 'ArrowLeft') {
+        if (e.isComposing) return;
+
         if (e.shiftKey) {
           this.rangeManager.moveRangeEnd(-1);
         } else {
@@ -236,6 +238,8 @@ export class TextEditor {
         }
         this.editor.render();
       } else if (e.key === 'ArrowRight') {
+        if (e.isComposing) return;
+
         if (e.shiftKey) {
           this.rangeManager.moveRangeEnd(1);
         } else {
