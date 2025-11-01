@@ -3,7 +3,7 @@ import opentype, { type Font } from 'opentype.js';
 class FontManager {
   private fonts: Record<string, Font | null> = {};
 
-  async loadAllFonts(fonts: Record<string, string>) {
+  async loadFonts(fonts: Record<string, string>) {
     for (const [key] of Object.entries(fonts)) {
       if (this.fonts[key]) {
         console.warn(`Font ${key} is loaded or loading, skip`);

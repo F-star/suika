@@ -58,12 +58,6 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       },
       opts,
     );
-
-    // if (attrs.autoFit) {
-    //   const { width } = this.getContentMetrics();
-    //   this.attrs.width = width;
-    //   this.attrs.height = attrs.fontSize;
-    // }
   }
 
   override updateAttrs(partialAttrs: Partial<TextAttrs> & IAdvancedAttrs) {

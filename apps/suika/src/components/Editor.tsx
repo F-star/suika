@@ -61,7 +61,7 @@ const Editor: FC = () => {
       );
 
       (async () => {
-        await fontManager.loadAllFonts({
+        await fontManager.loadFonts({
           'Smiley Sans': './font_files/smiley-sans-oblique.otf',
           'Source Han Sans CN': './font_files/SourceHanSansCN-Regular.otf',
         });
