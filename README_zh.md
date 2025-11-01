@@ -2,7 +2,7 @@
 
 简体中文 | [English](./README.md)
 
-[体验网址](https://blog.fstars.wang/app/suika/)
+[体验网址](https://f-star.github.io/suika/)
 
 ![Screenshot](screenshot.png)
 
@@ -81,7 +81,7 @@ pnpm build
 
 ## 代码实现相关文章
 
-如果你想学习如何系统开发 Web 图形编辑器，可以看我写的 [文章合集](https://blog.fstars.wang/graphics-editor/archive.html)
+如果你想学习如何系统开发 Web 图形编辑器，可以看我写的 [文章合集](https://mp.weixin.qq.com/s/rerdHx4FBfP9ONXd0DLB5w?click_id=3)
 
 可关注我的个人公众号，该公众号会持续更新图形编辑器相关文章。
 
