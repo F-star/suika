@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { FONT_FILES } from '@/constant';
 
 import { EditorContext } from '../../../context';
 import NumberInput from '../../input/NumberInput';
@@ -99,10 +100,11 @@ export const TypographyCard = () => {
               <SelectValue placeholder="Select font family" />
             </SelectTrigger>
             <SelectContent className="w-full">
-              <SelectItem value="Smiley Sans">Smiley Sans</SelectItem>
-              <SelectItem value="Source Han Sans CN">
-                Source Han Sans CN
-              </SelectItem>
+              {Object.keys(FONT_FILES).map((font) => (
+                <SelectItem key={font} value={font}>
+                  {font}
+                </SelectItem>
+              ))}
               <SelectItem className="hidden" value={MIXED}>
                 Mixed
               </SelectItem>
