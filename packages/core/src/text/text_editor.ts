@@ -374,14 +374,15 @@ export class TextEditor {
 
   drawRange(drawInfo: IDrawInfo) {
     if (!this.isActive()) return;
-    const editor = this.editor;
-
-    const zoom = editor.viewportManager.getZoom();
-    const fontSize = editor.setting.get('defaultFontSize');
-    const inputDomHeight = fontSize * zoom;
 
     const textGraphics = this.textGraphics;
     if (!textGraphics) return;
+
+    const editor = this.editor;
+
+    const zoom = editor.viewportManager.getZoom();
+    const lineHeight = textGraphics.getActualLineHeight();
+    const inputDomHeight = lineHeight * zoom;
 
     const { topInViewport, bottomInViewport, rightInViewport } =
       this.rangeManager.getCursorLinePos(textGraphics);

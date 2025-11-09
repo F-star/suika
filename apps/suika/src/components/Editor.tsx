@@ -4,6 +4,8 @@ import { pick, throttle } from '@suika/common';
 import { fontManager, type SettingValue, SuikaEditor } from '@suika/core';
 import { type FC, useEffect, useRef, useState } from 'react';
 
+import { FONT_FILES } from '@/constant';
+
 import { EditorContext } from '../context';
 import { AutoSaveGraphics } from '../store/auto-save-graphs';
 import { ContextMenu } from './ContextMenu';
@@ -61,10 +63,7 @@ const Editor: FC = () => {
       );
 
       (async () => {
-        await fontManager.loadFonts({
-          'Smiley Sans': './font_files/smiley-sans-oblique.otf',
-          'Source Han Sans CN': './font_files/SourceHanSansCN-Regular.otf',
-        });
+        await fontManager.loadFonts(FONT_FILES);
         if (isCanceled) return;
 
         const editor = new SuikaEditor({

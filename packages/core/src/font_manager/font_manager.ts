@@ -4,21 +4,21 @@ class FontManager {
   private fonts: Record<string, Font | null> = {};
 
   async loadFonts(fonts: Record<string, string>) {
-    for (const [key] of Object.entries(fonts)) {
-      if (this.fonts[key]) {
-        console.warn(`Font ${key} is loaded or loading, skip`);
+    for (const [fontName] of Object.entries(fonts)) {
+      if (this.fonts[fontName]) {
+        console.warn(`Font ${fontName} is loaded or loading, skip`);
         continue;
       }
-      this.fonts[key] = null;
+      this.fonts[fontName] = null;
     }
 
-    for (const [key, url] of Object.entries(fonts)) {
-      if (this.fonts[key]) {
+    for (const [fontName, url] of Object.entries(fonts)) {
+      if (this.fonts[fontName]) {
         continue;
       }
 
       const font = await opentype.load(url);
-      this.fonts[key] = font;
+      this.fonts[fontName] = font;
     }
   }
 
@@ -29,6 +29,10 @@ class FontManager {
       return this.fonts['Smiley Sans']!;
     }
     return font;
+  }
+
+  getFontNames() {
+    return Object.keys(this.fonts);
   }
 }
 

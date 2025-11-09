@@ -76,16 +76,16 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   fitContent() {
-    const { width } = this.getContentMetrics();
+    const { width, height } = this.getContentMetrics();
     this.attrs.width = width;
-    this.attrs.height = this.attrs.fontSize;
+    this.attrs.height = height;
   }
 
   override draw(drawInfo: IDrawInfo) {
     if (this.shouldSkipDraw(drawInfo)) return;
 
     const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
-    const { transform, fill, stroke, fontSize, fontFamily } = this.attrs;
+    const { transform, fill, stroke } = this.attrs;
     const { ctx } = drawInfo;
     ctx.save();
     ctx.transform(...transform);
@@ -93,8 +93,6 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       ctx.globalAlpha = opacity;
     }
     ctx.beginPath();
-    // TODO: Don't hardcode this, should provide a default value from external source
-    ctx.font = `${fontSize}px ${fontFamily ?? 'sans-serif'}`;
 
     for (const paint of fill ?? []) {
       switch (paint.type) {
@@ -115,8 +113,8 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     ctx.restore();
   }
 
-  private getActualAdvanceWidth(font: Font, advanceWidth: number) {
-    return advanceWidth * (this.attrs.fontSize / font.unitsPerEm);
+  private fontUnitToPx(font: Font, unit: number) {
+    return unit * (this.attrs.fontSize / font.unitsPerEm);
   }
 
   private drawText(ctx: CanvasRenderingContext2D) {
@@ -124,18 +122,26 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     const font = fontManager.getFont(this.attrs.fontFamily);
 
     ctx.save();
-    const scale = this.attrs.fontSize / font.unitsPerEm;
 
-    const ascender = this.getActualAdvanceWidth(
-      font,
-      font.tables.hhea.ascender as number,
-    );
+    const fontSize = this.attrs.fontSize;
+    const fontSizeScale = fontSize / font.unitsPerEm;
 
-    const contentMetrics = this.getContentMetrics();
-    const metricsBlockHeight = contentMetrics.height;
-    const offset = (metricsBlockHeight - this.attrs.fontSize) / 2;
-    ctx.translate(0, ascender - offset);
-    ctx.scale(scale, -scale);
+    const unitsPerEm = font.unitsPerEm;
+    const ascender = font.ascender as number;
+    const descender = font.descender as number;
+    const lineGap = font.tables.hhea.lineGap as number;
+
+    const defaultLineHeight = (ascender - descender + lineGap) * fontSizeScale;
+    const actualLineHeight = Math.round(defaultLineHeight);
+
+    const halfPadding = (actualLineHeight - defaultLineHeight) / fontSizeScale;
+
+    const matrix = new Matrix()
+      .scale(1, -1)
+      .translate(0, ascender + lineGap / 2 + halfPadding)
+      .scale(fontSize / unitsPerEm, fontSize / unitsPerEm);
+
+    ctx.transform(...matrix.getArray());
 
     for (const glyph of glyphs) {
       ctx.save();
@@ -184,23 +190,25 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     const font = fontManager.getFont(this.attrs.fontFamily);
     const lastGlyph = glyphs[glyphs.length - 1];
 
+    const lineHeight = Math.round(this.getDefaultLineHeight());
+
+    this.contentMetrics = {
+      width: this.fontUnitToPx(font, lastGlyph.position.x + lastGlyph.width),
+      height: lineHeight,
+    };
+    return this.contentMetrics;
+  }
+
+  private getDefaultLineHeight() {
+    const font = fontManager.getFont(this.attrs.fontFamily);
     const ascender = font.tables.hhea.ascender as number;
     const descender = font.tables.hhea.descender as number;
     const lineGap = font.tables.hhea.lineGap as number;
+    return this.fontUnitToPx(font, ascender - descender + lineGap);
+  }
 
-    const metricsBlockHeight = this.getActualAdvanceWidth(
-      font,
-      ascender - descender + lineGap,
-    );
-
-    this.contentMetrics = {
-      width: this.getActualAdvanceWidth(
-        font,
-        lastGlyph.position.x + lastGlyph.width,
-      ),
-      height: Math.round(metricsBlockHeight),
-    };
-    return this.contentMetrics;
+  getActualLineHeight() {
+    return this.getContentMetrics().height;
   }
 
   getContentLength() {
