@@ -1,5 +1,9 @@
 import opentype, { type Font } from 'opentype.js';
 
+import { AsyncTaskManager } from './async_task_manager';
+
+const FONT_LOAD_CONCURRENCY = 3;
+
 class FontManager {
   private fonts: Record<string, Font | null> = {};
 
@@ -12,14 +16,22 @@ class FontManager {
       this.fonts[fontName] = null;
     }
 
+    const taskManager = new AsyncTaskManager<Font>(FONT_LOAD_CONCURRENCY);
+    const tasks: Array<() => Promise<Font>> = [];
+
     for (const [fontName, url] of Object.entries(fonts)) {
       if (this.fonts[fontName]) {
         continue;
       }
 
-      const font = await opentype.load(url);
-      this.fonts[fontName] = font;
+      tasks.push(async () => {
+        const font = await opentype.load(url);
+        this.fonts[fontName] = font;
+        return font;
+      });
     }
+
+    await taskManager.addTaskList(tasks);
   }
 
   getFont(fontFamily: string) {
