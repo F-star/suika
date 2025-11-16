@@ -13,6 +13,7 @@ import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
 import { LayerPanel } from './LayerPanel';
 import { Pages } from './Pages';
+import { ProgressOverlay } from './ProgressOverlay';
 
 const topMargin = 48;
 const leftRightMargin = 240 * 2;
@@ -34,6 +35,8 @@ const Editor: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [suikaEditor, setEditor] = useState<SuikaEditor | null>(null);
+
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -64,6 +67,7 @@ const Editor: FC = () => {
 
       (async () => {
         await fontManager.loadFonts(FONT_FILES);
+        setProgress(100);
         if (isCanceled) return;
 
         const editor = new SuikaEditor({
@@ -110,6 +114,7 @@ const Editor: FC = () => {
 
   return (
     <div>
+      <ProgressOverlay value={progress} />
       <EditorContext.Provider value={suikaEditor}>
         <Header title="suika" />
         {/* body */}
