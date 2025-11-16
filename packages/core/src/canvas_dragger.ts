@@ -78,7 +78,7 @@ export class CanvasDragger {
       this.editor.setCursor('grabbing');
       const vwPos = this.editor.getCursorXY(event);
       this.onStart({
-        pos: this.editor.toScenePt(vwPos.x, vwPos.y),
+        pos: this.editor.toScenePt(vwPos),
         vwPos,
         nativeEvent: event,
       });

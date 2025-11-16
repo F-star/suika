@@ -97,7 +97,7 @@ export class Ruler {
       bboxes.map(({ minX, maxX }) => [minX, maxX]),
     )) {
       ctx.fillRect(
-        this.editor.toViewportPt(minX, 0).x,
+        this.editor.toViewportPt({ x: minX, y: 0 }).x,
         0,
         this.editor.toViewportSize(maxX - minX),
         rulerWidth,
@@ -108,7 +108,7 @@ export class Ruler {
     )) {
       ctx.fillRect(
         0,
-        this.editor.toViewportPt(0, minY).y,
+        this.editor.toViewportPt({ x: 0, y: minY }).y,
         rulerWidth,
         this.editor.toViewportSize(maxY - minY),
       );
@@ -138,7 +138,7 @@ export class Ruler {
       ctx.fillStyle = setting.get('rulerMarkStroke');
       // 转为视口坐标
 
-      const intX = nearestPixelVal(this.editor.toViewportPt(x, 0).x);
+      const intX = nearestPixelVal(this.editor.toViewportPt({ x, y: 0 }).x);
       ctx.beginPath();
       ctx.moveTo(intX, y);
       ctx.lineTo(intX, y + setting.get('rulerMarkSize'));
@@ -165,7 +165,7 @@ export class Ruler {
     ctx.fillStyle = setting.get('rulerMarkStroke');
     let y = startYInScene;
     while (y <= endYInScene) {
-      const intY = nearestPixelVal(this.editor.toViewportPt(0, y).y);
+      const intY = nearestPixelVal(this.editor.toViewportPt({ x: 0, y }).y);
       ctx.beginPath();
       ctx.moveTo(x, intY);
       ctx.lineTo(x + setting.get('rulerMarkSize'), intY);

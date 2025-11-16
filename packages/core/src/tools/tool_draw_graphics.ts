@@ -71,8 +71,7 @@ export abstract class DrawGraphicsTool implements ITool {
       }
       if (this.isDragging) {
         this.lastDragPoint = editor.toScenePt(
-          this.lastDragPointInViewport.x,
-          this.lastDragPointInViewport.y,
+          this.lastDragPointInViewport,
           this.editor.setting.get('snapToGrid'),
         );
         this.updateRect();

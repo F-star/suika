@@ -116,13 +116,13 @@ export class RangeManager {
     const textMatrix = textGraphics.getWorldTransform();
 
     const top = applyMatrix(textMatrix, cursorPosInText);
-    const topInViewport = this.editor.toViewportPt(top.x, top.y);
+    const topInViewport = this.editor.toViewportPt(top);
 
     const bottom = applyMatrix(textMatrix, {
       x: cursorPosInText.x,
       y: cursorPosInText.y + contentHeight,
     });
-    const bottomInViewport = this.editor.toViewportPt(bottom.x, bottom.y);
+    const bottomInViewport = this.editor.toViewportPt(bottom);
 
     let rightInViewport: IPoint | null = null;
 
@@ -130,7 +130,7 @@ export class RangeManager {
       const endGlyphInfo = this.getGlyphByIndex(textGraphics, range.end);
       const endPosInText = endGlyphInfo.position;
       const right = applyMatrix(textMatrix, endPosInText);
-      rightInViewport = this.editor.toViewportPt(right.x, right.y);
+      rightInViewport = this.editor.toViewportPt(right);
     }
 
     return {

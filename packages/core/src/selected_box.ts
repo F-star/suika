@@ -80,7 +80,7 @@ export class SelectedBox {
         height: bbox.height,
       },
       bbox.transform,
-    ).map((pt) => this.editor.toViewportPt(pt.x, pt.y));
+    ).map((pt) => this.editor.toViewportPt(pt));
 
     this.drawBox(ctx, polygon);
     this.drawSizeIndicator(ctx, polygon, bbox);

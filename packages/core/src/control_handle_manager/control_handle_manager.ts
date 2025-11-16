@@ -202,7 +202,7 @@ export class ControlHandleManager {
         height: rect.height,
       },
       rect.transform,
-    ).map((pt) => this.editor.toViewportPt(pt.x, pt.y));
+    ).map((pt) => this.editor.toViewportPt(pt));
     const minSize = this.editor.setting.get('sizeIndicatorMinSize');
     if (
       distance(polygon[0], polygon[1]) < minSize &&
@@ -236,7 +236,10 @@ export class ControlHandleManager {
       if (graphics.type === GraphicsType.Path) {
         // TODO:
       } else {
-        const { x, y } = this.editor.toViewportPt(handle.cx, handle.cy);
+        const { x, y } = this.editor.toViewportPt({
+          x: handle.cx,
+          y: handle.cy,
+        });
         graphics.updateAttrs({
           transform: [
             1,
@@ -280,7 +283,7 @@ export class ControlHandleManager {
       return null;
     }
 
-    const hitPointVW = this.editor.toViewportPt(hitPoint.x, hitPoint.y);
+    const hitPointVW = this.editor.toViewportPt(hitPoint);
 
     const selectedBox = this.editor.selectedBox.getBox();
 
@@ -316,11 +319,11 @@ export class ControlHandleManager {
   }
   getCustomHandlesIntersectedWithRect(rect: IRect) {
     // convert rect to viewport
-    const leftTop = this.editor.toViewportPt(rect.x, rect.y);
-    const bottomRight = this.editor.toViewportPt(
-      rect.x + rect.width,
-      rect.y + rect.height,
-    );
+    const leftTop = this.editor.toViewportPt(rect);
+    const bottomRight = this.editor.toViewportPt({
+      x: rect.x + rect.width,
+      y: rect.y + rect.height,
+    });
     const box = {
       minX: leftTop.x,
       minY: leftTop.y,

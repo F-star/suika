@@ -239,8 +239,8 @@ export class ViewportManager {
     return { minX, minY, maxX, maxY };
   }
 
-  toScenePt(x: number, y: number, round = false) {
-    const scenePt = this.viewMatrix.applyInverse({ x, y });
+  toScenePt(point: IPoint, round = false) {
+    const scenePt = this.viewMatrix.applyInverse(point);
     if (round) {
       scenePt.x = Math.round(scenePt.x);
       scenePt.y = Math.round(scenePt.y);
@@ -248,8 +248,8 @@ export class ViewportManager {
     return scenePt;
   }
 
-  toViewportPt(x: number, y: number) {
-    return this.viewMatrix.apply({ x, y });
+  toViewportPt(point: IPoint) {
+    return this.viewMatrix.apply(point);
   }
 
   toSceneSize(size: number) {

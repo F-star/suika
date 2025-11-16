@@ -100,10 +100,7 @@ export class SelectMoveTool implements IBaseTool {
     this.editor.sceneGraph.showBoxAndHandleWhenSelected = false;
     this.editor.sceneGraph.showSelectedGraphsOutline = false;
 
-    const currPoint = this.editor.toScenePt(
-      this.dragPoint!.x,
-      this.dragPoint!.y,
-    );
+    const currPoint = this.editor.toScenePt(this.dragPoint!);
 
     let dx = currPoint.x - this.startPoint.x;
     let dy = currPoint.y - this.startPoint.y;

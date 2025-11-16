@@ -115,7 +115,7 @@ export class MouseEventManager {
   private getPosAndVwPos(event: PointerEvent) {
     const vwPos = this.editor.getCursorXY(event);
     return {
-      pos: this.editor.toScenePt(vwPos.x, vwPos.y),
+      pos: this.editor.toScenePt(vwPos),
       vwPos,
     };
   }

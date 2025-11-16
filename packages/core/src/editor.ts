@@ -1,5 +1,5 @@
 import { EventEmitter, genUuid } from '@suika/common';
-import { mergeBoxes } from '@suika/geo';
+import { type IPoint, mergeBoxes } from '@suika/geo';
 
 import { CanvasDragger } from './canvas_dragger';
 import { ClipboardManager } from './clipboard';
@@ -213,11 +213,11 @@ export class SuikaEditor {
     return this.cursorManager.getCursor();
   }
 
-  toScenePt(x: number, y: number, round = false) {
-    return this.viewportManager.toScenePt(x, y, round);
+  toScenePt(point: IPoint, round = false) {
+    return this.viewportManager.toScenePt(point, round);
   }
-  toViewportPt(x: number, y: number) {
-    return this.viewportManager.toViewportPt(x, y);
+  toViewportPt(point: IPoint) {
+    return this.viewportManager.toViewportPt(point);
   }
   toSceneSize(size: number) {
     return this.viewportManager.toSceneSize(size);
@@ -235,7 +235,7 @@ export class SuikaEditor {
   /** get cursor scene xy */
   getSceneCursorXY(event: { clientX: number; clientY: number }, round = false) {
     const { x, y } = this.getCursorXY(event);
-    return this.toScenePt(x, y, round);
+    return this.toScenePt({ x, y }, round);
   }
   render() {
     this.sceneGraph.render();

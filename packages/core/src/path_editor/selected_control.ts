@@ -169,10 +169,10 @@ export class SelectedControl {
               strokeWidth: 1,
             },
             {
-              advancedAttrs: this.editor.toViewportPt(
-                anchor.x + anchorSize / 2,
-                anchor.y + anchorSize / 2,
-              ),
+              advancedAttrs: this.editor.toViewportPt({
+                x: anchor.x + anchorSize / 2,
+                y: anchor.y + anchorSize / 2,
+              }),
               doc: this.editor.doc,
             },
           ),
@@ -260,10 +260,10 @@ export class SelectedControl {
                 count: 4,
               },
               {
-                advancedAttrs: this.editor.toViewportPt(
-                  handle.x + size / 2,
-                  handle.y + size / 2,
-                ),
+                advancedAttrs: this.editor.toViewportPt({
+                  x: handle.x + size / 2,
+                  y: handle.y + size / 2,
+                }),
                 doc: this.editor.doc,
               },
             ),

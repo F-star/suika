@@ -202,10 +202,7 @@ export class PenTool implements ITool {
                 {
                   segs: [
                     {
-                      point: this.editor.toViewportPt(
-                        lastSeg.point.x,
-                        lastSeg.point.y,
-                      ),
+                      point: this.editor.toViewportPt(lastSeg.point),
                       in: {
                         x: this.editor.toViewportSize(lastSeg.in.x),
                         y: this.editor.toViewportSize(lastSeg.in.y),
@@ -216,7 +213,7 @@ export class PenTool implements ITool {
                       },
                     },
                     {
-                      point: this.editor.toViewportPt(point.x, point.y),
+                      point: this.editor.toViewportPt(point),
                       in: { x: 0, y: 0 },
                       out: { x: 0, y: 0 },
                     },

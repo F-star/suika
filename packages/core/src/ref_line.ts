@@ -371,10 +371,10 @@ export class RefLine {
       let minY = Infinity;
       let maxY = -Infinity;
 
-      const { x } = this.editor.toViewportPt(vLine.x, 0);
+      const { x } = this.editor.toViewportPt({ x: vLine.x, y: 0 });
       for (const y_ of vLine.ys) {
         // TODO: optimize
-        const { y } = this.editor.toViewportPt(0, y_);
+        const { y } = this.editor.toViewportPt({ x: 0, y: y_ });
         minY = Math.min(minY, y);
         maxY = Math.max(maxY, y);
 
@@ -401,10 +401,10 @@ export class RefLine {
       let minX = Infinity;
       let maxX = -Infinity;
 
-      const { y } = this.editor.toViewportPt(0, hLine.y);
+      const { y } = this.editor.toViewportPt({ x: 0, y: hLine.y });
 
       for (const x_ of hLine.xs) {
-        const { x } = this.editor.toViewportPt(x_, 0);
+        const { x } = this.editor.toViewportPt({ x: x_, y: 0 });
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
 

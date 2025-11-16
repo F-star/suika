@@ -318,9 +318,6 @@ export class ToolManager {
   }
 
   getCurrPoint() {
-    return this.editor.toScenePt(
-      this.currViewportPoint.x,
-      this.currViewportPoint.y,
-    );
+    return this.editor.toScenePt(this.currViewportPoint);
   }
 }

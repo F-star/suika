@@ -158,7 +158,7 @@ export class SceneGraph {
         continue;
       }
       const pos = frame.getWorldPosition();
-      const viewportPos = this.editor.toViewportPt(pos.x, pos.y);
+      const viewportPos = this.editor.toViewportPt(pos);
       frame.drawText(ctx, viewportPos.x, viewportPos.y - padding);
     }
 
@@ -180,7 +180,10 @@ export class SceneGraph {
       ctx.fillStyle = setting.get('selectionFill');
       const { x, y, width, height } = this.selection;
 
-      const { x: xInViewport, y: yInViewport } = this.editor.toViewportPt(x, y);
+      const { x: xInViewport, y: yInViewport } = this.editor.toViewportPt({
+        x,
+        y,
+      });
 
       const widthInViewport = width * zoom;
       const heightInViewport = height * zoom;

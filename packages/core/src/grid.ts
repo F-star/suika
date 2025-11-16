@@ -22,7 +22,7 @@ export class Grid {
     let x = startXInScene;
     while (x <= endXInScene) {
       ctx.strokeStyle = setting.get('pixelGridLineColor');
-      const pixelX = nearestPixelVal(this.editor.toViewportPt(x, 0).x);
+      const pixelX = nearestPixelVal(this.editor.toViewportPt({ x, y: 0 }).x);
       ctx.beginPath();
       ctx.moveTo(pixelX, 0);
       ctx.lineTo(pixelX, pageSize.height);
@@ -37,7 +37,9 @@ export class Grid {
 
     while (startYInScene <= endYInScene) {
       ctx.strokeStyle = setting.get('pixelGridLineColor');
-      const y = nearestPixelVal(this.editor.toViewportPt(0, startYInScene).y);
+      const y = nearestPixelVal(
+        this.editor.toViewportPt({ x: 0, y: startYInScene }).y,
+      );
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(pageSize.width, y);
