@@ -10,6 +10,7 @@ import {
 
 import { ControlHandle } from '../control_handle_manager';
 import { type IPaint, PaintType } from '../paint';
+import { RectShape } from '../render_engine';
 import { GraphicsType, type Optional } from '../type';
 import { SuikaEllipse } from './ellipse';
 import {
@@ -38,6 +39,11 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
       },
       opts,
     );
+    this.shape.graphics.label = attrs.objectName;
+  }
+
+  protected override createShape() {
+    this.shape = new RectShape();
   }
 
   override getAttrs(): RectAttrs {

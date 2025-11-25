@@ -43,6 +43,7 @@ import {
   type PaintImage,
   PaintType,
 } from '../../paint';
+import { SuikaShape } from '../../render_engine';
 import {
   GraphicsType,
   type IFillStrokeSVGAttrs,
@@ -73,6 +74,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
 
   private noCollectUpdate: boolean;
 
+  shape!: SuikaShape;
+
   constructor(
     attrs: Omit<Optional<ATTRS, 'transform'>, 'id'>,
     opts: IGraphicsOpts,
@@ -102,6 +105,12 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
 
     this.noCollectUpdate = Boolean(opts?.noCollectUpdate);
+    this.createShape();
+  }
+
+  protected createShape() {
+    this.shape = new SuikaShape();
+    this.shape.graphics.label = this.attrs.objectName;
   }
 
   getAttrs(): ATTRS {
@@ -508,6 +517,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
       child.draw(drawInfo);
     }
     ctx.restore();
+
+    this.shape.draw();
   }
 
   drawOutline(
@@ -912,6 +923,9 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     }
 
     this.children.push(graphics);
+    // 添加渲染对象
+    this.shape.addChild(graphics.shape);
+
     if (sortIdx) {
       // TODO: 考虑 this._sortDirty 标记为 true，然后找个合适的时机再排序，减少图形重复地调用 sortChildren
       this.sortChildren();
