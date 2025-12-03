@@ -33,9 +33,16 @@ interface AlignItemProps {
   alignType: AlignType;
   intlId: MessageIds;
   editor: SuikaEditor | null;
+  disabled: boolean;
 }
 
-const AlignItem: FC<AlignItemProps> = ({ icon, alignType, intlId, editor }) => {
+const AlignItem: FC<AlignItemProps> = ({
+  icon,
+  alignType,
+  intlId,
+  editor,
+  disabled,
+}) => {
   const intl = useIntl();
 
   return (
@@ -44,7 +51,9 @@ const AlignItem: FC<AlignItemProps> = ({ icon, alignType, intlId, editor }) => {
         <div
           className="align-item"
           onClick={() => {
-            editor && alignAndRecord(editor, alignType);
+            if (editor && !disabled) {
+              alignAndRecord(editor, alignType);
+            }
           }}
         >
           {icon}
@@ -85,36 +94,42 @@ export const AlignCard: FC = () => {
           alignType={AlignType.Left}
           intlId="align.left"
           editor={editor}
+          disabled={disabled}
         />
         <AlignItem
           icon={<AlignHCenter />}
           alignType={AlignType.HCenter}
           intlId="align.horizontalCenter"
           editor={editor}
+          disabled={disabled}
         />
         <AlignItem
           icon={<AlignRight />}
           alignType={AlignType.Right}
           intlId="align.right"
           editor={editor}
+          disabled={disabled}
         />
         <AlignItem
           icon={<AlignTop />}
           alignType={AlignType.Top}
           intlId="align.top"
           editor={editor}
+          disabled={disabled}
         />
         <AlignItem
           icon={<AlignVCenter />}
           alignType={AlignType.VCenter}
           intlId="align.verticalCenter"
           editor={editor}
+          disabled={disabled}
         />
         <AlignItem
           icon={<IconAlignBottom />}
           alignType={AlignType.Bottom}
           intlId="align.bottom"
           editor={editor}
+          disabled={disabled}
         />
       </div>
     </BaseCard>
