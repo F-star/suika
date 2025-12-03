@@ -70,5 +70,12 @@
 
   "layer": "Layer",
 
-  "typography": "Typography"
+  "typography": "Typography",
+
+  "align.left": "Align left",
+  "align.horizontalCenter": "Align horizontal centers",
+  "align.right": "Align right",
+  "align.top": "Align top",
+  "align.verticalCenter": "Align vertical centers",
+  "align.bottom": "Align bottom"
 }

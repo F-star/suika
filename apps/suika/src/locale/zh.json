@@ -69,5 +69,12 @@
 
   "layer": "图层",
 
-  "typography": "文字"
+  "typography": "文字",
+
+  "align.left": "左对齐",
+  "align.horizontalCenter": "左右居中对齐",
+  "align.right": "右对齐",
+  "align.top": "顶部对齐",
+  "align.verticalCenter": "上下居中对齐",
+  "align.bottom": "底部对齐"
 }

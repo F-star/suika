@@ -1,6 +1,11 @@
 import './AlignCard.scss';
 
-import { alignAndRecord, AlignType, type SuikaGraphics } from '@suika/core';
+import {
+  alignAndRecord,
+  AlignType,
+  type SuikaEditor,
+  type SuikaGraphics,
+} from '@suika/core';
 import {
   AlignHCenter,
   AlignLeft,
@@ -11,9 +16,46 @@ import {
 } from '@suika/icons';
 import classNames from 'classnames';
 import { type FC, useContext, useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { EditorContext } from '../../../context';
+import { type MessageIds } from '../../../locale';
 import { BaseCard } from '../BaseCard';
+
+interface AlignItemProps {
+  icon: JSX.Element;
+  alignType: AlignType;
+  intlId: MessageIds;
+  editor: SuikaEditor | null;
+}
+
+const AlignItem: FC<AlignItemProps> = ({ icon, alignType, intlId, editor }) => {
+  const intl = useIntl();
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <div
+          className="align-item"
+          onClick={() => {
+            editor && alignAndRecord(editor, alignType);
+          }}
+        >
+          {icon}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        {intl.formatMessage({ id: intlId })}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
 
 export const AlignCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -38,54 +80,42 @@ export const AlignCard: FC = () => {
   return (
     <BaseCard>
       <div className={classNames('align-list', { disabled })}>
-        <div
-          className="align-item"
-          onClick={() => {
-            editor && alignAndRecord(editor, AlignType.Left);
-          }}
-        >
-          <AlignLeft />
-        </div>
-        <div
-          className="align-item"
-          onClick={() => {
-            editor && alignAndRecord(editor, AlignType.HCenter);
-          }}
-        >
-          <AlignHCenter />
-        </div>
-        <div
-          className="align-item"
-          onClick={() => {
-            editor && alignAndRecord(editor, AlignType.Right);
-          }}
-        >
-          <AlignRight />
-        </div>
-        <div
-          className="align-item"
-          onClick={() => {
-            editor && alignAndRecord(editor, AlignType.Top);
-          }}
-        >
-          <AlignTop />
-        </div>
-        <div
-          className="align-item"
-          onClick={() => {
-            editor && alignAndRecord(editor, AlignType.VCenter);
-          }}
-        >
-          <AlignVCenter />
-        </div>
-        <div
-          className="align-item"
-          onClick={() => {
-            editor && alignAndRecord(editor, AlignType.Bottom);
-          }}
-        >
-          <IconAlignBottom />
-        </div>
+        <AlignItem
+          icon={<AlignLeft />}
+          alignType={AlignType.Left}
+          intlId="align.left"
+          editor={editor}
+        />
+        <AlignItem
+          icon={<AlignHCenter />}
+          alignType={AlignType.HCenter}
+          intlId="align.horizontalCenter"
+          editor={editor}
+        />
+        <AlignItem
+          icon={<AlignRight />}
+          alignType={AlignType.Right}
+          intlId="align.right"
+          editor={editor}
+        />
+        <AlignItem
+          icon={<AlignTop />}
+          alignType={AlignType.Top}
+          intlId="align.top"
+          editor={editor}
+        />
+        <AlignItem
+          icon={<AlignVCenter />}
+          alignType={AlignType.VCenter}
+          intlId="align.verticalCenter"
+          editor={editor}
+        />
+        <AlignItem
+          icon={<IconAlignBottom />}
+          alignType={AlignType.Bottom}
+          intlId="align.bottom"
+          editor={editor}
+        />
       </div>
     </BaseCard>
   );
