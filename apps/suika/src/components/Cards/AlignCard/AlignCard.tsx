@@ -1,5 +1,6 @@
 import './AlignCard.scss';
 
+import { isWindows } from '@suika/common';
 import {
   alignAndRecord,
   AlignType,
@@ -34,6 +35,7 @@ interface AlignItemProps {
   intlId: MessageIds;
   editor: SuikaEditor | null;
   disabled: boolean;
+  hotkey?: string;
 }
 
 const AlignItem: FC<AlignItemProps> = ({
@@ -42,6 +44,7 @@ const AlignItem: FC<AlignItemProps> = ({
   intlId,
   editor,
   disabled,
+  hotkey,
 }) => {
   const intl = useIntl();
 
@@ -61,6 +64,7 @@ const AlignItem: FC<AlignItemProps> = ({
       </TooltipTrigger>
       <TooltipContent side="bottom">
         {intl.formatMessage({ id: intlId })}
+        {hotkey && <span className="ml-4 text-[#ccc]">{hotkey}</span>}
       </TooltipContent>
     </Tooltip>
   );
@@ -86,6 +90,10 @@ export const AlignCard: FC = () => {
     }
   }, [editor]);
 
+  const getHotkey = (key: string) => {
+    return isWindows() ? `Alt ${key}` : `⌥${key}`;
+  };
+
   return (
     <BaseCard>
       <div className={classNames('align-list', { disabled })}>
@@ -95,6 +103,7 @@ export const AlignCard: FC = () => {
           intlId="align.left"
           editor={editor}
           disabled={disabled}
+          hotkey={getHotkey('A')}
         />
         <AlignItem
           icon={<AlignHCenter />}
@@ -102,6 +111,7 @@ export const AlignCard: FC = () => {
           intlId="align.horizontalCenter"
           editor={editor}
           disabled={disabled}
+          hotkey={getHotkey('H')}
         />
         <AlignItem
           icon={<AlignRight />}
@@ -109,6 +119,7 @@ export const AlignCard: FC = () => {
           intlId="align.right"
           editor={editor}
           disabled={disabled}
+          hotkey={getHotkey('D')}
         />
         <AlignItem
           icon={<AlignTop />}
@@ -116,6 +127,7 @@ export const AlignCard: FC = () => {
           intlId="align.top"
           editor={editor}
           disabled={disabled}
+          hotkey={getHotkey('W')}
         />
         <AlignItem
           icon={<AlignVCenter />}
@@ -123,6 +135,7 @@ export const AlignCard: FC = () => {
           intlId="align.verticalCenter"
           editor={editor}
           disabled={disabled}
+          hotkey={getHotkey('V')}
         />
         <AlignItem
           icon={<IconAlignBottom />}
@@ -130,6 +143,7 @@ export const AlignCard: FC = () => {
           intlId="align.bottom"
           editor={editor}
           disabled={disabled}
+          hotkey={getHotkey('S')}
         />
       </div>
     </BaseCard>
