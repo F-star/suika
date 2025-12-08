@@ -302,6 +302,9 @@ export class SelectResizeTool implements IBaseTool {
   private resizeGraphicsArray(prependedTransform: IMatrixArr) {
     const selectedItems = this.editor.selectedElements.getItems();
     for (const item of selectedItems) {
+      if (item.isLock()) {
+        continue;
+      }
       const id = item.attrs.id;
       const originWorldTf = this.originWorldTransforms.get(id)!;
       const newWorldTf = multiplyMatrix(prependedTransform, originWorldTf);
