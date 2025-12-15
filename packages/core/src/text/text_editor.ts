@@ -92,6 +92,7 @@ export class TextEditor {
     this.transaction.recordOld<TextAttrs>(textGraphics!.attrs.id, {
       content: textGraphics!.attrs.content,
       width: textGraphics!.attrs.width,
+      height: textGraphics!.attrs.height,
     });
 
     if (params.range) {
@@ -123,6 +124,7 @@ export class TextEditor {
         this.transaction.update<TextAttrs>(this.textGraphics.attrs.id, {
           content: this.textGraphics.attrs.content,
           width: this.textGraphics.attrs.width,
+          height: this.textGraphics.attrs.height,
         });
         this.transaction.updateParentSize([this.textGraphics]);
         this.transaction.commit('update text content');
@@ -146,9 +148,7 @@ export class TextEditor {
 
     const inputDom = this.inputDom;
 
-    inputDom.addEventListener('input', (_e) => {
-      const e = _e as InputEvent;
-
+    const updateContent = (e: { isComposing: boolean; data: string }) => {
       const textGraphics = this.textGraphics;
       if (!textGraphics) return;
 
@@ -195,6 +195,15 @@ export class TextEditor {
         });
         this.editor.render();
       }
+    };
+
+    inputDom.addEventListener('input', (_e) => {
+      const e = _e as InputEvent;
+
+      updateContent({
+        isComposing: e.isComposing,
+        data: e.data ?? '',
+      });
     });
 
     inputDom.addEventListener('keydown', (e) => {
@@ -246,6 +255,18 @@ export class TextEditor {
           this.rangeManager.moveRight();
         }
         this.editor.render();
+      } else if (e.key === 'ArrowUp') {
+        if (e.isComposing) return;
+
+        const isRangeSelect = e.shiftKey;
+        this.rangeManager.moveUp(isRangeSelect);
+        this.editor.render();
+      } else if (e.key === 'ArrowDown') {
+        if (e.isComposing) return;
+
+        const isRangeSelect = e.shiftKey;
+        this.rangeManager.moveDown(isRangeSelect);
+        this.editor.render();
       }
       // select all
       else if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
@@ -294,6 +315,13 @@ export class TextEditor {
           end: rangeLeft,
         });
         this.editor.render();
+      }
+      // input '\n'
+      else if (e.key === 'Enter' && !e.isComposing) {
+        updateContent({
+          isComposing: false,
+          data: '\n',
+        });
       }
     });
     inputDom.addEventListener('blur', () => {
@@ -380,29 +408,28 @@ export class TextEditor {
 
     const editor = this.editor;
 
+    const canvasOffsetX = editor.setting.get('offsetX');
+    const canvasOffsetY = editor.setting.get('offsetY');
     const zoom = editor.viewportManager.getZoom();
     const lineHeight = textGraphics.getActualLineHeight();
     const inputDomHeight = lineHeight * zoom;
 
-    const { topInViewport, bottomInViewport, rightInViewport } =
-      this.rangeManager.getCursorLinePos(textGraphics);
+    const { rects, matrix } = this.rangeManager.getCursorLinePos(textGraphics);
 
-    const canvasOffsetX = editor.setting.get('offsetX');
-    const canvasOffsetY = editor.setting.get('offsetY');
+    // the top position of the left vertical line of the first glyph
+    const firstGlyphBottom = matrix.apply({
+      x: rects[0].x,
+      y: rects[0].y,
+    });
 
     const styles = {
-      left: bottomInViewport.x + canvasOffsetX + 'px',
-      top: bottomInViewport.y - inputDomHeight + canvasOffsetY + 'px',
+      left: firstGlyphBottom.x + canvasOffsetX + 'px',
+      top: firstGlyphBottom.y - inputDomHeight + canvasOffsetY + 'px',
       height: `${inputDomHeight}px`,
       fontSize: `${inputDomHeight}px`,
     } as const;
     Object.assign(this.inputDom.style, styles);
 
-    this.rangeManager.draw(
-      drawInfo,
-      topInViewport,
-      bottomInViewport,
-      rightInViewport,
-    );
+    this.rangeManager.draw(drawInfo, rects, matrix);
   }
 }

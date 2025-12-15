@@ -1,11 +1,5 @@
 import { escapeHtml, parseRGBAStr } from '@suika/common';
-import {
-  applyInverseMatrix,
-  type IGlyph,
-  type IPoint,
-  type ITextMetrics,
-  Matrix,
-} from '@suika/geo';
+import { applyInverseMatrix, type IPoint, Matrix } from '@suika/geo';
 import { type Font } from 'opentype.js';
 
 import { fontManager } from '../../font_manager';
@@ -18,7 +12,7 @@ import {
   SuikaGraphics,
 } from '../graphics';
 import { type IDrawInfo } from '../type';
-import { calcGlyphInfos } from './utils';
+import { Paragraph } from './paragraph';
 
 export interface TextAttrs extends GraphicsAttrs {
   content: string;
@@ -42,8 +36,7 @@ const DEFAULT_TEXT_WEIGHT = 30;
 export class SuikaText extends SuikaGraphics<TextAttrs> {
   override type = GraphicsType.Text;
 
-  private _glyphs: IGlyph[] | null = null;
-  private contentMetrics: ITextMetrics | null = null;
+  paragraph: Paragraph;
 
   constructor(
     attrs: Optional<Omit<TextAttrs, 'id'>, 'width' | 'height' | 'transform'>,
@@ -58,6 +51,13 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       },
       opts,
     );
+
+    this.paragraph = new Paragraph({
+      content: attrs.content,
+      fontSize: attrs.fontSize,
+      fontFamily: attrs.fontFamily,
+      lineHeight: this.getDefaultLineHeight(),
+    });
   }
 
   override updateAttrs(partialAttrs: Partial<TextAttrs> & IAdvancedAttrs) {
@@ -68,15 +68,22 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       'fontFamily' in partialAttrs &&
       partialAttrs.fontFamily !== this.attrs.fontFamily;
 
-    if (isContentChanged || isFontSizeChanged || isFontFamilyChanged) {
-      this._glyphs = null;
-      this.contentMetrics = null;
-    }
     super.updateAttrs(partialAttrs);
+
+    if (isContentChanged || isFontSizeChanged || isFontFamilyChanged) {
+      const { content, fontSize, fontFamily } = this.attrs;
+      // recompute
+      this.paragraph = new Paragraph({
+        content,
+        fontSize,
+        fontFamily,
+        lineHeight: this.getDefaultLineHeight(),
+      });
+    }
   }
 
   fitContent() {
-    const { width, height } = this.getContentMetrics();
+    const { width, height } = this.paragraph.getBoxSize();
     this.attrs.width = width;
     this.attrs.height = height;
   }
@@ -143,12 +150,14 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
 
     ctx.transform(...matrix.getArray());
 
-    for (const glyph of glyphs) {
-      ctx.save();
-      ctx.translate(glyph.position.x, glyph.position.y);
-      const path2d = new Path2D(glyph.commands);
-      ctx.fill(path2d);
-      ctx.restore();
+    for (const line of glyphs) {
+      for (const glyph of line) {
+        ctx.save();
+        ctx.translate(glyph.position.x, glyph.position.y);
+        const path2d = new Path2D(glyph.commands);
+        ctx.fill(path2d);
+        ctx.restore();
+      }
     }
     ctx.restore();
   }
@@ -173,30 +182,14 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   getGlyphs() {
-    if (this._glyphs) return this._glyphs;
-    this._glyphs = calcGlyphInfos(this.attrs.content, {
-      fontSize: this.attrs.fontSize,
-      fontFamily: this.attrs.fontFamily,
-    });
-    return this._glyphs;
+    return this.paragraph.getGlyphs();
   }
 
   /**
    * the unit of the metrics is Pixel
    */
   getContentMetrics() {
-    if (this.contentMetrics) return this.contentMetrics;
-    const glyphs = this.getGlyphs();
-    const font = fontManager.getFont(this.attrs.fontFamily);
-    const lastGlyph = glyphs[glyphs.length - 1];
-
-    const lineHeight = Math.round(this.getDefaultLineHeight());
-
-    this.contentMetrics = {
-      width: this.fontUnitToPx(font, lastGlyph.position.x + lastGlyph.width),
-      height: lineHeight,
-    };
-    return this.contentMetrics;
+    return this.paragraph.getBoxSize();
   }
 
   private getDefaultLineHeight() {
@@ -208,11 +201,12 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   getActualLineHeight() {
-    return this.getContentMetrics().height;
+    return this.getDefaultLineHeight();
   }
 
   getContentLength() {
-    return this.getGlyphs().length - 1;
+    // -1 because of the fallback newline character
+    return this.paragraph.getGlyphCount() - 1;
   }
 
   protected override isFillShouldRender() {
@@ -224,34 +218,10 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     point = applyInverseMatrix(this.getWorldTransform(), point);
     const font = fontManager.getFont(this.attrs.fontFamily);
     const scale = this.attrs.fontSize / font.unitsPerEm;
-    const matrix = new Matrix()
-      .translate(0, this.attrs.fontSize)
-      .scale(scale, -scale);
+    const matrix = new Matrix().scale(scale, scale);
     point = matrix.applyInverse(point);
-    const glyphs = this.getGlyphs();
 
-    // binary search, find the nearest but not greater than point.x glyph index
-    let left = 0;
-    let right = glyphs.length - 1;
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      const glyph = glyphs[mid];
-      if (point.x < glyph.position.x) {
-        right = mid - 1;
-      } else {
-        left = mid + 1;
-      }
-    }
-    if (left === 0) return 0;
-    if (left >= glyphs.length) return glyphs.length - 1;
-
-    if (
-      glyphs[left].position.x - point.x >
-      point.x - glyphs[right].position.x
-    ) {
-      return right;
-    }
-    return left;
+    return this.paragraph.getGlyphIndexByPt(point);
   }
 
   override getInfoPanelAttrs() {
