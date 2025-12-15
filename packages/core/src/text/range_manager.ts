@@ -1,7 +1,6 @@
-import { applyMatrix, type IPoint, Matrix } from '@suika/geo';
+import { type IRect, Matrix } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { fontManager } from '../font_manager';
 import { type IDrawInfo, type SuikaText } from '../graphics';
 
 export interface IRange {
@@ -62,6 +61,43 @@ export class RangeManager {
     }
   }
 
+  moveUp(rangeSelect: boolean) {
+    const textGraphics = this.editor.textEditor.getTextGraphics();
+    if (!textGraphics) return;
+    const index = textGraphics.paragraph.getUpGlyphIndex(this.range.start);
+
+    if (!rangeSelect) {
+      this.setRange({
+        start: index,
+        end: index,
+      });
+    } else {
+      const { rangeLeft } = this.getSortedRange();
+      this.setRange({
+        start: rangeLeft,
+        end: index,
+      });
+    }
+  }
+
+  moveDown(rangeSelect: boolean) {
+    const textGraphics = this.editor.textEditor.getTextGraphics();
+    if (!textGraphics) return;
+    const index = textGraphics.paragraph.getDownGlyphIndex(this.range.start);
+    if (!rangeSelect) {
+      this.setRange({
+        start: index,
+        end: index,
+      });
+    } else {
+      const { rangeRight } = this.getSortedRange();
+      this.setRange({
+        start: rangeRight,
+        end: index,
+      });
+    }
+  }
+
   dMove(num: number) {
     const start = Math.max(0, this.range.start + num);
     const end = Math.max(0, this.range.end + num);
@@ -87,95 +123,50 @@ export class RangeManager {
     this.moveRangeEnd(delta);
   }
 
-  private getGlyphByIndex(textGraphics: SuikaText, index: number) {
-    const glyphInfos = textGraphics.getGlyphs();
-    const { height: contentHeight } = textGraphics.getContentMetrics();
-    const glyphInfo = glyphInfos[index] ?? {
-      position: { x: 0, y: 0 },
-      width: 0,
-      height: contentHeight,
-    };
-
-    const font = fontManager.getFont(textGraphics.attrs.fontFamily);
-    const fontSizeScale = textGraphics.attrs.fontSize / font.unitsPerEm;
-    const fontSizeTf = new Matrix().scale(fontSizeScale, fontSizeScale);
-    const position = fontSizeTf.apply(glyphInfo.position);
-
-    return {
-      ...glyphInfo,
-      position,
-    };
-  }
-
+  // return the rects and matrix
   getCursorLinePos(textGraphics: SuikaText) {
+    const unitToPxMatrix = textGraphics.paragraph.getUnitToPxMatrix();
+    const textMatrix = new Matrix(...textGraphics.getWorldTransform());
+    const viewportMatrix = this.editor.viewportManager.getViewMatrix();
+    const matrix = viewportMatrix.append(textMatrix).append(unitToPxMatrix);
+
     const range = this.getRange();
-    const { height: contentHeight } = textGraphics.getContentMetrics();
-    const startGlyphInfo = this.getGlyphByIndex(textGraphics, range.start);
-    const cursorPosInText = startGlyphInfo.position;
 
-    const textMatrix = textGraphics.getWorldTransform();
-
-    const top = applyMatrix(textMatrix, cursorPosInText);
-    const topInViewport = this.editor.toViewportPt(top);
-
-    const bottom = applyMatrix(textMatrix, {
-      x: cursorPosInText.x,
-      y: cursorPosInText.y + contentHeight,
-    });
-    const bottomInViewport = this.editor.toViewportPt(bottom);
-
-    let rightInViewport: IPoint | null = null;
-
-    if (range.end !== range.start) {
-      const endGlyphInfo = this.getGlyphByIndex(textGraphics, range.end);
-      const endPosInText = endGlyphInfo.position;
-      const right = applyMatrix(textMatrix, endPosInText);
-      rightInViewport = this.editor.toViewportPt(right);
-    }
+    const rects = textGraphics.paragraph.getRangeRects(range.start, range.end);
 
     return {
-      topInViewport,
-      bottomInViewport,
-      rightInViewport,
+      rects,
+      matrix,
     };
   }
 
-  draw(
-    drawInfo: IDrawInfo,
-    topInViewport: IPoint,
-    bottomInViewport: IPoint,
-    rightInViewport: IPoint | null,
-  ) {
+  draw(drawInfo: IDrawInfo, rects: IRect[], matrix: Matrix) {
+    const range = this.getRange();
+    const isDrawLine = range.start === range.end;
+
     const { ctx } = drawInfo;
-
-    const stroke = this.editor.setting.get('textEditorCursorLineStroke');
-    const strokeWidth = this.editor.setting.get('textEditorCursorSize');
-
     ctx.save();
-    if (!rightInViewport) {
+
+    if (isDrawLine) {
+      const p1 = matrix.apply({ x: rects[0].x, y: rects[0].y });
+      const p2 = matrix.apply({
+        x: rects[0].x,
+        y: rects[0].y + rects[0].height,
+      });
       ctx.beginPath();
-      ctx.moveTo(topInViewport.x, topInViewport.y);
-      ctx.lineTo(bottomInViewport.x, bottomInViewport.y);
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
       ctx.closePath();
-      ctx.lineWidth = strokeWidth;
-      ctx.strokeStyle = stroke;
+
+      ctx.strokeStyle = this.editor.setting.get('textEditorCursorLineStroke');
+      ctx.lineWidth = this.editor.setting.get('textEditorCursorSize');
       ctx.stroke();
     } else {
-      const fill = this.editor.setting.get('textEditorSelectionFill');
-      ctx.beginPath();
-      ctx.moveTo(topInViewport.x, topInViewport.y);
-      ctx.lineTo(bottomInViewport.x, bottomInViewport.y);
-      const dx = bottomInViewport.x - topInViewport.x;
-      const dy = bottomInViewport.y - topInViewport.y;
-      const rightBottom = {
-        x: rightInViewport.x + dx,
-        y: rightInViewport.y + dy,
-      };
-      ctx.lineTo(rightBottom.x, rightBottom.y);
-      ctx.lineTo(rightInViewport.x, rightInViewport.y);
-      ctx.closePath();
-      ctx.fillStyle = fill;
-      ctx.fill();
+      ctx.transform(...matrix.getArray());
+      ctx.fillStyle = this.editor.setting.get('textEditorSelectionFill');
+      for (const rect of rects) {
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      }
     }
 
     ctx.restore();

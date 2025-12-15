@@ -24,7 +24,7 @@ export const calcGlyphInfos = (
 
   // 末尾换行符
   glyphs.push({
-    position: { x: x, y: y },
+    position: { x, y },
     width: 0,
     commands: '',
   });
