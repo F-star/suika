@@ -180,37 +180,42 @@ export class Paragraph {
 
     const glyphs = this.getGlyphs();
     let i = 0;
-    let endLoop = false;
-    let glyph: IGlyph | undefined;
     const lineHeightInFontUnit = this.pxToFontUnit(this.attrs.lineHeight);
     for (const line of glyphs) {
-      for (glyph of line) {
-        if (i >= start && i < end) {
-          rects.push({
-            x: glyph.position.x,
-            y: glyph.position.y,
-            width: glyph.width,
-            height: lineHeightInFontUnit,
-          });
-        }
-        if (i >= end) {
-          endLoop = true;
-          break;
-        }
-        i++;
+      const lineStart = i;
+      const lineEnd = lineStart + line.length - 1; // ignore last glyph '\n'
+
+      if (lineEnd < start) {
+        i += line.length;
+        continue;
       }
-      if (endLoop) {
+      if (lineStart > end) {
         break;
       }
-    }
-    // i === start === end
-    if (rects.length === 0 && glyph) {
+
+      const a = Math.max(start, lineStart);
+      const b = Math.min(end, lineEnd);
+
+      const glyphStart = line[a - lineStart];
+      const x = glyphStart.position.x;
+      const y = glyphStart.position.y;
+
+      let x2 = 0;
+      if (b === lineEnd && lineEnd !== end) {
+        x2 = this.width;
+      } else {
+        const glyphEnd = line[b - lineStart];
+        x2 = glyphEnd.position.x;
+      }
+
       rects.push({
-        x: glyph.position.x,
-        y: glyph.position.y,
-        width: glyph.width,
+        x: x,
+        y: y,
+        width: x2 - x,
         height: lineHeightInFontUnit,
       });
+
+      i += line.length;
     }
     return rects;
   }
