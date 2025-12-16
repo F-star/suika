@@ -16,6 +16,8 @@ const defaultInputStyle = {
   padding: 0,
   border: 0,
   outline: 0,
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
   opacity: 0,
 } as const;
 
@@ -57,6 +59,7 @@ export class TextEditor {
 
   active(params: { textGraphics?: SuikaText; pos: IPoint; range?: IRange }) {
     this._active = true;
+    this.inputDom.value = '';
     this.editor.controlHandleManager.enableTransformControl = false;
     this.editor.selectedBox.enableDrawSizeIndicator = false;
     this.transaction = new Transaction(this.editor);
@@ -318,6 +321,7 @@ export class TextEditor {
       }
       // input '\n'
       else if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault(); // prevent default new line behavior of textarea
         updateContent({
           isComposing: false,
           data: '\n',
