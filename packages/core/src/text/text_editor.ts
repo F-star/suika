@@ -20,7 +20,7 @@ const defaultInputStyle = {
 } as const;
 
 export class TextEditor {
-  private inputDom: HTMLInputElement;
+  private inputDom: HTMLTextAreaElement;
   private textGraphics: SuikaText | null = null;
   private rangeManager: RangeManager;
   private _active = false;
@@ -37,7 +37,7 @@ export class TextEditor {
   }
 
   private createInputDom() {
-    const inputDom = document.createElement('input');
+    const inputDom = document.createElement('textarea');
     inputDom.tabIndex = -1;
     Object.assign(inputDom.style, defaultInputStyle);
     return inputDom;
