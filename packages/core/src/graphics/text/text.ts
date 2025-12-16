@@ -84,8 +84,12 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
 
   fitContent() {
     const { width, height } = this.paragraph.getBoxSize();
+    if (width === this.attrs.width && height === this.attrs.height) {
+      return;
+    }
     this.attrs.width = width;
     this.attrs.height = height;
+    this.clearBboxCache();
   }
 
   override draw(drawInfo: IDrawInfo) {
