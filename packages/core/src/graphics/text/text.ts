@@ -83,7 +83,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   fitContent() {
-    const { width, height } = this.paragraph.getBoxSize();
+    const { width, height } = this.paragraph.getLayoutSize();
     if (width === this.attrs.width && height === this.attrs.height) {
       return;
     }
@@ -187,13 +187,6 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
 
   getGlyphs() {
     return this.paragraph.getGlyphs();
-  }
-
-  /**
-   * the unit of the metrics is Pixel
-   */
-  getContentMetrics() {
-    return this.paragraph.getBoxSize();
   }
 
   private getDefaultLineHeight() {

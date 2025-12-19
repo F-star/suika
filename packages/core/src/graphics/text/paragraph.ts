@@ -57,7 +57,7 @@ export class Paragraph {
     }
   }
 
-  getBoxSize() {
+  getLayoutSize() {
     const lineCount = this.glyphs.length;
     return {
       width: this.fontUnitToPx(this.width),
