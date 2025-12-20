@@ -61,7 +61,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       fontSize: attrs.fontSize,
       fontFamily: attrs.fontFamily,
       lineHeight: this.getDefaultLineHeight(),
-      letterSpacing: attrs.letterSpacing,
+      letterSpacing: this.attrs.letterSpacing,
     });
   }
 
