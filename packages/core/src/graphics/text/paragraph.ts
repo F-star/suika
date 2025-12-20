@@ -1,6 +1,7 @@
-import { type IGlyph, type IPoint, type IRect, Matrix } from '@suika/geo';
+import { type IPoint, type IRect, Matrix } from '@suika/geo';
 
 import { fontManager } from '../../font_manager';
+import { type IGlyph, type ILetterSpacing } from './type';
 import { calcGlyphInfos } from './utils';
 
 interface IParagraphAttrs {
@@ -8,6 +9,7 @@ interface IParagraphAttrs {
   fontSize: number;
   lineHeight: number;
   fontFamily: string;
+  letterSpacing: ILetterSpacing;
 }
 
 export class Paragraph {
@@ -41,6 +43,7 @@ export class Paragraph {
       const glyphs = calcGlyphInfos(line, {
         fontSize: this.attrs.fontSize,
         fontFamily: this.attrs.fontFamily,
+        letterSpacing: this.attrs.letterSpacing,
       });
       for (const glyph of glyphs) {
         glyph.position.y = y;

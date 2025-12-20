@@ -13,11 +13,14 @@ import {
 } from '../graphics';
 import { type IDrawInfo } from '../type';
 import { Paragraph } from './paragraph';
+import { type ILetterSpacing } from './type';
 
 export interface TextAttrs extends GraphicsAttrs {
   content: string;
   fontSize: number;
   fontFamily: string;
+  letterSpacing: ILetterSpacing;
+
   autoFit?: boolean;
   // e.g. fontName: { family: "Anonymous Pro", style: "Regular", postscript: "AnonymousPro-Regular" },
   // fontName: {
@@ -48,6 +51,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         type: GraphicsType.Text,
         width: attrs.width ?? DEFAULT_TEXT_WIDTH,
         height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
+        letterSpacing: attrs.letterSpacing ?? { value: 0, units: 'PIXELS' },
       },
       opts,
     );
@@ -57,6 +61,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       fontSize: attrs.fontSize,
       fontFamily: attrs.fontFamily,
       lineHeight: this.getDefaultLineHeight(),
+      letterSpacing: attrs.letterSpacing,
     });
   }
 
@@ -67,10 +72,16 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     const isFontFamilyChanged =
       'fontFamily' in partialAttrs &&
       partialAttrs.fontFamily !== this.attrs.fontFamily;
+    const isLetterSpacingChanged = 'letterSpacing' in partialAttrs;
 
     super.updateAttrs(partialAttrs);
 
-    if (isContentChanged || isFontSizeChanged || isFontFamilyChanged) {
+    if (
+      isContentChanged ||
+      isFontSizeChanged ||
+      isFontFamilyChanged ||
+      isLetterSpacingChanged
+    ) {
       const { content, fontSize, fontFamily } = this.attrs;
       // recompute
       this.paragraph = new Paragraph({
@@ -78,6 +89,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         fontSize,
         fontFamily,
         lineHeight: this.getDefaultLineHeight(),
+        letterSpacing: this.attrs.letterSpacing,
       });
     }
   }

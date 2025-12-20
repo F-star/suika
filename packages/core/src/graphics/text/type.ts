@@ -1,4 +1,4 @@
-import { type IPoint } from '../type';
+import { type IPoint } from '@suika/geo';
 
 export interface ITextMetrics {
   readonly width: number;
@@ -14,4 +14,12 @@ export interface IGlyph {
 export interface IFontStyle {
   fontSize: number;
   fontFamily: string;
+  letterSpacing: ILetterSpacing;
+}
+
+export type INumberUnits = 'PIXELS' | 'PERCENT';
+
+export interface ILetterSpacing {
+  value: number;
+  units: INumberUnits;
 }
