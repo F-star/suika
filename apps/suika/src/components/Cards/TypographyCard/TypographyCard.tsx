@@ -17,7 +17,7 @@ import {
 import { FONT_FILES } from '@/constant';
 
 import { EditorContext } from '../../../context';
-import NumberInput from '../../input/NumberInput';
+import { FontSizeInput } from '../../input/FontSizeInput';
 import { BaseCard } from '../BaseCard';
 
 export const TypographyCard = () => {
@@ -150,11 +150,12 @@ export const TypographyCard = () => {
         </div>
 
         <div className="flex ">
-          <div>
-            <div className="mx-[4px] mb-1 text-sm text-muted-foreground">
+          <div className="ml-2">
+            <div className="mb-1 text-sm text-muted-foreground">
               {intl.formatMessage({ id: 'fontSize' })}
             </div>
-            <NumberInput
+            <FontSizeInput
+              className="w-[100px]"
               value={fontSize}
               min={1}
               max={100}
@@ -166,7 +167,7 @@ export const TypographyCard = () => {
               onChange={execUpdateFontSizeCommand}
             />
           </div>
-          <div className="mx-[4px] mb-2">
+          <div className="ml-2 mb-2">
             <div className="mb-1 text-sm text-muted-foreground">
               {intl.formatMessage({ id: 'letterSpacing' })}
             </div>
