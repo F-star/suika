@@ -71,6 +71,9 @@
 
   "typography": "文字",
 
+  "fontSize": "字号",
+  "letterSpacing": "字间距",
+
   "align.left": "左对齐",
   "align.horizontalCenter": "左右居中对齐",
   "align.right": "右对齐",

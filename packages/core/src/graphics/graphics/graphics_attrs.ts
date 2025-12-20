@@ -3,6 +3,7 @@ import { type IMatrixArr } from '@suika/geo';
 import { type IPaint } from '../../paint';
 import { type GraphicsType } from '../../type';
 import { type SuikaDocument } from '../document';
+import { type ILetterSpacing } from '../text/type';
 
 export interface GraphicsAttrs {
   type?: GraphicsType;
@@ -37,6 +38,7 @@ export interface GraphicsAttrs {
   // text
   fontSize?: number;
   fontFamily?: string;
+  letterSpacing?: ILetterSpacing;
 }
 
 export interface IParentIndex {

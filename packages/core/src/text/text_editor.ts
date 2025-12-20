@@ -78,6 +78,7 @@ export class TextEditor {
           width: 0,
           height: fontSize,
           autoFit: true,
+          letterSpacing: { value: 0, units: 'PIXELS' },
         },
         {
           advancedAttrs: params.pos,

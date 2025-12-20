@@ -1,6 +1,5 @@
-import type { IFontStyle, IGlyph } from '@suika/geo';
-
 import { fontManager } from '../../font_manager';
+import { type IFontStyle, type IGlyph } from './type';
 
 export const calcGlyphInfos = (
   content: string,
@@ -11,15 +10,34 @@ export const calcGlyphInfos = (
   const originGlyphs = font.stringToGlyphs(content);
   const glyphs: IGlyph[] = [];
 
+  let letterSpacingVal = fontStyle.letterSpacing.value;
+  if (fontStyle.letterSpacing.units === 'PIXELS') {
+    letterSpacingVal = pxToFontUnit(letterSpacingVal, fontStyle);
+  } else if (fontStyle.letterSpacing.units === 'PERCENT') {
+    letterSpacingVal = pxToFontUnit(
+      (fontStyle.fontSize * letterSpacingVal) / 100,
+      fontStyle,
+    );
+  }
+
   let x = 0;
   const y = 0;
-  for (const glyph of originGlyphs) {
+
+  for (let i = 0; i < originGlyphs.length; i++) {
+    const glyph = originGlyphs[i];
+    let width = glyph.advanceWidth ?? 0;
+
+    // last glyph don't add letter spacing
+    if (i < originGlyphs.length - 1) {
+      width += letterSpacingVal;
+    }
+
     glyphs.push({
       position: { x: x, y: y },
-      width: glyph.advanceWidth!, // TODO: when will it be empty?
+      width: width,
       commands: glyph.path.toPathData(100),
     });
-    x += glyph.advanceWidth!;
+    x += width;
   }
 
   // 末尾换行符
@@ -32,18 +50,10 @@ export const calcGlyphInfos = (
   return glyphs;
 };
 
-// export const calcTextSize_by_opentype = (
-//   content: string,
-//   fontStyle: IFontStyle,
-// ): ITextMetrics => {
-//   const font = fontManager.getFont(fontStyle.fontFamily);
-//   const glyphs = calcGlyphInfos(content, fontStyle);
-//   const lastGlyph = glyphs[glyphs.length - 1];
-//   const contentMetrics = {
-//     width:
-//       ((lastGlyph.position.x + lastGlyph.width) * fontStyle.fontSize) /
-//       font.unitsPerEm,
-//     height: fontStyle.fontSize,
-//   };
-//   return contentMetrics;
-// };
+const pxToFontUnit = (
+  px: number,
+  fontStyle: { fontFamily: string; fontSize: number },
+) => {
+  const font = fontManager.getFont(fontStyle.fontFamily);
+  return px * (font.unitsPerEm / fontStyle.fontSize);
+};

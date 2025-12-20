@@ -72,6 +72,9 @@
 
   "typography": "Typography",
 
+  "fontSize": "Font size",
+  "letterSpacing": "Letter spacing",
+
   "align.left": "Align left",
   "align.horizontalCenter": "Align horizontal centers",
   "align.right": "Align right",
