@@ -64,7 +64,7 @@ export class RangeManager {
   moveUp(rangeSelect: boolean) {
     const textGraphics = this.editor.textEditor.getTextGraphics();
     if (!textGraphics) return;
-    const index = textGraphics.paragraph.getUpGlyphIndex(this.range.start);
+    const index = textGraphics.paragraph.getUpGlyphIndex(this.range.end);
 
     if (!rangeSelect) {
       this.setRange({
@@ -72,9 +72,8 @@ export class RangeManager {
         end: index,
       });
     } else {
-      const { rangeLeft } = this.getSortedRange();
       this.setRange({
-        start: rangeLeft,
+        start: this.range.start,
         end: index,
       });
     }
@@ -83,22 +82,21 @@ export class RangeManager {
   moveDown(rangeSelect: boolean) {
     const textGraphics = this.editor.textEditor.getTextGraphics();
     if (!textGraphics) return;
-    const index = textGraphics.paragraph.getDownGlyphIndex(this.range.start);
+    const index = textGraphics.paragraph.getDownGlyphIndex(this.range.end);
     if (!rangeSelect) {
       this.setRange({
         start: index,
         end: index,
       });
     } else {
-      const { rangeRight } = this.getSortedRange();
       this.setRange({
-        start: rangeRight,
+        start: this.range.start,
         end: index,
       });
     }
   }
 
-  dMove(num: number) {
+  private dMove(num: number) {
     const start = Math.max(0, this.range.start + num);
     const end = Math.max(0, this.range.end + num);
     this.setRange({
