@@ -1,6 +1,5 @@
 import { escapeHtml, parseRGBAStr } from '@suika/common';
 import { applyInverseMatrix, type IPoint, Matrix } from '@suika/geo';
-import { type Font } from 'opentype.js';
 
 import { fontManager } from '../../font_manager';
 import { PaintType } from '../../paint';
@@ -13,24 +12,16 @@ import {
 } from '../graphics';
 import { type IDrawInfo } from '../type';
 import { Paragraph } from './paragraph';
-import { type ILetterSpacing } from './type';
+import { type ILetterSpacing, type ILineHeight } from './type';
 
 export interface TextAttrs extends GraphicsAttrs {
   content: string;
   fontSize: number;
   fontFamily: string;
+  lineHeight: ILineHeight;
   letterSpacing: ILetterSpacing;
 
   autoFit?: boolean;
-  // e.g. fontName: { family: "Anonymous Pro", style: "Regular", postscript: "AnonymousPro-Regular" },
-  // fontName: {
-  //   family: string;
-  //   style: 'Regular' | 'Oblique' | 'Bold' | 'BoldOblique';
-  // };
-  // glyphs?: {
-  //   position: IPoint;
-  //   commands: IPathCommand[];
-  // }[];
 }
 
 const DEFAULT_TEXT_WIDTH = 80;
@@ -51,6 +42,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         type: GraphicsType.Text,
         width: attrs.width ?? DEFAULT_TEXT_WIDTH,
         height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
+        lineHeight: attrs.lineHeight ?? { value: 1, units: 'RAW' },
         letterSpacing: attrs.letterSpacing ?? { value: 0, units: 'PIXELS' },
       },
       opts,
@@ -60,7 +52,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       content: attrs.content,
       fontSize: attrs.fontSize,
       fontFamily: attrs.fontFamily,
-      lineHeight: this.getDefaultLineHeight(),
+      lineHeight: this.attrs.lineHeight,
       letterSpacing: this.attrs.letterSpacing,
     });
   }
@@ -73,14 +65,15 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       'fontFamily' in partialAttrs &&
       partialAttrs.fontFamily !== this.attrs.fontFamily;
     const isLetterSpacingChanged = 'letterSpacing' in partialAttrs;
-
+    const isLineHeightChanged = 'lineHeight' in partialAttrs;
     super.updateAttrs(partialAttrs);
 
     if (
       isContentChanged ||
       isFontSizeChanged ||
       isFontFamilyChanged ||
-      isLetterSpacingChanged
+      isLetterSpacingChanged ||
+      isLineHeightChanged
     ) {
       const { content, fontSize, fontFamily } = this.attrs;
       // recompute
@@ -88,7 +81,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         content,
         fontSize,
         fontFamily,
-        lineHeight: this.getDefaultLineHeight(),
+        lineHeight: this.attrs.lineHeight,
         letterSpacing: this.attrs.letterSpacing,
       });
     }
@@ -136,10 +129,6 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     ctx.restore();
   }
 
-  private fontUnitToPx(font: Font, unit: number) {
-    return unit * (this.attrs.fontSize / font.unitsPerEm);
-  }
-
   private drawText(ctx: CanvasRenderingContext2D) {
     const glyphs = this.getGlyphs();
     const font = fontManager.getFont(this.attrs.fontFamily);
@@ -155,9 +144,9 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     const lineGap = font.tables.hhea.lineGap as number;
 
     const defaultLineHeight = (ascender - descender + lineGap) * fontSizeScale;
-    const actualLineHeight = Math.round(defaultLineHeight);
-
-    const halfPadding = (actualLineHeight - defaultLineHeight) / fontSizeScale;
+    const actualLineHeight = this.getActualLineHeight();
+    const halfPadding =
+      (actualLineHeight - defaultLineHeight) / 2 / fontSizeScale;
 
     const matrix = new Matrix()
       .scale(1, -1)
@@ -201,16 +190,8 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     return this.paragraph.getGlyphs();
   }
 
-  private getDefaultLineHeight() {
-    const font = fontManager.getFont(this.attrs.fontFamily);
-    const ascender = font.tables.hhea.ascender as number;
-    const descender = font.tables.hhea.descender as number;
-    const lineGap = font.tables.hhea.lineGap as number;
-    return this.fontUnitToPx(font, ascender - descender + lineGap);
-  }
-
   getActualLineHeight() {
-    return this.getDefaultLineHeight();
+    return this.paragraph.getLineHeightPx();
   }
 
   getContentLength() {

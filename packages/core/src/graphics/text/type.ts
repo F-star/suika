@@ -23,3 +23,8 @@ export interface ILetterSpacing {
   value: number;
   units: INumberUnits;
 }
+
+export interface ILineHeight {
+  value: number;
+  units: INumberUnits | 'RAW';
+}

@@ -4,6 +4,7 @@ import { SetGraphsAttrsCmd } from '../commands/set_elements_attrs';
 import { type SuikaEditor } from '../editor';
 import {
   type ILetterSpacing,
+  type ILineHeight,
   type SuikaGraphics,
   type SuikaRect,
   type SuikaRegularPolygon,
@@ -510,5 +511,41 @@ export const MutateGraphsAndRecord = {
     }
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update LetterSpacing of Elements');
+  },
+
+  setLineHeight(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    val: ILineHeight,
+  ) {
+    const transaction = new Transaction(editor);
+
+    let hasTextElement = false;
+
+    for (const graphics of graphicsArr) {
+      if (!(graphics instanceof SuikaText)) {
+        continue;
+      }
+      hasTextElement = true;
+      transaction.recordOld(graphics.attrs.id, {
+        lineHeight: graphics.attrs.lineHeight,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+      });
+
+      graphics.updateAttrs({ lineHeight: val });
+      graphics.fitContent();
+
+      transaction.update(graphics.attrs.id, {
+        lineHeight: graphics.attrs.lineHeight,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+      });
+    }
+    if (!hasTextElement) {
+      return;
+    }
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update LineHeight of Elements');
   },
 };

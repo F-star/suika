@@ -77,8 +77,9 @@ export class TextEditor {
           fontFamily: defaultFontFamily,
           width: 0,
           height: fontSize,
-          autoFit: true,
+          lineHeight: { value: 1, units: 'RAW' },
           letterSpacing: { value: 0, units: 'PIXELS' },
+          autoFit: true,
         },
         {
           advancedAttrs: params.pos,
