@@ -57,3 +57,32 @@ const pxToFontUnit = (
   const font = fontManager.getFont(fontStyle.fontFamily);
   return px * (font.unitsPerEm / fontStyle.fontSize);
 };
+
+const fontUnitToPx = (unitsPerEm: number, unit: number, fontSize: number) => {
+  return unit * (fontSize / unitsPerEm);
+};
+
+export const getDefaultLineHeightPx = (
+  fontFamily: string,
+  fontSize: number,
+) => {
+  const font = fontManager.getFont(fontFamily);
+  if (!font) return 0;
+  const ascender = font.tables.hhea.ascender as number;
+  const descender = font.tables.hhea.descender as number;
+  const lineGap = font.tables.hhea.lineGap as number;
+  return fontUnitToPx(
+    font.unitsPerEm,
+    ascender - descender + lineGap,
+    fontSize,
+  );
+};
+
+export const getDefaultLineHeightInFontUnit = (fontFamily: string) => {
+  const font = fontManager.getFont(fontFamily);
+  if (!font) return 0;
+  const ascender = font.tables.hhea.ascender as number;
+  const descender = font.tables.hhea.descender as number;
+  const lineGap = font.tables.hhea.lineGap as number;
+  return ascender - descender + lineGap;
+};

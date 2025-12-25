@@ -1,14 +1,18 @@
 import { type IPoint, type IRect, Matrix } from '@suika/geo';
 
 import { fontManager } from '../../font_manager';
-import { type IGlyph, type ILetterSpacing } from './type';
-import { calcGlyphInfos } from './utils';
+import { type IGlyph, type ILetterSpacing, type ILineHeight } from './type';
+import {
+  calcGlyphInfos,
+  getDefaultLineHeightInFontUnit,
+  getDefaultLineHeightPx,
+} from './utils';
 
 interface IParagraphAttrs {
   content: string;
   fontSize: number;
-  lineHeight: number;
   fontFamily: string;
+  lineHeight: ILineHeight;
   letterSpacing: ILetterSpacing;
 }
 
@@ -16,6 +20,7 @@ export class Paragraph {
   private attrs: IParagraphAttrs;
   private glyphs: IGlyph[][] = [];
   private width = 0;
+  private lineHeightPx: number | undefined = undefined;
 
   constructor(attrs: IParagraphAttrs) {
     this.attrs = attrs;
@@ -33,17 +38,17 @@ export class Paragraph {
     this.width = 0;
     this.glyphs = [];
 
-    const lines = this.attrs.content.split('\n');
+    const attrs = this.attrs;
+    const lineHeightPx = this.getLineHeightPx();
+    const lineHeightInFontUnit = this.pxToFontUnit(lineHeightPx);
 
-    const lineHeight = this.attrs.lineHeight;
-    const lineHeightInFontUnit = this.pxToFontUnit(lineHeight);
-
+    const lines = attrs.content.split('\n');
     let y = 0;
     for (const line of lines) {
       const glyphs = calcGlyphInfos(line, {
-        fontSize: this.attrs.fontSize,
-        fontFamily: this.attrs.fontFamily,
-        letterSpacing: this.attrs.letterSpacing,
+        fontSize: attrs.fontSize,
+        fontFamily: attrs.fontFamily,
+        letterSpacing: attrs.letterSpacing,
       });
       for (const glyph of glyphs) {
         glyph.position.y = y;
@@ -60,11 +65,30 @@ export class Paragraph {
     }
   }
 
+  getLineHeightPx() {
+    if (this.lineHeightPx !== undefined) {
+      return this.lineHeightPx;
+    }
+    const attrs = this.attrs;
+    const lineHeight = attrs.lineHeight;
+    let lineHeightPx = lineHeight.value;
+    if (lineHeight.units === 'RAW') {
+      lineHeightPx = getDefaultLineHeightPx(attrs.fontFamily, attrs.fontSize);
+    } else if (lineHeight.units === 'PERCENT') {
+      lineHeightPx = attrs.fontSize * (lineHeight.value / 100);
+    } else if (lineHeight.units === 'PIXELS') {
+      lineHeightPx = lineHeight.value;
+    }
+    this.lineHeightPx = lineHeightPx;
+    return lineHeightPx;
+  }
+
   getLayoutSize() {
     const lineCount = this.glyphs.length;
     return {
       width: this.fontUnitToPx(this.width),
-      height: lineCount * this.attrs.lineHeight,
+      // TODO: consider min line height
+      height: lineCount * this.getLineHeightPx(),
     };
   }
 
@@ -100,7 +124,7 @@ export class Paragraph {
     if (glyphs.length === 0) return 0;
 
     if (lineIndex === undefined) {
-      const lineHeightInFontUnit = this.pxToFontUnit(this.attrs.lineHeight);
+      const lineHeightInFontUnit = this.pxToFontUnit(this.getLineHeightPx());
       lineIndex = Math.floor(point.y / lineHeightInFontUnit);
     }
     if (lineIndex < 0) lineIndex = 0;
@@ -183,7 +207,24 @@ export class Paragraph {
 
     const glyphs = this.getGlyphs();
     let i = 0;
-    const lineHeightInFontUnit = this.pxToFontUnit(this.attrs.lineHeight);
+
+    let rectHeight = 0;
+    let rectOffsetY = 0;
+
+    const lineHeightPx = this.getLineHeightPx();
+    const defaultLineHeightInFontUnit = getDefaultLineHeightInFontUnit(
+      this.attrs.fontFamily,
+    );
+    const lineHeightInFontUnit = this.pxToFontUnit(lineHeightPx);
+
+    const isDrawLine = start === end;
+    if (isDrawLine || lineHeightInFontUnit < defaultLineHeightInFontUnit) {
+      rectHeight = defaultLineHeightInFontUnit;
+      rectOffsetY = -(defaultLineHeightInFontUnit - lineHeightInFontUnit) / 2;
+    } else {
+      rectHeight = lineHeightInFontUnit;
+    }
+
     for (const line of glyphs) {
       const lineStart = i;
       const lineEnd = lineStart + line.length - 1; // ignore last glyph '\n'
@@ -213,9 +254,9 @@ export class Paragraph {
 
       rects.push({
         x: x,
-        y: y,
+        y: y + rectOffsetY,
         width: x2 - x,
-        height: lineHeightInFontUnit,
+        height: rectHeight,
       });
 
       i += line.length;
@@ -228,13 +269,13 @@ export class Paragraph {
     const fontSizeScale = this.attrs.fontSize / font.unitsPerEm;
     return new Matrix()
       .scale(fontSizeScale, -fontSizeScale)
-      .translate(0, this.attrs.lineHeight);
+      .translate(0, this.getLineHeightPx());
   }
 
   getUpGlyphIndex(index: number) {
     const glyph = this.getGlyphByIndex(index);
 
-    const lineHeightInFontUnit = this.pxToFontUnit(this.attrs.lineHeight);
+    const lineHeightInFontUnit = this.pxToFontUnit(this.getLineHeightPx());
 
     const lineIndex = Math.floor(-glyph.position.y / lineHeightInFontUnit) - 1;
     if (lineIndex < 0) return 0;
@@ -246,14 +287,14 @@ export class Paragraph {
   getDownGlyphIndex(index: number) {
     const glyph = this.getGlyphByIndex(index);
 
-    const lineHeightInFontUnit = this.pxToFontUnit(this.attrs.lineHeight);
+    const lineHeightInFontUnit = this.pxToFontUnit(this.getLineHeightPx());
     const lineIndex = Math.floor(-glyph.position.y / lineHeightInFontUnit) + 1;
     if (lineIndex >= this.glyphs.length) return this.getGlyphCount() - 1;
 
     const downIndex = this.getGlyphIndexByPt(
       {
         x: glyph.position.x,
-        y: glyph.position.y + this.attrs.lineHeight,
+        y: glyph.position.y + this.getLineHeightPx(),
       },
       lineIndex,
     );

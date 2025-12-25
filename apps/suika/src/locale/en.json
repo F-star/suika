@@ -74,6 +74,8 @@
 
   "fontSize": "Font size",
   "letterSpacing": "Letter spacing",
+  "lineHeight": "Line height",
+  "auto": "Auto",
 
   "align.left": "Align left",
   "align.horizontalCenter": "Align horizontal centers",

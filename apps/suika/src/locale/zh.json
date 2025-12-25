@@ -73,6 +73,8 @@
 
   "fontSize": "字号",
   "letterSpacing": "字间距",
+  "lineHeight": "行高",
+  "auto": "自动",
 
   "align.left": "左对齐",
   "align.horizontalCenter": "左右居中对齐",

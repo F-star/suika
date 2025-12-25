@@ -1,5 +1,6 @@
 import {
   type ILetterSpacing,
+  type ILineHeight,
   MutateGraphsAndRecord,
   SuikaText,
 } from '@suika/core';
@@ -7,6 +8,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { LetterSpacingInput } from '@/components/input/LetterSpacingInput';
+import { LineHeightInput } from '@/components/input/LineHeightInput';
 import {
   Select,
   SelectContent,
@@ -35,6 +37,12 @@ export const TypographyCard = () => {
     units: 'PERCENT',
   });
   const [isLetterSpacingMixed, setIsLetterSpacingMixed] = useState(false);
+
+  const [lineHeightUnit, setLineHeightUnit] = useState<ILineHeight>({
+    value: 1,
+    units: 'RAW',
+  });
+  const [isLineHeightMixed, setIsLineHeightMixed] = useState(false);
 
   useEffect(() => {
     if (!editor) return;
@@ -88,11 +96,31 @@ export const TypographyCard = () => {
         }
       }
 
+      let _lineHeight: ILineHeight | undefined;
+      let _isLineHeightMixed = false;
+      for (const item of items) {
+        if (item instanceof SuikaText) {
+          const lineHeight = item.attrs.lineHeight;
+          if (_lineHeight === undefined) {
+            _lineHeight = lineHeight;
+          } else if (
+            _lineHeight.value !== lineHeight.value ||
+            _lineHeight.units !== lineHeight.units
+          ) {
+            _isLineHeightMixed = true;
+            _lineHeight = { value: 1, units: 'RAW' };
+            break;
+          }
+        }
+      }
+
       setFontSize(_fontSize as number);
       setFontFamily(_fontFamily as string);
       setHasTextSelected(_hasTextSelected);
       setLetterSpacingUnit(_letterSpacing ?? { value: 0, units: 'PERCENT' });
       setIsLetterSpacingMixed(_isLetterSpacingMixed);
+      setLineHeightUnit(_lineHeight ?? { value: 1, units: 'RAW' });
+      setIsLineHeightMixed(_isLineHeightMixed);
     };
 
     updateFontInfo(); // init
@@ -118,6 +146,13 @@ export const TypographyCard = () => {
     if (!editor) return;
     const items = editor.selectedElements.getItems();
     MutateGraphsAndRecord.setLetterSpacing(editor, items, value);
+    editor.render();
+  };
+
+  const execUpdateLineHeightCommand = (value: ILineHeight) => {
+    if (!editor) return;
+    const items = editor.selectedElements.getItems();
+    MutateGraphsAndRecord.setLineHeight(editor, items, value);
     editor.render();
   };
 
@@ -149,22 +184,36 @@ export const TypographyCard = () => {
           </Select>
         </div>
 
-        <div className="flex ">
-          <div className="ml-2">
+        <div className="ml-2 mb-2">
+          <div className="mb-1 text-sm text-muted-foreground">
+            {intl.formatMessage({ id: 'fontSize' })}
+          </div>
+          <FontSizeInput
+            className="w-[100px]"
+            value={fontSize}
+            min={1}
+            max={100}
+            onIncrement={() => execUpdateFontSizeCommand(fontSize + 1)}
+            onDecrement={() => {
+              if (fontSize - 1 < 1) return;
+              execUpdateFontSizeCommand(fontSize - 1);
+            }}
+            onChange={execUpdateFontSizeCommand}
+          />
+        </div>
+        <div className="flex">
+          <div className="ml-2 mb-2">
             <div className="mb-1 text-sm text-muted-foreground">
-              {intl.formatMessage({ id: 'fontSize' })}
+              {intl.formatMessage({ id: 'lineHeight' })}
             </div>
-            <FontSizeInput
+            <LineHeightInput
               className="w-[100px]"
-              value={fontSize}
-              min={1}
-              max={100}
-              onIncrement={() => execUpdateFontSizeCommand(fontSize + 1)}
-              onDecrement={() => {
-                if (fontSize - 1 < 1) return;
-                execUpdateFontSizeCommand(fontSize - 1);
+              value={lineHeightUnit.value}
+              unit={lineHeightUnit.units}
+              mixed={isLineHeightMixed}
+              onChange={(value, unit) => {
+                execUpdateLineHeightCommand({ value, units: unit });
               }}
-              onChange={execUpdateFontSizeCommand}
             />
           </div>
           <div className="ml-2 mb-2">
