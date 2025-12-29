@@ -131,13 +131,6 @@ export class Paragraph {
     if (lineIndex >= glyphs.length) lineIndex = glyphs.length - 1;
 
     const lineGlyphs = glyphs[lineIndex];
-    if (lineGlyphs.length === 0) {
-      let totalIndex = 0;
-      for (let i = 0; i < lineIndex; i++) {
-        totalIndex += glyphs[i].length;
-      }
-      return totalIndex;
-    }
 
     // binary search, find the nearest but not greater than point.x glyph index
     let left = 0;
