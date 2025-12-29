@@ -30,33 +30,57 @@ export class RangeManager {
     return { rangeLeft, rangeRight };
   }
 
-  moveLeft() {
-    if (this.range.start === this.range.end) {
-      this.dMove(-1);
-    } else {
-      const { rangeLeft } = this.getSortedRange();
-      this.setRange({
-        start: rangeLeft,
-        end: rangeLeft,
-      });
-    }
-  }
-
   getMaxRange() {
     const textGraphics = this.editor.textEditor.getTextGraphics();
     return textGraphics ? textGraphics.getContentLength() : Infinity;
   }
 
-  moveRight() {
-    if (this.range.start === this.range.end) {
-      if (this.getMaxRange() > this.range.end) {
-        this.dMove(1);
+  moveLeft(rangeSelect: boolean) {
+    if (!rangeSelect) {
+      if (this.range.start !== this.range.end) {
+        const { rangeLeft } = this.getSortedRange();
+        this.setRange({
+          start: rangeLeft,
+          end: rangeLeft,
+        });
+      } else {
+        const newIndex = Math.max(this.range.end - 1, 0);
+        this.setRange({
+          start: newIndex,
+          end: newIndex,
+        });
       }
     } else {
-      const { rangeRight } = this.getSortedRange();
+      const newEnd = Math.max(this.range.end - 1, 0);
       this.setRange({
-        start: rangeRight,
-        end: rangeRight,
+        start: this.range.start,
+        end: newEnd,
+      });
+    }
+  }
+
+  moveRight(rangeSelect: boolean) {
+    if (!rangeSelect) {
+      if (this.range.start !== this.range.end) {
+        const { rangeRight } = this.getSortedRange();
+        this.setRange({
+          start: rangeRight,
+          end: rangeRight,
+        });
+      } else {
+        const glyphCount = this.getMaxRange();
+        const newIndex = Math.min(this.range.end + 1, glyphCount);
+        this.setRange({
+          start: newIndex,
+          end: newIndex,
+        });
+      }
+    } else {
+      const glyphCount = this.getMaxRange();
+      const newEnd = Math.min(this.range.end + 1, glyphCount);
+      this.setRange({
+        start: this.range.start,
+        end: newEnd,
       });
     }
   }
@@ -64,17 +88,19 @@ export class RangeManager {
   moveUp(rangeSelect: boolean) {
     const textGraphics = this.editor.textEditor.getTextGraphics();
     if (!textGraphics) return;
-    const index = textGraphics.paragraph.getUpGlyphIndex(this.range.end);
 
     if (!rangeSelect) {
+      const { rangeLeft } = this.getSortedRange();
+      const index = textGraphics.paragraph.getUpGlyphIndex(rangeLeft);
       this.setRange({
         start: index,
         end: index,
       });
     } else {
+      const newEnd = textGraphics.paragraph.getUpGlyphIndex(this.range.end);
       this.setRange({
         start: this.range.start,
-        end: index,
+        end: newEnd,
       });
     }
   }
@@ -82,13 +108,15 @@ export class RangeManager {
   moveDown(rangeSelect: boolean) {
     const textGraphics = this.editor.textEditor.getTextGraphics();
     if (!textGraphics) return;
-    const index = textGraphics.paragraph.getDownGlyphIndex(this.range.end);
     if (!rangeSelect) {
+      const { rangeRight } = this.getSortedRange();
+      const index = textGraphics.paragraph.getDownGlyphIndex(rangeRight);
       this.setRange({
         start: index,
         end: index,
       });
     } else {
+      const index = textGraphics.paragraph.getDownGlyphIndex(this.range.end);
       this.setRange({
         start: this.range.start,
         end: index,
@@ -96,29 +124,14 @@ export class RangeManager {
     }
   }
 
-  private dMove(num: number) {
-    const start = Math.max(0, this.range.start + num);
-    const end = Math.max(0, this.range.end + num);
+  setRangeEnd(end: number) {
+    const isInRange = end >= 0 && end <= this.getMaxRange();
+    if (!isInRange) return;
+
     this.setRange({
-      start,
+      start: this.range.start,
       end,
     });
-  }
-
-  moveRangeEnd(delta: number) {
-    const maxRange = this.getMaxRange();
-    const end = this.range.end + delta;
-    if (maxRange + 1 > end && end >= 0) {
-      this.setRange({
-        start: this.range.start,
-        end,
-      });
-    }
-  }
-
-  setRangeEnd(end: number) {
-    const delta = end - this.range.end;
-    this.moveRangeEnd(delta);
   }
 
   // return the rects and matrix

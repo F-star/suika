@@ -239,26 +239,16 @@ export class TextEditor {
             end: rangeLeft,
           });
         } else if (e.key === 'Backspace') {
-          this.rangeManager.moveLeft();
+          this.rangeManager.moveLeft(false);
         }
         this.editor.render();
       } else if (e.key === 'ArrowLeft') {
         if (e.isComposing) return;
-
-        if (e.shiftKey) {
-          this.rangeManager.moveRangeEnd(-1);
-        } else {
-          this.rangeManager.moveLeft();
-        }
+        this.rangeManager.moveLeft(e.shiftKey);
         this.editor.render();
       } else if (e.key === 'ArrowRight') {
         if (e.isComposing) return;
-
-        if (e.shiftKey) {
-          this.rangeManager.moveRangeEnd(1);
-        } else {
-          this.rangeManager.moveRight();
-        }
+        this.rangeManager.moveRight(e.shiftKey);
         this.editor.render();
       } else if (e.key === 'ArrowUp') {
         if (e.isComposing) return;

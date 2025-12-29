@@ -21,7 +21,6 @@ export const calcGlyphInfos = (
   }
 
   let x = 0;
-  const y = 0;
 
   for (let i = 0; i < originGlyphs.length; i++) {
     const glyph = originGlyphs[i];
@@ -33,7 +32,7 @@ export const calcGlyphInfos = (
     }
 
     glyphs.push({
-      position: { x: x, y: y },
+      position: { x: x, y: 0 },
       width: width,
       commands: glyph.path.toPathData(100),
     });
@@ -42,7 +41,7 @@ export const calcGlyphInfos = (
 
   // 末尾换行符
   glyphs.push({
-    position: { x, y },
+    position: { x, y: 0 },
     width: 0,
     commands: '',
   });
