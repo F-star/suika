@@ -26,6 +26,15 @@ export const calcGlyphInfos = (
     const glyph = originGlyphs[i];
     let width = glyph.advanceWidth ?? 0;
 
+    // solve kerning
+    if (i > 0) {
+      const prevGlyph = originGlyphs[i - 1];
+      const kerningValue = font.getKerningValue(prevGlyph, glyph);
+      if (kerningValue) {
+        x += kerningValue;
+      }
+    }
+
     // last glyph don't add letter spacing
     if (i < originGlyphs.length - 1) {
       width += letterSpacingVal;
