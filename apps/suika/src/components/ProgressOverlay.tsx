@@ -23,8 +23,10 @@ export const ProgressOverlay = ({ value }: IProps) => {
     let currentProgress = 0;
     const interval = setInterval(() => {
       if (currentProgress < 100) {
-        const increment = (100 - currentProgress) * 0.1 + 0.5;
-        currentProgress = Math.min(97, currentProgress + increment);
+        // slow start, fast end
+        const progressRatio = currentProgress / 100;
+        const increment = progressRatio * progressRatio * 5 + 1;
+        currentProgress = Math.min(95, currentProgress + increment);
         setDisplayProgress(Math.max(Math.floor(currentProgress), value));
       } else {
         clearInterval(interval);
