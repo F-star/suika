@@ -1,12 +1,10 @@
-import './LayerInfoCard.scss';
-
 import { Transaction } from '@suika/core';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { EditorContext } from '../../../context';
-import { PercentInput } from '../../input/PercentInput';
-import { BaseCard } from '../BaseCard';
+import { EditorContext } from '../../context';
+import { PercentInput } from '../input/PercentInput';
+import { BaseCard } from './BaseCard';
 
 export const LayerInfoCard: FC = () => {
   const [opacity, setOpacity] = useState<number | string>(1);
@@ -58,7 +56,7 @@ export const LayerInfoCard: FC = () => {
 
   return (
     <BaseCard title={intl.formatMessage({ id: 'layer' })}>
-      <div className="suika-layer-info-card">
+      <div className="px-2 [&_.suika-custom-ruler-input-box]:w-[60px]">
         <PercentInput
           value={opacity}
           min={0}

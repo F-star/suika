@@ -9,9 +9,9 @@ import { LineWidthOutlined } from '@suika/icons';
 import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { EditorContext } from '../../../context';
-import NumberInput from '../../input/NumberInput';
-import { PaintCard } from '../PaintCard';
+import { EditorContext } from '../../context';
+import NumberInput from '../input/NumberInput';
+import { PaintCard } from './PaintCard';
 
 export const StrokeCard: FC = () => {
   const editor = useContext(EditorContext);
@@ -222,16 +222,10 @@ export const StrokeCard: FC = () => {
       title={intl.formatMessage({ id: 'stroke' })}
       paints={strokes}
       appendedContent={
-        <div style={{ padding: '0 8px' }}>
+        <div className="px-2">
           <NumberInput
             prefix={
-              <div
-                style={{
-                  paddingLeft: '3px',
-                  color: '#b3b3b3',
-                  display: 'flex',
-                }}
-              >
+              <div className="pl-[3px] text-[#b3b3b3] flex">
                 <LineWidthOutlined />
               </div>
             }

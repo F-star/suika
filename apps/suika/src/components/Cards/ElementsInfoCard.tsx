@@ -1,24 +1,22 @@
-import './style.scss';
-
 import { remainDecimal } from '@suika/common';
 import { MutateGraphsAndRecord } from '@suika/core';
 import { deg2Rad, normalizeRadian } from '@suika/geo';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { EditorContext } from '../../../context';
-import NumberInput from '../../input/NumberInput';
-import { PercentInput } from '../../input/PercentInput';
-import { BaseCard } from '../BaseCard';
+import { EditorContext } from '../../context';
+import NumberInput from '../input/NumberInput';
+import { PercentInput } from '../input/PercentInput';
+import { BaseCard } from './BaseCard';
 
 /**
  * 因为运算中会丢失精度
  * 如果两个数距离非常非常小，我们认为它相等
  */
-const isEqual = (a: number | string, b: number) => {
-  if (typeof a === 'string') return false;
-  return Math.abs(a - b) < 0.00000001;
-};
+// const isEqual = (a: number | string, b: number) => {
+//   if (typeof a === 'string') return false;
+//   return Math.abs(a - b) < 0.00000001;
+// };
 
 interface IAttr {
   label: string;
@@ -141,7 +139,7 @@ export const ElementsInfoCards: FC = () => {
 
   return (
     <BaseCard>
-      <div className="element-info-attrs-row">
+      <div className="flex ml-2">
         {attrs.slice(0, 2).map((item) => (
           <NumAttrInput
             {...item}
@@ -150,7 +148,7 @@ export const ElementsInfoCards: FC = () => {
           />
         ))}
       </div>
-      <div className="element-info-attrs-row">
+      <div className="flex ml-2">
         {attrs.slice(2, 4).map((item) => (
           <NumAttrInput
             {...item}
@@ -159,7 +157,7 @@ export const ElementsInfoCards: FC = () => {
           />
         ))}
       </div>
-      <div className="element-info-attrs-row">
+      <div className="flex ml-2">
         {attrs.slice(4, 6).map((item) => (
           <NumAttrInput
             {...item}
@@ -169,7 +167,7 @@ export const ElementsInfoCards: FC = () => {
         ))}
       </div>
       {attrs.length > 6 && (
-        <div className="element-info-attrs-row">
+        <div className="flex ml-2">
           {attrs.slice(6, 8).map((item) => (
             <NumAttrInput
               {...item}
@@ -197,7 +195,11 @@ const NumAttrInput: FC<{
   if (props.uiType === 'percent') {
     return (
       <PercentInput
-        prefix={<span className="suika-info-attrs-label">{props.label}</span>}
+        prefix={
+          <span className="block h-7 w-7 leading-7 text-center text-[#b3b3b3]">
+            {props.label}
+          </span>
+        }
         value={props.value}
         min={props.min}
         max={props.max}
@@ -209,7 +211,11 @@ const NumAttrInput: FC<{
   } else {
     return (
       <NumberInput
-        prefix={<span className="suika-info-attrs-label">{props.label}</span>}
+        prefix={
+          <span className="block h-7 w-7 leading-7 text-center text-[#b3b3b3]">
+            {props.label}
+          </span>
+        }
         value={props.value}
         min={props.min}
         max={props.max}

@@ -1,5 +1,3 @@
-import './AlignCard.scss';
-
 import { isWindows } from '@suika/common';
 import {
   alignAndRecord,
@@ -25,9 +23,9 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import { EditorContext } from '../../../context';
-import { type MessageIds } from '../../../locale';
-import { BaseCard } from '../BaseCard';
+import { EditorContext } from '../../context';
+import { type MessageIds } from '../../locale';
+import { BaseCard } from './BaseCard';
 
 interface AlignItemProps {
   icon: JSX.Element;
@@ -52,7 +50,12 @@ const AlignItem: FC<AlignItemProps> = ({
     <Tooltip>
       <TooltipTrigger>
         <div
-          className="align-item"
+          className={classNames(
+            'flex justify-center items-center mx-[2px] rounded-[3px] w-9 h-8 text-[#333] hover:bg-[#f2f2f2] cursor-pointer',
+            {
+              'hover:bg-transparent': disabled,
+            },
+          )}
           onClick={() => {
             if (editor && !disabled) {
               alignAndRecord(editor, alignType);
@@ -96,7 +99,11 @@ export const AlignCard: FC = () => {
 
   return (
     <BaseCard>
-      <div className={classNames('align-list', { disabled })}>
+      <div
+        className={classNames('flex px-2', {
+          'opacity-30': disabled,
+        })}
+      >
         <AlignItem
           icon={<AlignLeft />}
           alignType={AlignType.Left}
