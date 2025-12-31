@@ -7,8 +7,8 @@ import {
 import { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { EditorContext } from '../../../context';
-import { PaintCard } from '../PaintCard';
+import { EditorContext } from '../../context';
+import { PaintCard } from './PaintCard';
 
 export const FillCard: FC = () => {
   const editor = useContext(EditorContext);

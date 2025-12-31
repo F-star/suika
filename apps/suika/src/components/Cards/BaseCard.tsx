@@ -1,5 +1,3 @@
-import './style.scss';
-
 import React, { type FC } from 'react';
 
 interface IBaseCardProps {
@@ -14,9 +12,9 @@ export const BaseCard: FC<IBaseCardProps> = ({
   headerAction,
 }) => {
   return (
-    <div className="info-card">
+    <div className="pt-2 pb-2 border-b border-[#e2e2e2]">
       {title && (
-        <div className="info-card-title">
+        <div className="flex justify-between items-center px-2 pl-4 h-8 leading-8 text-[#333] font-bold text-xs">
           <span>{title}</span>
           {headerAction}
         </div>

@@ -18,9 +18,9 @@ import {
 } from '@/components/ui/select';
 import { FONT_FILES } from '@/constant';
 
-import { EditorContext } from '../../../context';
-import { FontSizeInput } from '../../input/FontSizeInput';
-import { BaseCard } from '../BaseCard';
+import { EditorContext } from '../../context';
+import { FontSizeInput } from '../input/FontSizeInput';
+import { BaseCard } from './BaseCard';
 
 export const TypographyCard = () => {
   const editor = useContext(EditorContext);
