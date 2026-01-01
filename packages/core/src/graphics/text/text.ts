@@ -238,7 +238,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
   }
 
   protected override getSVGTagHead(offset?: IPoint) {
-    const tf = [...this.attrs.transform];
+    const tf = this.getWorldTransform();
     tf[5] += this.attrs.fontSize;
     if (offset) {
       tf[4] += offset.x;

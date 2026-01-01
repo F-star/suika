@@ -395,7 +395,7 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
   }
 
   override getSVGTagHead(offset?: IPoint) {
-    const tf = [...this.attrs.transform];
+    const tf = this.getWorldTransform();
     if (offset) {
       tf[4] += offset.x;
       tf[5] += offset.y;

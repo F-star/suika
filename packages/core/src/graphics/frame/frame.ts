@@ -313,6 +313,36 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     }
     return 'M4 0.5V3H8V0.5H9V3H11.5V4H9V8H11.5V9H9V11.5H8V9H4V11.5H3V9H0.5V8H3V4H0.5V3H3V0.5H4ZM8 8V4H4V8H8Z';
   }
+
+  override toSVGSegment(offset: IPoint) {
+    let content = '';
+    if (!this.isGroup()) {
+      content += super.toSVGSegment(offset);
+    }
+    for (const child of this.children) {
+      content += child.toSVGSegment(offset);
+    }
+    return content;
+  }
+
+  // as like rect
+  override getSVGTagHead(offset?: IPoint) {
+    if (this.isGroup()) {
+      return '';
+    }
+    const tf = this.getWorldTransform();
+    if (offset) {
+      tf[4] += offset.x;
+      tf[5] += offset.y;
+    }
+
+    const cornerRadius = this.attrs.cornerRadius ?? 0;
+    const cornerRadiusStr = cornerRadius > 1 ? ` rx="${cornerRadius}"` : '';
+
+    return `<rect width="${this.attrs.width}" height="${
+      this.attrs.height
+    }" transform="matrix(${tf.join(' ')})"${cornerRadiusStr}`;
+  }
 }
 
 export const isFrameGraphics = (

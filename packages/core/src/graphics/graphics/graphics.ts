@@ -727,7 +727,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     ];
   }
 
-  toSVGSegment(offset?: IPoint) {
+  toSVGSegment(offset: IPoint) {
     const tagHead = this.getSVGTagHead(offset);
     if (!tagHead) {
       console.warn(
