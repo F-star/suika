@@ -1,4 +1,4 @@
-import { escapeHtml, parseRGBAStr } from '@suika/common';
+import { parseRGBAStr } from '@suika/common';
 import {
   applyInverseMatrix,
   type IMatrixArr,
@@ -123,26 +123,9 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       const glyphs = this.getGlyphs();
       const font = fontManager.getFont(this.attrs.fontFamily);
 
-      layerCtx.save();
-
       const fontSize = this.attrs.fontSize;
-      const fontSizeScale = fontSize / font.unitsPerEm;
-
       const unitsPerEm = font.unitsPerEm;
-      const ascender = font.ascender as number;
-      const descender = font.descender as number;
-      const lineGap = font.tables.hhea.lineGap as number;
-
-      const defaultLineHeight =
-        (ascender - descender + lineGap) * fontSizeScale;
-      const actualLineHeight = this.getActualLineHeight();
-      const halfPadding =
-        (actualLineHeight - defaultLineHeight) / 2 / fontSizeScale;
-
-      const matrix = new Matrix()
-        .scale(1, -1)
-        .translate(0, ascender + lineGap / 2 + halfPadding)
-        .scale(fontSize / unitsPerEm, fontSize / unitsPerEm);
+      const matrix = this.paragraph.getToPixelMatrix();
 
       // Build text paths with their positions
       const textPaths: Array<{ path: Path2D; x: number; y: number }> = [];
@@ -156,7 +139,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
           });
         }
       }
-
+      layerCtx.save();
       // Apply font transform matrix
       layerCtx.transform(...matrix.getArray());
 
@@ -239,17 +222,13 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
 
   protected override getSVGTagHead(offset?: IPoint) {
     const tf = this.getWorldTransform();
-    tf[5] += this.attrs.fontSize;
     if (offset) {
       tf[4] += offset.x;
       tf[5] += offset.y;
     }
-    return `<text x="0" y="0" transform="matrix(${tf.join(' ')})"`;
-  }
 
-  protected override getSVGTagTail(): string {
-    const content = escapeHtml(this.attrs.content);
-    return `>${content}</text>`;
+    const d = this.paragraph.getMergedPathString();
+    return `<path d="${d}" transform="matrix(${tf.join(' ')})"`;
   }
 
   override getLayerIconPath() {

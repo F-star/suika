@@ -1,4 +1,5 @@
 import { type IPoint, type IRect, Matrix } from '@suika/geo';
+import svgPath from 'svgpath';
 
 import { fontManager } from '../../font_manager';
 import { type IGlyph, type ILetterSpacing, type ILineHeight } from './type';
@@ -292,5 +293,45 @@ export class Paragraph {
       lineIndex,
     );
     return downIndex;
+  }
+
+  getToPixelMatrix() {
+    const font = fontManager.getFont(this.attrs.fontFamily);
+    const fontSize = this.attrs.fontSize;
+    const fontSizeScale = fontSize / font.unitsPerEm;
+
+    const unitsPerEm = font.unitsPerEm;
+    const ascender = font.ascender as number;
+    const descender = font.descender as number;
+    const lineGap = font.tables.hhea.lineGap as number;
+
+    const defaultLineHeight = (ascender - descender + lineGap) * fontSizeScale;
+    const actualLineHeight = this.getLineHeightPx();
+    const halfPadding =
+      (actualLineHeight - defaultLineHeight) / 2 / fontSizeScale;
+
+    const matrix = new Matrix()
+      .scale(1, -1)
+      .translate(0, ascender + lineGap / 2 + halfPadding)
+      .scale(fontSize / unitsPerEm, fontSize / unitsPerEm);
+
+    return matrix;
+  }
+
+  getMergedPathString() {
+    let d = '';
+    const toPixelMatrix = this.getToPixelMatrix();
+    const glyphs = this.getGlyphs();
+    for (const line of glyphs) {
+      for (const glyph of line) {
+        if (!glyph.commands) continue;
+        const transformedCmds = svgPath(glyph.commands)
+          .translate(glyph.position.x, glyph.position.y)
+          .toString();
+        d += ' ' + transformedCmds;
+      }
+    }
+    d = svgPath(d).matrix(toPixelMatrix.getArray()).toString();
+    return d;
   }
 }
