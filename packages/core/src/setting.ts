@@ -22,6 +22,10 @@ export class Setting {
       type: PaintType.Solid,
       attrs: { r: 217, g: 217, b: 217, a: 1 },
     } as IPaint,
+    firstTextFill: {
+      type: PaintType.Solid,
+      attrs: { r: 0, g: 0, b: 0, a: 1 },
+    } as IPaint,
     firstFrameFill: {
       type: PaintType.Solid,
       attrs: { r: 255, g: 255, b: 255, a: 1 },

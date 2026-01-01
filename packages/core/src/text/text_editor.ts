@@ -1,4 +1,4 @@
-import { getContentLength, sliceContent } from '@suika/common';
+import { cloneDeep, getContentLength, sliceContent } from '@suika/common';
 import { type IPoint } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
@@ -77,6 +77,7 @@ export class TextEditor {
           fontFamily: defaultFontFamily,
           width: 0,
           height: fontSize,
+          fill: [cloneDeep(this.editor.setting.get('firstTextFill'))],
           lineHeight: { value: 1, units: 'RAW' },
           letterSpacing: { value: 0, units: 'PIXELS' },
           autoFit: true,

@@ -1,8 +1,13 @@
 import { escapeHtml, parseRGBAStr } from '@suika/common';
-import { applyInverseMatrix, type IPoint, Matrix } from '@suika/geo';
+import {
+  applyInverseMatrix,
+  type IMatrixArr,
+  type IPoint,
+  Matrix,
+} from '@suika/geo';
 
 import { fontManager } from '../../font_manager';
-import { PaintType } from '../../paint';
+import { type IPaint, PaintType } from '../../paint';
 import { GraphicsType, type Optional } from '../../type';
 import {
   type GraphicsAttrs,
@@ -11,6 +16,7 @@ import {
   SuikaGraphics,
 } from '../graphics';
 import { type IDrawInfo } from '../type';
+import { drawLayer } from '../utils';
 import { Paragraph } from './paragraph';
 import { type ILetterSpacing, type ILineHeight } from './type';
 
@@ -97,74 +103,138 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     this.clearBboxCache();
   }
 
+  private _realDraw(
+    drawInfo: IDrawInfo,
+    overrideStyle?: {
+      fill?: IPaint[];
+      stroke?: IPaint[];
+      strokeWidth?: number;
+      transform: IMatrixArr;
+    },
+  ) {
+    const { ctx } = drawInfo;
+    const { fill, strokeWidth, stroke, transform } =
+      overrideStyle || this.attrs;
+
+    ctx.save();
+    ctx.transform(...transform);
+
+    const draw = (layerCtx: CanvasRenderingContext2D) => {
+      const glyphs = this.getGlyphs();
+      const font = fontManager.getFont(this.attrs.fontFamily);
+
+      layerCtx.save();
+
+      const fontSize = this.attrs.fontSize;
+      const fontSizeScale = fontSize / font.unitsPerEm;
+
+      const unitsPerEm = font.unitsPerEm;
+      const ascender = font.ascender as number;
+      const descender = font.descender as number;
+      const lineGap = font.tables.hhea.lineGap as number;
+
+      const defaultLineHeight =
+        (ascender - descender + lineGap) * fontSizeScale;
+      const actualLineHeight = this.getActualLineHeight();
+      const halfPadding =
+        (actualLineHeight - defaultLineHeight) / 2 / fontSizeScale;
+
+      const matrix = new Matrix()
+        .scale(1, -1)
+        .translate(0, ascender + lineGap / 2 + halfPadding)
+        .scale(fontSize / unitsPerEm, fontSize / unitsPerEm);
+
+      // Build text paths with their positions
+      const textPaths: Array<{ path: Path2D; x: number; y: number }> = [];
+      for (const line of glyphs) {
+        for (const glyph of line) {
+          const path2d = new Path2D(glyph.commands);
+          textPaths.push({
+            path: path2d,
+            x: glyph.position.x,
+            y: glyph.position.y,
+          });
+        }
+      }
+
+      // Apply font transform matrix
+      layerCtx.transform(...matrix.getArray());
+
+      // Calculate inverse matrix scale factor for strokeWidth
+      // The matrix scale factor is fontSize / unitsPerEm, so we need to divide strokeWidth by it
+      // to keep strokeWidth constant in pixel space
+      const scale = fontSize / unitsPerEm;
+
+      // Apply fills
+      for (const paint of fill ?? []) {
+        if (paint.visible === false) continue;
+        switch (paint.type) {
+          case PaintType.Solid: {
+            layerCtx.fillStyle = parseRGBAStr(paint.attrs);
+            for (const { path, x, y } of textPaths) {
+              layerCtx.save();
+              layerCtx.translate(x, y);
+              layerCtx.fill(path);
+              layerCtx.restore();
+            }
+            break;
+          }
+          case PaintType.Image: {
+            // TODO:
+          }
+        }
+      }
+
+      // Apply strokes
+      if (strokeWidth) {
+        layerCtx.lineWidth = strokeWidth / scale;
+        layerCtx.miterLimit = 8;
+        for (const paint of stroke ?? []) {
+          if (paint.visible === false) continue;
+          switch (paint.type) {
+            case PaintType.Solid: {
+              layerCtx.strokeStyle = parseRGBAStr(paint.attrs);
+              for (const { path, x, y } of textPaths) {
+                layerCtx.save();
+                layerCtx.translate(x, y);
+                layerCtx.stroke(path);
+                layerCtx.restore();
+              }
+              break;
+            }
+            case PaintType.Image: {
+              // TODO: stroke image
+            }
+          }
+        }
+      }
+
+      layerCtx.restore();
+    };
+
+    const opacity = drawInfo.opacity ?? 1;
+    if (opacity < 1) {
+      ctx.globalAlpha = opacity;
+    }
+
+    if (opacity !== 1) {
+      drawLayer({
+        originCtx: ctx,
+        viewSize: this.doc.getDeviceViewSize(),
+        draw,
+      });
+    } else {
+      draw(ctx);
+    }
+
+    ctx.restore();
+  }
+
   override draw(drawInfo: IDrawInfo) {
     if (this.shouldSkipDraw(drawInfo)) return;
 
     const opacity = this.getOpacity() * (drawInfo.opacity ?? 1);
-    const { transform, fill, stroke } = this.attrs;
-    const { ctx } = drawInfo;
-    ctx.save();
-    ctx.transform(...transform);
-    if (opacity < 1) {
-      ctx.globalAlpha = opacity;
-    }
-    ctx.beginPath();
-
-    for (const paint of fill ?? []) {
-      switch (paint.type) {
-        case PaintType.Solid: {
-          ctx.fillStyle = parseRGBAStr(paint.attrs);
-          break;
-        }
-        case PaintType.Image: {
-          // TODO:
-        }
-      }
-    }
-    if (stroke) {
-      // TODO:
-    }
-
-    this.drawText(ctx);
-    ctx.restore();
-  }
-
-  private drawText(ctx: CanvasRenderingContext2D) {
-    const glyphs = this.getGlyphs();
-    const font = fontManager.getFont(this.attrs.fontFamily);
-
-    ctx.save();
-
-    const fontSize = this.attrs.fontSize;
-    const fontSizeScale = fontSize / font.unitsPerEm;
-
-    const unitsPerEm = font.unitsPerEm;
-    const ascender = font.ascender as number;
-    const descender = font.descender as number;
-    const lineGap = font.tables.hhea.lineGap as number;
-
-    const defaultLineHeight = (ascender - descender + lineGap) * fontSizeScale;
-    const actualLineHeight = this.getActualLineHeight();
-    const halfPadding =
-      (actualLineHeight - defaultLineHeight) / 2 / fontSizeScale;
-
-    const matrix = new Matrix()
-      .scale(1, -1)
-      .translate(0, ascender + lineGap / 2 + halfPadding)
-      .scale(fontSize / unitsPerEm, fontSize / unitsPerEm);
-
-    ctx.transform(...matrix.getArray());
-
-    for (const line of glyphs) {
-      for (const glyph of line) {
-        ctx.save();
-        ctx.translate(glyph.position.x, glyph.position.y);
-        const path2d = new Path2D(glyph.commands);
-        ctx.fill(path2d);
-        ctx.restore();
-      }
-    }
-    ctx.restore();
+    this._realDraw({ ...drawInfo, opacity });
   }
 
   protected override getSVGTagHead(offset?: IPoint) {
