@@ -56,8 +56,10 @@
   "flip.horizontal": "Flip horizontal",
   "flip.vertical": "Flip vertical",
 
+  "file": "File",
   "import.originFile": "Import local file",
   "export.originFile": "Save local copy",
+  "export.currentPageAsSVG": "Export current page as SVG",
 
   "preference": "Preference",
   "keepToolSelectedAfterUse": "Keep tool selected after use",
