@@ -48,6 +48,10 @@ export const Menu: FC = () => {
           key: 'exportCurrentPageAsSVG',
           label: t({ id: 'export.currentPageAsSVG' }),
         },
+        {
+          key: 'exportCurrentPageAsPNG',
+          label: t({ id: 'export.currentPageAsPNG' }),
+        },
       ],
     },
     {
@@ -100,6 +104,9 @@ export const Menu: FC = () => {
         break;
       case 'exportCurrentPageAsSVG':
         exportService.exportCurrentPageSVG(editor);
+        break;
+      case 'exportCurrentPageAsPNG':
+        exportService.exportCurrentPagePNG(editor);
         break;
       case 'keepToolSelectedAfterUse':
       case 'invertZoomDirection':

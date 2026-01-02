@@ -60,6 +60,7 @@
   "import.originFile": "Import local file",
   "export.originFile": "Save local copy",
   "export.currentPageAsSVG": "Export current page as SVG",
+  "export.currentPageAsPNG": "Export current page as PNG",
 
   "preference": "Preference",
   "keepToolSelectedAfterUse": "Keep tool selected after use",
