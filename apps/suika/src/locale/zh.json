@@ -59,6 +59,7 @@
   "import.originFile": "从本地导入",
   "export.originFile": "导出到本地",
   "export.currentPageAsSVG": "导出当前页面为 SVG",
+  "export.currentPageAsPNG": "导出当前页面为 PNG",
 
   "preference": "偏好设置",
   "keepToolSelectedAfterUse": "使用工具后保持选中状态",

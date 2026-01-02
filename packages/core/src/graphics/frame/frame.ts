@@ -315,6 +315,10 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
   }
 
   override toSVGSegment(offset: IPoint) {
+    if (!this.isVisible()) {
+      return '';
+    }
+
     let content = '';
     if (!this.isGroup()) {
       content += super.toSVGSegment(offset);

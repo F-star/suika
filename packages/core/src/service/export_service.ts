@@ -1,5 +1,5 @@
 import { type SuikaEditor } from '../editor';
-import { toSVG } from '../to_svg';
+import { toPNGBlob, toSVG } from '../to_svg';
 
 export const exportService = {
   exportOriginFile: (editor: SuikaEditor, filename = 'design') => {
@@ -12,7 +12,9 @@ export const exportService = {
 
   exportCurrentPageSVG: (editor: SuikaEditor) => {
     const currentPage = editor.doc.getCurrentCanvas();
-    const graphicsItems = currentPage.getChildren();
+    const graphicsItems = currentPage
+      .getChildren()
+      .filter((item) => item.isVisible());
 
     if (graphicsItems.length === 0) {
       // TODO: if no graphics items, show error message
@@ -20,11 +22,34 @@ export const exportService = {
       return;
     }
 
-    const svg = toSVG(graphicsItems);
+    const svg = toSVG(graphicsItems).svg;
     const blob = new Blob([svg], {
       type: 'image/svg+xml',
     });
-    download(blob, 'design.svg');
+
+    const suffix = currentPage.attrs.objectName;
+    download(blob, `${suffix}.svg`);
+  },
+
+  exportCurrentPagePNG: async (editor: SuikaEditor) => {
+    const currentPage = editor.doc.getCurrentCanvas();
+    const graphicsItems = currentPage
+      .getChildren()
+      .filter((item) => item.isVisible());
+
+    if (graphicsItems.length === 0) {
+      // TODO: if no graphics items, show error message
+      console.error('No graphics items to export');
+      return;
+    }
+
+    try {
+      const blob = await toPNGBlob(graphicsItems);
+      const suffix = currentPage.attrs.objectName;
+      download(blob, `${suffix}.png`);
+    } catch (error) {
+      console.error('Failed to export PNG:', error);
+    }
   },
 };
 

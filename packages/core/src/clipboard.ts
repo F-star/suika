@@ -132,7 +132,7 @@ export class ClipboardManager {
     if (graphs.length === 0) {
       return;
     }
-    const svgStr = toSVG(graphs);
+    const svgStr = toSVG(graphs).svg;
     navigator.clipboard.writeText(svgStr).then(() => {
       console.log('SVG copied');
     });
