@@ -1,10 +1,12 @@
-import { Button, ConfigProvider, Input, message } from 'antd';
 import { FC, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import { ApiService } from '../../api-service';
-import styles from './login.module.less';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { PasswordInput } from '../../components/ui/password-input';
+import { toast } from '../../components/ui/toast';
 
 export const Login: FC = () => {
   const intl = useIntl();
@@ -14,8 +16,6 @@ export const Login: FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
 
   const navigate = useNavigate();
-
-  const [messageApi, contextHolder] = message.useMessage();
 
   const submitting = useRef(false);
 
@@ -34,11 +34,7 @@ export const Login: FC = () => {
       })
       .catch((res) => {
         const message = res.response.data.message;
-        messageApi.open({
-          type: 'error',
-          key: 'error',
-          content: message,
-        });
+        toast.error(message);
       })
       .finally(() => {
         submitting.current = false;
@@ -46,75 +42,62 @@ export const Login: FC = () => {
   };
 
   return (
-    <div className={styles.loginPage}>
-      <ConfigProvider
-        theme={{
-          components: {
-            Input: {
-              inputFontSizeLG: 16,
-              paddingBlockLG: 10,
-              paddingInlineLG: 15,
-            },
-            Button: {
-              contentFontSizeLG: 16,
-              paddingInline: 2,
-            },
-          },
-        }}
-      >
-        {contextHolder}
-        <div className={styles.loginBox}>
-          <div className={styles.loginTitle}>
-            <FormattedMessage
-              id={mode === 'login' ? 'welcomeBack' : 'createNewAccount'}
-            />
-          </div>
-          <Input
-            value={username}
-            size="large"
-            placeholder={intl.formatMessage({ id: 'username' })}
-            variant="filled"
-            onChange={(e) => setUsername(e.target.value)}
+    <div className="flex flex-col items-center justify-center h-screen">
+      <div className="w-[440px] py-10 px-8 bg-card">
+        <div className="pb-8 font-normal text-[24px] text-center">
+          <FormattedMessage
+            id={mode === 'login' ? 'welcomeBack' : 'createNewAccount'}
           />
-          <div style={{ margin: '16px 0 24px 0' }}>
-            <Input.Password
-              value={password}
-              size="large"
-              placeholder={intl.formatMessage({ id: 'password' })}
-              variant="filled"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <Button
-            size="large"
-            type="primary"
-            style={{ width: '100%', height: 48 }}
-            onClick={submit}
-          >
-            <FormattedMessage
-              id={mode === 'login' ? 'login' : 'createAccount'}
-            />
-          </Button>
-          <div className={styles.loginBottom}>
-            {mode === 'login' ? (
-              <>
-                <FormattedMessage id="NoAccount?" />
-                <Button type="link" onClick={() => setMode('register')}>
-                  <FormattedMessage id="createAccount" />
-                </Button>
-              </>
-            ) : (
-              <>
-                <FormattedMessage id="alreadyHaveAnAccount?" />
-                <Button type="link" onClick={() => setMode('login')}>
-                  <FormattedMessage id="login" />
-                </Button>
-              </>
-            )}
-          </div>
         </div>
-      </ConfigProvider>
+        <Input
+          value={username}
+          placeholder={intl.formatMessage({ id: 'username' })}
+          onChange={(e) => setUsername(e.target.value)}
+          className="mb-4"
+        />
+        <div className="mb-6">
+          <PasswordInput
+            value={password}
+            placeholder={intl.formatMessage({ id: 'password' })}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <Button
+          size="lg"
+          variant="default"
+          className="w-full"
+          onClick={submit}
+          disabled={submitting.current}
+        >
+          <FormattedMessage id={mode === 'login' ? 'login' : 'createAccount'} />
+        </Button>
+        <div className="flex items-center justify-center mt-4 text-sm text-black/50">
+          {mode === 'login' ? (
+            <>
+              <FormattedMessage id="NoAccount?" />
+              <Button
+                variant="link"
+                onClick={() => setMode('register')}
+                className="h-auto p-0"
+              >
+                <FormattedMessage id="createAccount" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <FormattedMessage id="alreadyHaveAnAccount?" />
+              <Button
+                variant="link"
+                onClick={() => setMode('login')}
+                className="h-auto p-0"
+              >
+                <FormattedMessage id="login" />
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
