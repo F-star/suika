@@ -79,7 +79,7 @@ export class TextEditor {
           height: fontSize,
           fill: [cloneDeep(this.editor.setting.get('firstTextFill'))],
           lineHeight: { value: 1, units: 'RAW' },
-          letterSpacing: { value: 0, units: 'PIXELS' },
+          letterSpacing: { value: 0, units: 'PERCENT' },
           autoFit: true,
         },
         {

@@ -55,12 +55,11 @@ export const LetterSpacingInput: React.FC<LetterSpacingInputProps> = ({
     const str = rawStr.trim();
 
     // Regex to capture number and optional suffix (px or %)
-    // Matches numbers like "10", "10.5", ".5", "10px", "10%", "10 px"
-    // Also allows negative temporarily to check min value logic, though regex captures it.
+    // Matches numbers like "10", "10.5", ".5", "-10", "-10.5", "10px", "10%", "10 px", "-10px", "-10%"
     const match = str.match(/^(-?\d*\.?\d+)\s*(px|%)?$/);
 
     if (match) {
-      let num = parseFloat(match[1]);
+      const num = parseFloat(match[1]);
       const suffix = match[2];
 
       let newUnit = unit;
@@ -69,9 +68,6 @@ export const LetterSpacingInput: React.FC<LetterSpacingInputProps> = ({
       } else if (suffix === '%') {
         newUnit = 'PERCENT';
       }
-
-      // Min value check
-      if (num < 0) num = 0;
 
       // Update parent
       onChange(num, newUnit);
