@@ -6,18 +6,10 @@ import React, { type FC } from 'react';
 interface IToolBtn {
   className?: string;
   children?: React.ReactNode;
-  tooltipContent: string;
-  hotkey: string;
   onMouseDown: () => void;
 }
 
-export const ToolBtn: FC<IToolBtn> = ({
-  children,
-  onMouseDown,
-  className,
-  tooltipContent,
-  hotkey,
-}) => {
+export const ToolBtn: FC<IToolBtn> = ({ children, onMouseDown, className }) => {
   return (
     <div
       className={classNames('tool-btn', className)}
@@ -26,10 +18,6 @@ export const ToolBtn: FC<IToolBtn> = ({
       }}
     >
       {children}
-      <div className="tooltip">
-        {tooltipContent}
-        {hotkey && <span className="tool-hotkey">{hotkey}</span>}
-      </div>
     </div>
   );
 };

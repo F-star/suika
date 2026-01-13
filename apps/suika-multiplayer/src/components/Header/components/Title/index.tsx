@@ -10,7 +10,6 @@ interface IProps {
 const Title: FC<IProps> = ({ value }) => {
   return (
     <div className="suika-header-title">
-      <GithubOutlined />
       <a href="https://github.com/F-star/suika" target="_blank">
         {value}
       </a>

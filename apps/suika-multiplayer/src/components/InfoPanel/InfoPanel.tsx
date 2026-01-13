@@ -1,5 +1,3 @@
-import './style.scss';
-
 import { type SuikaGraphics } from '@suika/core';
 import { type FC, useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -10,6 +8,7 @@ import { ElementsInfoCards } from '../Cards/ElementsInfoCard';
 import { FillCard } from '../Cards/FillCard';
 import { LayerInfoCard } from '../Cards/LayerInfoCard';
 import { StrokeCard } from '../Cards/StrokeCard';
+import { TypographyCard } from '../Cards/TypographyCard';
 import { DebugPanel } from '../DebugPanel';
 
 enum PanelType {
@@ -38,18 +37,22 @@ export const InfoPanel: FC = () => {
   }, [editor]);
 
   return (
-    <div className="info-panel" onKeyDown={(e) => e.stopPropagation()}>
+    <div
+      className="absolute top-0 right-0 z-[40] border-l border-[#e6e6e6] w-[240px] h-[calc(100vh-48px)] text-xs bg-white select-none"
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       {type === PanelType.SelectedElements && (
         <>
           <AlignCard />
           <ElementsInfoCards />
+          <TypographyCard />
           <LayerInfoCard />
           <FillCard key="fill" />
           <StrokeCard key="stroke" />
         </>
       )}
       {type === PanelType.Global && (
-        <div className="empty-text">
+        <div className="text-[#b3b3b3] p-4">
           <FormattedMessage id="noSelectedShapes" />
         </div>
       )}

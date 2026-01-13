@@ -21,8 +21,10 @@
       "@suika/icons": ["../../packages/icons/src"],
       "@suika/components": ["../../packages/components/src"],
       "@suika/geo": ["../../packages/geo/src"],
-      "@suika/core": ["../../packages/core/src"]
-    }
+      "@suika/core": ["../../packages/core/src"],
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

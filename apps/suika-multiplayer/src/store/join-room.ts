@@ -6,16 +6,16 @@ import { SuikaBinding } from './y-suika';
 export const joinRoom = (
   editor: SuikaEditor,
   roomId: string,
-  user: { username: string; id: number },
+  user: { username: string; id: string },
 ) => {
   const host = import.meta.env.DEV ? 'localhost:5356' : location.host;
 
   const provider = new HocuspocusProvider({
     url: `ws://${host}/join/room/`,
-    name: roomId,
-    token: document.cookie.slice(13),
+    name: roomId + '',
+    token: document.cookie.slice(13), // TODO: optimize......
     onAuthenticationFailed: (data) => {
-      console.log('权限不足', data);
+      console.log('authentication failed', data);
     },
   });
 

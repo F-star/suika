@@ -1,0 +1,39 @@
+.suika {
+  .suika-page-list {
+    .info-card {
+      padding-bottom: 0;
+    }
+  }
+  .suika-page-list-content {
+    padding-bottom: 8px;
+    max-height: 268px;
+    overflow: auto;
+
+    // hide scrollbar by default
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE/Edge
+    &::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+    // show scrollbar when hover
+    &:hover {
+      scrollbar-width: thin; // Firefox
+      -ms-overflow-style: auto; // IE/Edge
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        &:hover {
+          background: rgba(0, 0, 0, 0.4);
+        }
+      }
+    }
+  }
+}

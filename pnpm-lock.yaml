@@ -288,7 +288,7 @@ importers:
         version: 6.8.9(react@18.3.1)(typescript@5.7.2)
       react-scripts:
         specifier: 5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.21.4(@babel/core@7.24.5))(@babel/plugin-transform-react-jsx@7.21.0(@babel/core@7.24.5))(@swc/core@1.3.53)(@types/babel__core@7.20.5)(esbuild@0.17.18)(eslint@8.57.1)(react@18.3.1)(sass@1.62.0)(ts-node@10.9.2(@swc/core@1.3.53)(@types/node@20.11.5)(typescript@5.7.2))(type-fest@2.19.0)(typescript@5.7.2)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.21.4(@babel/core@7.26.10))(@babel/plugin-transform-react-jsx@7.21.0(@babel/core@7.26.10))(@swc/core@1.3.53)(@types/babel__core@7.20.5)(esbuild@0.17.18)(eslint@8.57.1)(react@18.3.1)(sass@1.62.0)(ts-node@10.9.2(@swc/core@1.3.53)(@types/node@20.11.5)(typescript@5.7.2))(type-fest@2.19.0)(typescript@5.7.2)
       sass:
         specifier: ^1.57.1
         version: 1.62.0
@@ -342,8 +342,23 @@ importers:
         specifier: ^0.22.3
         version: 0.22.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@hocuspocus/provider':
-        specifier: ^2.13.5
-        version: 2.13.5(y-protocols@1.0.6(yjs@13.6.24))(yjs@13.6.24)
+        specifier: ^2.15.3
+        version: 2.15.3(y-protocols@1.0.6(yjs@13.6.29))(yjs@13.6.29)
+      '@radix-ui/react-popover':
+        specifier: ^1.1.15
+        version: 1.1.15(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-progress':
+        specifier: ^1.1.8
+        version: 1.1.8(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-select':
+        specifier: ^2.2.6
+        version: 2.2.6(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-slot':
+        specifier: ^1.2.3
+        version: 1.2.4(@types/react@18.3.20)(react@18.3.1)
+      '@radix-ui/react-tooltip':
+        specifier: ^1.2.8
+        version: 1.2.8(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@suika/common':
         specifier: workspace:^
         version: link:../../packages/common
@@ -359,15 +374,27 @@ importers:
       '@suika/icons':
         specifier: workspace:^
         version: link:../../packages/icons
+      '@tailwindcss/vite':
+        specifier: ^4.1.15
+        version: 4.1.15(vite@5.4.14(@types/node@20.11.5)(less@4.2.2)(lightningcss@1.30.2)(sass@1.62.0)(terser@5.39.0))
       ahooks:
         specifier: ^3.7.4
         version: 3.7.6(react@18.3.1)
       axios:
         specifier: ^1.7.3
         version: 1.7.3
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
       classnames:
         specifier: ^2.3.2
         version: 2.5.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: ^0.546.0
+        version: 0.546.0(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -382,19 +409,25 @@ importers:
         version: 6.8.9(react@18.3.1)(typescript@5.7.2)
       react-scripts:
         specifier: 5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.21.4(@babel/core@7.26.10))(@babel/plugin-transform-react-jsx@7.21.0(@babel/core@7.26.10))(@swc/core@1.3.53)(@types/babel__core@7.20.5)(esbuild@0.17.18)(eslint@8.57.1)(react@18.3.1)(sass@1.62.0)(ts-node@10.9.2(@swc/core@1.3.53)(@types/node@20.11.5)(typescript@5.7.2))(type-fest@2.19.0)(typescript@5.7.2)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.21.4(@babel/core@7.24.5))(@babel/plugin-transform-react-jsx@7.21.0(@babel/core@7.24.5))(@swc/core@1.3.53)(@types/babel__core@7.20.5)(esbuild@0.17.18)(eslint@8.57.1)(react@18.3.1)(sass@1.62.0)(ts-node@10.9.2(@swc/core@1.3.53)(@types/node@20.11.5)(typescript@5.7.2))(type-fest@2.19.0)(typescript@5.7.2)
       sass:
         specifier: ^1.57.1
         version: 1.62.0
       stats.js:
         specifier: ^0.17.0
         version: 0.17.0
+      tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
+      tailwindcss:
+        specifier: ^4.1.15
+        version: 4.1.15
       y-websocket:
-        specifier: ^2.0.3
-        version: 2.0.3(yjs@13.6.24)
+        specifier: ^2.1.0
+        version: 2.1.0(yjs@13.6.29)
       yjs:
-        specifier: ^13.6.17
-        version: 13.6.24
+        specifier: ^13.6.29
+        version: 13.6.29
     devDependencies:
       '@types/react':
         specifier: ^18.2.25
@@ -420,6 +453,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.5
         version: 0.4.19(eslint@8.57.1)
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
       vite:
         specifier: ^5.0.8
         version: 5.4.14(@types/node@20.11.5)(less@4.2.2)(lightningcss@1.30.2)(sass@1.62.0)(terser@5.39.0)
@@ -2276,11 +2312,11 @@ packages:
       typescript:
         optional: true
 
-  '@hocuspocus/common@2.13.5':
-    resolution: {integrity: sha512-8D9FzhZFlt0WsgXw5yT2zwSxi6z9d4V2vUz6co2vo3Cj+Y2bvGZsdDiTvU/MerGcCLME5k/w6PwLPojLYH/4pg==}
-
   '@hocuspocus/common@2.15.2':
     resolution: {integrity: sha512-wU1wxXNnQQMXyeL3mdSDYiQsm/r/QyJVjjQhF7sUBrLnjdsN7bA1cvfcSvJBr1ymrMSeYRmUL3UlQmEHEOaP7w==}
+
+  '@hocuspocus/common@2.15.3':
+    resolution: {integrity: sha512-Rzh1HF0a2o/tf90A3w2XNdXd9Ym3aQzMDfD3lAUONCX9B9QOdqdyiORrj6M25QEaJrEIbXFy8LtAFcL0wRdWzA==}
 
   '@hocuspocus/extension-database@2.15.2':
     resolution: {integrity: sha512-BkYDfKA99udx7AEkqWReBS61kvGMC9SqoPJs3v8xNgpaj2GGyMJQlUdQRMhPyZTn2osV+pqhk8Hn7xUJCW1RJg==}
@@ -2290,8 +2326,8 @@ packages:
   '@hocuspocus/extension-logger@2.15.2':
     resolution: {integrity: sha512-nqSnSFI+xO7dBTsgzSANKvx09ptq8J4Doz3AdLgxfaweYC85qFao7mAx1ZCtWoVHseVwBYua6S3dTwQq5IsWEg==}
 
-  '@hocuspocus/provider@2.13.5':
-    resolution: {integrity: sha512-G3S0OiFSYkmbOwnbhV7FyJs4OBqB/+1YT9c44Ujux1RKowGm5H8+0p3FUHfXwd/3v9V0jE+E1FnFKoGonJSQwA==}
+  '@hocuspocus/provider@2.15.3':
+    resolution: {integrity: sha512-oadN05m+KL4ylNKVo5YspNG4MXkT2Y+FUFzrgigpQeTjQibkPUwCNmUnkUxMgrGRgxb+O0lJCfirFIJMxedctA==}
     peerDependencies:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
@@ -11430,8 +11466,8 @@ packages:
     peerDependencies:
       yjs: ^13.0.0
 
-  y-websocket@2.0.3:
-    resolution: {integrity: sha512-fWmz2EhmocEx5U8IzVV3rVcsbhRuZIwg9hsOVNfAtflii8BX68s1KNwop+h+vcJSjh+mvLeYMic7XIolVZ5mzQ==}
+  y-websocket@2.1.0:
+    resolution: {integrity: sha512-WHYDRqomaGkkaujtowCDwL8KYk+t1zQCGIgKyvxvchhjTQlMgWXRHJK+FDEcWmHA7I7o/4fy0eniOrtmz0e4mA==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -11476,6 +11512,10 @@ packages:
 
   yjs@13.6.24:
     resolution: {integrity: sha512-xn/pYLTZa3uD1uDG8lpxfLRo5SR/rp0frdASOl2a71aYNvUXdWcLtVL91s2y7j+Q8ppmjZ9H3jsGVgoFMbT2VA==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+
+  yjs@13.6.29:
+    resolution: {integrity: sha512-kHqDPdltoXH+X4w1lVmMtddE3Oeqq48nM40FD5ojTd8xYhQpzIDcfE2keMSU5bAgRPJBe225WTUdyUgj1DtbiQ==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
 
   yn@3.1.1:
@@ -14492,11 +14532,11 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.2
 
-  '@hocuspocus/common@2.13.5':
+  '@hocuspocus/common@2.15.2':
     dependencies:
       lib0: 0.2.94
 
-  '@hocuspocus/common@2.15.2':
+  '@hocuspocus/common@2.15.3':
     dependencies:
       lib0: 0.2.94
 
@@ -14518,14 +14558,14 @@ snapshots:
       - y-protocols
       - yjs
 
-  '@hocuspocus/provider@2.13.5(y-protocols@1.0.6(yjs@13.6.24))(yjs@13.6.24)':
+  '@hocuspocus/provider@2.15.3(y-protocols@1.0.6(yjs@13.6.29))(yjs@13.6.29)':
     dependencies:
-      '@hocuspocus/common': 2.13.5
+      '@hocuspocus/common': 2.15.3
       '@lifeomic/attempt': 3.1.0
       lib0: 0.2.94
       ws: 8.18.1
-      y-protocols: 1.0.6(yjs@13.6.24)
-      yjs: 13.6.24
+      y-protocols: 1.0.6(yjs@13.6.29)
+      yjs: 13.6.29
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -26014,11 +26054,11 @@ snapshots:
 
   xtend@4.0.2: {}
 
-  y-leveldb@0.1.2(yjs@13.6.24):
+  y-leveldb@0.1.2(yjs@13.6.29):
     dependencies:
       level: 6.0.1
       lib0: 0.2.94
-      yjs: 13.6.24
+      yjs: 13.6.29
     optional: true
 
   y-protocols@1.0.6(yjs@13.6.24):
@@ -26026,15 +26066,20 @@ snapshots:
       lib0: 0.2.94
       yjs: 13.6.24
 
-  y-websocket@2.0.3(yjs@13.6.24):
+  y-protocols@1.0.6(yjs@13.6.29):
+    dependencies:
+      lib0: 0.2.94
+      yjs: 13.6.29
+
+  y-websocket@2.1.0(yjs@13.6.29):
     dependencies:
       lib0: 0.2.94
       lodash.debounce: 4.0.8
-      y-protocols: 1.0.6(yjs@13.6.24)
-      yjs: 13.6.24
+      y-protocols: 1.0.6(yjs@13.6.29)
+      yjs: 13.6.29
     optionalDependencies:
       ws: 6.2.2
-      y-leveldb: 0.1.2(yjs@13.6.24)
+      y-leveldb: 0.1.2(yjs@13.6.29)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -26079,6 +26124,10 @@ snapshots:
       fd-slicer: 1.1.0
 
   yjs@13.6.24:
+    dependencies:
+      lib0: 0.2.101
+
+  yjs@13.6.29:
     dependencies:
       lib0: 0.2.101
 

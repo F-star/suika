@@ -1,7 +1,6 @@
 import './Toolbar.scss';
 
 import { isWindows } from '@suika/common';
-import { Button } from '@suika/components';
 import {
   EllipseOutlined,
   FrameOutlined,
@@ -19,6 +18,13 @@ import {
 import classNames from 'classnames';
 import { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { EditorContext } from '../../../../context';
 import { type MessageIds } from '../../../../locale';
@@ -149,26 +155,32 @@ export const ToolBar = () => {
       {enableTools.map((toolType) => {
         const tool = keyMap[toolType];
         return (
-          <ToolBtn
-            key={tool.name}
-            className={classNames({ active: currTool === tool.name })}
-            tooltipContent={intl.formatMessage({ id: tool.intlId })}
-            hotkey={tool.hotkey}
-            onMouseDown={() => {
-              editor?.toolManager.setActiveTool(tool.name);
-            }}
-          >
-            {tool.icon}
-          </ToolBtn>
+          <Tooltip key={tool.name} delayDuration={20}>
+            <TooltipTrigger>
+              <ToolBtn
+                key={tool.name}
+                className={classNames({ active: currTool === tool.name })}
+                onMouseDown={() => {
+                  editor?.toolManager.setActiveTool(tool.name);
+                }}
+              >
+                {tool.icon}
+              </ToolBtn>
+            </TooltipTrigger>
+            <TooltipContent>
+              {intl.formatMessage({ id: tool.intlId })}
+              {tool.hotkey && (
+                <span className="ml-4 text-[#ccc]">{tool.hotkey}</span>
+              )}
+            </TooltipContent>
+          </Tooltip>
         );
       })}
 
       {isPathEditorActive && (
         <Button
-          style={{
-            marginLeft: '16px',
-            userSelect: 'none',
-          }}
+          className="ml-4 user-select-none"
+          variant="outline"
           onClick={() => {
             if (editor) {
               editor.pathEditor.inactive();

@@ -30,7 +30,7 @@ export class SuikaBinding {
     private yMap: YMap<Record<string, any>>,
     private editor: SuikaEditor,
     public awareness: NonNullable<HocuspocusProvider['awareness']>,
-    private user: { username: string; id: number },
+    private user: { username: string; id: string },
   ) {
     this.doc = yMap.doc!;
     // data
@@ -38,19 +38,20 @@ export class SuikaBinding {
     yMap.observe(this.yMapObserve);
 
     // awareness
-    this.awareness.on('change', this.onAwarenessChange);
-    this.editor.mouseEventManager.on('cursorPosUpdate', this.onCursorPosChange);
-    this.awareness.setLocalStateField('user', {
-      id: this.user.id,
-      name: this.user.username,
-      awarenessId: this.awareness.clientID,
-      pos: null,
-      color: getRandomColor(),
-    });
+    // this.awareness.on('change', this.onAwarenessChange);
+    // this.editor.mouseEventManager.on('cursorPosUpdate', this.onCursorPosChange);
+    // this.awareness.setLocalStateField('user', {
+    //   id: this.user.id,
+    //   name: this.user.username,
+    //   awarenessId: this.awareness.clientID,
+    //   pos: null,
+    //   color: getRandomColor(),
+    // });
   }
 
   // editor --> remote
   private suikaObserve = (ops: IChanges) => {
+    console.log('ops', ops);
     const yMap = this.yMap;
     devLog('[[editor --> remote]]');
     devLog(ops);
@@ -74,6 +75,7 @@ export class SuikaBinding {
 
   // remote --> editor
   private yMapObserve = (event: YMapEvent<any>) => {
+    console.log('--- yMapObserve');
     const yMap = this.yMap;
     if (event.transaction.origin == this) {
       return;
@@ -89,7 +91,7 @@ export class SuikaBinding {
     for (const [id, { action }] of event.changes.keys) {
       if (action === 'delete') {
         changes.deleted.add(id);
-        return;
+        continue;
       }
       const attrs = yMap.get(id) as GraphicsAttrs;
       if (action === 'add' && attrs.type !== GraphicsType.Document) {
@@ -130,6 +132,7 @@ export class SuikaBinding {
 
   destroy() {
     // data
+    console.log('destroy');
     this.yMap.unobserve(this.yMapObserve);
     this.editor.doc.off('sceneChange', this.suikaObserve);
 

@@ -59,7 +59,10 @@ export const ZoomActions: FC = () => {
             <ZoomInput
               defaultValue={zoom}
               onChange={(newZoom) => {
-                editor?.viewportManager.setZoomAndUpdateViewport(newZoom);
+                editor?.viewportManager.setZoom(
+                  newZoom,
+                  editor.viewportManager.getSceneCenter(),
+                );
                 editor?.render();
               }}
             />

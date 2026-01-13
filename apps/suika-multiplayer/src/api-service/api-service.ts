@@ -3,7 +3,7 @@ import './api-config';
 import axios from 'axios';
 
 interface FileItem {
-  id: number;
+  id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
@@ -23,7 +23,7 @@ interface LoginRes {
 
 interface UserProfileRes {
   username: string;
-  id: number;
+  id: string;
 }
 
 export const ApiService = {
@@ -51,11 +51,11 @@ export const ApiService = {
     });
     return res.data;
   },
-  getFile: async (id: number) => {
+  getFile: async (id: string) => {
     const res = await axios.get<ResStruct<FileItem>>(`files/${id}`);
     return res.data;
   },
-  deleteFiles: async (ids: number[]) => {
+  deleteFiles: async (ids: string[]) => {
     const res = await axios.delete<ResStruct<FileItem[]>>('files', {
       params: {
         ids,
@@ -63,7 +63,7 @@ export const ApiService = {
     });
     return res.data;
   },
-  updateFile: async (id: number, data: Partial<FileItem>) => {
+  updateFile: async (id: string, data: Partial<FileItem>) => {
     const res = await axios.patch<ResStruct<FileItem[]>>(`files/${id}`, {
       data,
     });
