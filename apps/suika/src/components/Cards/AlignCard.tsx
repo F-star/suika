@@ -48,7 +48,7 @@ const AlignItem: FC<AlignItemProps> = ({
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <div
           className={classNames(
             'flex justify-center items-center mx-[2px] rounded-[3px] w-9 h-8 text-[#333] hover:bg-[#f2f2f2] cursor-pointer',
