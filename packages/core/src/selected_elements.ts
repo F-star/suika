@@ -4,7 +4,12 @@ import { boxToRect, type IRect, mergeBoxes } from '@suika/geo';
 import { type SuikaEditor } from './editor';
 import { type SuikaGraphics } from './graphics';
 import { removeGraphicsAndRecord } from './service/remove_service';
-import { getParentIdSet } from './utils';
+import {
+  cleanTreeSelectState,
+  getAllNodesInTree,
+  getBetweenNodes,
+  getParentIdSet,
+} from './utils';
 
 interface Events {
   itemsChange(items: SuikaGraphics[]): void;
@@ -103,17 +108,53 @@ export class SelectedElements {
 
     if (opts?.disableParentAndChildCoexist) {
       const pathIdSet = new Set(toggledElement.getParentIds());
-      // if this.items contains toggledElement's parent, return
+      // if ancestor of toggledElement had been selected, return
       for (const item of this.items) {
         if (pathIdSet.has(item.attrs.id)) {
           return;
         }
       }
-      // if this.items contains toggledElement's child, remove it
+      // if some children of toggledElement had been selected, remove them
       this.items = this.items.filter((item) => !item.containAncestor(id));
     }
     this.toggleItems([toggledElement]);
   }
+
+  continuousSelect(id: string) {
+    if (this.isEmpty()) {
+      this.setItemsById(new Set([id]));
+      return;
+    }
+
+    const lastNode = this.items.at(-1)!;
+    const targetNode = this.editor.doc.getGraphicsById(id)!;
+
+    const betweenNodes = getBetweenNodes(lastNode, targetNode);
+    const targetNodes = getAllNodesInTree([targetNode]);
+
+    const idSet = new Set<string>();
+
+    const oldNodes = getAllNodesInTree(this.items);
+    for (const node of oldNodes) {
+      idSet.add(node.attrs.id);
+    }
+
+    for (const node of betweenNodes) {
+      idSet.add(node.attrs.id);
+    }
+    for (const node of targetNodes) {
+      idSet.add(node.attrs.id);
+    }
+
+    const newNodes: SuikaGraphics[] = [];
+    idSet.forEach((id) => {
+      newNodes.push(this.editor.doc.getGraphicsById(id)!);
+    });
+
+    const cleanedNodes = cleanTreeSelectState(newNodes, idSet);
+    this.setItems(cleanedNodes);
+  }
+
   size() {
     return this.items.length;
   }

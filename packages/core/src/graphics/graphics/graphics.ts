@@ -1065,30 +1065,8 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     return path;
   }
 
-  static sortGraphics(graphics: SuikaGraphics[]) {
-    const elements = graphics.map((item) => ({
-      path: item.getSortIndexPath(),
-      val: item,
-    }));
-
-    elements.sort((a, b) => {
-      const len = Math.max(a.path.length, b.path.length);
-      for (let i = 0; i < len; i++) {
-        const sortIdxA = a.path[i];
-        const sortIdxB = b.path[i];
-        if (sortIdxA === sortIdxB) {
-          continue;
-        }
-        return sortIdxA < sortIdxB ? -1 : 1;
-      }
-      return a.path.length < b.path.length ? -1 : 1;
-    });
-    return elements.map((item) => item.val);
-  }
-
   containAncestor(id: string) {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let node: SuikaGraphics | undefined = this;
+    let node: SuikaGraphics | undefined = this.getParent();
     while (node) {
       if (node.attrs.id === id) {
         return true;

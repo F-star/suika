@@ -20,7 +20,7 @@ import { PaintType } from './paint';
 import { toSVG } from './to_svg';
 import { Transaction } from './transaction';
 import { type IEditorPaperData } from './type';
-import { getChildNodeSet } from './utils';
+import { getChildNodeSet, sortGraphicsDeep } from './utils';
 
 /**
  * Clipboard Manager
@@ -148,7 +148,7 @@ export class ClipboardManager {
   }
 
   private getSelectedItemsSnapshot() {
-    const selectedItems = SuikaGraphics.sortGraphics(
+    const selectedItems = sortGraphicsDeep(
       this.editor.selectedElements.getItems(),
     );
     if (selectedItems.length === 0) {
@@ -209,9 +209,8 @@ export class ClipboardManager {
     let left: string | null = null;
     let right: string | null = null;
     const firstGraphics =
-      SuikaGraphics.sortGraphics(this.editor.selectedElements.getItems()).at(
-        -1,
-      ) ?? this.editor.doc.getCurrentCanvas();
+      sortGraphicsDeep(this.editor.selectedElements.getItems()).at(-1) ??
+      this.editor.doc.getCurrentCanvas();
     let parent = firstGraphics;
 
     if (isCanvasGraphics(firstGraphics) || isFrameGraphics(firstGraphics)) {
