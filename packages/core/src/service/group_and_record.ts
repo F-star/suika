@@ -8,9 +8,17 @@ import {
 } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
-import { GraphicsObjectSuffix, SuikaFrame, SuikaGraphics } from '../graphics';
+import {
+  GraphicsObjectSuffix,
+  SuikaFrame,
+  type SuikaGraphics,
+} from '../graphics';
 import { Transaction } from '../transaction';
-import { getNoConflictObjectName, getParentIdSet } from '../utils';
+import {
+  getNoConflictObjectName,
+  getParentIdSet,
+  sortGraphicsDeep,
+} from '../utils';
 export const groupAndRecord = (
   graphicsArr: SuikaGraphics[],
   editor: SuikaEditor,
@@ -19,7 +27,7 @@ export const groupAndRecord = (
     console.warn('graphics should not be empty');
     return;
   }
-  graphicsArr = SuikaGraphics.sortGraphics(graphicsArr);
+  graphicsArr = sortGraphicsDeep(graphicsArr);
   const parentIdSet = getParentIdSet(graphicsArr);
 
   const lastGraphics = graphicsArr.at(-1)!;

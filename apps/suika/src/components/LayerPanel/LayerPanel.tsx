@@ -38,6 +38,8 @@ export const LayerPanel: FC = () => {
       editor.selectedElements.toggleItemById(objId, {
         disableParentAndChildCoexist: true,
       });
+    } else if (event.shiftKey) {
+      editor.selectedElements.continuousSelect(objId);
     } else {
       editor.selectedElements.setItemsById(new Set([objId]));
     }
