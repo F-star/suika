@@ -125,6 +125,9 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     this._cacheBbox = null;
     this._cacheBboxWithStroke = null;
     this._cacheMinBbox = null;
+    for (const child of this.children) {
+      child.clearBboxCache();
+    }
   }
 
   private updatedKeys = new Set<string>();
