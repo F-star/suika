@@ -98,8 +98,12 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     if (width === this.attrs.width && height === this.attrs.height) {
       return;
     }
-    this.attrs.width = width;
-    this.attrs.height = height;
+    // this.attrs.width = width;
+    // this.attrs.height = height;
+    this.updateAttrs({
+      width,
+      height,
+    });
     this.clearBboxCache();
   }
 

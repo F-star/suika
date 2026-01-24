@@ -33,12 +33,26 @@ export const Menu: FC = () => {
 
   const items: IDropdownProps['items'] = [
     {
-      key: 'import',
-      label: t({ id: 'import.originFile' }),
-    },
-    {
-      key: 'export',
-      label: t({ id: 'export.originFile' }),
+      key: 'file',
+      label: t({ id: 'file' }),
+      children: [
+        {
+          key: 'import',
+          label: t({ id: 'import.originFile' }),
+        },
+        {
+          key: 'export',
+          label: t({ id: 'export.originFile' }),
+        },
+        {
+          key: 'exportCurrentPageAsSVG',
+          label: t({ id: 'export.currentPageAsSVG' }),
+        },
+        {
+          key: 'exportCurrentPageAsPNG',
+          label: t({ id: 'export.currentPageAsPNG' }),
+        },
+      ],
     },
     {
       type: 'divider',
@@ -87,6 +101,12 @@ export const Menu: FC = () => {
         break;
       case 'export':
         exportService.exportOriginFile(editor);
+        break;
+      case 'exportCurrentPageAsSVG':
+        exportService.exportCurrentPageSVG(editor);
+        break;
+      case 'exportCurrentPageAsPNG':
+        exportService.exportCurrentPagePNG(editor);
         break;
       case 'keepToolSelectedAfterUse':
       case 'invertZoomDirection':

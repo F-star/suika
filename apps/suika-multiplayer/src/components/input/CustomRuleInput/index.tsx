@@ -30,6 +30,7 @@ const CustomRuleInput: FC<ICustomRuleInputProps> = (props) => {
       {prefix && <div className="suika-custom-input-prefix">{prefix}</div>}
       <input
         ref={inputRef}
+        style={{ marginLeft: prefix ? 0 : 8 }}
         className="custom-rule-input"
         defaultValue={value}
         onMouseUp={(e) => {

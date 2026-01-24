@@ -30,6 +30,8 @@
   "arrange.front": "移到顶部",
   "arrange.back": "移到底部",
 
+  "page.delete": "删除页面",
+
   "zoom.zoomIn": "放大",
   "zoom.zoomOut": "缩小",
   "zoom.zoomToFit": "适应画布",
@@ -53,8 +55,11 @@
   "flip.horizontal": "水平翻转",
   "flip.vertical": "垂直翻转",
 
+  "file": "文件",
   "import.originFile": "从本地导入",
   "export.originFile": "导出到本地",
+  "export.currentPageAsSVG": "导出当前页面为 SVG",
+  "export.currentPageAsPNG": "导出当前页面为 PNG",
 
   "preference": "偏好设置",
   "keepToolSelectedAfterUse": "使用工具后保持选中状态",
@@ -65,5 +70,19 @@
 
   "done": "完成",
 
-  "layer": "图层"
+  "layer": "图层",
+
+  "typography": "文字",
+
+  "fontSize": "字号",
+  "letterSpacing": "字间距",
+  "lineHeight": "行高",
+  "auto": "自动",
+
+  "align.left": "左对齐",
+  "align.horizontalCenter": "左右居中对齐",
+  "align.right": "右对齐",
+  "align.top": "顶部对齐",
+  "align.verticalCenter": "上下居中对齐",
+  "align.bottom": "底部对齐"
 }

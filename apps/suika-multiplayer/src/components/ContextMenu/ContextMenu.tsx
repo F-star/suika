@@ -1,5 +1,3 @@
-import './ContextMenu.scss';
-
 import { isWindows } from '@suika/common';
 import {
   arrangeAndRecord,
@@ -340,7 +338,7 @@ export const ContextMenu: FC = () => {
     <div onContextMenu={(e) => e.preventDefault()}>
       {visible && (
         <div
-          className="suika-context-menu-mask"
+          className="fixed inset-0 z-[60]"
           onMouseDown={() => {
             setVisible(false);
           }}
@@ -348,7 +346,7 @@ export const ContextMenu: FC = () => {
       )}
       <div
         ref={menuRef}
-        className="suika-context-menu"
+        className="fixed rounded-[2px] py-2 w-[200px] z-[62] shadow-[0px_5px_10px_rgba(0,0,0,0.15)] bg-white"
         style={{
           display: visible ? undefined : 'none',
           ...calculateMenuPosition(),
