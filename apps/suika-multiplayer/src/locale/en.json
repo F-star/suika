@@ -30,6 +30,8 @@
   "arrange.front": "Bring to Front",
   "arrange.back": "Send to Back",
 
+  "page.delete": "Delete page",
+
   "zoom.zoomIn": "Zoom in",
   "zoom.zoomOut": "Zoom out",
   "zoom.zoomToFit": "Zoom to fit",
@@ -54,8 +56,11 @@
   "flip.horizontal": "Flip horizontal",
   "flip.vertical": "Flip vertical",
 
+  "file": "File",
   "import.originFile": "Import local file",
   "export.originFile": "Save local copy",
+  "export.currentPageAsSVG": "Export current page as SVG",
+  "export.currentPageAsPNG": "Export current page as PNG",
 
   "preference": "Preference",
   "keepToolSelectedAfterUse": "Keep tool selected after use",
@@ -66,5 +71,19 @@
 
   "done": "Done",
 
-  "layer": "Layer"
+  "layer": "Layer",
+
+  "typography": "Typography",
+
+  "fontSize": "Font size",
+  "letterSpacing": "Letter spacing",
+  "lineHeight": "Line height",
+  "auto": "Auto",
+
+  "align.left": "Align left",
+  "align.horizontalCenter": "Align horizontal centers",
+  "align.right": "Align right",
+  "align.top": "Align top",
+  "align.verticalCenter": "Align vertical centers",
+  "align.bottom": "Align bottom"
 }

@@ -138,6 +138,7 @@ export class SuikaEditor {
 
     const canvas = new SuikaCanvas(
       {
+        id: '0-1',
         objectName: 'Page 1',
       },
       {
@@ -179,6 +180,7 @@ export class SuikaEditor {
     if (!this.doc.getChildren().length) {
       const canvas = new SuikaCanvas(
         {
+          id: '0-1',
           objectName: 'Page 1',
         },
         {
@@ -267,6 +269,10 @@ export class SuikaEditor {
         continue;
       }
       graphics.updateAttrs(partialAttrs);
+      // 处理父子关系
+      if (partialAttrs.parentIndex) {
+        graphics.insertAtParent(partialAttrs.parentIndex.position);
+      }
     }
 
     for (const id of changes.deleted) {

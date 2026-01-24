@@ -32,7 +32,7 @@ export const MultiCursorsView: FC<IProps> = ({
   const editor = useContext(EditorContext);
 
   const toViewportPos = (pos: IPoint) => {
-    return editor!.toViewportPt(pos.x, pos.y);
+    return editor!.toViewportPt(pos);
   };
 
   const [, setViewportId] = useState({}); // to force rerender component
