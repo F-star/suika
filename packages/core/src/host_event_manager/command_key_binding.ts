@@ -408,7 +408,7 @@ export class CommandKeyBinding {
       }
     };
     const enterGraphicsEdit = () => {
-      const selectedCount = editor.selectedElements.size();
+      const selectedCount = editor.selectedElements.getSelectedCount();
       if (editor.pathEditor.isActive() || selectedCount === 0) return;
 
       if (selectedCount === 1) {

@@ -39,7 +39,7 @@ export class SelectedBox {
   updateBbox() {
     const selectedElements = this.editor.selectedElements;
 
-    const count = selectedElements.size();
+    const count = selectedElements.getSelectedCount();
     if (count > 0) {
       if (count === 1) {
         const selectedGraph = selectedElements.getItems()[0];

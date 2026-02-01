@@ -7,7 +7,7 @@ import { Transaction } from '../transaction';
 import { ArrangeType } from '../type';
 
 export const arrangeAndRecord = (editor: SuikaEditor, type: ArrangeType) => {
-  if (editor.selectedElements.size() === 0) {
+  if (editor.selectedElements.getSelectedCount() === 0) {
     console.warn("can't arrange, no element");
   }
 

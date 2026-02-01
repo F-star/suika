@@ -103,7 +103,7 @@ export class SelectResizeTool implements IBaseTool {
     );
     const isOneDirResizeWithoutRotateHandle =
       ['n', 'e', 's', 'w'].includes(this.handleName) &&
-      (this.editor.selectedElements.size() > 1 ||
+      (this.editor.selectedElements.getSelectedCount() > 1 ||
         this.editor.selectedElements.getItems()[0].getRotate() % HALF_PI === 0);
 
     if (!this.lastDragPoint && this.editor.setting.get('snapToObjects')) {
@@ -354,7 +354,10 @@ export class SelectResizeTool implements IBaseTool {
   }
 
   onEnd(_e: PointerEvent, isDragHappened: boolean) {
-    if (this.editor.selectedElements.size() === 0 || !isDragHappened) {
+    if (
+      this.editor.selectedElements.getSelectedCount() === 0 ||
+      !isDragHappened
+    ) {
       return;
     }
     const items = this.editor.selectedElements.getItems();

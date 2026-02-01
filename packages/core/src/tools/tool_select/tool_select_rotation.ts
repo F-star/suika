@@ -107,7 +107,7 @@ export class SelectRotationTool implements IBaseTool {
     }
 
     // update cursor
-    if (editor.selectedElements.size() === 1) {
+    if (editor.selectedElements.getSelectedCount() === 1) {
       editor.setCursor(
         getRotationCursor(this.handleType, editor.selectedBox.getBox()!),
       );

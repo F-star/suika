@@ -99,25 +99,27 @@ export class SelectedElements {
       this.eventEmitter.emit('itemsChange', items);
     }
   }
-  toggleItemById(id: string, opts?: { disableParentAndChildCoexist: boolean }) {
+
+  toggleItemById(id: string) {
     const toggledElement = this.editor.doc.getGraphicsById(id);
     if (!toggledElement) {
       console.warn('can not find element by id');
-      return;
+      return false;
     }
 
-    if (opts?.disableParentAndChildCoexist) {
-      const pathIdSet = new Set(toggledElement.getParentIds());
-      // if ancestor of toggledElement had been selected, return
-      for (const item of this.items) {
-        if (pathIdSet.has(item.attrs.id)) {
-          return;
-        }
+    const pathIdSet = new Set(toggledElement.getParentIds());
+    // if ancestor of toggledElement had been selected, return
+    for (const item of this.items) {
+      if (pathIdSet.has(item.attrs.id)) {
+        return false;
       }
-      // if some children of toggledElement had been selected, remove them
-      this.items = this.items.filter((item) => !item.containAncestor(id));
     }
+    // if some children of toggledElement had been selected, remove them
+    this.items = this.items.filter((item) => !item.containAncestor(id));
+
     this.toggleItems([toggledElement]);
+
+    return true;
   }
 
   continuousSelect(id: string) {
@@ -155,7 +157,7 @@ export class SelectedElements {
     this.setItems(cleanedNodes);
   }
 
-  size() {
+  getSelectedCount() {
     return this.items.length;
   }
   isEmpty() {

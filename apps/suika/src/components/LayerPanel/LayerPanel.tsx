@@ -1,6 +1,7 @@
 import './LayerPanel.scss';
 
-import { type IObject, MutateGraphsAndRecord } from '@suika/core';
+import { isWindows } from '@suika/common';
+import { type IObject, MutateGraphsAndRecord, SelectCmd } from '@suika/core';
 import { type FC, useContext, useEffect, useState } from 'react';
 
 import { EditorContext } from '../../context';
@@ -33,15 +34,39 @@ export const LayerPanel: FC = () => {
     event: React.MouseEvent<Element, MouseEvent>,
   ) => {
     if (!editor) return;
-    if (event.ctrlKey || event.metaKey) {
+
+    const prevSelectedIds = editor.selectedElements.getIdSet();
+    let isSelectUpdated = false;
+
+    const isToggle = isWindows() ? event.ctrlKey : event.metaKey;
+    if (isToggle) {
       // parent and child can not be selected together, remove parent in selected object
-      editor.selectedElements.toggleItemById(objId, {
-        disableParentAndChildCoexist: true,
-      });
+      isSelectUpdated = editor.selectedElements.toggleItemById(objId);
     } else if (event.shiftKey) {
       editor.selectedElements.continuousSelect(objId);
+      if (editor.selectedElements.getSelectedCount() !== prevSelectedIds.size) {
+        isSelectUpdated = true;
+      } else {
+        const currentSelectedIds = editor.selectedElements.getIdSet();
+        for (const id of prevSelectedIds) {
+          if (!currentSelectedIds.has(id)) {
+            isSelectUpdated = true;
+            break;
+          }
+        }
+      }
     } else {
       editor.selectedElements.setItemsById(new Set([objId]));
+      isSelectUpdated = !(
+        prevSelectedIds.size === 1 && prevSelectedIds.has(objId)
+      );
+    }
+    if (isSelectUpdated) {
+      const command = new SelectCmd('toggle item by id', editor, {
+        prevItems: prevSelectedIds,
+        items: editor.selectedElements.getIdSet(),
+      });
+      editor.commandManager.pushCommand(command);
     }
     editor.render();
   };

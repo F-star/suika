@@ -60,7 +60,8 @@ export class ControlHandleManager {
   private onHoverItemChange = () => {
     if (!this.editor.pathEditor.isActive()) {
       const hoverItem = this.editor.selectedElements.getHoverItem();
-      const isSingleSelectedGraph = this.editor.selectedElements.size() === 1;
+      const isSingleSelectedGraph =
+        this.editor.selectedElements.getSelectedCount() === 1;
       const selectedGraph = isSingleSelectedGraph
         ? this.editor.selectedElements.getItems()[0]
         : null;
