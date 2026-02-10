@@ -151,6 +151,8 @@ export class TextEditor {
     let composingText = '';
     let leftContentWhenComposing = '';
     let rightContentWhenComposing = '';
+    let leftIndexWhenComposing = 0;
+    let leftLogicIndexWhenComposing = 0;
 
     const inputDom = this.inputDom;
 
@@ -161,40 +163,84 @@ export class TextEditor {
       if (e.isComposing) {
         if (!composingText) {
           const { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
-          const content = textGraphics.attrs.content;
-          leftContentWhenComposing = sliceContent(content, 0, rangeLeft);
-          rightContentWhenComposing = sliceContent(content, rangeRight);
+
+          leftContentWhenComposing = textGraphics.sliceContentByGlyphIndex(
+            0,
+            rangeLeft,
+          );
+          rightContentWhenComposing =
+            textGraphics.sliceContentByGlyphIndex(rangeRight);
+          leftLogicIndexWhenComposing =
+            textGraphics.paragraph.glyphIndexToLogicIndex(rangeLeft);
+          leftIndexWhenComposing = rangeLeft;
         }
         composingText = e.data ?? '';
       } else {
         composingText = '';
         leftContentWhenComposing = '';
         rightContentWhenComposing = '';
+        leftLogicIndexWhenComposing = 0;
+        leftIndexWhenComposing = 0;
       }
+
       // Not IME input, directly add to textGraphics
       if (!e.isComposing && e.data) {
         const { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
+        const leftContent = textGraphics.sliceContentByGlyphIndex(0, rangeLeft);
+        const rightContent = textGraphics.sliceContentByGlyphIndex(rangeRight);
+        const newContent = leftContent + e.data + rightContent;
 
-        const content = textGraphics.attrs.content;
-        const newContent =
-          sliceContent(content, 0, rangeLeft) +
-          e.data +
-          sliceContent(content, rangeRight);
+        // 计算两个逻辑索引之间，占用的 glyph 数。
+        const rangeLeftLogicIndex =
+          textGraphics.paragraph.glyphIndexToLogicIndex(rangeLeft);
+
+        console.log('非输入法 rangeLeftLogicIndex:', rangeLeftLogicIndex);
 
         TextEditor.updateTextContentAndResize(textGraphics, newContent);
+
         const dataLength = getContentLength(e.data);
+        const rangeRightLogicIndex = rangeLeftLogicIndex + dataLength;
+        debugger;
+        const correctedDataLength =
+          textGraphics.paragraph.getGlyphBetweenCountByLogicIndex(
+            rangeLeftLogicIndex,
+            rangeRightLogicIndex,
+          );
+
+        console.log('++++++ correctedDataLength:', correctedDataLength);
+
         this.rangeManager.setRange({
-          start: rangeLeft + dataLength,
-          end: rangeLeft + dataLength,
+          start: rangeLeft + correctedDataLength,
+          end: rangeLeft + correctedDataLength,
         });
         this.editor.render();
       } else if (e.isComposing) {
         const newContent =
           leftContentWhenComposing + composingText + rightContentWhenComposing;
+
+        // const rangeLeftLogicIndex =
+        //   textGraphics.paragraph.glyphIndexToLogicIndex(rangeLeft);
+
         TextEditor.updateTextContentAndResize(textGraphics, newContent);
-        const newRangeStart =
-          getContentLength(leftContentWhenComposing) +
-          getContentLength(composingText);
+
+        const dataLength = getContentLength(composingText);
+        const rangeRightLogicIndex = leftLogicIndexWhenComposing + dataLength;
+
+        console.log(
+          'leftLogicIndexWhenComposing:',
+          leftLogicIndexWhenComposing,
+        );
+        console.log('rangeRightLogicIndex:', rangeRightLogicIndex);
+
+        const correctedDataLength =
+          textGraphics.paragraph.getGlyphBetweenCountByLogicIndex(
+            leftLogicIndexWhenComposing,
+            rangeRightLogicIndex,
+          );
+
+        const newRangeStart = leftIndexWhenComposing + correctedDataLength;
+        // getContentLength(leftContentWhenComposing) + correctedDataLength;
+        console.log('correctedDataLength:', correctedDataLength);
         this.rangeManager.setRange({
           start: newRangeStart,
           end: newRangeStart,
@@ -228,9 +274,9 @@ export class TextEditor {
           rangeRight = e.key === 'Backspace' ? rangeRight : rangeRight + 1;
         }
 
-        const content = textGraphics.attrs.content;
-        const leftContent = sliceContent(content, 0, rangeLeft);
-        const rightContent = sliceContent(content, rangeRight);
+        const leftContent = textGraphics.sliceContentByGlyphIndex(0, rangeLeft);
+        const rightContent = textGraphics.sliceContentByGlyphIndex(rangeRight);
+
         const newContent = leftContent + rightContent;
         TextEditor.updateTextContentAndResize(textGraphics, newContent);
 
@@ -329,6 +375,8 @@ export class TextEditor {
       composingText = '';
       leftContentWhenComposing = '';
       rightContentWhenComposing = '';
+      leftLogicIndexWhenComposing = 0;
+      leftIndexWhenComposing = 0;
     });
 
     /****** bind mouse events *******/

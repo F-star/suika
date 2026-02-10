@@ -60,6 +60,8 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       fontFamily: attrs.fontFamily,
       lineHeight: this.attrs.lineHeight,
       letterSpacing: this.attrs.letterSpacing,
+      // FIXME: 测试数据，后续改成动态计算
+      maxWidth: 20,
     });
   }
 
@@ -89,6 +91,8 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         fontFamily,
         lineHeight: this.attrs.lineHeight,
         letterSpacing: this.attrs.letterSpacing,
+        // FIXME: 测试数据，后续改成动态计算
+        maxWidth: 20,
       });
     }
   }
@@ -285,5 +289,9 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         uiType: 'string',
       },
     ];
+  }
+
+  sliceContentByGlyphIndex(start: number, end?: number) {
+    return this.paragraph.sliceContentByGlyphIndex(start, end);
   }
 }

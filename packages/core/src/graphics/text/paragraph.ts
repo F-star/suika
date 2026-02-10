@@ -1,3 +1,4 @@
+import { sliceContent } from '@suika/common';
 import { type IPoint, type IRect, Matrix } from '@suika/geo';
 import svgPath from 'svgpath';
 
@@ -15,6 +16,7 @@ interface IParagraphAttrs {
   fontFamily: string;
   lineHeight: ILineHeight;
   letterSpacing: ILetterSpacing;
+  maxWidth: number;
 }
 
 export class Paragraph {
@@ -45,24 +47,32 @@ export class Paragraph {
 
     const lines = attrs.content.split('\n');
     let y = 0;
+    let logicCount = 0;
+
     for (const line of lines) {
-      const glyphs = calcGlyphInfos(line, {
+      const { glyphLines, logicCount: lineLogicCount } = calcGlyphInfos(line, {
         fontSize: attrs.fontSize,
         fontFamily: attrs.fontFamily,
         letterSpacing: attrs.letterSpacing,
+        maxWidth: attrs.maxWidth,
+        lineHeight: lineHeightInFontUnit,
       });
-      for (const glyph of glyphs) {
-        glyph.position.y = y;
+      for (const glyphs of glyphLines) {
+        for (const glyph of glyphs) {
+          glyph.position.y = y;
+          glyph.logicIndex += logicCount;
+        }
+        y -= lineHeightInFontUnit;
+        if (glyphs.length > 0) {
+          const lastGlyph = glyphs.at(-1)!;
+          this.width = Math.max(
+            this.width,
+            lastGlyph.position.x + lastGlyph.width,
+          );
+        }
+        this.glyphs.push(glyphs);
       }
-      y -= lineHeightInFontUnit;
-      if (glyphs.length > 0) {
-        const lastGlyph = glyphs.at(-1)!;
-        this.width = Math.max(
-          this.width,
-          lastGlyph.position.x + lastGlyph.width,
-        );
-      }
-      this.glyphs.push(glyphs);
+      logicCount += lineLogicCount;
     }
   }
 
@@ -106,6 +116,7 @@ export class Paragraph {
       position: { x: 0, y: 0 },
       width: 0,
       commands: '',
+      logicIndex: 0,
     };
 
     let i = 0;
@@ -333,5 +344,45 @@ export class Paragraph {
     }
     d = svgPath(d).matrix(toPixelMatrix.getArray()).toString();
     return d;
+  }
+
+  glyphIndexToLogicIndex(index: number) {
+    const glyphs = this.getGlyphs().flat();
+    const glyph = glyphs[index];
+
+    if (!glyph) return -1;
+    return glyph.logicIndex;
+  }
+
+  sliceContentByGlyphIndex(start: number, end?: number) {
+    const startGlyph = this.getGlyphByIndex(start);
+    const endGlyph = end === undefined ? undefined : this.getGlyphByIndex(end);
+
+    return sliceContent(
+      this.attrs.content,
+      startGlyph.logicIndex,
+      endGlyph?.logicIndex,
+    );
+  }
+
+  // [startLogic, endLogic)
+  getGlyphBetweenCountByLogicIndex(startLogic: number, endLogic: number) {
+    const glyphs = this.getGlyphs().flat();
+    const start = glyphs.findIndex((item) => item.logicIndex === startLogic);
+    if (start === -1) {
+      console.warn('start glyph not found');
+    }
+    let end = -1;
+    for (let i = glyphs.length - 1; i >= 0; i--) {
+      if (glyphs[i].logicIndex === endLogic) {
+        end = i;
+        break;
+      }
+    }
+    if (end === -1) {
+      console.warn('end glyph not found');
+    }
+
+    return end - start;
   }
 }
