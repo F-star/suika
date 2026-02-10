@@ -8,6 +8,7 @@ import {
 
 import { DOUBLE_PI } from '../constant';
 import { PaintType } from '../paint';
+import { EllipseShape } from '../render_engine';
 import { GraphicsType, type Optional } from '../type';
 import {
   type GraphicsAttrs,
@@ -27,6 +28,10 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
     opts: IGraphicsOpts,
   ) {
     super({ ...attrs, type: GraphicsType.Ellipse }, opts);
+  }
+
+  protected override createShape() {
+    this.shape = new EllipseShape(this.attrs);
   }
 
   override hitTest(point: IPoint, padding = 0) {

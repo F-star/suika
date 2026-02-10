@@ -14,6 +14,7 @@ import { KeyBindingManager } from './key_binding_manager';
 import { PathEditor } from './path_editor';
 import { PerfMonitor } from './perf_monitor';
 import { RefLine } from './ref_line';
+import { SuikaShapeApplication } from './render_engine';
 import { Ruler } from './ruler';
 import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
@@ -26,8 +27,8 @@ import { ViewportManager } from './viewport_manager';
 
 interface IEditorOptions {
   containerElement: HTMLDivElement;
-  width: number;
-  height: number;
+  // width: number;
+  // height: number;
   offsetX?: number;
   offsetY?: number;
   showPerfMonitor?: boolean;
@@ -42,13 +43,14 @@ export class SuikaEditor {
   containerElement: HTMLDivElement;
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  renderApp: SuikaShapeApplication | null = null;
 
   appVersion = 'suika-editor_0.0.3';
   paperId: string;
 
   private emitter = new EventEmitter<Events>();
 
-  doc: SuikaDocument;
+  doc!: SuikaDocument;
   sceneGraph: SceneGraph;
   controlHandleManager: ControlHandleManager;
 
@@ -128,12 +130,47 @@ export class SuikaEditor {
 
     this.paperId = genUuid();
 
-    this.doc = new SuikaDocument({
-      id: '0-0',
-      objectName: 'Document',
-      width: 0,
-      height: 0,
+    this.perfMonitor = new PerfMonitor();
+    if (options.showPerfMonitor) {
+      this.perfMonitor.start(this.containerElement);
+    }
+
+    // /**
+    //  * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
+    //  * 所以下面的 render 要异步执行
+    //  */
+    // Promise.resolve().then(() => {
+    //   this.render();
+    // });
+  }
+
+  async init(options: {
+    canvasForPixi: HTMLCanvasElement;
+    width: number;
+    height: number;
+  }) {
+    // pixijs 的初始化，异步的
+    this.renderApp = new SuikaShapeApplication();
+
+    // const canvasSize = this.viewportManager.getPageSize();
+
+    await this.renderApp.init({
+      canvas: options.canvasForPixi,
+      width: 500,
+      height: 350,
+      backgroundColor: 0xffffff,
     });
+    // end
+
+    this.doc = new SuikaDocument(
+      {
+        id: '0-0',
+        objectName: 'Document',
+        width: 0,
+        height: 0,
+      },
+      this.renderApp!,
+    );
     this.doc.setEditor(this);
 
     const canvas = new SuikaCanvas(
@@ -154,19 +191,6 @@ export class SuikaEditor {
     });
 
     this.doc.setCurrentCanvas(canvas.attrs.id);
-
-    this.perfMonitor = new PerfMonitor();
-    if (options.showPerfMonitor) {
-      this.perfMonitor.start(this.containerElement);
-    }
-
-    /**
-     * setViewport 其实会修改 canvas 的宽高，浏览器的 DOM 更新是异步的，
-     * 所以下面的 render 要异步执行
-     */
-    Promise.resolve().then(() => {
-      this.render();
-    });
   }
 
   setContents(data: IEditorPaperData) {

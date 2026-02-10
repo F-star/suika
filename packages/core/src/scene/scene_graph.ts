@@ -270,7 +270,7 @@ export class SceneGraph {
     /** document need to be handled separately */
     for (const item of data) {
       if (item.type === GraphicsType.Document) {
-        const doc = new SuikaDocument(item);
+        const doc = new SuikaDocument(item, this.editor.renderApp!);
         doc.setEditor(this.editor);
         this.editor.doc = doc;
         children.push(doc);
