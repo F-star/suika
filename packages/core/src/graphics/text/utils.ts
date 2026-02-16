@@ -1,14 +1,12 @@
 import { fontManager } from '../../font_manager';
 import { type IFontStyle, type IGlyph } from './type';
 
-export const calcGlyphInfos = (
-  content: string,
-  fontStyle: IFontStyle,
-): IGlyph[] => {
+export const calcGlyphInfos = (content: string, fontStyle: IFontStyle) => {
   const font = fontManager.getFont(fontStyle.fontFamily);
 
   const originGlyphs = font.stringToGlyphs(content);
-  const glyphs: IGlyph[] = [];
+  let glyphs: IGlyph[] = [];
+  const glyphLines: IGlyph[][] = [];
 
   let letterSpacingVal = fontStyle.letterSpacing.value;
   if (fontStyle.letterSpacing.units === 'PIXELS') {
@@ -19,15 +17,33 @@ export const calcGlyphInfos = (
       fontStyle,
     );
   }
+  // +0.5 to avoid precision problem
+  const maxWidth = pxToFontUnit(fontStyle.maxWidth + 0.5, fontStyle);
 
   let x = 0;
+  const y = 0;
+  let i = 0;
 
-  for (let i = 0; i < originGlyphs.length; i++) {
+  for (; i < originGlyphs.length; i++) {
     const glyph = originGlyphs[i];
     let width = glyph.advanceWidth ?? 0;
 
+    const isSoftWrapAdd = i > 0 && x + width > maxWidth;
+    if (isSoftWrapAdd) {
+      glyphs.push({
+        position: { x, y: y },
+        width: 0,
+        commands: '',
+        logicIndex: i,
+      });
+
+      x = 0;
+      glyphLines.push(glyphs);
+      glyphs = [];
+    }
+
     // solve kerning
-    if (i > 0) {
+    if (i > 0 && !isSoftWrapAdd) {
       const prevGlyph = originGlyphs[i - 1];
       const kerningValue = font.getKerningValue(prevGlyph, glyph);
       if (kerningValue) {
@@ -41,21 +57,28 @@ export const calcGlyphInfos = (
     }
 
     glyphs.push({
-      position: { x: x, y: 0 },
+      position: { x: x, y: y },
       width: width,
       commands: glyph.path.toPathData(100),
+      logicIndex: i,
     });
     x += width;
   }
 
   // 末尾换行符
   glyphs.push({
-    position: { x, y: 0 },
+    position: { x, y: y },
     width: 0,
     commands: '',
+    logicIndex: i,
   });
 
-  return glyphs;
+  glyphLines.push(glyphs);
+
+  return {
+    glyphLines,
+    logicCount: i + 1,
+  };
 };
 
 const pxToFontUnit = (

@@ -80,6 +80,10 @@
   "lineHeight": "Line height",
   "auto": "Auto",
 
+  "textAutoResize.autoWidth": "Auto width",
+  "textAutoResize.autoHeight": "Auto height",
+  "textAutoResize.fixed": "Fixed",
+
   "align.left": "Align left",
   "align.horizontalCenter": "Align horizontal centers",
   "align.right": "Align right",

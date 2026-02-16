@@ -1,6 +1,7 @@
 import {
   type ILetterSpacing,
   type ILineHeight,
+  type ITextAutoResize,
   MutateGraphsAndRecord,
   SuikaText,
 } from '@suika/core';
@@ -29,6 +30,8 @@ export const TypographyCard = () => {
 
   const [fontSize, setFontSize] = useState(12);
   const [fontFamily, setFontFamily] = useState('Smiley Sans');
+  const [textAutoResize, setTextAutoResize] =
+    useState<string>('WIDTH_AND_HEIGHT');
 
   const [hasTextSelected, setHasTextSelected] = useState(false);
 
@@ -114,6 +117,19 @@ export const TypographyCard = () => {
         }
       }
 
+      let _textAutoResize: string | undefined;
+      for (const item of items) {
+        if (item instanceof SuikaText) {
+          const textAutoResize = item.attrs.textAutoResize;
+          if (_textAutoResize === undefined) {
+            _textAutoResize = textAutoResize;
+          } else if (_textAutoResize !== textAutoResize) {
+            _textAutoResize = MIXED;
+            break;
+          }
+        }
+      }
+
       setFontSize(_fontSize as number);
       setFontFamily(_fontFamily as string);
       setHasTextSelected(_hasTextSelected);
@@ -121,6 +137,7 @@ export const TypographyCard = () => {
       setIsLetterSpacingMixed(_isLetterSpacingMixed);
       setLineHeightUnit(_lineHeight ?? { value: 1, units: 'RAW' });
       setIsLineHeightMixed(_isLineHeightMixed);
+      setTextAutoResize(_textAutoResize as string);
     };
 
     updateFontInfo(); // init
@@ -160,6 +177,13 @@ export const TypographyCard = () => {
     return null;
   }
 
+  const execUpdateTextAutoResizeCommand = (value: ITextAutoResize) => {
+    if (!editor) return;
+    const items = editor.selectedElements.getItems();
+    MutateGraphsAndRecord.setTextAutoResize(editor, items, value);
+    editor.render();
+  };
+
   return (
     <BaseCard title={intl.formatMessage({ id: 'typography' })}>
       <div className="mx-2">
@@ -167,6 +191,13 @@ export const TypographyCard = () => {
           <Select
             value={fontFamily}
             onValueChange={execUpdateFontFamilyCommand}
+            onOpenChange={(open) => {
+              if (!open) {
+                setTimeout(() => {
+                  (document.activeElement as HTMLElement)?.blur();
+                }, 0);
+              }
+            }}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select font family" />
@@ -230,6 +261,39 @@ export const TypographyCard = () => {
               }}
             />
           </div>
+        </div>
+        <div className="mx-[4px] mb-2">
+          <Select
+            value={textAutoResize}
+            onValueChange={(value) =>
+              execUpdateTextAutoResizeCommand(value as ITextAutoResize)
+            }
+            onOpenChange={(open) => {
+              if (!open) {
+                setTimeout(() => {
+                  (document.activeElement as HTMLElement)?.blur();
+                }, 0);
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select text auto resize" />
+            </SelectTrigger>
+            <SelectContent className="w-full">
+              <SelectItem value="WIDTH_AND_HEIGHT">
+                {intl.formatMessage({ id: 'textAutoResize.autoWidth' })}
+              </SelectItem>
+              <SelectItem value="HEIGHT">
+                {intl.formatMessage({ id: 'textAutoResize.autoHeight' })}
+              </SelectItem>
+              <SelectItem value="NONE">
+                {intl.formatMessage({ id: 'textAutoResize.fixed' })}
+              </SelectItem>
+              <SelectItem className="hidden" value={MIXED}>
+                Mixed
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </BaseCard>

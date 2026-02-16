@@ -419,10 +419,6 @@ export class CommandKeyBinding {
           editor.textEditor.active({
             textGraphics: graphics,
             pos: graphics.getWorldPosition(),
-            range: {
-              start: 0,
-              end: graphics.getContentLength(),
-            },
           });
         } else if (isFrameGraphics(graphics) && graphics.isGroup()) {
           enterGraphicsEditWithGroup();

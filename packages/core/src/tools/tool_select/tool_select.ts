@@ -74,10 +74,6 @@ export class SelectTool implements ITool {
       editor.textEditor.active({
         textGraphics: topHitElement,
         pos: topHitElement.getWorldPosition(),
-        range: {
-          start: 0,
-          end: topHitElement.getContentLength(),
-        },
       });
       // prevent text editor input DOM from blurring
       event.nativeEvent.preventDefault();

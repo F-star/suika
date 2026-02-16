@@ -18,7 +18,11 @@ import {
 import { type IDrawInfo } from '../type';
 import { drawLayer } from '../utils';
 import { Paragraph } from './paragraph';
-import { type ILetterSpacing, type ILineHeight } from './type';
+import {
+  type ILetterSpacing,
+  type ILineHeight,
+  type ITextAutoResize,
+} from './type';
 
 export interface TextAttrs extends GraphicsAttrs {
   content: string;
@@ -28,6 +32,7 @@ export interface TextAttrs extends GraphicsAttrs {
   letterSpacing: ILetterSpacing;
 
   autoFit?: boolean;
+  textAutoResize?: ITextAutoResize;
 }
 
 const DEFAULT_TEXT_WIDTH = 80;
@@ -50,9 +55,19 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
         height: attrs.height ?? DEFAULT_TEXT_WEIGHT,
         lineHeight: attrs.lineHeight ?? { value: 1, units: 'RAW' },
         letterSpacing: attrs.letterSpacing ?? { value: 0, units: 'PIXELS' },
+        textAutoResize: attrs.textAutoResize ?? 'WIDTH_AND_HEIGHT',
       },
       opts,
     );
+
+    let maxWidth = Infinity;
+    if (attrs.textAutoResize === 'WIDTH_AND_HEIGHT') {
+      maxWidth = Infinity;
+    } else if (attrs.textAutoResize === 'HEIGHT') {
+      maxWidth = attrs.width!;
+    } else if (attrs.textAutoResize === 'NONE') {
+      maxWidth = attrs.width!;
+    }
 
     this.paragraph = new Paragraph({
       content: attrs.content,
@@ -60,10 +75,12 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       fontFamily: attrs.fontFamily,
       lineHeight: this.attrs.lineHeight,
       letterSpacing: this.attrs.letterSpacing,
+      maxWidth,
     });
   }
 
   override updateAttrs(partialAttrs: Partial<TextAttrs> & IAdvancedAttrs) {
+    const isSizeChanged = 'width' in partialAttrs || 'height' in partialAttrs;
     const isContentChanged =
       'content' in partialAttrs && partialAttrs.content !== this.attrs.content;
     const isFontSizeChanged = 'fontSize' in partialAttrs;
@@ -72,39 +89,64 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
       partialAttrs.fontFamily !== this.attrs.fontFamily;
     const isLetterSpacingChanged = 'letterSpacing' in partialAttrs;
     const isLineHeightChanged = 'lineHeight' in partialAttrs;
+    const isTextAutoResizeChanged = 'textAutoResize' in partialAttrs;
     super.updateAttrs(partialAttrs);
 
     if (
+      isSizeChanged ||
       isContentChanged ||
       isFontSizeChanged ||
       isFontFamilyChanged ||
       isLetterSpacingChanged ||
-      isLineHeightChanged
+      isLineHeightChanged ||
+      isTextAutoResizeChanged
     ) {
       const { content, fontSize, fontFamily } = this.attrs;
+
       // recompute
+      let maxWidth = Infinity;
+      if (this.attrs.textAutoResize === 'WIDTH_AND_HEIGHT') {
+        maxWidth = Infinity;
+      } else if (this.attrs.textAutoResize === 'HEIGHT') {
+        maxWidth = this.attrs.width!;
+      } else if (this.attrs.textAutoResize === 'NONE') {
+        maxWidth = this.attrs.width!;
+      }
       this.paragraph = new Paragraph({
         content,
         fontSize,
         fontFamily,
         lineHeight: this.attrs.lineHeight,
         letterSpacing: this.attrs.letterSpacing,
+        maxWidth,
       });
     }
   }
 
   fitContent() {
-    const { width, height } = this.paragraph.getLayoutSize();
-    if (width === this.attrs.width && height === this.attrs.height) {
+    // if fixed, do nothing
+    if (this.attrs.textAutoResize === 'NONE') {
       return;
+    } else if (this.attrs.textAutoResize === 'WIDTH_AND_HEIGHT') {
+      const { width, height } = this.paragraph.getLayoutSize();
+      if (width === this.attrs.width && height === this.attrs.height) {
+        return;
+      }
+      this.updateAttrs({
+        width,
+        height,
+      });
+      this.clearBboxCache();
+    } else if (this.attrs.textAutoResize === 'HEIGHT') {
+      const { height } = this.paragraph.getLayoutSize();
+      if (height === this.attrs.height) {
+        return;
+      }
+      this.updateAttrs({
+        height,
+      });
+      this.clearBboxCache();
     }
-    // this.attrs.width = width;
-    // this.attrs.height = height;
-    this.updateAttrs({
-      width,
-      height,
-    });
-    this.clearBboxCache();
   }
 
   private _realDraw(
@@ -264,7 +306,7 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
     const matrix = new Matrix().scale(scale, scale);
     point = matrix.applyInverse(point);
 
-    return this.paragraph.getGlyphIndexByPt(point);
+    return this.paragraph.getPositionByPt(point);
   }
 
   override getInfoPanelAttrs() {

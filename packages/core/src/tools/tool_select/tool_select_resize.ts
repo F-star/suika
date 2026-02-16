@@ -15,7 +15,11 @@ import { UpdateGraphicsAttrsCmd } from '../../commands';
 import { HALF_PI } from '../../constant';
 import { isTransformHandle } from '../../control_handle_manager';
 import { type SuikaEditor } from '../../editor';
-import { type GraphicsAttrs, type SuikaGraphics } from '../../graphics';
+import {
+  type GraphicsAttrs,
+  type SuikaGraphics,
+  SuikaText,
+} from '../../graphics';
 import { SnapHelper } from '../../snap';
 import { getChildNodeSet, getParentIdSet, updateNodeSize } from '../../utils';
 import { type IBaseTool } from '../type';
@@ -166,7 +170,7 @@ export class SelectResizeTool implements IBaseTool {
   }
 
   private updateSingleGraphics(graphics: SuikaGraphics) {
-    const updatedAttrs = graphics.calcNewAttrsByControlHandle(
+    const newAttrs = graphics.calcNewAttrsByControlHandle(
       this.handleName,
       this.lastDragPoint!,
       this.originAttrsMap.get(graphics.attrs.id)!,
@@ -176,10 +180,32 @@ export class SelectResizeTool implements IBaseTool {
       this.editor.setting.get('flipObjectsWhileResizing'),
     );
 
-    graphics.updateAttrs(updatedAttrs, {
+    graphics.updateAttrs(newAttrs, {
       finishRecomputed: true,
     });
-    this.updatedAttrsMap.set(graphics.attrs.id, cloneDeep(updatedAttrs));
+
+    const oldAttrs = this.originAttrsMap.get(graphics.attrs.id)!;
+
+    if (graphics instanceof SuikaText) {
+      if (graphics.attrs.textAutoResize !== 'NONE') {
+        if (newAttrs.height !== oldAttrs.height) {
+          newAttrs.textAutoResize = 'NONE';
+        } else if (newAttrs.width !== oldAttrs.width) {
+          newAttrs.textAutoResize = 'HEIGHT';
+        }
+      }
+
+      graphics.updateAttrs(newAttrs);
+      graphics.fitContent();
+      newAttrs.width = graphics.attrs.width;
+      newAttrs.height = graphics.attrs.height;
+    } else {
+      graphics.updateAttrs(newAttrs, {
+        finishRecomputed: true,
+      });
+    }
+
+    this.updatedAttrsMap.set(graphics.attrs.id, cloneDeep(newAttrs));
 
     updateNodeSize(
       this.editor,
@@ -311,12 +337,28 @@ export class SelectResizeTool implements IBaseTool {
       );
 
       const { width, height } = this.originAttrsMap.get(id)!;
-      const newAttrs = recomputeTransformRect({
+      const newAttrs: Partial<GraphicsAttrs> = recomputeTransformRect({
         width,
         height,
         transform: newLocalTf,
       });
-      item.updateAttrs(newAttrs);
+
+      if (item instanceof SuikaText) {
+        if (item.attrs.textAutoResize !== 'NONE') {
+          if (newAttrs.height !== height) {
+            newAttrs.textAutoResize = 'NONE';
+          } else if (newAttrs.width !== width) {
+            newAttrs.textAutoResize = 'HEIGHT';
+          }
+        }
+
+        item.updateAttrs(newAttrs);
+        item.fitContent();
+        newAttrs.width = item.attrs.width;
+        newAttrs.height = item.attrs.height;
+      } else {
+        item.updateAttrs(newAttrs);
+      }
       this.updatedAttrsMap.set(id, cloneDeep(newAttrs));
     }
 

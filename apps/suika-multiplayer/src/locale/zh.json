@@ -79,6 +79,10 @@
   "lineHeight": "行高",
   "auto": "自动",
 
+  "textAutoResize.autoWidth": "自动宽度",
+  "textAutoResize.autoHeight": "自动高度",
+  "textAutoResize.fixed": "固定宽高",
+
   "align.left": "左对齐",
   "align.horizontalCenter": "左右居中对齐",
   "align.right": "右对齐",

@@ -5,6 +5,7 @@ import { type SuikaEditor } from '../editor';
 import {
   type ILetterSpacing,
   type ILineHeight,
+  type ITextAutoResize,
   type SuikaGraphics,
   type SuikaRect,
   type SuikaRegularPolygon,
@@ -547,5 +548,47 @@ export const MutateGraphsAndRecord = {
     }
     transaction.updateParentSize(graphicsArr);
     transaction.commit('Update LineHeight of Elements');
+  },
+
+  setTextAutoResize(
+    editor: SuikaEditor,
+    graphicsArr: SuikaGraphics[],
+    val: ITextAutoResize,
+  ) {
+    const transaction = new Transaction(editor);
+
+    let hasTextElement = false;
+
+    for (const graphics of graphicsArr) {
+      if (!(graphics instanceof SuikaText)) {
+        continue;
+      }
+      hasTextElement = true;
+      transaction.recordOld(graphics.attrs.id, {
+        textAutoResize: graphics.attrs.textAutoResize,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+      });
+
+      graphics.updateAttrs({ textAutoResize: val });
+      if (val === 'WIDTH_AND_HEIGHT') {
+        graphics.fitContent();
+      } else if (val === 'HEIGHT') {
+        graphics.fitContent();
+      } else if (val === 'NONE') {
+        // noop
+      }
+
+      transaction.update(graphics.attrs.id, {
+        textAutoResize: graphics.attrs.textAutoResize,
+        width: graphics.attrs.width,
+        height: graphics.attrs.height,
+      });
+    }
+    if (!hasTextElement) {
+      return;
+    }
+    transaction.updateParentSize(graphicsArr);
+    transaction.commit('Update TextAutoResize of Elements');
   },
 };

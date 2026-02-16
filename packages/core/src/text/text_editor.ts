@@ -6,7 +6,7 @@ import { type IDrawInfo, SuikaText, type TextAttrs } from '../graphics';
 import { type IMousemoveEvent } from '../host_event_manager';
 import { removeGraphicsAndRecord } from '../service/remove_service';
 import { Transaction } from '../transaction';
-import { type IRange, RangeManager } from './range_manager';
+import { type ISelection, SelectionManager } from './selection_manager';
 
 const defaultInputStyle = {
   position: 'fixed',
@@ -24,12 +24,12 @@ const defaultInputStyle = {
 export class TextEditor {
   private inputDom: HTMLTextAreaElement;
   private textGraphics: SuikaText | null = null;
-  private rangeManager: RangeManager;
+  private selectionManager: SelectionManager;
   private _active = false;
   private transaction!: Transaction;
 
   constructor(private editor: SuikaEditor) {
-    this.rangeManager = new RangeManager(editor);
+    this.selectionManager = new SelectionManager(editor);
 
     this.inputDom = this.createInputDom();
     this.inactive();
@@ -57,7 +57,11 @@ export class TextEditor {
     return this._active;
   }
 
-  active(params: { textGraphics?: SuikaText; pos: IPoint; range?: IRange }) {
+  active(params: {
+    textGraphics?: SuikaText;
+    pos?: IPoint;
+    selection?: ISelection;
+  }) {
     this._active = true;
     this.inputDom.value = '';
     this.editor.controlHandleManager.enableTransformControl = false;
@@ -81,6 +85,7 @@ export class TextEditor {
           lineHeight: { value: 1, units: 'RAW' },
           letterSpacing: { value: 0, units: 'PERCENT' },
           autoFit: true,
+          textAutoResize: 'WIDTH_AND_HEIGHT',
         },
         {
           advancedAttrs: params.pos,
@@ -101,14 +106,10 @@ export class TextEditor {
       height: textGraphics!.attrs.height,
     });
 
-    if (params.range) {
-      this.rangeManager.setRange(params.range);
+    if (params.selection) {
+      this.selectionManager.setSelection(params.selection);
     } else {
-      const rangeStart = textGraphics!.getContentLength();
-      this.rangeManager.setRange({
-        start: rangeStart,
-        end: rangeStart,
-      });
+      this.selectAll();
     }
 
     const cursorPos = this.editor.mouseEventManager.getCursorPos();
@@ -147,6 +148,17 @@ export class TextEditor {
     textGraphics.fitContent();
   }
 
+  selectAll() {
+    if (!this.textGraphics) return;
+    const maxPosition = this.textGraphics.paragraph.getMaxPosition();
+    this.selectionManager.setSelection({
+      anchorLineNum: 0,
+      anchorColumn: 0,
+      focusLineNum: maxPosition.lineNum,
+      focusColumn: maxPosition.column,
+    });
+  }
+
   private bindEvent() {
     let composingText = '';
     let leftContentWhenComposing = '';
@@ -154,50 +166,78 @@ export class TextEditor {
 
     const inputDom = this.inputDom;
 
-    const updateContent = (e: { isComposing: boolean; data: string }) => {
+    const updateContent = (params: {
+      isComposing: boolean;
+      data: string;
+      selection: ISelection;
+    }) => {
       const textGraphics = this.textGraphics;
       if (!textGraphics) return;
 
-      if (e.isComposing) {
+      // selection 转为 logic
+      const rangeLeft = textGraphics.paragraph.getOffsetAt({
+        column: params.selection.anchorColumn,
+        lineNum: params.selection.anchorLineNum,
+      });
+
+      const rangeRight = textGraphics.paragraph.getOffsetAt({
+        column: params.selection.focusColumn,
+        lineNum: params.selection.focusLineNum,
+      });
+
+      if (params.isComposing) {
         if (!composingText) {
-          const { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
           const content = textGraphics.attrs.content;
           leftContentWhenComposing = sliceContent(content, 0, rangeLeft);
           rightContentWhenComposing = sliceContent(content, rangeRight);
         }
-        composingText = e.data ?? '';
+        composingText = params.data ?? '';
       } else {
         composingText = '';
         leftContentWhenComposing = '';
         rightContentWhenComposing = '';
       }
       // Not IME input, directly add to textGraphics
-      if (!e.isComposing && e.data) {
-        const { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
-
+      if (!params.isComposing && params.data != undefined) {
         const content = textGraphics.attrs.content;
         const newContent =
           sliceContent(content, 0, rangeLeft) +
-          e.data +
+          params.data +
           sliceContent(content, rangeRight);
 
         TextEditor.updateTextContentAndResize(textGraphics, newContent);
-        const dataLength = getContentLength(e.data);
-        this.rangeManager.setRange({
-          start: rangeLeft + dataLength,
-          end: rangeLeft + dataLength,
+        const dataLength = getContentLength(params.data);
+
+        const position = textGraphics.paragraph.getPositionAt(
+          rangeLeft + dataLength,
+          'upstream',
+        );
+
+        this.selectionManager.setSelection({
+          anchorLineNum: position.lineNum,
+          anchorColumn: position.column,
+          focusLineNum: position.lineNum,
+          focusColumn: position.column,
         });
         this.editor.render();
-      } else if (e.isComposing) {
+      } else if (params.isComposing) {
         const newContent =
           leftContentWhenComposing + composingText + rightContentWhenComposing;
         TextEditor.updateTextContentAndResize(textGraphics, newContent);
         const newRangeStart =
           getContentLength(leftContentWhenComposing) +
           getContentLength(composingText);
-        this.rangeManager.setRange({
-          start: newRangeStart,
-          end: newRangeStart,
+
+        const position = textGraphics.paragraph.getPositionAt(
+          newRangeStart,
+          'upstream',
+        );
+
+        this.selectionManager.setSelection({
+          anchorLineNum: position.lineNum,
+          anchorColumn: position.column,
+          focusLineNum: position.lineNum,
+          focusColumn: position.column,
         });
         this.editor.render();
       }
@@ -205,10 +245,12 @@ export class TextEditor {
 
     inputDom.addEventListener('input', (_e) => {
       const e = _e as InputEvent;
+      const selection = this.selectionManager.getSelection();
 
       updateContent({
         isComposing: e.isComposing,
         data: e.data ?? '',
+        selection,
       });
     });
 
@@ -219,69 +261,81 @@ export class TextEditor {
         const textGraphics = this.textGraphics;
         if (!textGraphics) return;
         if (!textGraphics.attrs.content) return;
+        const range = this.selectionManager.getSortedSelectionRange();
+        const isCollapsed = this.selectionManager.isCollapsed();
 
-        let { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
-        const isSelected = rangeLeft !== rangeRight;
+        if (isCollapsed) {
+          if (range.startColumn === 0 && range.startLineNum === 0) {
+            return;
+          }
 
-        if (!isSelected) {
-          rangeLeft = e.key === 'Backspace' ? rangeLeft - 1 : rangeLeft;
-          rangeRight = e.key === 'Backspace' ? rangeRight : rangeRight + 1;
-        }
-
-        const content = textGraphics.attrs.content;
-        const leftContent = sliceContent(content, 0, rangeLeft);
-        const rightContent = sliceContent(content, rangeRight);
-        const newContent = leftContent + rightContent;
-        TextEditor.updateTextContentAndResize(textGraphics, newContent);
-
-        if (isSelected) {
-          this.rangeManager.setRange({
-            start: rangeLeft,
-            end: rangeLeft,
+          const offset = textGraphics.paragraph.getOffsetAt({
+            column: range.startColumn,
+            lineNum: range.startLineNum,
           });
-        } else if (e.key === 'Backspace') {
-          this.rangeManager.moveLeft(false);
+          const leftPosition = textGraphics.paragraph.getPositionAt(offset - 1);
+          updateContent({
+            isComposing: false,
+            data: '',
+            selection: {
+              anchorLineNum: leftPosition.lineNum,
+              anchorColumn: leftPosition.column,
+              focusColumn: range.endColumn,
+              focusLineNum: range.endLineNum,
+            },
+          });
+        } else {
+          updateContent({
+            isComposing: false,
+            data: '',
+            selection: {
+              anchorLineNum: range.startLineNum,
+              anchorColumn: range.startColumn,
+              focusLineNum: range.endLineNum,
+              focusColumn: range.endColumn,
+            },
+          });
         }
         this.editor.render();
       } else if (e.key === 'ArrowLeft') {
         if (e.isComposing) return;
-        this.rangeManager.moveLeft(e.shiftKey);
+        this.selectionManager.moveLeft(e.shiftKey);
         this.editor.render();
       } else if (e.key === 'ArrowRight') {
         if (e.isComposing) return;
-        this.rangeManager.moveRight(e.shiftKey);
+        this.selectionManager.moveRight(e.shiftKey);
         this.editor.render();
       } else if (e.key === 'ArrowUp') {
         if (e.isComposing) return;
-
         const isRangeSelect = e.shiftKey;
-        this.rangeManager.moveUp(isRangeSelect);
+        this.selectionManager.moveUp(isRangeSelect);
         this.editor.render();
       } else if (e.key === 'ArrowDown') {
         if (e.isComposing) return;
-
         const isRangeSelect = e.shiftKey;
-        this.rangeManager.moveDown(isRangeSelect);
+        this.selectionManager.moveDown(isRangeSelect);
         this.editor.render();
       }
       // select all
       else if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
         if (this.textGraphics) {
-          this.rangeManager.setRange({
-            start: 0,
-            end: this.textGraphics.getContentLength(),
-          });
+          this.selectAll();
           this.editor.render();
         }
       }
       // copy
       else if (e.key === 'c' && (e.metaKey || e.ctrlKey)) {
         if (!this.textGraphics) return;
-        const { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
+        const left = this.textGraphics.paragraph.getOffsetAt(
+          this.selectionManager.getStartPosition(),
+        );
+        const right = this.textGraphics.paragraph.getOffsetAt(
+          this.selectionManager.getEndPosition(),
+        );
         const content = sliceContent(
           this.textGraphics.attrs.content,
-          rangeLeft,
-          rangeRight,
+          left,
+          right,
         );
 
         if (content) {
@@ -291,33 +345,41 @@ export class TextEditor {
       // cut
       else if (e.key === 'x' && (e.metaKey || e.ctrlKey)) {
         if (!this.textGraphics) return;
-        const { rangeLeft, rangeRight } = this.rangeManager.getSortedRange();
+
+        const startPosition = this.selectionManager.getStartPosition();
+        const endPosition = this.selectionManager.getEndPosition();
+        const left = this.textGraphics.paragraph.getOffsetAt(startPosition);
+        const right = this.textGraphics.paragraph.getOffsetAt(endPosition);
         const content = sliceContent(
           this.textGraphics.attrs.content,
-          rangeLeft,
-          rangeRight,
+          left,
+          right,
         );
         if (content) {
           navigator.clipboard.writeText(content);
         }
 
         const newContent =
-          sliceContent(this.textGraphics.attrs.content, 0, rangeLeft) +
-          sliceContent(this.textGraphics.attrs.content, rangeRight);
+          sliceContent(this.textGraphics.attrs.content, 0, left) +
+          sliceContent(this.textGraphics.attrs.content, right);
         TextEditor.updateTextContentAndResize(this.textGraphics, newContent);
 
-        this.rangeManager.setRange({
-          start: rangeLeft,
-          end: rangeLeft,
+        this.selectionManager.setSelection({
+          anchorLineNum: startPosition.lineNum,
+          anchorColumn: startPosition.column,
+          focusLineNum: startPosition.lineNum,
+          focusColumn: startPosition.column,
         });
         this.editor.render();
       }
       // input '\n'
       else if (e.key === 'Enter' && !e.isComposing) {
         e.preventDefault(); // prevent default new line behavior of textarea
+        const selection = this.selectionManager.getSelection();
         updateContent({
           isComposing: false,
           data: '\n',
+          selection,
         });
       }
     });
@@ -347,10 +409,12 @@ export class TextEditor {
       if (!this.textGraphics.hitTest(mousePt)) return;
       event.nativeEvent.preventDefault();
 
-      const cursorIndex = this.textGraphics.getCursorIndex(mousePt);
-      this.rangeManager.setRange({
-        start: cursorIndex,
-        end: cursorIndex,
+      const selection = this.textGraphics.getCursorIndex(mousePt);
+      this.selectionManager.setSelection({
+        anchorLineNum: selection.lineNum,
+        anchorColumn: selection.column,
+        focusLineNum: selection.lineNum,
+        focusColumn: selection.column,
       });
       this.editor.render();
     };
@@ -366,8 +430,11 @@ export class TextEditor {
       }
 
       const mousePt = event.pos;
-      const cursorIndex = this.textGraphics.getCursorIndex(mousePt);
-      this.rangeManager.setRangeEnd(cursorIndex);
+      const selection = this.textGraphics.getCursorIndex(mousePt);
+      this.selectionManager.setSelection({
+        focusLineNum: selection.lineNum,
+        focusColumn: selection.column,
+      });
       this.editor.render();
     };
 
@@ -411,7 +478,8 @@ export class TextEditor {
     const lineHeight = textGraphics.getActualLineHeight();
     const inputDomHeight = lineHeight * zoom;
 
-    const { rects, matrix } = this.rangeManager.getCursorLinePos(textGraphics);
+    const { rects, matrix } =
+      this.selectionManager.getCursorLinePos(textGraphics);
 
     // the top position of the left vertical line of the first glyph
     const firstGlyphBottom = matrix.apply({
@@ -427,6 +495,6 @@ export class TextEditor {
     } as const;
     Object.assign(this.inputDom.style, styles);
 
-    this.rangeManager.draw(drawInfo, rects, matrix);
+    this.selectionManager.draw(drawInfo, rects, matrix);
   }
 }
