@@ -8,6 +8,7 @@ import {
   SuikaGraphics,
 } from './graphics';
 import { GraphicsStoreManager } from './graphics_manger';
+import { SuikaShapeApplication } from '../render_engine';
 
 type SuikaCanvasAttrs = GraphicsAttrs;
 
@@ -27,6 +28,8 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   override type = GraphicsType.Document;
   protected override isContainer = true;
 
+  app: SuikaShapeApplication;
+
   graphicsStoreManager = new GraphicsStoreManager();
   private emitter = new EventEmitter<Events>();
 
@@ -39,8 +42,12 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
   private editor!: SuikaEditor;
   private currentCanvasId: string = '';
 
-  constructor(attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>) {
+  constructor(
+    attrs: Optional<SuikaCanvasAttrs, 'id' | 'transform'>,
+    app: SuikaShapeApplication,
+  ) {
     super({ ...attrs, type: GraphicsType.Document }, {} as IGraphicsOpts);
+    this.app = app;
   }
 
   setEditor(editor: SuikaEditor) {
@@ -109,6 +116,12 @@ export class SuikaDocument extends SuikaGraphics<SuikaCanvasAttrs> {
         this.editor.viewportManager.resetViewport();
       }
     }
+
+    // TODO: pixijs 上添加这个画布
+    // debugger;
+
+    this.app.clear();
+    this.app.addChild(currentCanvas.shape);
 
     this.emitter.emit('currentCanvasChange', canvasId, prevCanvasId);
   }

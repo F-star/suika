@@ -10,6 +10,7 @@ import {
 } from '@suika/geo';
 
 import { type IPaint, PaintType } from '../../paint';
+import { GroupShape } from '../../render_engine';
 import { GraphicsType, type Optional } from '../../type';
 import {
   type GraphicsAttrs,
@@ -31,6 +32,10 @@ export class SuikaFrame extends SuikaGraphics<FrameAttrs> {
     opts: IGraphicsOpts,
   ) {
     super({ ...attrs, type: GraphicsType.Frame }, opts);
+  }
+
+  protected override createShape() {
+    this.shape = new GroupShape(this.attrs);
   }
 
   // children 中有图形 size 进行了更新，frame 需要重新 size

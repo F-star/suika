@@ -34,6 +34,8 @@ const storeKeys: Partial<keyof SettingValue>[] = [
 const Editor: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const canvasForPixiRef = useRef<HTMLCanvasElement>(null);
+
   const [suikaEditor, setEditor] = useState<SuikaEditor | null>(null);
 
   const [progress, setProgress] = useState(0);
@@ -72,12 +74,17 @@ const Editor: FC = () => {
 
         const editor = new SuikaEditor({
           containerElement: containerRef.current!,
-          width: document.body.clientWidth - leftRightMargin,
-          height: document.body.clientHeight - topMargin,
+          // width: document.body.clientWidth - leftRightMargin,
+          // height: document.body.clientHeight - topMargin,
           offsetY: 48,
           offsetX: 240,
           showPerfMonitor: false,
           userPreference: userPreference,
+        });
+        await editor.init({
+          canvasForPixi: canvasForPixiRef.current!,
+          width: document.body.clientWidth - leftRightMargin,
+          height: document.body.clientHeight - topMargin,
         });
         editorReference.value = editor;
 
@@ -130,6 +137,16 @@ const Editor: FC = () => {
           <InfoPanel />
           <ContextMenu />
         </div>
+        <canvas
+          ref={canvasForPixiRef}
+          style={{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            border: '1px solid red',
+            zIndex: 1000,
+          }}
+        />
       </EditorContext.Provider>
     </div>
   );

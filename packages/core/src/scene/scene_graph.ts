@@ -1,5 +1,5 @@
 import { EventEmitter, getDevicePixelRatio } from '@suika/common';
-import { type IRect, Matrix } from '@suika/geo';
+import { Matrix } from '@suika/geo';
 
 import { type SuikaEditor } from '../editor';
 import {
@@ -40,7 +40,6 @@ interface Events {
 }
 
 export class SceneGraph {
-  selection: IRect | null = null;
   private eventEmitter = new EventEmitter<Events>();
   private grid: Grid;
   showBoxAndHandleWhenSelected = true;
@@ -174,29 +173,7 @@ export class SceneGraph {
     });
 
     /** draw selection */
-    if (this.selection) {
-      ctx.save();
-      ctx.strokeStyle = setting.get('selectionStroke');
-      ctx.fillStyle = setting.get('selectionFill');
-      const { x, y, width, height } = this.selection;
-
-      const { x: xInViewport, y: yInViewport } = this.editor.toViewportPt({
-        x,
-        y,
-      });
-
-      const widthInViewport = width * zoom;
-      const heightInViewport = height * zoom;
-
-      ctx.fillRect(xInViewport, yInViewport, widthInViewport, heightInViewport);
-      ctx.strokeRect(
-        xInViewport,
-        yInViewport,
-        widthInViewport,
-        heightInViewport,
-      );
-      ctx.restore();
-    }
+    this.editor.selectSelection.draw(ctx);
 
     this.editor.refLine.drawRefLine(ctx);
 
@@ -234,9 +211,9 @@ export class SceneGraph {
     ctx.restore();
   }
 
-  setSelection(partialRect: Partial<IRect>) {
-    this.selection = Object.assign({}, this.selection, partialRect);
-  }
+  // setSelection(partialRect: Partial<IRect>) {
+  //   this.selection = Object.assign({}, this.selection, partialRect);
+  // }
 
   /**
    * get tree data with simple info (for layer panel)
@@ -270,7 +247,7 @@ export class SceneGraph {
     /** document need to be handled separately */
     for (const item of data) {
       if (item.type === GraphicsType.Document) {
-        const doc = new SuikaDocument(item);
+        const doc = new SuikaDocument(item, this.editor.renderApp!);
         doc.setEditor(this.editor);
         this.editor.doc = doc;
         children.push(doc);

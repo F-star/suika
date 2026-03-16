@@ -27,7 +27,7 @@ export const getElementsInSelection = (
   editor: SuikaEditor,
   parentIdSet: Set<string> = new Set(),
 ): SuikaGraphics[] => {
-  const selection = editor.sceneGraph.selection;
+  const selection = editor.selectSelection.getSelection();
   if (selection === null) {
     console.warn('selection 为 null，请确认在正确的时机调用当前方法');
     return [];

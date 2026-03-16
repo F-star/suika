@@ -46,13 +46,13 @@ export class DrawPathSelectionTool implements IBaseTool {
     this.lastPoint = editor.toolManager.getCurrPoint();
 
     editor.render();
-    editor.sceneGraph.setSelection(this.lastPoint);
+    editor.selectSelection.setSelection(this.lastPoint);
   }
   onDrag(e: PointerEvent) {
     const point = this.editor.getSceneCursorXY(e);
 
     const box = getRectByTwoPoint(this.lastPoint, point);
-    this.editor.sceneGraph.setSelection(box);
+    this.editor.selectSelection.setSelection(box);
 
     const controls =
       this.editor.controlHandleManager.getCustomHandlesIntersectedWithRect(box);
@@ -102,7 +102,7 @@ export class DrawPathSelectionTool implements IBaseTool {
     }
     this.editor.pathEditor.drawControlHandles();
 
-    this.editor.sceneGraph.selection = null;
+    this.editor.selectSelection.clear();
     this.editor.render();
   }
 }
