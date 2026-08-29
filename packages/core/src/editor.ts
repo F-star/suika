@@ -195,6 +195,18 @@ export class SuikaEditor {
     this.viewportManager.zoomToFit(1);
   }
 
+  appendContent(data: GraphicsAttrs[]) {
+    const addedMap = new Map<string, GraphicsAttrs>();
+    for (const item of data) {
+      addedMap.set(item.id, item);
+    }
+    this.applyChanges({
+      added: addedMap,
+      deleted: new Set(),
+      update: new Map(),
+    });
+  }
+
   destroy() {
     this.containerElement.removeChild(this.canvasElement);
     this.textEditor.destroy();

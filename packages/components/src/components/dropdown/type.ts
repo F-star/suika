@@ -7,7 +7,7 @@ export interface DropDownItemType {
   label: string;
   suffix?: string;
   check?: boolean;
-  children?: DropDownItemType[];
+  children?: Item[];
 }
 
 export type Item = DropDownItemType | DropdownDivider;

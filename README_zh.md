@@ -22,7 +22,7 @@
 12. 编组功能、画板功能；
 13. 多人协同编辑（需要自行实现后端）；
 14. 标尺功能；
-15. 导入导出图纸；
+15. 导入导出图纸、SVG；
 16. 用户设置；
 
 [编辑器功能清单-脑图](https://f5b8b9lm1y.feishu.cn/mindnotes/ORJabmf7qmYHxqnjtIBcOkhGnNf#mindmap)
