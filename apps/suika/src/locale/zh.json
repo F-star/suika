@@ -57,6 +57,8 @@
 
   "file": "文件",
   "import.originFile": "从本地导入",
+  "import.svgFile": "导入 SVG 文件",
+
   "export.originFile": "导出到本地",
   "export.currentPageAsSVG": "导出当前页面为 SVG",
   "export.currentPageAsPNG": "导出当前页面为 PNG",

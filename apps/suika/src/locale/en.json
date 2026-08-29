@@ -58,6 +58,8 @@
 
   "file": "File",
   "import.originFile": "Import local file",
+  "import.svgFile": "Import SVG file",
+
   "export.originFile": "Save local copy",
   "export.currentPageAsSVG": "Export current page as SVG",
   "export.currentPageAsPNG": "Export current page as PNG",

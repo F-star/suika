@@ -41,6 +41,13 @@ export const Menu: FC = () => {
           label: t({ id: 'import.originFile' }),
         },
         {
+          key: 'importSVG',
+          label: t({ id: 'import.svgFile' }),
+        },
+        {
+          type: 'divider',
+        },
+        {
           key: 'export',
           label: t({ id: 'export.originFile' }),
         },
@@ -107,6 +114,10 @@ export const Menu: FC = () => {
         break;
       case 'exportCurrentPageAsPNG':
         exportService.exportCurrentPagePNG(editor);
+        break;
+      case 'importSVG':
+        importService.importSVGFile(editor);
+
         break;
       case 'keepToolSelectedAfterUse':
       case 'invertZoomDirection':

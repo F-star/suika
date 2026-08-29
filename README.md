@@ -24,7 +24,7 @@ English | [中文](./README_zh.md)
 12. Group, Frame;
 13. Multi-user collaborative editing (requires backend implementation);
 14. Ruler;
-15. Import and export JSON data;
+15. Import and export JSON data, SVG;
 16. User settings;
 
 ## Documentation
