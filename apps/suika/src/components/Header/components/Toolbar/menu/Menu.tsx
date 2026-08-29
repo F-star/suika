@@ -8,10 +8,12 @@ import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../../../context';
 import { type MessageIds } from '../../../../../locale';
+import { NudgeAmountDialog } from './NudgeAmountDialog';
 
 export const Menu: FC = () => {
   const intl = useIntl();
   const editor = useContext(EditorContext);
+  const [nudgeAmountOpen, setNudgeAmountOpen] = useState(false);
 
   const [editorSetting, setEditorSetting] = useState<SettingValue>(
     {} as SettingValue,
@@ -93,6 +95,13 @@ export const Menu: FC = () => {
           check: editorSetting.flipObjectsWhileResizing,
           label: t({ id: 'flipObjectsWhileResizing' }),
         },
+        {
+          type: 'divider',
+        },
+        {
+          key: 'nudgeAmount',
+          label: t({ id: 'nudgeAmount' }),
+        },
       ],
     },
   ];
@@ -127,6 +136,9 @@ export const Menu: FC = () => {
         editor.setting.toggle(key);
         preventClose = true;
         break;
+      case 'nudgeAmount':
+        setNudgeAmountOpen(true);
+        break;
       default:
         break;
     }
@@ -135,10 +147,17 @@ export const Menu: FC = () => {
   };
 
   return (
-    <Dropdown items={items} onClick={handleClick}>
-      <div className="sk-ed-menu-btn">
-        <MenuOutlined />
-      </div>
-    </Dropdown>
+    <>
+      <Dropdown items={items} onClick={handleClick}>
+        <div className="sk-ed-menu-btn">
+          <MenuOutlined />
+        </div>
+      </Dropdown>
+      <NudgeAmountDialog
+        editor={editor}
+        open={nudgeAmountOpen}
+        onOpenChange={setNudgeAmountOpen}
+      />
+    </>
   );
 };

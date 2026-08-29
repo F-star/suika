@@ -70,6 +70,10 @@
   "highlightLayersOnHover": "Highlight layers on hover",
   "flipObjectsWhileResizing": "Flip objects while resizing",
   "snapToObjects": "Snap to objects",
+  "nudgeAmount": "Nudge amount",
+  "nudgeAmount.description": "Set the distance elements move with the arrow keys",
+  "nudgeAmount.small": "Small nudge",
+  "nudgeAmount.big": "Big nudge",
 
   "done": "Done",
 

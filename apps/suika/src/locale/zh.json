@@ -69,6 +69,10 @@
   "highlightLayersOnHover": "鼠标悬停时高亮图层",
   "flipObjectsWhileResizing": "缩放时对图形进行翻转",
   "snapToObjects": "吸附到对象",
+  "nudgeAmount": "微移距离",
+  "nudgeAmount.description": "设置使用方向键移动元素时的距离",
+  "nudgeAmount.small": "小幅微移",
+  "nudgeAmount.big": "大幅微移",
 
   "done": "完成",
 

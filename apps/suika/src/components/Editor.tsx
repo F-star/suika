@@ -29,6 +29,8 @@ const storeKeys: Partial<keyof SettingValue>[] = [
   'highlightLayersOnHover',
   'flipObjectsWhileResizing',
   'snapToObjects',
+  'smallNudge',
+  'bigNudge',
 ];
 
 const Editor: FC = () => {
