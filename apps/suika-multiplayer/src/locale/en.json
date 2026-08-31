@@ -25,8 +25,8 @@
   "command.undo": "Undo",
   "command.redo": "Redo",
   "command.selectAll": "Select all",
-  "arrange.forward": "Forward",
-  "arrange.backward": "Backward",
+  "arrange.forward": "Bring Forward",
+  "arrange.backward": "Send Backward",
   "arrange.front": "Bring to Front",
   "arrange.back": "Send to Back",
 
@@ -57,6 +57,8 @@
   "flip.vertical": "Flip vertical",
 
   "file": "File",
+  "edit": "Edit",
+  "object": "Object",
   "import.originFile": "Import local file",
   "export.originFile": "Save local copy",
   "export.currentPageAsSVG": "Export current page as SVG",

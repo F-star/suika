@@ -7,6 +7,7 @@ export interface DropDownItemType {
   label: string;
   suffix?: string;
   check?: boolean;
+  disabled?: boolean;
   children?: Item[];
 }
 

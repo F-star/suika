@@ -57,6 +57,7 @@ export const Dropdown: FC<IDropdownProps> = (props) => {
                 label={item.label}
                 suffix={item.suffix}
                 check={item.check}
+                disabled={item.disabled}
                 subItems={item.children}
                 emitter={emitter.current}
                 onClick={(params) => {

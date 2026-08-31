@@ -150,10 +150,13 @@ export class CommandManager {
     this.emitStatusChange();
   }
   private emitStatusChange() {
-    this.emitter.emit('change', {
+    this.emitter.emit('change', this.getStatus());
+  }
+  getStatus(): IHistoryStatus {
+    return {
       canRedo: this.redoStack.length > 0,
       canUndo: this.undoStack.length > 0,
-    });
+    };
   }
   on<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.on(eventName, listener);

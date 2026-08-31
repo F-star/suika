@@ -13,6 +13,7 @@ interface IProps {
   label: string;
   suffix?: string;
   check?: boolean;
+  disabled?: boolean;
   subItems?: Item[];
 
   onClick: (params: { key: string }) => void;
@@ -21,7 +22,7 @@ interface IProps {
 }
 
 export const DropdownItem: FC<IProps> = (props) => {
-  const { onClick, label, suffix, check, subItems, emitter } = props;
+  const { onClick, label, suffix, check, disabled, subItems, emitter } = props;
 
   useEffect(() => {
     const handleOpenSubMenu = () => {
@@ -63,8 +64,13 @@ export const DropdownItem: FC<IProps> = (props) => {
           }}
         >
           <div
-            className={classNames('sk-dropdown-item-wrap', { active: open })}
+            aria-disabled={disabled}
+            className={classNames('sk-dropdown-item-wrap', {
+              active: open,
+              disabled,
+            })}
             onMouseEnter={() => {
+              if (disabled) return;
               emitter.emit('openSubMenu', props.itemKey);
               setOpen(true);
             }}
@@ -74,8 +80,13 @@ export const DropdownItem: FC<IProps> = (props) => {
         </Dropdown>
       ) : (
         <div
-          className="sk-dropdown-item-wrap"
-          onClick={() => onClick({ key: props.itemKey })}
+          aria-disabled={disabled}
+          className={classNames('sk-dropdown-item-wrap', { disabled })}
+          onClick={() => {
+            if (!disabled) {
+              onClick({ key: props.itemKey });
+            }
+          }}
           onMouseEnter={() => {
             emitter.emit('openSubMenu', props.itemKey);
           }}

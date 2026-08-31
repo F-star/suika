@@ -17,6 +17,12 @@
     background-color: #0f8fff;
   }
 
+  &.disabled {
+    color: #aaa;
+    background-color: transparent;
+    cursor: default;
+  }
+
   .sk-dropdown-item {
     display: flex;
     align-items: center;
