@@ -85,7 +85,7 @@ export const importService = {
 
       // history
       const transaction = new Transaction(editor);
-      transaction.addNewIds([...addedItemIdSet]);
+      transaction.addNewIds([...addedItemIdSet, group.attrs.id]);
       transaction.commit('import svg');
 
       editor.render();
