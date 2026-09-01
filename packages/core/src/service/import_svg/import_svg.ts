@@ -1,5 +1,5 @@
 import { genUuid, parseHexToRGBA } from '@suika/common';
-import { type IPathItem } from '@suika/geo';
+import { boxToRect, GeoPath, type IPathItem } from '@suika/geo';
 import svgpath from 'svgpath';
 
 import { type GraphicsAttrs } from '../../graphics';
@@ -163,24 +163,21 @@ const makePathData = (d: string): IPathItem[] => {
 };
 
 const normalizePath = (pathData: IPathItem[], transform: Matrix) => {
-  const points = pathData.flatMap((item) => item.segs.map((seg) => seg.point));
-  const minX = Math.min(...points.map((point) => point.x));
-  const minY = Math.min(...points.map((point) => point.y));
-  const maxX = Math.max(...points.map((point) => point.x));
-  const maxY = Math.max(...points.map((point) => point.y));
+  const bbox = new GeoPath(pathData).getBbox();
+  const bRect = boxToRect(bbox);
 
   for (const item of pathData) {
     for (const seg of item.segs) {
-      seg.point.x -= minX;
-      seg.point.y -= minY;
+      seg.point.x -= bRect.x;
+      seg.point.y -= bRect.y;
     }
   }
 
   return {
     pathData,
-    width: maxX - minX,
-    height: maxY - minY,
-    transform: multiplyTransform(transform, translate(minX, minY)),
+    width: bRect.width,
+    height: bRect.height,
+    transform: multiplyTransform(transform, translate(bRect.x, bRect.y)),
   };
 };
 
