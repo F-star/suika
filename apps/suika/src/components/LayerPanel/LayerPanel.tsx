@@ -1,8 +1,13 @@
 import './LayerPanel.scss';
 
 import { isWindows } from '@suika/common';
-import { type IObject, MutateGraphsAndRecord, SelectCmd } from '@suika/core';
-import { type FC, useContext, useEffect, useState } from 'react';
+import {
+  type IObject,
+  MutateGraphsAndRecord,
+  SelectCmd,
+  type SuikaGraphics,
+} from '@suika/core';
+import { type FC, useContext, useEffect, useRef, useState } from 'react';
 
 import { EditorContext } from '../../context';
 import { LayerTree } from './LayerTree';
@@ -12,20 +17,46 @@ export const LayerPanel: FC = () => {
   const [objects, setObjects] = useState<IObject[]>([]);
   const [selectedIds, setSelectedIds] = useState(new Set<string>());
   const [hlId, setHlId] = useState('');
+  const [focusId, setFocusId] = useState('');
+  const isLayerTreeSelectionRef = useRef(false);
 
   useEffect(() => {
     if (editor) {
       setObjects(editor.sceneGraph.toObjects());
+      setSelectedIds(editor.selectedElements.getIdSet());
       editor.sceneGraph.on('render', () => {
         setObjects(editor.sceneGraph.toObjects());
         setSelectedIds(editor.selectedElements.getIdSet());
       });
 
+      const handleItemsChange = () => {
+        const ids = editor.selectedElements.getIdSet();
+        setSelectedIds(ids);
+        if (isLayerTreeSelectionRef.current) {
+          isLayerTreeSelectionRef.current = false;
+        } else {
+          setFocusId(Array.from(ids)[0] ?? '');
+        }
+      };
+      editor.selectedElements.on('itemsChange', handleItemsChange);
+
       setHlId(editor.selectedElements.getHighlightedItem()?.attrs.id || '');
-      editor.selectedElements.on('highlightedItemChange', (item) => {
+      const handleHighlightedItemChange = (item: SuikaGraphics | null) => {
         const id = item ? item.attrs.id : '';
         setHlId(id);
-      });
+      };
+      editor.selectedElements.on(
+        'highlightedItemChange',
+        handleHighlightedItemChange,
+      );
+
+      return () => {
+        editor.selectedElements.off('itemsChange', handleItemsChange);
+        editor.selectedElements.off(
+          'highlightedItemChange',
+          handleHighlightedItemChange,
+        );
+      };
     }
   }, [editor]);
 
@@ -37,6 +68,7 @@ export const LayerPanel: FC = () => {
 
     const prevSelectedIds = editor.selectedElements.getIdSet();
     let isSelectUpdated = false;
+    isLayerTreeSelectionRef.current = true;
 
     const isToggle = isWindows() ? event.ctrlKey : event.metaKey;
     if (isToggle) {
@@ -67,6 +99,8 @@ export const LayerPanel: FC = () => {
         items: editor.selectedElements.getIdSet(),
       });
       editor.commandManager.pushCommand(command);
+    } else {
+      isLayerTreeSelectionRef.current = false;
     }
     editor.render();
   };
@@ -132,6 +166,7 @@ export const LayerPanel: FC = () => {
       <LayerTree
         treeData={objects}
         activeIds={Array.from(selectedIds)}
+        focusId={focusId}
         hlId={hlId}
         toggleVisible={toggleVisible}
         toggleLock={toggleLock}

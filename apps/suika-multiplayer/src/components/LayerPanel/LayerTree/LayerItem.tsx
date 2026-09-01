@@ -1,6 +1,5 @@
 import './LayerItem.scss';
 
-import { type IObject } from '@suika/core';
 import {
   HideOutlined,
   LockFilled,
@@ -20,11 +19,12 @@ interface IProps extends IBaseEvents {
   id: string;
   type: string;
   name: string;
-  children?: IObject[];
+  hasChildren: boolean;
+  isExpanded: boolean;
+  toggleExpanded: (id: string) => void;
   active?: boolean;
   activeSecond?: boolean;
   level?: number;
-  activeIds?: string[];
   hlId?: string;
   visible: boolean;
   visibleSecond?: boolean;
@@ -34,12 +34,13 @@ interface IProps extends IBaseEvents {
 
 const LayerItem: FC<IProps> = ({
   name,
-  children,
+  hasChildren,
+  isExpanded,
+  toggleExpanded,
   active = false,
   activeSecond = false,
   id,
   type,
-  activeIds = [],
   level = 0,
   hlId,
   visible,
@@ -131,9 +132,19 @@ const LayerItem: FC<IProps> = ({
         }}
       >
         <div style={{ width: indentWidth, minWidth: indentWidth }} />
-        <div className="sk-group-collapse-btn">
-          {children?.length ? <SmallCaretDownSolid /> : undefined}
-        </div>
+        <button
+          className={classNames('sk-group-collapse-btn', {
+            'sk-collapsed': !isExpanded,
+          })}
+          type="button"
+          aria-label={isExpanded ? 'Collapse group' : 'Expand group'}
+          aria-expanded={hasChildren ? isExpanded : undefined}
+          disabled={!hasChildren}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={() => toggleExpanded(id)}
+        >
+          {hasChildren && <SmallCaretDownSolid />}
+        </button>
         <div
           className="sk-layer-icon"
           onDoubleClick={() => {
@@ -215,35 +226,6 @@ const LayerItem: FC<IProps> = ({
           </span>
         </div>
       </div>
-      {children && (
-        <div className="layer-item-children">
-          {[...children].reverse().map((item) => (
-            <LayerItem
-              key={item.id}
-              id={item.id}
-              type={item.type}
-              name={item.name}
-              active={activeIds.includes(item.id)}
-              activeSecond={activeSecond || activeIds.includes(item.id)}
-              level={level + 1}
-              children={item.children}
-              activeIds={activeIds}
-              hlId={hlId}
-              visible={item.visible}
-              visibleSecond={finalVisible}
-              lock={item.lock}
-              lockSecond={finalLock}
-              setName={setName}
-              toggleVisible={toggleVisible}
-              toggleLock={toggleLock}
-              setHlId={setHlId}
-              setSelectedGraph={setSelectedGraph}
-              getLayerIcon={getLayerIcon}
-              zoomGraphicsToFit={zoomGraphicsToFit}
-            />
-          ))}
-        </div>
-      )}
     </>
   );
 };
