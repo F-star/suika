@@ -8,6 +8,7 @@ import { FONT_FILES } from '@/constant';
 
 import { EditorContext } from '../context';
 import { AutoSaveGraphics } from '../store/auto-save-graphs';
+import { ClearCanvasDialog } from './ClearCanvasDialog';
 import { ContextMenu } from './ContextMenu';
 import { Header } from './Header';
 import { InfoPanel } from './InfoPanel';
@@ -17,6 +18,7 @@ import { ProgressOverlay } from './ProgressOverlay';
 
 const topMargin = 48;
 const leftRightMargin = 240 * 2;
+const clearCanvasHintDelay = 20000;
 
 const USER_PREFERENCE_KEY = 'suika-user-preference';
 const storeKeys: Partial<keyof SettingValue>[] = [
@@ -39,6 +41,7 @@ const Editor: FC = () => {
   const [suikaEditor, setEditor] = useState<SuikaEditor | null>(null);
 
   const [progress, setProgress] = useState(0);
+  const [clearCanvasOpen, setClearCanvasOpen] = useState(false);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -116,9 +119,13 @@ const Editor: FC = () => {
 
   return (
     <div>
-      <ProgressOverlay value={progress} />
+      <ProgressOverlay
+        value={progress}
+        clearCanvasHintDelay={clearCanvasHintDelay}
+        onClearCanvas={() => setClearCanvasOpen(true)}
+      />
       <EditorContext.Provider value={suikaEditor}>
-        <Header title="suika" />
+        <Header title="suika" onClearCanvas={() => setClearCanvasOpen(true)} />
         {/* body */}
         <div className="body">
           <div className="suika-editor-left-area">
@@ -133,6 +140,10 @@ const Editor: FC = () => {
           <ContextMenu />
         </div>
       </EditorContext.Provider>
+      <ClearCanvasDialog
+        open={clearCanvasOpen}
+        onOpenChange={setClearCanvasOpen}
+      />
     </div>
   );
 };

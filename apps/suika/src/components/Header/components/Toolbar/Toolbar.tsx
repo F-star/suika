@@ -31,7 +31,11 @@ import { type MessageIds } from '../../../../locale';
 import { ToolBtn } from './components/ToolBtn';
 import { Menu } from './menu';
 
-export const ToolBar = () => {
+interface IProps {
+  onClearCanvas: () => void;
+}
+
+export const ToolBar = ({ onClearCanvas }: IProps) => {
   const editor = useContext(EditorContext);
   const intl = useIntl();
   const [currTool, setCurrTool] = useState('');
@@ -151,7 +155,7 @@ export const ToolBar = () => {
 
   return (
     <div className="suika-tool-bar">
-      <Menu />
+      <Menu onClearCanvas={onClearCanvas} />
       {enableTools.map((toolType) => {
         const tool = keyMap[toolType];
         return (

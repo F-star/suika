@@ -65,6 +65,12 @@
   "export.originFile": "Save local copy",
   "export.currentPageAsSVG": "Export current page as SVG",
   "export.currentPageAsPNG": "Export current page as PNG",
+  "clearCanvasAndRefresh": "Clear canvas and refresh",
+  "clearCanvas.confirm.title": "Clear canvas and refresh?",
+  "clearCanvas.confirm.description": "This permanently deletes the canvas data saved in this browser and cannot be undone.",
+  "clearCanvas.confirm.action": "Clear and refresh",
+  "cancel": "Cancel",
+  "loadingFailedHintPrefix": "If loading keeps failing, try ",
 
   "preference": "Preference",
   "keepToolSelectedAfterUse": "Keep tool selected after use",

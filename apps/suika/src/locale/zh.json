@@ -64,6 +64,12 @@
   "export.originFile": "导出到本地",
   "export.currentPageAsSVG": "导出当前页面为 SVG",
   "export.currentPageAsPNG": "导出当前页面为 PNG",
+  "clearCanvasAndRefresh": "清空画布并刷新",
+  "clearCanvas.confirm.title": "清空画布并刷新？",
+  "clearCanvas.confirm.description": "这会永久删除当前浏览器中保存的画布数据，且无法恢复。",
+  "clearCanvas.confirm.action": "清空并刷新",
+  "cancel": "取消",
+  "loadingFailedHintPrefix": "如果加载一直无法完成，尝试",
 
   "preference": "偏好设置",
   "keepToolSelectedAfterUse": "使用工具后保持选中状态",

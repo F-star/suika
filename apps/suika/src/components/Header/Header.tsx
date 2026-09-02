@@ -9,12 +9,13 @@ import { ToolBar } from './components/Toolbar';
 
 interface IProps {
   title: string;
+  onClearCanvas: () => void;
 }
 
-export const Header: FC<IProps> = ({ title }) => {
+export const Header: FC<IProps> = ({ title, onClearCanvas }) => {
   return (
     <div className="sk-header">
-      <ToolBar />
+      <ToolBar onClearCanvas={onClearCanvas} />
       <Title value={title} />
       <div className="sk-right-area">
         <LocaleSelector />

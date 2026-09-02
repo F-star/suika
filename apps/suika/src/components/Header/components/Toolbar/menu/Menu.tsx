@@ -21,7 +21,11 @@ import { EditorContext } from '../../../../../context';
 import { type MessageIds } from '../../../../../locale';
 import { NudgeAmountDialog } from './NudgeAmountDialog';
 
-export const Menu: FC = () => {
+interface IProps {
+  onClearCanvas: () => void;
+}
+
+export const Menu: FC<IProps> = ({ onClearCanvas }) => {
   const intl = useIntl();
   const editor = useContext(EditorContext);
   const [nudgeAmountOpen, setNudgeAmountOpen] = useState(false);
@@ -97,6 +101,13 @@ export const Menu: FC = () => {
         {
           key: 'exportCurrentPageAsPNG',
           label: t({ id: 'export.currentPageAsPNG' }),
+        },
+        {
+          type: 'divider',
+        },
+        {
+          key: 'clearCanvasAndRefresh',
+          label: t({ id: 'clearCanvasAndRefresh' }),
         },
       ],
     },
@@ -306,6 +317,9 @@ export const Menu: FC = () => {
       case 'importSVG':
         importService.importSVGFile(editor);
 
+        break;
+      case 'clearCanvasAndRefresh':
+        onClearCanvas();
         break;
       case 'keepToolSelectedAfterUse':
       case 'invertZoomDirection':
