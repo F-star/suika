@@ -1,5 +1,6 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  applyMatrix,
   commandsToStr,
   deletePathSegAndHeal,
   distance,
@@ -7,6 +8,7 @@ import {
   type IMatrixArr,
   insertPathSeg,
   invertMatrix,
+  type IPathCommand,
   type IPathItem,
   type IPoint,
   type IRect,
@@ -622,5 +624,20 @@ export class SuikaPath extends SuikaGraphics<PathAttrs> {
     });
 
     return commandsToStr(commands, precision);
+  }
+
+  override isSupportOffsetPath(): boolean {
+    return true;
+  }
+
+  override toWorldPathCmds(): IPathCommand[][] {
+    const matrix = this.getWorldTransform();
+    const commands = this.getGeoPath().toCommands();
+    for (const command of commands) {
+      command.points = command.points.map((point) =>
+        applyMatrix(matrix, point),
+      );
+    }
+    return [commands];
   }
 }

@@ -1,7 +1,13 @@
 import './Editor.scss';
 
 import { pick, throttle } from '@suika/common';
-import { fontManager, type SettingValue, SuikaEditor } from '@suika/core';
+import {
+  fontManager,
+  initPathKit,
+  PathTool,
+  type SettingValue,
+  SuikaEditor,
+} from '@suika/core';
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { FONT_FILES } from '@/constant';
@@ -111,6 +117,7 @@ const Editor: FC = () => {
 
       (async () => {
         await fontManager.loadFonts(FONT_FILES);
+        const pathTool = new PathTool(await initPathKit());
         setProgress(100);
         if (isCanceled) return;
 
@@ -122,6 +129,7 @@ const Editor: FC = () => {
           offsetX: 240,
           showPerfMonitor: false,
           userPreference: userPreference,
+          pathTool,
         });
         editorReference.value = editor;
 

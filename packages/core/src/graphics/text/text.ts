@@ -1,10 +1,13 @@
 import { parseRGBAStr } from '@suika/common';
 import {
   applyInverseMatrix,
+  applyMatrix,
   type IMatrixArr,
+  type IPathCommand,
   type IPoint,
   Matrix,
 } from '@suika/geo';
+import svgpath from 'svgpath';
 
 import { fontManager } from '../../font_manager';
 import { type IPaint, PaintType } from '../../paint';
@@ -275,6 +278,37 @@ export class SuikaText extends SuikaGraphics<TextAttrs> {
 
     const d = this.paragraph.getMergedPathString();
     return `<path d="${d}" transform="matrix(${tf.join(' ')})"`;
+  }
+
+  override isSupportOffsetPath(): boolean {
+    return true;
+  }
+
+  override toWorldPathCmds(): IPathCommand[][] {
+    const pathCmds: IPathCommand[][] = [];
+    const matrix = this.getWorldTransform();
+    let commands: IPathCommand[] | undefined;
+
+    svgpath(this.paragraph.getMergedPathString())
+      .abs()
+      .unshort()
+      .unarc()
+      .iterate((segment) => {
+        const type = segment[0].toUpperCase();
+        const values = segment.slice(1) as number[];
+        const points: IPoint[] = [];
+        for (let i = 0; i < values.length; i += 2) {
+          points.push(applyMatrix(matrix, { x: values[i], y: values[i + 1] }));
+        }
+
+        if (type === 'M') {
+          commands = [];
+          pathCmds.push(commands);
+        }
+        commands?.push({ type, points });
+      });
+
+    return pathCmds;
   }
 
   override getLayerIconPath() {

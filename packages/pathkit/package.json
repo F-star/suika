@@ -1,0 +1,23 @@
+{
+  "name": "@suika/pathkit",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./pathkit.mjs",
+  "module": "./pathkit.mjs",
+  "types": "./pathkit.d.mts",
+  "exports": {
+    ".": {
+      "types": "./pathkit.d.mts",
+      "import": "./pathkit.mjs",
+      "default": "./pathkit.mjs"
+    },
+    "./pathkit.wasm": "./pathkit.wasm",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "node --check pathkit.mjs"
+  },
+  "license": "BSD-3-Clause"
+}

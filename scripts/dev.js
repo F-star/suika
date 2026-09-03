@@ -39,6 +39,9 @@ const setup = async () => {
     sourcemap: true,
     format: 'esm',
     platform: 'browser',
+    loader: {
+      '.wasm': 'dataurl',
+    },
     plugins: [
       sassPlugin({
         type: 'css',

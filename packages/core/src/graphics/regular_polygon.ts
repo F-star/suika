@@ -1,5 +1,6 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  applyMatrix,
   commandsToStr,
   getPointsBbox,
   getRegularPolygon,
@@ -257,6 +258,21 @@ export class SuikaRegularPolygon extends SuikaGraphics<RegularPolygonAttrs> {
       cmds.push({ type: 'Z', points: [] });
     }
     return cmds;
+  }
+
+  override isSupportOffsetPath(): boolean {
+    return true;
+  }
+
+  override toWorldPathCmds(): IPathCommand[][] {
+    const matrix = this.getWorldTransform();
+    const commands = this.toPathCmds();
+    for (const command of commands) {
+      command.points = command.points.map((point) =>
+        applyMatrix(matrix, point),
+      );
+    }
+    return [commands];
   }
 
   override getLayerIconPath() {

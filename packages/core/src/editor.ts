@@ -12,6 +12,7 @@ import { HostEventManager, MouseEventManager } from './host_event_manager';
 import { ImgManager } from './Img_manager';
 import { KeyBindingManager } from './key_binding_manager';
 import { PathEditor } from './path_editor';
+import { type PathTool } from './path_tool';
 import { PerfMonitor } from './perf_monitor';
 import { RefLine } from './ref_line';
 import { Ruler } from './ruler';
@@ -32,6 +33,7 @@ interface IEditorOptions {
   offsetY?: number;
   showPerfMonitor?: boolean;
   userPreference?: Partial<SettingValue>;
+  pathTool: PathTool;
 }
 
 interface Events {
@@ -73,10 +75,12 @@ export class SuikaEditor {
   refLine: RefLine;
   textEditor: TextEditor;
   pathEditor: PathEditor;
+  pathTool: PathTool;
 
   perfMonitor: PerfMonitor;
 
   constructor(options: IEditorOptions) {
+    this.pathTool = options.pathTool;
     this.containerElement = options.containerElement;
     this.canvasElement = document.createElement('canvas');
     this.containerElement.appendChild(this.canvasElement);

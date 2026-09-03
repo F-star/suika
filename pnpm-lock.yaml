@@ -681,6 +681,9 @@ importers:
       '@suika/geo':
         specifier: workspace:^
         version: link:../geo
+      '@suika/pathkit':
+        specifier: workspace:^
+        version: link:../pathkit
       fractional-indexing:
         specifier: ^3.2.0
         version: 3.2.0
@@ -744,6 +747,8 @@ importers:
       vite:
         specifier: ^5.0.8
         version: 5.4.14(@types/node@20.11.5)(less@4.2.2)(lightningcss@1.30.2)(sass@1.62.0)(terser@5.39.0)
+
+  packages/pathkit: {}
 
 packages:
 

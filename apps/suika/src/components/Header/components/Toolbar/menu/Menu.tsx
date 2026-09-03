@@ -20,6 +20,7 @@ import { useIntl } from 'react-intl';
 import { EditorContext } from '../../../../../context';
 import { type MessageIds } from '../../../../../locale';
 import { NudgeAmountDialog } from './NudgeAmountDialog';
+import { OffsetVectorDialog } from './OffsetVectorDialog';
 
 interface IProps {
   onClearCanvas: () => void;
@@ -29,11 +30,13 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
   const intl = useIntl();
   const editor = useContext(EditorContext);
   const [nudgeAmountOpen, setNudgeAmountOpen] = useState(false);
+  const [offsetVectorOpen, setOffsetVectorOpen] = useState(false);
   const [historyStatus, setHistoryStatus] = useState<IHistoryStatus>({
     canRedo: false,
     canUndo: false,
   });
   const [hasSelection, setHasSelection] = useState(false);
+  const [hasOffsetVectorTarget, setHasOffsetVectorTarget] = useState(false);
 
   const [editorSetting, setEditorSetting] = useState<SettingValue>(
     {} as SettingValue,
@@ -55,14 +58,20 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
     if (!editor) return;
 
     setHistoryStatus(editor.commandManager.getStatus());
-    setHasSelection(!editor.selectedElements.isEmpty());
+    const updateSelectionState = () => {
+      const selectedItems = editor.selectedElements.getItems();
+      setHasSelection(selectedItems.length > 0);
+      setHasOffsetVectorTarget(
+        selectedItems.length === 1 && selectedItems[0].isSupportOffsetPath(),
+      );
+    };
+
+    updateSelectionState();
 
     const handleHistoryChange = (status: IHistoryStatus) => {
       setHistoryStatus(status);
     };
-    const handleSelectionChange = () => {
-      setHasSelection(!editor.selectedElements.isEmpty());
-    };
+    const handleSelectionChange = updateSelectionState;
 
     editor.commandManager.on('change', handleHistoryChange);
     editor.selectedElements.on('itemsChange', handleSelectionChange);
@@ -244,6 +253,17 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
         },
       ],
     },
+    {
+      key: 'vector',
+      label: t({ id: 'vector' }),
+      children: [
+        {
+          key: 'offsetVector',
+          label: t({ id: 'offsetVector' }),
+          disabled: !hasOffsetVectorTarget,
+        },
+      ],
+    },
   ];
 
   const handleClick = ({ key }: { key: string }) => {
@@ -332,6 +352,9 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
       case 'nudgeAmount':
         setNudgeAmountOpen(true);
         break;
+      case 'offsetVector':
+        setOffsetVectorOpen(true);
+        break;
       default:
         break;
     }
@@ -350,6 +373,11 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
         editor={editor}
         open={nudgeAmountOpen}
         onOpenChange={setNudgeAmountOpen}
+      />
+      <OffsetVectorDialog
+        editor={editor}
+        open={offsetVectorOpen}
+        onOpenChange={setOffsetVectorOpen}
       />
     </>
   );
