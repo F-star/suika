@@ -1,5 +1,11 @@
 import { parseRGBAStr } from '@suika/common';
-import { applyMatrix, getPointsBbox, type IPoint, Matrix } from '@suika/geo';
+import {
+  applyMatrix,
+  getPointsBbox,
+  type IPathCommand,
+  type IPoint,
+  Matrix,
+} from '@suika/geo';
 
 import { PaintType } from '../paint';
 import { GraphicsType, type Optional } from '../type';
@@ -130,5 +136,22 @@ export class SuikaLine extends SuikaGraphics<LineAttrs> {
     return `M${points[0].x.toFixed(precision)} ${points[0].y.toFixed(
       precision,
     )} L${points[1].x.toFixed(precision)} ${points[1].y.toFixed(precision)}`;
+  }
+
+  override isSupportOffsetPath(): boolean {
+    return true;
+  }
+
+  override toWorldPathCmds(): IPathCommand[][] {
+    const matrix = this.getWorldTransform();
+    return [
+      [
+        { type: 'M', points: [applyMatrix(matrix, { x: 0, y: 0 })] },
+        {
+          type: 'L',
+          points: [applyMatrix(matrix, { x: this.attrs.width, y: 0 })],
+        },
+      ],
+    ];
   }
 }

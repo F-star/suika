@@ -1,5 +1,6 @@
 import { parseRGBAStr } from '@suika/common';
 import {
+  applyMatrix,
   commandsToStr,
   ellipseToPathCmds,
   type IPoint,
@@ -156,6 +157,28 @@ export class SuikaEllipse extends SuikaGraphics<EllipseAttrs> {
         ' ',
       )})"`;
     }
+  }
+
+  override isSupportOffsetPath(): boolean {
+    return true;
+  }
+
+  override toWorldPathCmds() {
+    const attrs = this.attrs;
+    const commands = ellipseToPathCmds({
+      x: 0,
+      y: 0,
+      width: attrs.width,
+      height: attrs.height,
+    });
+
+    const matrix = this.getWorldTransform();
+    commands.forEach((cmd) => {
+      cmd.points.forEach((pt, idx) => {
+        cmd.points[idx] = applyMatrix(matrix, pt);
+      });
+    });
+    return [commands];
   }
 
   override getLayerIconPath() {

@@ -3,5 +3,6 @@ export * from './common';
 export * from './frame';
 export * from './geo';
 export * from './group';
+export * from './path';
 export * from './raf_throttle';
 export * from './tree';

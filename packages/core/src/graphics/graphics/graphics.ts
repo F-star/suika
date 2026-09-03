@@ -17,6 +17,7 @@ import {
   identityMatrix,
   type IMatrixArr,
   invertMatrix,
+  type IPathCommand,
   type IPoint,
   isBoxContain,
   isBoxIntersect,
@@ -839,6 +840,26 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
 
   getLayerIconPath() {
     return 'M0.5 0.5H11.5V11.5H0.5V0.5Z';
+  }
+
+  /**
+   * Returns the graphic outline in world coordinates. Subclasses with custom
+   * geometry override this method; the rectangular outline is the default.
+   */
+  toWorldPathCmds(): IPathCommand[][] {
+    if (this.isContainer) {
+      const commands: IPathCommand[][] = [];
+      for (const item of this.getChildren()) {
+        commands.push(...item.toWorldPathCmds());
+      }
+      return commands;
+    }
+
+    return [];
+  }
+
+  isSupportOffsetPath(): boolean {
+    return false;
   }
 
   getWorldTransform(): IMatrixArr {

@@ -1,9 +1,8 @@
 import { type IPathCommand, type IRect } from '../type';
+import { K } from './constant';
 import { rectToBox } from './geo_rect';
 
 export const ellipseToPathCmds = (rect: IRect): IPathCommand[] => {
-  const k = 0.5522847498307936;
-
   const { minX, minY, maxX, maxY } = rectToBox(rect);
   const midX = (minX + maxX) / 2;
   const midY = (minY + maxY) / 2;
@@ -11,8 +10,8 @@ export const ellipseToPathCmds = (rect: IRect): IPathCommand[] => {
   const rx = rect.width / 2;
   const ry = rect.height / 2;
 
-  const lx = rx * k;
-  const ly = ry * k;
+  const lx = rx * K;
+  const ly = ry * K;
 
   // clockwise, starting from the right vertex
   return [

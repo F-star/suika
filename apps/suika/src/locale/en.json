@@ -83,6 +83,11 @@
   "nudgeAmount.small": "Small nudge",
   "nudgeAmount.big": "Big nudge",
 
+  "vector": "Vector",
+  "offsetVector": "Offset vector",
+  "offsetVector.offset": "Offset",
+  "apply": "Apply",
+
   "done": "Done",
 
   "layer": "Layer",

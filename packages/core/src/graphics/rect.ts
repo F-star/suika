@@ -1,7 +1,9 @@
 import { cloneDeep, parseHexToRGBA, parseRGBAStr } from '@suika/common';
 import {
+  applyMatrix,
   commandsToStr,
   type IMatrixArr,
+  type IPathCommand,
   type IPoint,
   isPointInRoundRect,
   Matrix,
@@ -444,5 +446,23 @@ export class SuikaRect extends SuikaGraphics<RectAttrs> {
     });
 
     return commandsToStr(commands, precision);
+  }
+
+  override isSupportOffsetPath(): boolean {
+    return true;
+  }
+
+  override toWorldPathCmds(): IPathCommand[][] {
+    const commands = roundRectToPathCmds(
+      { x: 0, y: 0, width: this.attrs.width, height: this.attrs.height },
+      this.attrs.cornerRadius,
+    );
+    const matrix = this.getWorldTransform();
+    for (const command of commands) {
+      command.points = command.points.map((point) =>
+        applyMatrix(matrix, point),
+      );
+    }
+    return [commands];
   }
 }

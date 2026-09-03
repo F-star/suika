@@ -82,6 +82,11 @@
   "nudgeAmount.small": "小幅微移",
   "nudgeAmount.big": "大幅微移",
 
+  "vector": "矢量",
+  "offsetVector": "偏移矢量",
+  "offsetVector.offset": "偏移",
+  "apply": "应用",
+
   "done": "完成",
 
   "layer": "图层",
