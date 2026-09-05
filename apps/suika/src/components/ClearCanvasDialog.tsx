@@ -32,7 +32,7 @@ export const ClearCanvasDialog = ({ open, onOpenChange }: IProps) => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose asChild>
+          <DialogClose>
             <Button variant="outline">{t('cancel')}</Button>
           </DialogClose>
           <Button

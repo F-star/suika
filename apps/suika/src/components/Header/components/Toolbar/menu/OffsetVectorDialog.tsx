@@ -55,7 +55,7 @@ export const OffsetVectorDialog = ({
         </label>
 
         <DialogFooter>
-          <DialogClose asChild>
+          <DialogClose>
             <Button variant="outline">{t('cancel')}</Button>
           </DialogClose>
           <Button onClick={applyOffset}>{t('apply')}</Button>
