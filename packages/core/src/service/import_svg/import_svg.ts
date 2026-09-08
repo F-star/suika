@@ -93,12 +93,17 @@ const getPaintAttrs = (node: SvgNode) => {
     attributes['stroke-opacity'] === undefined
       ? 1
       : numberAttr(attributes, 'stroke-opacity');
+  const stroke = parseColor(attributes.stroke, opacity * strokeOpacity);
 
   return {
     // SVG fills shapes black by default. Lines are handled separately below.
     fill: parseColor(attributes.fill ?? '#000000', opacity * fillOpacity),
-    stroke: parseColor(attributes.stroke, opacity * strokeOpacity),
-    strokeWidth: numberAttr(attributes, 'stroke-width'),
+    stroke,
+    // SVG defaults stroke-width to 1 when a stroke is present.
+    strokeWidth:
+      attributes['stroke-width'] === undefined && stroke.length > 0
+        ? 1
+        : numberAttr(attributes, 'stroke-width'),
   };
 };
 
