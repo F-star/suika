@@ -19,6 +19,7 @@ import { Ruler } from './ruler';
 import { SceneGraph } from './scene/scene_graph';
 import { SelectedBox } from './selected_box';
 import { SelectedElements } from './selected_elements';
+import { importService } from './service';
 import { Setting, type SettingValue } from './setting';
 import { TextEditor } from './text/text_editor';
 import { ToolManager } from './tools';
@@ -78,6 +79,7 @@ export class SuikaEditor {
   pathTool: PathTool;
 
   perfMonitor: PerfMonitor;
+  private unbindSVGDropEvents: () => void;
 
   constructor(options: IEditorOptions) {
     this.pathTool = options.pathTool;
@@ -125,6 +127,8 @@ export class SuikaEditor {
 
     this.clipboard = new ClipboardManager(this);
     this.clipboard.bindEvents();
+
+    this.unbindSVGDropEvents = importService.bindSVGDropEvents(this);
 
     this.imgManager.on('added', () => {
       this.render();
@@ -217,6 +221,7 @@ export class SuikaEditor {
     this.keybindingManager.destroy();
     this.hostEventManager.destroy();
     this.clipboard.destroy();
+    this.unbindSVGDropEvents();
     this.canvasDragger.destroy();
     this.toolManager.unbindEvent();
     this.toolManager.destroy();
