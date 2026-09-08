@@ -3,11 +3,17 @@ import { cloneDeep } from '@suika/common';
 import { AddGraphCmd } from '../commands';
 import { type SuikaEditor } from '../editor';
 import { SuikaPath } from '../graphics';
+import { type OffsetPathJoin } from '../utils/path';
+
+export interface OffsetPathAndRecordOptions {
+  join?: OffsetPathJoin;
+}
 
 /** Offsets the selected graphics and records adding the resulting path. */
 export const offsetPathAndRecord = (
   editor: SuikaEditor,
   distance: number,
+  options?: OffsetPathAndRecordOptions,
 ): boolean => {
   const selectedGraphics = editor.selectedElements.getItems()[0];
   if (!selectedGraphics?.isSupportOffsetPath()) return false;
@@ -15,6 +21,7 @@ export const offsetPathAndRecord = (
   const offsetPathCmds = editor.pathTool.offsetPath(
     selectedGraphics.toWorldPathCmds(),
     distance,
+    options,
   );
 
   if (!offsetPathCmds?.length) return false;

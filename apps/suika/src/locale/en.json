@@ -86,6 +86,10 @@
   "vector": "Vector",
   "offsetVector": "Offset vector",
   "offsetVector.offset": "Offset",
+  "offsetVector.join": "Join",
+  "offsetVector.join.miter": "Miter",
+  "offsetVector.join.round": "Round",
+  "offsetVector.join.bevel": "Bevel",
   "apply": "Apply",
 
   "done": "Done",

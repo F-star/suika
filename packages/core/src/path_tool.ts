@@ -2,7 +2,15 @@ import { type IPathCommand, type IPathItem, type IPoint } from '@suika/geo';
 import { type PathKit, type SkPath } from '@suika/pathkit';
 import svgpath from 'svgpath';
 
-import { offsetPath, type OffsetPathOptions } from './utils/path';
+import {
+  offsetPath,
+  type OffsetPathJoin,
+  type OffsetPathOptions,
+} from './utils/path';
+
+type PathToolOffsetOptions = Omit<OffsetPathOptions, 'join'> & {
+  join?: OffsetPathJoin;
+};
 
 /**
  * Provides PathKit-backed path operations to an editor.
@@ -16,7 +24,7 @@ export class PathTool {
   offsetPath(
     pathCmds: IPathCommand[][],
     distance: number,
-    options?: OffsetPathOptions,
+    options?: PathToolOffsetOptions,
   ): IPathCommand[][] | null {
     const skPath = this.pathKit.FromCmds(
       pathCmds.flatMap((commands) =>
@@ -28,7 +36,11 @@ export class PathTool {
     }
 
     try {
-      const result = offsetPath(skPath, distance, this.pathKit, options);
+      const { join, ...strokeOptions } = options ?? {};
+      const result = offsetPath(skPath, distance, this.pathKit, {
+        ...strokeOptions,
+        ...(join ? { join: this.pathKit.StrokeJoin[join] } : {}),
+      });
       if (!result) {
         return null;
       }

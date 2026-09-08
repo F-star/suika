@@ -1,11 +1,13 @@
 import PathKitInit, {
   type PathKit,
   type SkPath,
+  type StrokeJoinEnumValues,
   type StrokeOpts,
 } from '@suika/pathkit';
 import pathKitWasmUrl from '@suika/pathkit/pathkit.wasm?url';
 
 export type OffsetPathOptions = Omit<StrokeOpts, 'width'>;
+export type OffsetPathJoin = keyof StrokeJoinEnumValues;
 
 export const initPathKit = async () => {
   const PathKit = await PathKitInit({ locateFile: () => pathKitWasmUrl });

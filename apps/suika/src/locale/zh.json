@@ -85,6 +85,10 @@
   "vector": "矢量",
   "offsetVector": "偏移矢量",
   "offsetVector.offset": "偏移",
+  "offsetVector.join": "连接",
+  "offsetVector.join.miter": "尖角",
+  "offsetVector.join.round": "圆角",
+  "offsetVector.join.bevel": "斜角",
   "apply": "应用",
 
   "done": "完成",

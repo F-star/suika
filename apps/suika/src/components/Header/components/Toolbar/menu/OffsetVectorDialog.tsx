@@ -1,4 +1,8 @@
-import { offsetPathAndRecord, type SuikaEditor } from '@suika/core';
+import {
+  offsetPathAndRecord,
+  type OffsetPathJoin,
+  type SuikaEditor,
+} from '@suika/core';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -12,6 +16,13 @@ import {
   DialogTitle,
   DraggableDialogContent,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import { type MessageIds } from '../../../../../locale';
 
@@ -28,10 +39,11 @@ export const OffsetVectorDialog = ({
 }: OffsetVectorDialogProps) => {
   const intl = useIntl();
   const [offset, setOffset] = useState(20);
+  const [join, setJoin] = useState<OffsetPathJoin>('MITER');
   const t = (id: MessageIds) => intl.formatMessage({ id });
 
   const applyOffset = () => {
-    if (editor && offsetPathAndRecord(editor, offset)) {
+    if (editor && offsetPathAndRecord(editor, offset, { join })) {
       onOpenChange(false);
     }
   };
@@ -43,7 +55,7 @@ export const OffsetVectorDialog = ({
           <DialogTitle>{t('offsetVector')}</DialogTitle>
         </DialogHeader>
 
-        <label className="grid grid-cols-[6rem_1fr] items-center gap-3 py-2 text-sm">
+        <label className="grid grid-cols-[6rem_1fr] items-center gap-3 text-sm">
           <span className="text-muted-foreground">
             {t('offsetVector.offset')}
           </span>
@@ -52,6 +64,31 @@ export const OffsetVectorDialog = ({
             classNames={['!m-0', '!h-9', '!w-full']}
             onChange={setOffset}
           />
+        </label>
+
+        <label className="grid grid-cols-[6rem_1fr] items-center gap-3 text-sm">
+          <span className="text-muted-foreground">
+            {t('offsetVector.join')}
+          </span>
+          <Select
+            value={join}
+            onValueChange={(value) => setJoin(value as OffsetPathJoin)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="MITER">
+                {t('offsetVector.join.miter')}
+              </SelectItem>
+              <SelectItem value="ROUND">
+                {t('offsetVector.join.round')}
+              </SelectItem>
+              <SelectItem value="BEVEL">
+                {t('offsetVector.join.bevel')}
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </label>
 
         <DialogFooter>
