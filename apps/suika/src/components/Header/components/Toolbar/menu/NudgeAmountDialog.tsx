@@ -5,10 +5,10 @@ import { useIntl } from 'react-intl';
 import NumberInput from '@/components/input/NumberInput';
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DraggableDialogContent,
 } from '@/components/ui/dialog';
 
 import { type MessageIds } from '../../../../../locale';
@@ -39,7 +39,7 @@ export const NudgeAmountDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="suika sm:max-w-xs">
+      <DraggableDialogContent className="suika sm:max-w-xs">
         <DialogHeader>
           <DialogTitle>{t('nudgeAmount')}</DialogTitle>
           <DialogDescription className="sr-only">
@@ -80,7 +80,7 @@ export const NudgeAmountDialog = ({
             />
           </label>
         </div>
-      </DialogContent>
+      </DraggableDialogContent>
     </Dialog>
   );
 };

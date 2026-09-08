@@ -33,6 +33,7 @@
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "react-intl": "^6.3.2",
+    "react-rnd": "^10.5.3",
     "react-scripts": "5.0.1",
     "sass": "^1.57.1",
     "stats.js": "^0.17.0",

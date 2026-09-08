@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
-  DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DraggableDialogContent,
 } from '@/components/ui/dialog';
 
 import { type MessageIds } from '../../../../../locale';
@@ -38,7 +38,7 @@ export const OffsetVectorDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="suika sm:max-w-xs">
+      <DraggableDialogContent className="suika sm:max-w-xs">
         <DialogHeader>
           <DialogTitle>{t('offsetVector')}</DialogTitle>
         </DialogHeader>
@@ -60,7 +60,7 @@ export const OffsetVectorDialog = ({
           </DialogClose>
           <Button onClick={applyOffset}>{t('apply')}</Button>
         </DialogFooter>
-      </DialogContent>
+      </DraggableDialogContent>
     </Dialog>
   );
 };
