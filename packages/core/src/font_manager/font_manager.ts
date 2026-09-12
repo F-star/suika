@@ -1,8 +1,27 @@
 import opentype, { type Font } from 'opentype.js';
+import decompressWoff2 from 'woff2-encoder/decompress';
 
 import { AsyncTaskManager } from './async_task_manager';
 
 const FONT_LOAD_CONCURRENCY = 3;
+
+const WOFF2_SIGNATURE = 'wOF2';
+
+async function loadFont(url: string): Promise<Font> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to load font: ${url} (${response.status})`);
+  }
+
+  const buffer = await response.arrayBuffer();
+  const signature = new TextDecoder().decode(new Uint8Array(buffer, 0, 4));
+  const fontBuffer =
+    signature === WOFF2_SIGNATURE
+      ? (await decompressWoff2(buffer)).buffer
+      : buffer;
+
+  return opentype.parse(fontBuffer as ArrayBuffer);
+}
 
 class FontManager {
   private fonts: Record<string, Font | null> = {};
@@ -25,7 +44,7 @@ class FontManager {
       }
 
       tasks.push(async () => {
-        const font = await opentype.load(url);
+        const font = await loadFont(url);
         this.fonts[fontName] = font;
         return font;
       });
@@ -38,7 +57,7 @@ class FontManager {
     const font = this.fonts[fontFamily];
     if (!font) {
       console.warn(`Font ${fontFamily} not found, use default font`);
-      return this.fonts['Smiley Sans']!;
+      return this.fonts['Source Han Sans CN']!;
     }
     return font;
   }

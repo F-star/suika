@@ -28,7 +28,7 @@ export const TypographyCard = () => {
   const MIXED = intl.formatMessage({ id: 'mixed' });
 
   const [fontSize, setFontSize] = useState(12);
-  const [fontFamily, setFontFamily] = useState('Smiley Sans');
+  const [fontFamily, setFontFamily] = useState('Source Han Sans CN');
 
   const [hasTextSelected, setHasTextSelected] = useState(false);
 

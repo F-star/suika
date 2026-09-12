@@ -73,7 +73,7 @@ export class Setting {
 
     /********* text ********/
     defaultFontSize: 12,
-    defaultFontFamily: 'Smiley Sans', // 'Source Han Sans CN', // 'sans-serif',
+    defaultFontFamily: 'Source Han Sans CN', // 'Smiley Sans', // 'sans-serif',
     textFill: [
       {
         type: PaintType.Solid,
