@@ -5,7 +5,7 @@ import svgpath from 'svgpath';
 import { type GraphicsAttrs } from '../../graphics';
 import { type IPaint, PaintType } from '../../paint';
 import { GraphicsType } from '../../type';
-import { svgToJson } from './svgToJson';
+import { svgToJson } from './svg_to_json';
 import { type Matrix, type SvgNode } from './types';
 
 const multiplyTransform = (m1: Matrix, m2: Matrix): Matrix => [

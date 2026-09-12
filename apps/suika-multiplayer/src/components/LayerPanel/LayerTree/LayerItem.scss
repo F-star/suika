@@ -52,6 +52,11 @@
       border-color: transparent;
     }
 
+    &.sk-drop-inside {
+      background-color: #f2f9ff;
+      border-color: #0f8fff;
+    }
+
     .sk-group-collapse-btn {
       display: flex;
       justify-content: center;
@@ -136,5 +141,14 @@
         font-size: 0;
       }
     }
+  }
+
+  .sk-layer-drop-indicator {
+    position: absolute;
+    right: 4px;
+    height: 1px;
+    background: #0f8fff;
+    pointer-events: none;
+    z-index: 1;
   }
 }

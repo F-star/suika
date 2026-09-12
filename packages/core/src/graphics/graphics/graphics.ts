@@ -994,6 +994,7 @@ export class SuikaGraphics<ATTRS extends GraphicsAttrs = GraphicsAttrs> {
     return parent ? parent.getWorldTransform() : identityMatrix();
   }
 
+  /** remove from parent children attr, but `attr.parentIndex` will no change */
   removeFromParent() {
     const parent = this.getParent();
     if (parent) {

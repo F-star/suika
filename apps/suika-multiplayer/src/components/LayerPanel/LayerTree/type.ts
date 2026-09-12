@@ -1,3 +1,5 @@
+export type LayerDropPosition = 'before' | 'after' | 'inside';
+
 export interface IBaseEvents {
   toggleVisible: (id: string) => void;
   toggleLock: (id: string) => void;
@@ -10,4 +12,12 @@ export interface IBaseEvents {
   ) => void;
   getLayerIcon: (id: string) => string;
   zoomGraphicsToFit: (id: string) => void;
+}
+
+export interface ILayerTreeEvents extends IBaseEvents {
+  reposition: (
+    draggedIds: string[],
+    targetId: string,
+    position: LayerDropPosition,
+  ) => void;
 }

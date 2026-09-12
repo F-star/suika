@@ -8,4 +8,5 @@ export * from './mutate_graphs_and_record';
 export * from './page_service';
 export * from './path_op_service';
 export * from './remove_service';
+export * from './reposition_record';
 export * from './ungroup_and_record';

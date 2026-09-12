@@ -2,12 +2,15 @@ import { type IObject } from '@suika/core';
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import LayerItem from './LayerItem';
-import { type IBaseEvents } from './type';
+import { type ILayerTreeEvents, type LayerDropPosition } from './type';
 
 const ROW_HEIGHT = 32;
 const OVERSCAN_COUNT = 8;
+const emptyDragImage = new Image(1, 1);
+emptyDragImage.src =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
-interface IProps extends IBaseEvents {
+interface IProps extends ILayerTreeEvents {
   treeData: IObject[];
   activeIds: string[];
   focusId: string;
@@ -24,6 +27,11 @@ interface IVisibleLayer {
   hasChildren: boolean;
 }
 
+interface IDropIndicator {
+  id: string;
+  position: LayerDropPosition;
+}
+
 export const LayerTree: FC<IProps> = ({
   treeData,
   activeIds,
@@ -36,6 +44,7 @@ export const LayerTree: FC<IProps> = ({
   setSelectedGraph,
   getLayerIcon,
   zoomGraphicsToFit,
+  reposition,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
@@ -44,6 +53,10 @@ export const LayerTree: FC<IProps> = ({
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [pendingFocusId, setPendingFocusId] = useState('');
+  const [draggingIds, setDraggingIds] = useState<string[]>([]);
+  const [dropIndicator, setDropIndicator] = useState<IDropIndicator | null>(
+    null,
+  );
   const lastFocusIdRef = useRef('');
 
   useEffect(() => {
@@ -171,6 +184,19 @@ export const LayerTree: FC<IProps> = ({
     });
   };
 
+  const clearDragState = () => {
+    setDraggingIds([]);
+    setDropIndicator(null);
+  };
+
+  const handleDrop = (
+    targetId: string,
+    position: IDropIndicator['position'],
+  ) => {
+    reposition(draggingIds, targetId, position);
+    clearDragState();
+  };
+
   return (
     <div
       ref={containerRef}
@@ -185,12 +211,22 @@ export const LayerTree: FC<IProps> = ({
       >
         {visibleLayers.slice(startIndex, endIndex).map((layer, offset) => {
           const { item } = layer;
+          const isDragging = draggingIds.includes(item.id);
+          const isDescendantOfDragging = draggingIds.some((draggingId) =>
+            (ancestorIdsById.get(item.id) ?? []).includes(draggingId),
+          );
+          const isDropTargetDisabled =
+            isDragging || layer.active || isDescendantOfDragging;
+          const itemIndex = startIndex + offset;
+          const indicatorPosition =
+            dropIndicator?.id === item.id ? dropIndicator.position : null;
+          const isDropInside = indicatorPosition === 'inside';
           return (
             <div
               key={item.id}
               style={{
                 position: 'absolute',
-                top: (startIndex + offset) * ROW_HEIGHT,
+                top: itemIndex * ROW_HEIGHT,
                 width: '100%',
               }}
             >
@@ -216,7 +252,65 @@ export const LayerTree: FC<IProps> = ({
                 setSelectedGraph={setSelectedGraph}
                 getLayerIcon={getLayerIcon}
                 zoomGraphicsToFit={zoomGraphicsToFit}
+                draggable
+                isDragging={isDragging}
+                isDropInside={isDropInside}
+                onDragStart={(event) => {
+                  const draggedIds = activeIds.includes(item.id)
+                    ? activeIds
+                    : [item.id];
+                  event.dataTransfer.effectAllowed = 'move';
+                  event.dataTransfer.setData(
+                    'text/plain',
+                    JSON.stringify(draggedIds),
+                  );
+                  event.dataTransfer.setDragImage(emptyDragImage, 0, 0);
+                  setDraggingIds(draggedIds);
+                }}
+                onDragOver={(event) => {
+                  if (!draggingIds.length) return;
+
+                  if (isDropTargetDisabled) {
+                    // drop target is a selected/dragged element:
+                    // no drop hint, no drop effect
+                    setDropIndicator(null);
+                    return;
+                  }
+
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = 'move';
+                  const bounds = event.currentTarget.getBoundingClientRect();
+                  const offsetY = event.clientY - bounds.top;
+                  setDropIndicator({
+                    id: item.id,
+                    position:
+                      item.type === 'Frame'
+                        ? offsetY < bounds.height / 4
+                          ? 'before'
+                          : offsetY > (bounds.height * 3) / 4
+                          ? 'after'
+                          : 'inside'
+                        : offsetY < bounds.height / 2
+                        ? 'before'
+                        : 'after',
+                  });
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (isDropTargetDisabled) return;
+                  handleDrop(item.id, indicatorPosition ?? 'after');
+                }}
+                onDragEnd={clearDragState}
               />
+              {indicatorPosition && !isDropInside && (
+                <div
+                  className="sk-layer-drop-indicator"
+                  style={{
+                    top: indicatorPosition === 'before' ? 0 : ROW_HEIGHT,
+                    left: layer.level * 16,
+                  }}
+                />
+              )}
             </div>
           );
         })}

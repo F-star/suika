@@ -10,7 +10,7 @@ import {
 } from '@suika/icons';
 import { useDebounceEffect } from 'ahooks';
 import classNames from 'classnames';
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type DragEvent, type FC, useEffect, useRef, useState } from 'react';
 
 import { LayerIcon } from './LayerIcon';
 import { type IBaseEvents } from './type';
@@ -30,6 +30,13 @@ interface IProps extends IBaseEvents {
   visibleSecond?: boolean;
   lock: boolean;
   lockSecond?: boolean;
+  draggable?: boolean;
+  isDragging?: boolean;
+  isDropInside?: boolean;
+  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragOver?: (event: DragEvent<HTMLDivElement>) => void;
+  onDrop?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: () => void;
 }
 
 const LayerItem: FC<IProps> = ({
@@ -47,6 +54,13 @@ const LayerItem: FC<IProps> = ({
   visibleSecond = true,
   lock,
   lockSecond = false,
+  draggable = false,
+  isDragging = false,
+  isDropInside = false,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
   toggleVisible,
   toggleLock,
   setHlId,
@@ -95,6 +109,11 @@ const LayerItem: FC<IProps> = ({
 
   const isHl = hlId === id;
 
+  // Deferred selection: when plain-clicking an already-selected item,
+  // skip selecting it on mouse-down (so dragging can move the whole
+  // selection) and run the original select logic on mouse-up instead.
+  const isDeferredSelectionRef = useRef(false);
+
   const finalVisible = visible && visibleSecond;
   const finalLock = lock || lockSecond;
 
@@ -120,9 +139,34 @@ const LayerItem: FC<IProps> = ({
           'sk-hidden': !finalVisible,
           'sk-layer-highlight': isHl,
           'sk-editing': isEditing,
+          'sk-dragging': isDragging,
+          'sk-drop-inside': isDropInside,
         })}
+        draggable={draggable && !isEditing}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        onDragEnd={() => {
+          // A drag happened, the deferred selection must not run.
+          isDeferredSelectionRef.current = false;
+          onDragEnd && onDragEnd();
+        }}
         onMouseDown={(e) => {
+          // Plain click on an already-selected item: defer to mouse-up,
+          // because the press may be the start of a multi-item drag.
+          const isPlainClick =
+            !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+          if (active && isPlainClick) {
+            isDeferredSelectionRef.current = true;
+            return;
+          }
           setSelectedGraph && setSelectedGraph(id, e);
+        }}
+        onMouseUp={(e) => {
+          if (isDeferredSelectionRef.current) {
+            isDeferredSelectionRef.current = false;
+            setSelectedGraph && setSelectedGraph(id, e);
+          }
         }}
         onMouseEnter={() => {
           setHlId && setHlId(id);

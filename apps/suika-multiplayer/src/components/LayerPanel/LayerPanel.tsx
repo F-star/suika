@@ -4,6 +4,9 @@ import { isWindows } from '@suika/common';
 import {
   type IObject,
   MutateGraphsAndRecord,
+  repositionAfterAndRecord,
+  repositionBeforeAndRecord,
+  repositionInsideAndRecord,
   SelectCmd,
   type SuikaGraphics,
 } from '@suika/core';
@@ -161,6 +164,33 @@ export const LayerPanel: FC = () => {
     }
   };
 
+  const reposition = (
+    draggedIds: string[],
+    targetId: string,
+    position: 'before' | 'after' | 'inside',
+  ) => {
+    if (!editor) return;
+
+    const target = editor.doc.getGraphicsById(targetId);
+    const entities = draggedIds
+      .map((id) => editor.doc.getGraphicsById(id))
+      .filter((entity): entity is NonNullable<typeof entity> => !!entity);
+    if (!target || !entities.length) return;
+
+    switch (position) {
+      case 'before':
+        repositionAfterAndRecord(editor, target, entities);
+        break;
+      case 'after':
+        repositionBeforeAndRecord(editor, target, entities);
+        break;
+      case 'inside':
+        repositionInsideAndRecord(editor, target, entities);
+        break;
+    }
+    editor.render();
+  };
+
   return (
     <div className="layer-panel">
       <LayerTree
@@ -175,6 +205,7 @@ export const LayerPanel: FC = () => {
         setSelectedGraph={setSelectedGraph}
         getLayerIcon={getLayerIcon}
         zoomGraphicsToFit={zoomGraphicsToFit}
+        reposition={reposition}
       />
     </div>
   );
