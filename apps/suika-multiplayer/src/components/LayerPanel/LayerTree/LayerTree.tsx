@@ -15,6 +15,9 @@ interface IProps extends ILayerTreeEvents {
   activeIds: string[];
   focusId: string;
   hlId: string;
+  /** ids of collapsed layers (controlled state, owned by the parent) */
+  collapsedIds: Set<string>;
+  toggleExpanded: (id: string) => void;
 }
 
 interface IVisibleLayer {
@@ -37,6 +40,8 @@ export const LayerTree: FC<IProps> = ({
   activeIds,
   focusId,
   hlId: hoverId,
+  collapsedIds,
+  toggleExpanded,
   toggleVisible,
   toggleLock,
   setHlId: setHoverId,
@@ -47,9 +52,6 @@ export const LayerTree: FC<IProps> = ({
   reposition,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
-    () => new Set(),
-  );
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [pendingFocusId, setPendingFocusId] = useState('');
@@ -98,13 +100,7 @@ export const LayerTree: FC<IProps> = ({
 
     lastFocusIdRef.current = focusId;
     setPendingFocusId(focusId);
-    const ancestorIds = ancestorIdsById.get(focusId) ?? [];
-    setCollapsedIds((ids) => {
-      const nextIds = new Set(ids);
-      ancestorIds.forEach((id) => nextIds.delete(id));
-      return nextIds.size === ids.size ? ids : nextIds;
-    });
-  }, [ancestorIdsById, focusId]);
+  }, [focusId]);
 
   const visibleLayers = useMemo(() => {
     const selectedIds = new Set(activeIds);
@@ -174,15 +170,6 @@ export const LayerTree: FC<IProps> = ({
     });
     setPendingFocusId('');
   }, [pendingFocusId, visibleLayers]);
-
-  const toggleExpanded = (id: string) => {
-    setCollapsedIds((ids) => {
-      const nextIds = new Set(ids);
-      if (nextIds.has(id)) nextIds.delete(id);
-      else nextIds.add(id);
-      return nextIds;
-    });
-  };
 
   const clearDragState = () => {
     setDraggingIds([]);

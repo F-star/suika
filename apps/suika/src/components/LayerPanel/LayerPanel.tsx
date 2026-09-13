@@ -10,7 +10,14 @@ import {
   SelectCmd,
   type SuikaGraphics,
 } from '@suika/core';
-import { type FC, useContext, useEffect, useRef, useState } from 'react';
+import {
+  type FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { EditorContext } from '../../context';
 import { LayerTree } from './LayerTree';
@@ -21,7 +28,44 @@ export const LayerPanel: FC = () => {
   const [selectedIds, setSelectedIds] = useState(new Set<string>());
   const [hlId, setHlId] = useState('');
   const [focusId, setFocusId] = useState('');
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const isLayerTreeSelectionRef = useRef(false);
+  const lastFocusIdRef = useRef('');
+
+  const ancestorIdsById = useMemo(() => {
+    const ancestorsById = new Map<string, string[]>();
+
+    const collectAncestorIds = (items: IObject[], ancestors: string[]) => {
+      items.forEach((item) => {
+        ancestorsById.set(item.id, ancestors);
+        if (item.children?.length) {
+          collectAncestorIds(item.children, [...ancestors, item.id]);
+        }
+      });
+    };
+
+    collectAncestorIds(objects, []);
+    return ancestorsById;
+  }, [objects]);
+
+  // Expand the ancestors of the focused layer, so that it is visible in the tree.
+  useEffect(() => {
+    if (!focusId) {
+      lastFocusIdRef.current = '';
+      return;
+    }
+    if (lastFocusIdRef.current === focusId) return;
+
+    lastFocusIdRef.current = focusId;
+    const ancestorIds = ancestorIdsById.get(focusId) ?? [];
+    setCollapsedIds((ids) => {
+      const nextIds = new Set(ids);
+      ancestorIds.forEach((id) => nextIds.delete(id));
+      return nextIds.size === ids.size ? ids : nextIds;
+    });
+  }, [ancestorIdsById, focusId]);
 
   useEffect(() => {
     if (editor) {
@@ -53,15 +97,36 @@ export const LayerPanel: FC = () => {
         handleHighlightedItemChange,
       );
 
+      // App-side decision: collapse the imported SVG group in the layer panel
+      // by default, as it may contain a large number of shapes.
+      const handleSvgImported = ({ groupId }: { groupId: string }) => {
+        setCollapsedIds((prevIds) => {
+          const nextIds = new Set(prevIds);
+          nextIds.add(groupId);
+          return nextIds;
+        });
+      };
+      editor.on('svgImported', handleSvgImported);
+
       return () => {
         editor.selectedElements.off('itemsChange', handleItemsChange);
         editor.selectedElements.off(
           'highlightedItemChange',
           handleHighlightedItemChange,
         );
+        editor.off('svgImported', handleSvgImported);
       };
     }
   }, [editor]);
+
+  const toggleExpanded = (id: string) => {
+    setCollapsedIds((ids) => {
+      const nextIds = new Set(ids);
+      if (nextIds.has(id)) nextIds.delete(id);
+      else nextIds.add(id);
+      return nextIds;
+    });
+  };
 
   const setSelectedGraph = (
     objId: string,
@@ -198,6 +263,8 @@ export const LayerPanel: FC = () => {
         activeIds={Array.from(selectedIds)}
         focusId={focusId}
         hlId={hlId}
+        collapsedIds={collapsedIds}
+        toggleExpanded={toggleExpanded}
         toggleVisible={toggleVisible}
         toggleLock={toggleLock}
         setHlId={setEditorHlId}

@@ -118,6 +118,10 @@ function importSVG(
 
   editor.selectedElements.setItemsById(new Set([group.attrs.id]));
 
+  // Notify that the SVG import is finished, carrying the created group's id.
+  // The caller decides what to do (e.g. collapse the group in the layer panel).
+  editor.emit('svgImported', { groupId: group.attrs.id });
+
   const transaction = new Transaction(editor);
   transaction.addNewIds([...addedItemIdSet, group.attrs.id]);
   transaction.commit('import svg');

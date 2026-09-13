@@ -39,6 +39,8 @@ interface IEditorOptions {
 
 interface Events {
   destroy(): void;
+  /** emitted after an SVG file has been imported (UI state only) */
+  svgImported(payload: { groupId: string }): void;
 }
 
 export class SuikaEditor {
@@ -312,5 +314,11 @@ export class SuikaEditor {
   }
   off<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.off(eventName, listener);
+  }
+  emit<T extends keyof Events>(
+    eventName: T,
+    ...args: Parameters<Events[T]>
+  ): void {
+    this.emitter.emit(eventName, ...args);
   }
 }
