@@ -13,8 +13,8 @@ export const importService = {
     });
   },
   importSVGFile: (editor: SuikaEditor) => {
-    readTextFile('.svg', (content) => {
-      importSVG(editor, content);
+    readTextFile('.svg', (content, fileName) => {
+      importSVG(editor, content, undefined, fileName);
     });
   },
   bindSVGDropEvents: (editor: SuikaEditor) => {
@@ -34,7 +34,9 @@ export const importService = {
       if (!file) return;
 
       const position = editor.getSceneCursorXY(event);
-      readFileAsText(file, (content) => importSVG(editor, content, position));
+      readFileAsText(file, (content) =>
+        importSVG(editor, content, position, file.name),
+      );
     };
 
     const canvas = editor.canvasElement;
@@ -48,7 +50,12 @@ export const importService = {
   },
 };
 
-function importSVG(editor: SuikaEditor, content: string, center?: IPoint) {
+function importSVG(
+  editor: SuikaEditor,
+  content: string,
+  center?: IPoint,
+  fileName?: string,
+) {
   const result = svgStrToSuikaData(content);
 
   if (result.length === 0) {
@@ -85,11 +92,10 @@ function importSVG(editor: SuikaEditor, content: string, center?: IPoint) {
   const offsetX = targetCenter.x - (bbox.maxX - bbox.minX) / 2;
   const offsetY = targetCenter.y - (bbox.maxY - bbox.minY) / 2;
 
-  // 创建一个 group 包住新增的图形
   const group = new SuikaFrame(
     {
       resizeToFit: true,
-      objectName: 'group',
+      objectName: fileName ? fileName.replace(/\.svg$/i, '') : 'group',
       width: bbox.maxX - bbox.minX,
       height: bbox.maxY - bbox.minY,
       transform: [1, 0, 0, 1, offsetX, offsetY],
@@ -121,7 +127,7 @@ function importSVG(editor: SuikaEditor, content: string, center?: IPoint) {
 
 function readTextFile(
   accept: string,
-  callback: (contents: string) => void,
+  callback: (contents: string, fileName: string) => void,
 ): void {
   const input = document.createElement('input');
   input.type = 'file';
@@ -144,13 +150,16 @@ function isSVGFile(file: File) {
   );
 }
 
-function readFileAsText(file: File, callback: (contents: string) => void) {
+function readFileAsText(
+  file: File,
+  callback: (contents: string, fileName: string) => void,
+) {
   const reader = new FileReader();
 
   reader.onload = function (event) {
     const contents = event.target?.result as string;
     if (contents) {
-      callback(contents);
+      callback(contents, file.name);
     }
   };
 
