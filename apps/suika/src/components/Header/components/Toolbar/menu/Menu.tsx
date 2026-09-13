@@ -213,6 +213,17 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
       ],
     },
     {
+      key: 'vector',
+      label: t({ id: 'vector' }),
+      children: [
+        {
+          key: 'offsetVector',
+          label: t({ id: 'offsetVector' }),
+          disabled: !hasOffsetVectorTarget,
+        },
+      ],
+    },
+    {
       type: 'divider',
     },
     {
@@ -250,17 +261,6 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
         {
           key: 'nudgeAmount',
           label: t({ id: 'nudgeAmount' }),
-        },
-      ],
-    },
-    {
-      key: 'vector',
-      label: t({ id: 'vector' }),
-      children: [
-        {
-          key: 'offsetVector',
-          label: t({ id: 'offsetVector' }),
-          disabled: !hasOffsetVectorTarget,
         },
       ],
     },
