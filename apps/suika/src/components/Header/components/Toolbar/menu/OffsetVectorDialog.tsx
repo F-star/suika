@@ -1,9 +1,13 @@
+import { throttle } from '@suika/common';
 import {
   offsetPathAndRecord,
   type OffsetPathJoin,
   type SuikaEditor,
+  type SuikaGraphics,
+  type SuikaPath,
+  updateOffsetPath,
 } from '@suika/core';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import NumberInput from '@/components/input/NumberInput';
@@ -32,6 +36,11 @@ interface OffsetVectorDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface OffsetPathSession {
+  source: SuikaGraphics;
+  path: SuikaPath;
+}
+
 export const OffsetVectorDialog = ({
   editor,
   open,
@@ -40,16 +49,61 @@ export const OffsetVectorDialog = ({
   const intl = useIntl();
   const [offset, setOffset] = useState(20);
   const [join, setJoin] = useState<OffsetPathJoin>('MITER');
+  const sessionRef = useRef<OffsetPathSession | null>(null);
   const t = (id: MessageIds) => intl.formatMessage({ id });
 
-  const applyOffset = () => {
-    if (editor && offsetPathAndRecord(editor, offset, { join })) {
+  const throttledUpdateOffset = useMemo(
+    () =>
+      throttle((nextOffset: number, nextJoin: OffsetPathJoin) => {
+        const session = sessionRef.current;
+        if (editor && session) {
+          updateOffsetPath(editor, session.source, session.path, nextOffset, {
+            join: nextJoin,
+          });
+        }
+      }, 100),
+    [editor],
+  );
+
+  useEffect(() => {
+    return () => throttledUpdateOffset.cancel();
+  }, [throttledUpdateOffset]);
+
+  useEffect(() => {
+    if (!editor || !open || sessionRef.current) return;
+
+    const source = editor.selectedElements.getItems()[0];
+    if (!source?.isSupportOffsetPath()) {
       onOpenChange(false);
+      return;
     }
+
+    const path = offsetPathAndRecord(editor, offset, { join });
+    if (path) {
+      sessionRef.current = { source, path };
+    }
+  }, [editor, join, offset, onOpenChange, open]);
+
+  const updateOffset = (nextOffset: number, nextJoin = join) => {
+    setOffset(nextOffset);
+    throttledUpdateOffset(nextOffset, nextJoin);
+  };
+
+  const updateJoin = (nextJoin: OffsetPathJoin) => {
+    setJoin(nextJoin);
+    throttledUpdateOffset(offset, nextJoin);
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      throttledUpdateOffset.flush();
+      sessionRef.current = null;
+    }
+    onOpenChange(nextOpen);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DraggableDialogContent className="suika sm:max-w-xs">
         <DialogHeader>
           <DialogTitle>{t('offsetVector')}</DialogTitle>
@@ -62,7 +116,7 @@ export const OffsetVectorDialog = ({
           <NumberInput
             value={offset}
             classNames={['!m-0', '!h-9', '!w-full']}
-            onChange={setOffset}
+            onChange={updateOffset}
           />
         </label>
 
@@ -72,7 +126,7 @@ export const OffsetVectorDialog = ({
           </span>
           <Select
             value={join}
-            onValueChange={(value) => setJoin(value as OffsetPathJoin)}
+            onValueChange={(value) => updateJoin(value as OffsetPathJoin)}
           >
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -92,10 +146,10 @@ export const OffsetVectorDialog = ({
         </label>
 
         <DialogFooter>
-          <DialogClose>
-            <Button variant="outline">{t('cancel')}</Button>
+          <DialogClose render={<Button variant="outline" />}>
+            {t('cancel')}
           </DialogClose>
-          <Button onClick={applyOffset}>{t('apply')}</Button>
+          <Button onClick={() => handleOpenChange(false)}>{t('apply')}</Button>
         </DialogFooter>
       </DraggableDialogContent>
     </Dialog>
