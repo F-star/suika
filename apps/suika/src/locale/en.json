@@ -59,7 +59,7 @@
   "file": "File",
   "edit": "Edit",
   "object": "Object",
-  "import.originFile": "Import local file",
+  "import.originFile": "Open…",
   "import.svgFile": "Import SVG file",
 
   "export.originFile": "Save local copy",

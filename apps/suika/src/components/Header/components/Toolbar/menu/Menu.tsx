@@ -18,6 +18,7 @@ import { type FC, useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { EditorContext } from '../../../../../context';
+import { desktopFileService } from '../../../../../lib/desktop-file-service';
 import { type MessageIds } from '../../../../../locale';
 import { NudgeAmountDialog } from './NudgeAmountDialog';
 import { OffsetVectorDialog } from './OffsetVectorDialog';
@@ -323,19 +324,69 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
         editor.render();
         break;
       case 'import':
-        importService.importOriginFile(editor);
+        {
+          (async () => {
+            const file = await desktopFileService()?.openDocument();
+            if (file) {
+              importService.importOriginText(editor, file.content);
+            } else if (!desktopFileService()) {
+              importService.importOriginFile(editor);
+            }
+          })();
+        }
         break;
       case 'export':
-        exportService.exportOriginFile(editor);
+        {
+          const desktop = desktopFileService();
+          if (desktop) {
+            desktop.saveDocument(editor.sceneGraph.toJSON(), false);
+          } else {
+            exportService.exportOriginFile(editor);
+          }
+        }
         break;
       case 'exportCurrentPageAsSVG':
-        exportService.exportCurrentPageSVG(editor);
+        {
+          const file = exportService.getCurrentPageSVG(editor);
+          const desktop = desktopFileService();
+          if (file && desktop) {
+            file.blob
+              .arrayBuffer()
+              .then((buffer) =>
+                desktop.saveExport(new Uint8Array(buffer), file.filename),
+              );
+          } else if (file) {
+            exportService.exportCurrentPageSVG(editor);
+          }
+        }
         break;
       case 'exportCurrentPageAsPNG':
-        exportService.exportCurrentPagePNG(editor);
+        {
+          const desktop = desktopFileService();
+          if (desktop) {
+            exportService.getCurrentPagePNG(editor).then(async (file) => {
+              if (!file) return;
+              await desktop.saveExport(
+                new Uint8Array(await file.blob.arrayBuffer()),
+                file.filename,
+              );
+            });
+          } else {
+            exportService.exportCurrentPagePNG(editor);
+          }
+        }
         break;
       case 'importSVG':
-        importService.importSVGFile(editor);
+        {
+          (async () => {
+            const file = await desktopFileService()?.openSvg();
+            if (file) {
+              importService.importSVGText(editor, file.content, file.name);
+            } else if (!desktopFileService()) {
+              importService.importSVGFile(editor);
+            }
+          })();
+        }
 
         break;
       case 'clearCanvasAndRefresh':

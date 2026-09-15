@@ -1,0 +1,30 @@
+{
+  "name": "@suika/suika-desktop",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/main.cjs",
+  "scripts": {
+    "dev": "pnpm --filter @suika/core build && pnpm build:main && cross-env SUIKA_DEV_SERVER_URL=http://localhost:6167 concurrently -k \"pnpm --filter @suika/suika dev\" \"wait-on http://localhost:6167 && electron .\"",
+    "build:main": "esbuild src/main.ts src/preload.ts --bundle --platform=node --target=node20 --external:electron --outdir=dist --out-extension:.js=.cjs",
+    "build": "pnpm --filter @suika/suika build && pnpm build:main && electron-builder"
+  },
+  "build": {
+    "appId": "com.suika.editor",
+    "productName": "Suika",
+    "files": ["dist/**"],
+    "extraResources": [{ "from": "../suika/build", "to": "renderer" }],
+    "extraMetadata": { "main": "dist/main.cjs" },
+    "mac": { "target": ["dmg"] },
+    "win": { "target": ["nsis"] },
+    "linux": { "target": ["AppImage"] }
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^35.0.0",
+    "electron-builder": "26.15.3",
+    "esbuild": "^0.25.0",
+    "wait-on": "^8.0.2"
+  }
+}
