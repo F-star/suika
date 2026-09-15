@@ -15,6 +15,8 @@
     "app:dev": "pnpm --filter @suika/suika dev",
     "app-m:dev": "pnpm --filter @suika/suika-multiplayer dev",
     "app:build": "pnpm --filter @suika/suika build",
+    "desktop:dev": "pnpm --filter @suika/suika-desktop dev",
+    "desktop:build": "pnpm --filter @suika/suika-desktop build",
     "storybook": "pnpm --filter @suika/components storybook",
     "components:build": "pnpm --filter @suika/components build",
     "common:dev": "pnpm -F @suika/common dev",
@@ -78,5 +80,10 @@
   },
   "engines": {
     "node": ">=18.12.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@noble/hashes": "1.8.0"
+    }
   }
 }

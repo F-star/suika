@@ -13,6 +13,7 @@ import { type FC, useEffect, useRef, useState } from 'react';
 import { FONT_FILES } from '@/constant';
 
 import { EditorContext } from '../context';
+import { desktopFileService } from '../lib/desktop-file-service';
 import { AutoSaveGraphics } from '../store/auto-save-graphs';
 import { ClearCanvasDialog } from './ClearCanvasDialog';
 import { ContextMenu } from './ContextMenu';
@@ -48,6 +49,25 @@ const Editor: FC = () => {
 
   const [progress, setProgress] = useState(0);
   const [clearCanvasOpen, setClearCanvasOpen] = useState(false);
+
+  useEffect(() => {
+    const desktop = desktopFileService();
+    if (!desktop || !suikaEditor) return;
+
+    return desktop.onMenuCommand((command) => {
+      if (command === 'open') {
+        desktop.openDocument().then((file) => {
+          if (file) suikaEditor.setContents(JSON.parse(file.content));
+        });
+      }
+      if (command === 'save' || command === 'save-as') {
+        desktop.saveDocument(
+          suikaEditor.sceneGraph.toJSON(),
+          command === 'save-as',
+        );
+      }
+    });
+  }, [suikaEditor]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -110,7 +130,11 @@ const Editor: FC = () => {
 
         (window as any).editor = editor;
 
-        new AutoSaveGraphics(editor);
+        // A desktop document is explicitly opened and saved through Electron's
+        // native file APIs. Do not restore or overwrite it via browser storage.
+        if (!desktopFileService()) {
+          new AutoSaveGraphics(editor);
+        }
 
         window.addEventListener('resize', changeViewport);
 

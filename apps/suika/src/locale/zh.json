@@ -58,7 +58,7 @@
   "file": "文件",
   "edit": "编辑",
   "object": "对象",
-  "import.originFile": "从本地导入",
+  "import.originFile": "打开…",
   "import.svgFile": "导入 SVG 文件",
 
   "export.originFile": "导出到本地",

@@ -9,13 +9,19 @@ import { svgStrToSuikaData } from './import_svg';
 export const importService = {
   importOriginFile: (editor: SuikaEditor) => {
     readTextFile('.suika', (content) => {
-      editor.setContents(JSON.parse(content));
+      importService.importOriginText(editor, content);
     });
+  },
+  importOriginText: (editor: SuikaEditor, content: string) => {
+    editor.setContents(JSON.parse(content));
   },
   importSVGFile: (editor: SuikaEditor) => {
     readTextFile('.svg', (content, fileName) => {
-      importSVG(editor, content, undefined, fileName);
+      importService.importSVGText(editor, content, fileName);
     });
+  },
+  importSVGText: (editor: SuikaEditor, content: string, fileName?: string) => {
+    importSVG(editor, content, undefined, fileName);
   },
   bindSVGDropEvents: (editor: SuikaEditor) => {
     const onDragOver = (event: DragEvent) => {
