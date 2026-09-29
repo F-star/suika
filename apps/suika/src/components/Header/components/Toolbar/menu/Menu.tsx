@@ -339,7 +339,11 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
         {
           const desktop = desktopFileService();
           if (desktop) {
-            desktop.saveDocument(editor.sceneGraph.toJSON(), false);
+            desktop.saveDocument(
+              editor.sceneGraph.toJSON(),
+              editor.commandManager.getCurrentHistoryId(),
+              false,
+            );
           } else {
             exportService.exportOriginFile(editor);
           }

@@ -1,13 +1,15 @@
 import { type SuikaEditor } from '../editor';
 import { type SuikaGraphics } from '../graphics';
-import { type ICommand } from './type';
+import { BaseCommand } from './base_command';
 
-export class AddGraphCmd implements ICommand {
+export class AddGraphCmd extends BaseCommand {
   constructor(
-    public desc: string,
+    desc: string,
     private editor: SuikaEditor,
     private elements: SuikaGraphics[],
-  ) {}
+  ) {
+    super(desc);
+  }
   redo() {
     for (const el of this.elements) {
       el.setDeleted(false);

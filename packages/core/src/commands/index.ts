@@ -1,4 +1,5 @@
 export * from './add_graphs';
+export * from './base_command';
 export * from './command_manager';
 export * from './macro';
 export * from './select_cmd';

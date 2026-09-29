@@ -2,21 +2,22 @@ import { cloneDeep } from '@suika/common';
 import { type IMatrixArr } from '@suika/geo';
 
 import { type IParentIndex, type SuikaGraphics } from '../graphics';
-import { type ICommand } from './type';
+import { BaseCommand } from './base_command';
 
 export type ISetElementsAttrsType = Partial<{
   transform: IMatrixArr;
   parentIndex: IParentIndex;
 }>;
 
-export class ReparentGraphsCmd implements ICommand {
+export class ReparentGraphsCmd extends BaseCommand {
   static readonly type = 'SetElementsAttrs';
   constructor(
-    public desc: string,
+    desc: string,
     private elements: SuikaGraphics[],
     private attrs: ISetElementsAttrsType | ISetElementsAttrsType[],
     private prevAttrs: ISetElementsAttrsType[],
   ) {
+    super(desc);
     if (elements.length !== prevAttrs.length) {
       throw new Error(
         `elements 和 preAttrs 数量不匹配 ${elements.length} ${prevAttrs.length}`,

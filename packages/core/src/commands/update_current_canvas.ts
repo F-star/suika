@@ -1,15 +1,17 @@
 import { type SuikaEditor } from '../editor';
-import { type ICommand } from './type';
+import { BaseCommand } from './base_command';
 
-export class SwitchCurrentCanvasCmd implements ICommand {
+export class SwitchCurrentCanvasCmd extends BaseCommand {
   constructor(
-    public desc: string,
+    desc: string,
     private editor: SuikaEditor,
     private params: {
       id: string;
       prevId: string;
     },
-  ) {}
+  ) {
+    super(desc);
+  }
   redo() {
     this.editor.doc.setCurrentCanvas(this.params.id);
   }

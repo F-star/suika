@@ -1,17 +1,18 @@
 import { type SuikaEditor } from '../editor';
 import { type GraphicsAttrs } from '../graphics';
-import { type ICommand } from './type';
+import { BaseCommand } from './base_command';
 
-export class UpdateGraphicsAttrsCmd implements ICommand {
+export class UpdateGraphicsAttrsCmd extends BaseCommand {
   static readonly type = 'UpdateGraphicsAttrs';
   constructor(
-    public desc: string,
+    desc: string,
     private editor: SuikaEditor,
     private originAttrsMap: Map<string, Partial<GraphicsAttrs>>,
     private updatedAttrsMap: Map<string, Partial<GraphicsAttrs>>,
     private removedIds: Set<string> = new Set(),
     private newIds: Set<string> = new Set(),
   ) {
+    super(desc);
     if (originAttrsMap.size !== updatedAttrsMap.size) {
       console.warn(
         `originAttrsMap 和 updatedAttrsMap 数量不匹配 ${originAttrsMap.size} ${updatedAttrsMap.size}`,

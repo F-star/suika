@@ -57,16 +57,39 @@ const Editor: FC = () => {
     return desktop.onMenuCommand((command) => {
       if (command === 'open') {
         desktop.openDocument().then((file) => {
-          if (file) suikaEditor.setContents(JSON.parse(file.content));
+          if (file) {
+            suikaEditor.setContents(JSON.parse(file.content));
+            const historyId = suikaEditor.commandManager.getCurrentHistoryId();
+            desktop.markDocumentLoaded(historyId);
+          }
         });
       }
       if (command === 'save' || command === 'save-as') {
         desktop.saveDocument(
           suikaEditor.sceneGraph.toJSON(),
+          suikaEditor.commandManager.getCurrentHistoryId(),
           command === 'save-as',
         );
       }
     });
+  }, [suikaEditor]);
+
+  useEffect(() => {
+    const desktop = desktopFileService();
+    if (!desktop || !suikaEditor) return;
+
+    const syncDocumentHistoryId = () => {
+      const id = suikaEditor.commandManager.getCurrentHistoryId();
+      desktop.setDocumentHistoryId(id);
+    };
+
+    syncDocumentHistoryId();
+    const id = suikaEditor.commandManager.getCurrentHistoryId();
+    desktop.markDocumentLoaded(id);
+    suikaEditor.commandManager.on('change', syncDocumentHistoryId);
+    return () => {
+      suikaEditor.commandManager.off('change', syncDocumentHistoryId);
+    };
   }, [suikaEditor]);
 
   useEffect(() => {

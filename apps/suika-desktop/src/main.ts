@@ -5,6 +5,23 @@ import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
 
 let mainWindow: BrowserWindow | undefined;
 let documentPath: string | undefined;
+let currentDocHistoryId: string | undefined;
+let savedDocHistoryId: string | undefined;
+
+const isDocumentDirty = () =>
+  currentDocHistoryId !== undefined &&
+  currentDocHistoryId !== savedDocHistoryId;
+
+const updateWindowTitle = () => {
+  if (!mainWindow) return;
+
+  let fileName = 'Untitled';
+  if (documentPath) fileName = path.basename(documentPath);
+  if (isDocumentDirty()) {
+    fileName += ' *';
+  }
+  mainWindow.setTitle(fileName);
+};
 
 const createWindow = async () => {
   mainWindow = new BrowserWindow({
@@ -20,6 +37,7 @@ const createWindow = async () => {
       sandbox: true,
     },
   });
+  updateWindowTitle();
 
   const devServerUrl = process.env.SUIKA_DEV_SERVER_URL;
   if (devServerUrl) {
@@ -52,7 +70,11 @@ const openTextFile = async (filters: Electron.FileFilter[]) => {
   };
 };
 
-const saveDocument = async (content: string, saveAs: boolean) => {
+const saveDocument = async (
+  content: string,
+  historyId: string,
+  saveAs: boolean,
+) => {
   if (!mainWindow) return null;
   if (!documentPath || saveAs) {
     const result = await dialog.showSaveDialog(mainWindow, {
@@ -63,7 +85,8 @@ const saveDocument = async (content: string, saveAs: boolean) => {
     documentPath = result.filePath;
   }
   await writeFile(documentPath, content, 'utf8');
-  mainWindow.setTitle(`${path.basename(documentPath)} — Suika`);
+  savedDocHistoryId = historyId;
+  updateWindowTitle();
   return documentPath;
 };
 
@@ -102,16 +125,29 @@ app.whenReady().then(() => {
     ]);
     if (file) {
       documentPath = file.path;
-      mainWindow?.setTitle(`${file.name} — Suika`);
+      currentDocHistoryId = undefined;
+      savedDocHistoryId = undefined;
+      updateWindowTitle();
     }
     return file;
   });
   ipcMain.handle('svg:open', () =>
     openTextFile([{ name: 'SVG', extensions: ['svg'] }]),
   );
-  ipcMain.handle('document:save', (_event, content: string, saveAs: boolean) =>
-    saveDocument(content, saveAs),
+  ipcMain.handle(
+    'document:save',
+    (_event, content: string, historyId: string, saveAs: boolean) =>
+      saveDocument(content, historyId, saveAs),
   );
+  ipcMain.on('document:history-changed', (_event, historyId: string) => {
+    currentDocHistoryId = historyId;
+    updateWindowTitle();
+  });
+  ipcMain.on('document:loaded', (_event, historyId: string) => {
+    currentDocHistoryId = historyId;
+    savedDocHistoryId = historyId;
+    updateWindowTitle();
+  });
   ipcMain.handle(
     'export:save',
     async (_event, data: Uint8Array, suggestedName: string) => {

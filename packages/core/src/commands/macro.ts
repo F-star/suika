@@ -1,7 +1,10 @@
+import { BaseCommand } from './base_command';
 import { type ICommand } from './type';
 
-export class MacroCmd implements ICommand {
-  constructor(public desc: string, private cmds: ICommand[]) {}
+export class MacroCmd extends BaseCommand {
+  constructor(desc: string, private cmds: ICommand[]) {
+    super(desc);
+  }
 
   redo() {
     for (const cmd of this.cmds) {

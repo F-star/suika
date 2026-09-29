@@ -1,4 +1,4 @@
-import { EventEmitter } from '@suika/common';
+import { EventEmitter, genUuid } from '@suika/common';
 
 import { type SuikaEditor } from '../editor';
 import { type ICommand } from './type';
@@ -34,6 +34,7 @@ export class CommandManager {
   private isEnableRedoUndo = true;
   private emitter = new EventEmitter<Events>();
   private isBatching = false;
+  private rootHistoryId = genUuid();
 
   constructor(private editor: SuikaEditor) {}
 
@@ -158,6 +159,13 @@ export class CommandManager {
       canUndo: this.undoStack.length > 0,
     };
   }
+  getCurrentHistoryId() {
+    if (this.undoStack.length === 0) {
+      return this.rootHistoryId;
+    }
+    const cmd = this.undoStack[this.undoStack.length - 1];
+    return cmd.command.id;
+  }
   on<T extends keyof Events>(eventName: T, listener: Events[T]) {
     this.emitter.on(eventName, listener);
   }
@@ -167,6 +175,7 @@ export class CommandManager {
   clearRecords() {
     this.redoStack = [];
     this.undoStack = [];
+    this.rootHistoryId = genUuid();
     this.emitStatusChange();
   }
 }

@@ -3,7 +3,7 @@ import { type IMatrixArr, type IPathItem } from '@suika/geo';
 
 import { type IParentIndex, type SuikaGraphics } from '../graphics';
 import { type IPaint } from '../paint';
-import { type ICommand } from './type';
+import { BaseCommand } from './base_command';
 
 export type ISetElementsAttrsType = Partial<{
   x: number;
@@ -26,14 +26,15 @@ export type ISetElementsAttrsType = Partial<{
   parentIndex: IParentIndex;
 }>;
 
-export class SetGraphsAttrsCmd implements ICommand {
+export class SetGraphsAttrsCmd extends BaseCommand {
   static readonly type = 'SetElementsAttrs';
   constructor(
-    public desc: string,
+    desc: string,
     private elements: SuikaGraphics[],
     private attrs: ISetElementsAttrsType | ISetElementsAttrsType[],
     private prevAttrs: ISetElementsAttrsType[],
   ) {
+    super(desc);
     if (elements.length !== prevAttrs.length) {
       throw new Error(
         `elements 和 preAttrs 数量不匹配 ${elements.length} ${prevAttrs.length}`,

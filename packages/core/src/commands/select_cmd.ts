@@ -1,15 +1,17 @@
 import { type SuikaEditor } from '../editor';
-import { type ICommand } from './type';
+import { BaseCommand } from './base_command';
 
-export class SelectCmd implements ICommand {
+export class SelectCmd extends BaseCommand {
   constructor(
-    public desc: string,
+    desc: string,
     private editor: SuikaEditor,
     private params: {
       items: Set<string>;
       prevItems: Set<string>;
     },
-  ) {}
+  ) {
+    super(desc);
+  }
 
   redo() {
     this.editor.selectedElements.setItemsById(this.params.items);
