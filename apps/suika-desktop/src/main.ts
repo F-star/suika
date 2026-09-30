@@ -189,6 +189,56 @@ const buildMenu = () => {
   return Menu.buildFromTemplate(template);
 };
 
+/** Document paths passed on the command line, e.g. by the OS on Windows and Linux. */
+const getFilePathsFromArgv = (argv: string[], workingDirectory: string) =>
+  argv
+    .slice(1)
+    .filter(
+      (arg) =>
+        !arg.startsWith('-') && path.extname(arg).toLowerCase() === '.suika',
+    )
+    .map((arg) => path.resolve(workingDirectory, arg));
+
+let isAppReady = false;
+const pendingFilePaths: string[] = [];
+
+/**
+ * Opens files handed over by the OS in the focused window, falling back to
+ * any window or a new one. Files are opened one by one so the same file is
+ * never opened twice. With no files, just brings a window to the front.
+ */
+const openFilePaths = async (filePaths: string[]) => {
+  if (!isAppReady) {
+    pendingFilePaths.push(...filePaths);
+    return;
+  }
+  const appWindow =
+    AppWindow.fromBaseWindow(BaseWindow.getFocusedWindow() ?? undefined) ??
+    AppWindow.all()[0] ??
+    createWindow();
+  if (appWindow.window.isMinimized()) appWindow.window.restore();
+  appWindow.window.focus();
+  for (const filePath of filePaths) {
+    await openDocumentPath(appWindow, filePath);
+  }
+};
+
+// Windows and Linux start a new process for every opened file; hand the file
+// over to the running instance instead.
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
+if (!hasSingleInstanceLock) app.quit();
+
+app.on('second-instance', (_event, argv, workingDirectory) => {
+  openFilePaths(getFilePathsFromArgv(argv, workingDirectory));
+});
+
+// macOS: double-clicking a document or dropping it on the Dock icon. May fire
+// before the app is ready when the app is launched this way.
+app.on('open-file', (event, filePath) => {
+  event.preventDefault();
+  openFilePaths([filePath]);
+});
+
 let isQuitConfirmed = false;
 
 app.on('before-quit', (event) => {
@@ -206,6 +256,8 @@ app.on('before-quit', (event) => {
 });
 
 app.whenReady().then(() => {
+  if (!hasSingleInstanceLock) return;
+
   Menu.setApplicationMenu(buildMenu());
 
   ipcMain.handle('document:open', (event) =>
@@ -302,7 +354,21 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('document:open-paths', async (event, filePaths: string[]) => {
+    const appWindow = AppWindow.fromWebContents(event.sender);
+    if (!appWindow) return;
+    for (const filePath of filePaths) {
+      await openDocumentPath(appWindow, filePath);
+    }
+  });
+
+  isAppReady = true;
   createWindow();
+  const initialFilePaths = [
+    ...pendingFilePaths.splice(0),
+    ...getFilePathsFromArgv(process.argv, process.cwd()),
+  ];
+  if (initialFilePaths.length > 0) openFilePaths(initialFilePaths);
   app.on('activate', () => {
     if (BaseWindow.getAllWindows().length === 0) createWindow();
   });

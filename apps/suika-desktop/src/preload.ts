@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 import type { DocumentContent } from './document-session';
+import { handleFileDrops } from './file-drop';
 
 contextBridge.exposeInMainWorld('suikaDesktop', {
   openDocument: () => ipcRenderer.invoke('document:open'),
@@ -22,3 +23,5 @@ contextBridge.exposeInMainWorld('suikaDesktop', {
       ipcRenderer.removeListener('document:content-request', handler);
   },
 });
+
+handleFileDrops();

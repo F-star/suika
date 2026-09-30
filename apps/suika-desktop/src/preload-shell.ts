@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 import type { ShellState } from './app-window';
+import { handleFileDrops } from './file-drop';
 
 const subscribe = <T extends unknown[]>(
   channel: string,
@@ -32,3 +33,5 @@ contextBridge.exposeInMainWorld('suikaShell', {
   showRecentFileMenu: (filePath: string) =>
     ipcRenderer.send('recent:show-menu', filePath),
 });
+
+handleFileDrops();

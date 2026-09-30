@@ -6,6 +6,7 @@ import {
   type BaseWindowConstructorOptions,
   dialog,
   Menu,
+  shell,
   type WebContents,
   WebContentsView,
 } from 'electron';
@@ -53,8 +54,8 @@ const titleBarOptions: BaseWindowConstructorOptions =
         },
       };
 
-const createView = (preload: string) =>
-  new WebContentsView({
+const createView = (preload: string) => {
+  const view = new WebContentsView({
     webPreferences: {
       preload: path.join(__dirname, preload),
       contextIsolation: true,
@@ -62,6 +63,15 @@ const createView = (preload: string) =>
       sandbox: true,
     },
   });
+  // Navigating away would discard the document, e.g. after dropping a file
+  // or clicking a link. Web links open in the default browser instead.
+  view.webContents.on('will-navigate', (event) => event.preventDefault());
+  view.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  return view;
+};
 
 const loadRendererPage = (
   webContents: WebContents,

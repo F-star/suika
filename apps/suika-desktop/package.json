@@ -16,7 +16,15 @@
     "extraMetadata": { "main": "dist/main.cjs" },
     "mac": { "target": ["dmg"] },
     "win": { "target": ["nsis"] },
-    "linux": { "target": ["AppImage"] }
+    "linux": { "target": ["AppImage"] },
+    "fileAssociations": [
+      {
+        "ext": "suika",
+        "name": "Suika Document",
+        "role": "Editor",
+        "mimeType": "application/x-suika"
+      }
+    ]
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
