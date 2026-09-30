@@ -27,11 +27,12 @@ export class DocumentSession {
     );
   }
 
+  get fileName() {
+    return this._filePath ? path.basename(this._filePath) : 'Untitled';
+  }
+
   get title() {
-    const fileName = this._filePath
-      ? path.basename(this._filePath)
-      : 'Untitled';
-    return this.isDirty ? `${fileName} *` : fileName;
+    return this.isDirty ? `${this.fileName} *` : this.fileName;
   }
 
   /** The history baseline is reset until the renderer reports it via markLoaded. */

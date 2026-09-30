@@ -1,64 +1,30 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import {
-  app,
-  type BaseWindow,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  Menu,
-} from 'electron';
+import { app, BaseWindow, dialog, ipcMain, Menu } from 'electron';
 
-import {
-  createDocumentSession,
-  type DocumentSession,
-  getDocumentSession,
-} from './document-session';
+import { AppWindow } from './app-window';
+import { type DocumentSession, getDocumentSession } from './document-session';
 
-const updateWindowTitle = (session: DocumentSession) => {
-  BrowserWindow.fromWebContents(session.webContents)?.setTitle(session.title);
-};
-
-const createWindow = async () => {
-  const window = new BrowserWindow({
-    width: 1440,
-    height: 900,
-    minWidth: 1024,
-    minHeight: 700,
-    title: 'Suika',
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.cjs'),
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true,
-    },
-  });
-  const session = createDocumentSession(window.webContents, updateWindowTitle);
-  updateWindowTitle(session);
-
-  const devServerUrl = process.env.SUIKA_DEV_SERVER_URL;
-  if (devServerUrl) {
-    await window.loadURL(devServerUrl);
-    window.webContents.openDevTools({ mode: 'detach' });
-  } else {
-    await window.loadFile(
-      path.join(process.resourcesPath, 'renderer/index.html'),
-    );
-  }
+const createWindow = () => {
+  new AppWindow().openEditorTab();
 };
 
 const sendRendererCommand = (
   window: BaseWindow | undefined,
   command: string,
 ) => {
-  if (window instanceof BrowserWindow) {
-    window.webContents.send('menu:command', command);
-  }
+  AppWindow.fromBaseWindow(window)?.activeTab?.view.webContents.send(
+    'menu:command',
+    command,
+  );
 };
 
+const getOwnerWindow = (webContents: Electron.WebContents) =>
+  AppWindow.fromWebContents(webContents)?.window;
+
 const openTextFile = async (
-  window: BrowserWindow,
+  window: BaseWindow,
   filters: Electron.FileFilter[],
 ) => {
   const result = await dialog.showOpenDialog(window, {
@@ -77,7 +43,7 @@ const openTextFile = async (
 
 const saveDocument = async (
   session: DocumentSession,
-  window: BrowserWindow,
+  window: BaseWindow,
   content: string,
   historyId: string,
   saveAs: boolean,
@@ -127,7 +93,7 @@ app.whenReady().then(() => {
   );
   ipcMain.handle('document:open', async (event) => {
     const session = getDocumentSession(event.sender);
-    const window = BrowserWindow.fromWebContents(event.sender);
+    const window = getOwnerWindow(event.sender);
     if (!session || !window) return null;
 
     const file = await openTextFile(window, [
@@ -137,7 +103,7 @@ app.whenReady().then(() => {
     return file;
   });
   ipcMain.handle('svg:open', (event) => {
-    const window = BrowserWindow.fromWebContents(event.sender);
+    const window = getOwnerWindow(event.sender);
     if (!window) return null;
     return openTextFile(window, [{ name: 'SVG', extensions: ['svg'] }]);
   });
@@ -145,7 +111,7 @@ app.whenReady().then(() => {
     'document:save',
     (event, content: string, historyId: string, saveAs: boolean) => {
       const session = getDocumentSession(event.sender);
-      const window = BrowserWindow.fromWebContents(event.sender);
+      const window = getOwnerWindow(event.sender);
       if (!session || !window) return null;
       return saveDocument(session, window, content, historyId, saveAs);
     },
@@ -159,7 +125,7 @@ app.whenReady().then(() => {
   ipcMain.handle(
     'export:save',
     async (event, data: Uint8Array, suggestedName: string) => {
-      const window = BrowserWindow.fromWebContents(event.sender);
+      const window = getOwnerWindow(event.sender);
       if (!window) return null;
       const result = await dialog.showSaveDialog(window, {
         defaultPath: suggestedName,
@@ -170,9 +136,17 @@ app.whenReady().then(() => {
     },
   );
 
+  ipcMain.handle(
+    'shell:get-tabs',
+    (event) => AppWindow.fromShell(event.sender)?.getTabInfos() ?? [],
+  );
+  ipcMain.on('shell:activate-tab', (event, id: string) => {
+    AppWindow.fromShell(event.sender)?.activateTab(id);
+  });
+
   createWindow();
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BaseWindow.getAllWindows().length === 0) createWindow();
   });
 });
 

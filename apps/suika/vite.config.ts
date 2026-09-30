@@ -20,5 +20,12 @@ export default defineConfig({
   build: {
     outDir: 'build',
     cssCodeSplit: false,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        // Tab bar of the desktop app.
+        shell: path.resolve(__dirname, 'shell.html'),
+      },
+    },
   },
 });

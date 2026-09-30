@@ -5,7 +5,7 @@
   "main": "dist/main.cjs",
   "scripts": {
     "dev": "pnpm --filter @suika/core build && pnpm build:main && cross-env SUIKA_DEV_SERVER_URL=http://localhost:6167 concurrently -k \"pnpm --filter @suika/suika dev\" \"wait-on http://localhost:6167 && electron .\"",
-    "build:main": "esbuild src/main.ts src/preload.ts --bundle --platform=node --target=node20 --external:electron --outdir=dist --out-extension:.js=.cjs",
+    "build:main": "esbuild src/main.ts src/preload.ts src/preload-shell.ts --bundle --platform=node --target=node20 --external:electron --outdir=dist --out-extension:.js=.cjs",
     "build": "pnpm --filter @suika/suika build && pnpm build:main && electron-builder"
   },
   "build": {
