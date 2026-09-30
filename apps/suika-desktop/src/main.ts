@@ -1,30 +1,27 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
+import {
+  app,
+  type BaseWindow,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+} from 'electron';
 
-let mainWindow: BrowserWindow | undefined;
-let documentPath: string | undefined;
-let currentDocHistoryId: string | undefined;
-let savedDocHistoryId: string | undefined;
+import {
+  createDocumentSession,
+  type DocumentSession,
+  getDocumentSession,
+} from './document-session';
 
-const isDocumentDirty = () =>
-  currentDocHistoryId !== undefined &&
-  currentDocHistoryId !== savedDocHistoryId;
-
-const updateWindowTitle = () => {
-  if (!mainWindow) return;
-
-  let fileName = 'Untitled';
-  if (documentPath) fileName = path.basename(documentPath);
-  if (isDocumentDirty()) {
-    fileName += ' *';
-  }
-  mainWindow.setTitle(fileName);
+const updateWindowTitle = (session: DocumentSession) => {
+  BrowserWindow.fromWebContents(session.webContents)?.setTitle(session.title);
 };
 
 const createWindow = async () => {
-  mainWindow = new BrowserWindow({
+  const window = new BrowserWindow({
     width: 1440,
     height: 900,
     minWidth: 1024,
@@ -37,26 +34,34 @@ const createWindow = async () => {
       sandbox: true,
     },
   });
-  updateWindowTitle();
+  const session = createDocumentSession(window.webContents, updateWindowTitle);
+  updateWindowTitle(session);
 
   const devServerUrl = process.env.SUIKA_DEV_SERVER_URL;
   if (devServerUrl) {
-    await mainWindow.loadURL(devServerUrl);
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
+    await window.loadURL(devServerUrl);
+    window.webContents.openDevTools({ mode: 'detach' });
   } else {
-    await mainWindow.loadFile(
+    await window.loadFile(
       path.join(process.resourcesPath, 'renderer/index.html'),
     );
   }
 };
 
-const sendRendererCommand = (command: string) => {
-  mainWindow?.webContents.send('menu:command', command);
+const sendRendererCommand = (
+  window: BaseWindow | undefined,
+  command: string,
+) => {
+  if (window instanceof BrowserWindow) {
+    window.webContents.send('menu:command', command);
+  }
 };
 
-const openTextFile = async (filters: Electron.FileFilter[]) => {
-  if (!mainWindow) return null;
-  const result = await dialog.showOpenDialog(mainWindow, {
+const openTextFile = async (
+  window: BrowserWindow,
+  filters: Electron.FileFilter[],
+) => {
+  const result = await dialog.showOpenDialog(window, {
     properties: ['openFile'],
     filters,
   });
@@ -71,23 +76,24 @@ const openTextFile = async (filters: Electron.FileFilter[]) => {
 };
 
 const saveDocument = async (
+  session: DocumentSession,
+  window: BrowserWindow,
   content: string,
   historyId: string,
   saveAs: boolean,
 ) => {
-  if (!mainWindow) return null;
-  if (!documentPath || saveAs) {
-    const result = await dialog.showSaveDialog(mainWindow, {
-      defaultPath: documentPath ?? 'design.suika',
+  let filePath = session.filePath;
+  if (!filePath || saveAs) {
+    const result = await dialog.showSaveDialog(window, {
+      defaultPath: filePath ?? 'design.suika',
       filters: [{ name: 'Suika document', extensions: ['suika'] }],
     });
     if (result.canceled || !result.filePath) return null;
-    documentPath = result.filePath;
+    filePath = result.filePath;
   }
-  await writeFile(documentPath, content, 'utf8');
-  savedDocHistoryId = historyId;
-  updateWindowTitle();
-  return documentPath;
+  await writeFile(filePath, content, 'utf8');
+  session.markSaved(filePath, historyId);
+  return filePath;
 };
 
 app.whenReady().then(() => {
@@ -99,17 +105,17 @@ app.whenReady().then(() => {
           {
             label: 'Open…',
             accelerator: 'CommandOrControl+O',
-            click: () => sendRendererCommand('open'),
+            click: (_item, window) => sendRendererCommand(window, 'open'),
           },
           {
             label: 'Save',
             accelerator: 'CommandOrControl+S',
-            click: () => sendRendererCommand('save'),
+            click: (_item, window) => sendRendererCommand(window, 'save'),
           },
           {
             label: 'Save As…',
             accelerator: 'CommandOrControl+Shift+S',
-            click: () => sendRendererCommand('save-as'),
+            click: (_item, window) => sendRendererCommand(window, 'save-as'),
           },
           { type: 'separator' },
           { role: 'quit' },
@@ -119,40 +125,43 @@ app.whenReady().then(() => {
       { role: 'windowMenu' },
     ]),
   );
-  ipcMain.handle('document:open', async () => {
-    const file = await openTextFile([
+  ipcMain.handle('document:open', async (event) => {
+    const session = getDocumentSession(event.sender);
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!session || !window) return null;
+
+    const file = await openTextFile(window, [
       { name: 'Suika document', extensions: ['suika'] },
     ]);
-    if (file) {
-      documentPath = file.path;
-      currentDocHistoryId = undefined;
-      savedDocHistoryId = undefined;
-      updateWindowTitle();
-    }
+    if (file) session.open(file.path);
     return file;
   });
-  ipcMain.handle('svg:open', () =>
-    openTextFile([{ name: 'SVG', extensions: ['svg'] }]),
-  );
+  ipcMain.handle('svg:open', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return null;
+    return openTextFile(window, [{ name: 'SVG', extensions: ['svg'] }]);
+  });
   ipcMain.handle(
     'document:save',
-    (_event, content: string, historyId: string, saveAs: boolean) =>
-      saveDocument(content, historyId, saveAs),
+    (event, content: string, historyId: string, saveAs: boolean) => {
+      const session = getDocumentSession(event.sender);
+      const window = BrowserWindow.fromWebContents(event.sender);
+      if (!session || !window) return null;
+      return saveDocument(session, window, content, historyId, saveAs);
+    },
   );
-  ipcMain.on('document:history-changed', (_event, historyId: string) => {
-    currentDocHistoryId = historyId;
-    updateWindowTitle();
+  ipcMain.on('document:history-changed', (event, historyId: string) => {
+    getDocumentSession(event.sender)?.setHistoryId(historyId);
   });
-  ipcMain.on('document:loaded', (_event, historyId: string) => {
-    currentDocHistoryId = historyId;
-    savedDocHistoryId = historyId;
-    updateWindowTitle();
+  ipcMain.on('document:loaded', (event, historyId: string) => {
+    getDocumentSession(event.sender)?.markLoaded(historyId);
   });
   ipcMain.handle(
     'export:save',
-    async (_event, data: Uint8Array, suggestedName: string) => {
-      if (!mainWindow) return null;
-      const result = await dialog.showSaveDialog(mainWindow, {
+    async (event, data: Uint8Array, suggestedName: string) => {
+      const window = BrowserWindow.fromWebContents(event.sender);
+      if (!window) return null;
+      const result = await dialog.showSaveDialog(window, {
         defaultPath: suggestedName,
       });
       if (result.canceled || !result.filePath) return null;
