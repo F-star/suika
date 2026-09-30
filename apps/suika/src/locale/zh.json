@@ -111,5 +111,10 @@
   "align.right": "右对齐",
   "align.top": "顶部对齐",
   "align.verticalCenter": "上下居中对齐",
-  "align.bottom": "底部对齐"
+  "align.bottom": "底部对齐",
+
+  "home": "主页",
+  "home.newFile": "新建文件",
+  "home.recentFiles": "最近文件",
+  "home.noRecentFiles": "暂无最近文件"
 }

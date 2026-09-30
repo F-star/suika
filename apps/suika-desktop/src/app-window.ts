@@ -5,6 +5,7 @@ import {
   BaseWindow,
   type BaseWindowConstructorOptions,
   dialog,
+  Menu,
   type WebContents,
   WebContentsView,
 } from 'electron';
@@ -25,6 +26,14 @@ export interface TabInfo {
   isDirty: boolean;
   isActive: boolean;
 }
+
+export interface ShellState {
+  tabs: TabInfo[];
+  isHomeActive: boolean;
+}
+
+/** Menu items that only apply to a document tab, not to Home. */
+const DOCUMENT_MENU_ITEM_IDS = ['save', 'save-as'];
 
 interface Tab {
   id: string;
@@ -69,9 +78,10 @@ const loadRendererPage = (
 const appWindows = new Set<AppWindow>();
 
 /**
- * A native window made of a shell view (tab bar, drawn at the bottom and
- * filling the window) and one editor view per tab stacked below the tab bar.
- * Only the active tab's editor view is visible.
+ * A native window made of a shell view (tab bar and Home, drawn at the bottom
+ * and filling the window) and one editor view per tab stacked below the tab
+ * bar. Only the active tab's editor view is visible; when Home is active, all
+ * editor views are hidden and the shell's Home page shows through.
  */
 export class AppWindow {
   static all() {
@@ -98,6 +108,7 @@ export class AppWindow {
   readonly window: BaseWindow;
   private readonly shellView: WebContentsView;
   private tabs: Tab[] = [];
+  /** Undefined when Home is active. */
   private activeTabId: string | undefined;
   private closingTabIds = new Set<string>();
   private closeConfirmation: Promise<boolean> | undefined;
@@ -117,6 +128,7 @@ export class AppWindow {
     loadRendererPage(this.shellView.webContents, 'shell.html');
 
     this.window.on('resize', () => this.layout());
+    this.window.on('focus', () => this.updateMenuState());
     this.window.on('close', (event) => {
       if (this.isCloseConfirmed || !this.hasDirtyTabs()) return;
       event.preventDefault();
@@ -164,22 +176,22 @@ export class AppWindow {
 
   activateTab(id: string) {
     if (!this.tabs.some((tab) => tab.id === id)) return;
-
-    this.activeTabId = id;
-    for (const tab of this.tabs) tab.view.setVisible(tab.id === id);
-    this.layout();
-    this.activeTab?.view.webContents.focus();
-    this.handleTabsChange();
+    this.setActiveTabId(id);
   }
 
-  /** Activates the tab `offset` positions away from the active one, wrapping around. */
+  activateHome() {
+    this.setActiveTabId(undefined);
+  }
+
+  /**
+   * Activates the tab `offset` positions away from the active one, wrapping
+   * around. Home counts as the position before the first tab.
+   */
   activateAdjacentTab(offset: number) {
-    if (this.tabs.length === 0) return;
-    const index = this.tabs.findIndex((tab) => tab.id === this.activeTabId);
-    const count = this.tabs.length;
-    this.activateTab(
-      this.tabs[(((index + offset) % count) + count) % count].id,
-    );
+    const ids = [undefined, ...this.tabs.map((tab) => tab.id)];
+    const count = ids.length;
+    const index = ids.indexOf(this.activeTabId);
+    this.setActiveTabId(ids[(((index + offset) % count) + count) % count]);
   }
 
   /** Resolves false if the user canceled closing a tab with unsaved changes. */
@@ -225,13 +237,22 @@ export class AppWindow {
     this.isCloseConfirmed = true;
   }
 
-  getTabInfos(): TabInfo[] {
-    return this.tabs.map((tab) => ({
-      id: tab.id,
-      title: tab.session.fileName,
-      isDirty: tab.session.isDirty,
-      isActive: tab.id === this.activeTabId,
-    }));
+  getShellState(): ShellState {
+    return {
+      tabs: this.tabs.map((tab) => ({
+        id: tab.id,
+        title: tab.session.fileName,
+        isDirty: tab.session.isDirty,
+        isActive: tab.id === this.activeTabId,
+      })),
+      isHomeActive: this.activeTabId === undefined,
+    };
+  }
+
+  sendToShell(channel: string, ...args: unknown[]) {
+    if (!this.shellView.webContents.isDestroyed()) {
+      this.shellView.webContents.send(channel, ...args);
+    }
   }
 
   private hasDirtyTabs() {
@@ -261,7 +282,7 @@ export class AppWindow {
     tab.view.webContents.close();
 
     if (this.tabs.length === 0) {
-      this.window.close();
+      this.activateHome();
     } else if (tab.id === this.activeTabId) {
       this.activateTab(this.tabs[Math.min(index, this.tabs.length - 1)].id);
     } else {
@@ -273,10 +294,27 @@ export class AppWindow {
     return this.shellView.webContents === webContents;
   }
 
+  private setActiveTabId(id: string | undefined) {
+    this.activeTabId = id;
+    for (const tab of this.tabs) tab.view.setVisible(tab.id === id);
+    this.layout();
+    (this.activeTab?.view ?? this.shellView).webContents.focus();
+    this.handleTabsChange();
+  }
+
   private handleTabsChange() {
     this.window.setTitle(this.activeTab?.session.title ?? 'Suika');
-    if (!this.shellView.webContents.isDestroyed()) {
-      this.shellView.webContents.send('tabs:changed', this.getTabInfos());
+    this.sendToShell('shell:state-changed', this.getShellState());
+    this.updateMenuState();
+  }
+
+  /** The application menu is shared, so only the focused window updates it. */
+  private updateMenuState() {
+    if (!this.window.isFocused()) return;
+    const menu = Menu.getApplicationMenu();
+    for (const id of DOCUMENT_MENU_ITEM_IDS) {
+      const item = menu?.getMenuItemById(id);
+      if (item) item.enabled = !!this.activeTab;
     }
   }
 

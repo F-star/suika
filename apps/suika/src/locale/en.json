@@ -112,5 +112,10 @@
   "align.right": "Align right",
   "align.top": "Align top",
   "align.verticalCenter": "Align vertical centers",
-  "align.bottom": "Align bottom"
+  "align.bottom": "Align bottom",
+
+  "home": "Home",
+  "home.newFile": "New File",
+  "home.recentFiles": "Recent Files",
+  "home.noRecentFiles": "No recent files"
 }

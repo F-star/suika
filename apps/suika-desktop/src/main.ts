@@ -8,6 +8,7 @@ import {
   ipcMain,
   Menu,
   type MenuItemConstructorOptions,
+  shell,
 } from 'electron';
 
 import { AppWindow } from './app-window';
@@ -16,14 +17,18 @@ import {
   getDocumentSession,
   resolveContentRequest,
 } from './document-session';
+import {
+  addRecentFile,
+  isRecentFile,
+  listRecentFiles,
+  onRecentFilesChange,
+  removeRecentFile,
+} from './recent-files';
 
 const SUIKA_FILE_FILTERS = [{ name: 'Suika document', extensions: ['suika'] }];
 
-const createWindow = () => {
-  const appWindow = new AppWindow();
-  appWindow.openEditorTab();
-  return appWindow;
-};
+/** New windows start on Home. */
+const createWindow = () => new AppWindow();
 
 const getOwnerWindow = (webContents: Electron.WebContents) =>
   AppWindow.fromWebContents(webContents)?.window;
@@ -49,6 +54,7 @@ const openDocumentPath = async (
     return;
   }
 
+  addRecentFile(filePath);
   for (const existingWindow of AppWindow.all()) {
     const tab = existingWindow.findTabByPath(filePath);
     if (tab) {
@@ -106,9 +112,9 @@ const buildMenu = () => {
           label: 'New File',
           accelerator: 'CommandOrControl+N',
           click: (_item, window) => {
-            const appWindow = AppWindow.fromBaseWindow(window);
-            if (appWindow) appWindow.openEditorTab();
-            else createWindow();
+            (
+              AppWindow.fromBaseWindow(window) ?? createWindow()
+            ).openEditorTab();
           },
         },
         {
@@ -119,11 +125,13 @@ const buildMenu = () => {
         },
         { type: 'separator' },
         {
+          id: 'save',
           label: 'Save',
           accelerator: 'CommandOrControl+S',
           click: (_item, window) => saveActiveTab(window, false),
         },
         {
+          id: 'save-as',
           label: 'Save As…',
           accelerator: 'CommandOrControl+Shift+S',
           click: (_item, window) => saveActiveTab(window, true),
@@ -135,7 +143,9 @@ const buildMenu = () => {
           click: (_item, window) => {
             const appWindow = AppWindow.fromBaseWindow(window);
             const tab = appWindow?.activeTab;
+            // On Home there is no tab to close, so close the window instead.
             if (tab) appWindow.closeTab(tab.id);
+            else window?.close();
           },
         },
         ...(isMac
@@ -244,10 +254,12 @@ app.whenReady().then(() => {
     },
   );
 
-  ipcMain.handle(
-    'shell:get-tabs',
-    (event) => AppWindow.fromShell(event.sender)?.getTabInfos() ?? [],
+  ipcMain.handle('shell:get-state', (event) =>
+    AppWindow.fromShell(event.sender)?.getShellState(),
   );
+  ipcMain.on('shell:activate-home', (event) => {
+    AppWindow.fromShell(event.sender)?.activateHome();
+  });
   ipcMain.on('shell:activate-tab', (event, id: string) => {
     AppWindow.fromShell(event.sender)?.activateTab(id);
   });
@@ -256,6 +268,38 @@ app.whenReady().then(() => {
   });
   ipcMain.on('shell:new-tab', (event) => {
     AppWindow.fromShell(event.sender)?.openEditorTab();
+  });
+  ipcMain.on('shell:open-file', (event) => {
+    const appWindow = AppWindow.fromShell(event.sender);
+    if (appWindow) openDocument(appWindow);
+  });
+
+  ipcMain.handle('recent:list', () => listRecentFiles());
+  ipcMain.on('recent:open', async (event, filePath: string) => {
+    const appWindow = AppWindow.fromShell(event.sender);
+    if (appWindow && (await isRecentFile(filePath))) {
+      openDocumentPath(appWindow, filePath);
+    }
+  });
+  ipcMain.on('recent:show-menu', async (event, filePath: string) => {
+    const appWindow = AppWindow.fromShell(event.sender);
+    if (!appWindow || !(await isRecentFile(filePath))) return;
+    Menu.buildFromTemplate([
+      {
+        label:
+          process.platform === 'darwin' ? 'Show in Finder' : 'Show in Folder',
+        click: () => shell.showItemInFolder(filePath),
+      },
+      {
+        label: 'Remove from Recent',
+        click: () => removeRecentFile(filePath),
+      },
+    ]).popup({ window: appWindow.window });
+  });
+  onRecentFilesChange(() => {
+    for (const appWindow of AppWindow.all()) {
+      appWindow.sendToShell('recent:changed');
+    }
   });
 
   createWindow();

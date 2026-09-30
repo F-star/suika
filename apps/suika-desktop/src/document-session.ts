@@ -3,6 +3,8 @@ import path from 'node:path';
 
 import { type BaseWindow, dialog, type WebContents } from 'electron';
 
+import { addRecentFile } from './recent-files';
+
 export interface DocumentContent {
   content: string;
   historyId: string;
@@ -104,6 +106,7 @@ export class DocumentSession {
     this._filePath = await realpath(filePath);
     this.savedHistoryId = historyId;
     this.onChange(this);
+    addRecentFile(this._filePath);
     return this._filePath;
   }
 
