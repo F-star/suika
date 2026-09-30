@@ -1,6 +1,26 @@
+import { realpath, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import type { WebContents } from 'electron';
+import { type BaseWindow, dialog, type WebContents } from 'electron';
+
+export interface DocumentContent {
+  content: string;
+  historyId: string;
+}
+
+let nextContentRequestId = 0;
+const pendingContentRequests = new Map<
+  number,
+  (content: DocumentContent | undefined) => void
+>();
+
+/** Resolves a request sent by DocumentSession.requestContent. */
+export const resolveContentRequest = (
+  requestId: number,
+  content: DocumentContent,
+) => {
+  pendingContentRequests.get(requestId)?.(content);
+};
 
 /**
  * State of one document opened in one renderer (webContents): file path and
@@ -20,15 +40,15 @@ export class DocumentSession {
     return this._filePath;
   }
 
+  get fileName() {
+    return this._filePath ? path.basename(this._filePath) : 'Untitled';
+  }
+
   get isDirty() {
     return (
       this.currentHistoryId !== undefined &&
       this.currentHistoryId !== this.savedHistoryId
     );
-  }
-
-  get fileName() {
-    return this._filePath ? path.basename(this._filePath) : 'Untitled';
   }
 
   get title() {
@@ -54,10 +74,55 @@ export class DocumentSession {
     this.onChange(this);
   }
 
-  markSaved(filePath: string, historyId: string) {
-    this._filePath = filePath;
+  /** Asks the renderer for the document and saves it. Resolves false if not saved. */
+  async save(window: BaseWindow, saveAs = false) {
+    const doc = await this.requestContent();
+    if (!doc) return false;
+    return (
+      (await this.saveContent(window, doc.content, doc.historyId, saveAs)) !==
+      null
+    );
+  }
+
+  /** Resolves the saved path, or null if the save dialog was canceled. */
+  async saveContent(
+    window: BaseWindow,
+    content: string,
+    historyId: string,
+    saveAs: boolean,
+  ) {
+    let filePath = this._filePath;
+    if (!filePath || saveAs) {
+      const result = await dialog.showSaveDialog(window, {
+        defaultPath: filePath ?? 'design.suika',
+        filters: [{ name: 'Suika document', extensions: ['suika'] }],
+      });
+      if (result.canceled || !result.filePath) return null;
+      filePath = result.filePath;
+    }
+    await writeFile(filePath, content, 'utf8');
+    this._filePath = await realpath(filePath);
     this.savedHistoryId = historyId;
     this.onChange(this);
+    return this._filePath;
+  }
+
+  /** Resolves undefined if the renderer is destroyed before replying. */
+  private requestContent() {
+    return new Promise<DocumentContent | undefined>((resolve) => {
+      if (this.webContents.isDestroyed()) return resolve(undefined);
+
+      const requestId = ++nextContentRequestId;
+      const handleDestroyed = () => settle(undefined);
+      const settle = (content: DocumentContent | undefined) => {
+        pendingContentRequests.delete(requestId);
+        this.webContents.off('destroyed', handleDestroyed);
+        resolve(content);
+      };
+      pendingContentRequests.set(requestId, settle);
+      this.webContents.once('destroyed', handleDestroyed);
+      this.webContents.send('document:content-request', requestId);
+    });
   }
 }
 

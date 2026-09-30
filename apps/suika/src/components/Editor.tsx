@@ -54,24 +54,10 @@ const Editor: FC = () => {
     const desktop = desktopFileService();
     if (!desktop || !suikaEditor) return;
 
-    return desktop.onMenuCommand((command) => {
-      if (command === 'open') {
-        desktop.openDocument().then((file) => {
-          if (file) {
-            suikaEditor.setContents(JSON.parse(file.content));
-            const historyId = suikaEditor.commandManager.getCurrentHistoryId();
-            desktop.markDocumentLoaded(historyId);
-          }
-        });
-      }
-      if (command === 'save' || command === 'save-as') {
-        desktop.saveDocument(
-          suikaEditor.sceneGraph.toJSON(),
-          suikaEditor.commandManager.getCurrentHistoryId(),
-          command === 'save-as',
-        );
-      }
-    });
+    return desktop.onContentRequest(() => ({
+      content: suikaEditor.sceneGraph.toJSON(),
+      historyId: suikaEditor.commandManager.getCurrentHistoryId(),
+    }));
   }, [suikaEditor]);
 
   useEffect(() => {
@@ -123,6 +109,8 @@ const Editor: FC = () => {
         await fontManager.loadFonts(FONT_FILES);
 
         const pathTool = new PathTool(await initPathKit());
+        const initialDocument =
+          await desktopFileService()?.getInitialDocument();
 
         setProgress(100);
         if (isCanceled) return;
@@ -138,6 +126,9 @@ const Editor: FC = () => {
           pathTool,
         });
         editorReference.value = editor;
+        if (initialDocument) {
+          editor.setContents(JSON.parse(initialDocument));
+        }
 
         editor.setting.on(
           'update',

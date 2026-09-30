@@ -10,6 +10,8 @@ interface ShellService {
   platform: string;
   getTabs(): Promise<TabInfo[]>;
   activateTab(id: string): void;
+  closeTab(id: string): void;
+  newTab(): void;
   onTabsChange(callback: (tabs: TabInfo[]) => void): () => void;
 }
 

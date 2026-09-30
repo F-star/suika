@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   BaseWindow,
   type BaseWindowConstructorOptions,
+  dialog,
   type WebContents,
   WebContentsView,
 } from 'electron';
@@ -73,34 +74,34 @@ const appWindows = new Set<AppWindow>();
  * Only the active tab's editor view is visible.
  */
 export class AppWindow {
+  static all() {
+    return [...appWindows];
+  }
+
   static fromBaseWindow(window: BaseWindow | undefined) {
-    for (const appWindow of appWindows) {
-      if (appWindow.window === window) return appWindow;
-    }
+    return AppWindow.all().find((appWindow) => appWindow.window === window);
   }
 
   /** Finds the window hosting the webContents, either as its shell or a tab. */
   static fromWebContents(webContents: WebContents) {
-    for (const appWindow of appWindows) {
-      if (
+    return AppWindow.all().find(
+      (appWindow) =>
         appWindow.isShell(webContents) ||
-        appWindow.tabs.some((tab) => tab.view.webContents === webContents)
-      ) {
-        return appWindow;
-      }
-    }
+        appWindow.tabs.some((tab) => tab.view.webContents === webContents),
+    );
   }
 
   static fromShell(webContents: WebContents) {
-    for (const appWindow of appWindows) {
-      if (appWindow.isShell(webContents)) return appWindow;
-    }
+    return AppWindow.all().find((appWindow) => appWindow.isShell(webContents));
   }
 
   readonly window: BaseWindow;
   private readonly shellView: WebContentsView;
   private tabs: Tab[] = [];
   private activeTabId: string | undefined;
+  private closingTabIds = new Set<string>();
+  private closeConfirmation: Promise<boolean> | undefined;
+  private isCloseConfirmed = false;
 
   constructor() {
     this.window = new BaseWindow({
@@ -116,6 +117,15 @@ export class AppWindow {
     loadRendererPage(this.shellView.webContents, 'shell.html');
 
     this.window.on('resize', () => this.layout());
+    this.window.on('close', (event) => {
+      if (this.isCloseConfirmed || !this.hasDirtyTabs()) return;
+      event.preventDefault();
+      this.confirmClose().then((confirmed) => {
+        if (!confirmed) return;
+        this.skipCloseConfirmation();
+        this.window.close();
+      });
+    });
     this.window.on('closed', () => {
       appWindows.delete(this);
       // Views are not destroyed together with a BaseWindow.
@@ -130,7 +140,12 @@ export class AppWindow {
     return this.tabs.find((tab) => tab.id === this.activeTabId);
   }
 
-  openEditorTab() {
+  findTabByPath(filePath: string) {
+    return this.tabs.find((tab) => tab.session.filePath === filePath);
+  }
+
+  /** Opens an untitled document, or the document at filePath. */
+  openEditorTab(filePath?: string) {
     const view = createView('preload.cjs');
     const tab: Tab = {
       id: randomUUID(),
@@ -140,10 +155,9 @@ export class AppWindow {
       ),
     };
     this.tabs.push(tab);
+    if (filePath) tab.session.open(filePath);
     this.window.contentView.addChildView(view);
-    loadRendererPage(view.webContents, 'index.html').then(() => {
-      if (devServerUrl) view.webContents.openDevTools({ mode: 'detach' });
-    });
+    loadRendererPage(view.webContents, 'index.html');
     this.activateTab(tab.id);
     return tab;
   }
@@ -158,6 +172,59 @@ export class AppWindow {
     this.handleTabsChange();
   }
 
+  /** Activates the tab `offset` positions away from the active one, wrapping around. */
+  activateAdjacentTab(offset: number) {
+    if (this.tabs.length === 0) return;
+    const index = this.tabs.findIndex((tab) => tab.id === this.activeTabId);
+    const count = this.tabs.length;
+    this.activateTab(
+      this.tabs[(((index + offset) % count) + count) % count].id,
+    );
+  }
+
+  /** Resolves false if the user canceled closing a tab with unsaved changes. */
+  async closeTab(id: string) {
+    const tab = this.tabs.find((tab) => tab.id === id);
+    if (!tab || this.closingTabIds.has(id)) return false;
+
+    this.closingTabIds.add(id);
+    try {
+      if (tab.session.isDirty) {
+        this.activateTab(id);
+        if (!(await this.confirmDiscardChanges(tab))) return false;
+      }
+      this.destroyTab(tab);
+      return true;
+    } finally {
+      this.closingTabIds.delete(id);
+    }
+  }
+
+  /**
+   * Asks the user about every tab with unsaved changes. Resolves false if
+   * any prompt was canceled. Does not close anything by itself.
+   */
+  confirmClose() {
+    this.closeConfirmation ??= (async () => {
+      try {
+        for (const tab of this.tabs) {
+          if (!tab.session.isDirty) continue;
+          this.activateTab(tab.id);
+          if (!(await this.confirmDiscardChanges(tab))) return false;
+        }
+        return true;
+      } finally {
+        this.closeConfirmation = undefined;
+      }
+    })();
+    return this.closeConfirmation;
+  }
+
+  /** Lets the next window close proceed without asking about unsaved changes. */
+  skipCloseConfirmation() {
+    this.isCloseConfirmed = true;
+  }
+
   getTabInfos(): TabInfo[] {
     return this.tabs.map((tab) => ({
       id: tab.id,
@@ -165,6 +232,41 @@ export class AppWindow {
       isDirty: tab.session.isDirty,
       isActive: tab.id === this.activeTabId,
     }));
+  }
+
+  private hasDirtyTabs() {
+    return this.tabs.some((tab) => tab.session.isDirty);
+  }
+
+  /** Resolves true if the tab may be closed: saved, or changes discarded. */
+  private async confirmDiscardChanges(tab: Tab) {
+    const { response } = await dialog.showMessageBox(this.window, {
+      type: 'warning',
+      message: `Do you want to save the changes you made to "${tab.session.fileName}"?`,
+      detail: "Your changes will be lost if you don't save them.",
+      buttons: ['Save', "Don't Save", 'Cancel'],
+      defaultId: 0,
+      cancelId: 2,
+    });
+    if (response === 0) return tab.session.save(this.window);
+    return response === 1;
+  }
+
+  private destroyTab(tab: Tab) {
+    const index = this.tabs.indexOf(tab);
+    if (index === -1) return;
+
+    this.tabs.splice(index, 1);
+    this.window.contentView.removeChildView(tab.view);
+    tab.view.webContents.close();
+
+    if (this.tabs.length === 0) {
+      this.window.close();
+    } else if (tab.id === this.activeTabId) {
+      this.activateTab(this.tabs[Math.min(index, this.tabs.length - 1)].id);
+    } else {
+      this.handleTabsChange();
+    }
   }
 
   private isShell(webContents: WebContents) {

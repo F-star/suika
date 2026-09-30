@@ -1,27 +1,81 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, realpath, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { app, BaseWindow, dialog, ipcMain, Menu } from 'electron';
+import {
+  app,
+  BaseWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  type MenuItemConstructorOptions,
+} from 'electron';
 
 import { AppWindow } from './app-window';
-import { type DocumentSession, getDocumentSession } from './document-session';
+import {
+  type DocumentContent,
+  getDocumentSession,
+  resolveContentRequest,
+} from './document-session';
+
+const SUIKA_FILE_FILTERS = [{ name: 'Suika document', extensions: ['suika'] }];
 
 const createWindow = () => {
-  new AppWindow().openEditorTab();
-};
-
-const sendRendererCommand = (
-  window: BaseWindow | undefined,
-  command: string,
-) => {
-  AppWindow.fromBaseWindow(window)?.activeTab?.view.webContents.send(
-    'menu:command',
-    command,
-  );
+  const appWindow = new AppWindow();
+  appWindow.openEditorTab();
+  return appWindow;
 };
 
 const getOwnerWindow = (webContents: Electron.WebContents) =>
   AppWindow.fromWebContents(webContents)?.window;
+
+/** Opens the file in a new tab, or focuses the tab where it is already open. */
+const openDocumentPath = async (
+  appWindow: AppWindow | undefined,
+  filePath: string,
+) => {
+  try {
+    filePath = await realpath(filePath);
+    // Validate before creating a tab, so an unreadable file cannot end up as
+    // an empty document that overwrites it on save.
+    JSON.parse(await readFile(filePath, 'utf8'));
+  } catch (error) {
+    const options = {
+      type: 'error' as const,
+      message: `Could not open "${path.basename(filePath)}".`,
+      detail: String(error),
+    };
+    if (appWindow) dialog.showMessageBox(appWindow.window, options);
+    else dialog.showMessageBox(options);
+    return;
+  }
+
+  for (const existingWindow of AppWindow.all()) {
+    const tab = existingWindow.findTabByPath(filePath);
+    if (tab) {
+      existingWindow.window.focus();
+      existingWindow.activateTab(tab.id);
+      return;
+    }
+  }
+  (appWindow ?? new AppWindow()).openEditorTab(filePath);
+};
+
+const openDocument = async (appWindow: AppWindow | undefined) => {
+  const options: Electron.OpenDialogOptions = {
+    properties: ['openFile'],
+    filters: SUIKA_FILE_FILTERS,
+  };
+  const result = appWindow
+    ? await dialog.showOpenDialog(appWindow.window, options)
+    : await dialog.showOpenDialog(options);
+  if (result.canceled || !result.filePaths[0]) return;
+  await openDocumentPath(appWindow, result.filePaths[0]);
+};
+
+const saveActiveTab = (window: BaseWindow | undefined, saveAs: boolean) => {
+  const appWindow = AppWindow.fromBaseWindow(window);
+  appWindow?.activeTab?.session.save(appWindow.window, saveAs);
+};
 
 const openTextFile = async (
   window: BaseWindow,
@@ -41,67 +95,121 @@ const openTextFile = async (
   };
 };
 
-const saveDocument = async (
-  session: DocumentSession,
-  window: BaseWindow,
-  content: string,
-  historyId: string,
-  saveAs: boolean,
-) => {
-  let filePath = session.filePath;
-  if (!filePath || saveAs) {
-    const result = await dialog.showSaveDialog(window, {
-      defaultPath: filePath ?? 'design.suika',
-      filters: [{ name: 'Suika document', extensions: ['suika'] }],
-    });
-    if (result.canceled || !result.filePath) return null;
-    filePath = result.filePath;
-  }
-  await writeFile(filePath, content, 'utf8');
-  session.markSaved(filePath, historyId);
-  return filePath;
+const buildMenu = () => {
+  const isMac = process.platform === 'darwin';
+  const template: MenuItemConstructorOptions[] = [
+    ...(isMac ? [{ role: 'appMenu' } as const] : []),
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'New File',
+          accelerator: 'CommandOrControl+N',
+          click: (_item, window) => {
+            const appWindow = AppWindow.fromBaseWindow(window);
+            if (appWindow) appWindow.openEditorTab();
+            else createWindow();
+          },
+        },
+        {
+          label: 'Open…',
+          accelerator: 'CommandOrControl+O',
+          click: (_item, window) =>
+            openDocument(AppWindow.fromBaseWindow(window)),
+        },
+        { type: 'separator' },
+        {
+          label: 'Save',
+          accelerator: 'CommandOrControl+S',
+          click: (_item, window) => saveActiveTab(window, false),
+        },
+        {
+          label: 'Save As…',
+          accelerator: 'CommandOrControl+Shift+S',
+          click: (_item, window) => saveActiveTab(window, true),
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          accelerator: 'CommandOrControl+W',
+          click: (_item, window) => {
+            const appWindow = AppWindow.fromBaseWindow(window);
+            const tab = appWindow?.activeTab;
+            if (tab) appWindow.closeTab(tab.id);
+          },
+        },
+        ...(isMac
+          ? []
+          : [{ type: 'separator' } as const, { role: 'quit' } as const]),
+      ],
+    },
+    { role: 'editMenu' },
+    ...(process.env.SUIKA_DEV_SERVER_URL
+      ? [
+          {
+            label: 'View',
+            submenu: [{ role: 'toggleDevTools' } as const],
+          },
+        ]
+      : []),
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        { type: 'separator' },
+        {
+          label: 'Select Next Tab',
+          accelerator: 'Control+Tab',
+          click: (_item, window) =>
+            AppWindow.fromBaseWindow(window)?.activateAdjacentTab(1),
+        },
+        {
+          label: 'Select Previous Tab',
+          accelerator: 'Control+Shift+Tab',
+          click: (_item, window) =>
+            AppWindow.fromBaseWindow(window)?.activateAdjacentTab(-1),
+        },
+        { type: 'separator' },
+        { role: 'close', accelerator: 'CommandOrControl+Shift+W' },
+        ...(isMac ? [{ role: 'front' } as const] : []),
+      ],
+    },
+  ];
+  return Menu.buildFromTemplate(template);
 };
 
-app.whenReady().then(() => {
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate([
-      {
-        label: 'File',
-        submenu: [
-          {
-            label: 'Open…',
-            accelerator: 'CommandOrControl+O',
-            click: (_item, window) => sendRendererCommand(window, 'open'),
-          },
-          {
-            label: 'Save',
-            accelerator: 'CommandOrControl+S',
-            click: (_item, window) => sendRendererCommand(window, 'save'),
-          },
-          {
-            label: 'Save As…',
-            accelerator: 'CommandOrControl+Shift+S',
-            click: (_item, window) => sendRendererCommand(window, 'save-as'),
-          },
-          { type: 'separator' },
-          { role: 'quit' },
-        ],
-      },
-      { role: 'editMenu' },
-      { role: 'windowMenu' },
-    ]),
-  );
-  ipcMain.handle('document:open', async (event) => {
-    const session = getDocumentSession(event.sender);
-    const window = getOwnerWindow(event.sender);
-    if (!session || !window) return null;
+let isQuitConfirmed = false;
 
-    const file = await openTextFile(window, [
-      { name: 'Suika document', extensions: ['suika'] },
-    ]);
-    if (file) session.open(file.path);
-    return file;
+app.on('before-quit', (event) => {
+  if (isQuitConfirmed) return;
+  event.preventDefault();
+  (async () => {
+    const appWindows = AppWindow.all();
+    for (const appWindow of appWindows) {
+      if (!(await appWindow.confirmClose())) return;
+    }
+    for (const appWindow of appWindows) appWindow.skipCloseConfirmation();
+    isQuitConfirmed = true;
+    app.quit();
+  })();
+});
+
+app.whenReady().then(() => {
+  Menu.setApplicationMenu(buildMenu());
+
+  ipcMain.handle('document:open', (event) =>
+    openDocument(AppWindow.fromWebContents(event.sender)),
+  );
+  ipcMain.handle('document:get-initial', async (event) => {
+    const filePath = getDocumentSession(event.sender)?.filePath;
+    return filePath ? readFile(filePath, 'utf8') : null;
   });
+  ipcMain.on(
+    'document:content',
+    (_event, requestId: number, content: DocumentContent) =>
+      resolveContentRequest(requestId, content),
+  );
   ipcMain.handle('svg:open', (event) => {
     const window = getOwnerWindow(event.sender);
     if (!window) return null;
@@ -113,7 +221,7 @@ app.whenReady().then(() => {
       const session = getDocumentSession(event.sender);
       const window = getOwnerWindow(event.sender);
       if (!session || !window) return null;
-      return saveDocument(session, window, content, historyId, saveAs);
+      return session.saveContent(window, content, historyId, saveAs);
     },
   );
   ipcMain.on('document:history-changed', (event, historyId: string) => {
@@ -142,6 +250,12 @@ app.whenReady().then(() => {
   );
   ipcMain.on('shell:activate-tab', (event, id: string) => {
     AppWindow.fromShell(event.sender)?.activateTab(id);
+  });
+  ipcMain.on('shell:close-tab', (event, id: string) => {
+    AppWindow.fromShell(event.sender)?.closeTab(id);
+  });
+  ipcMain.on('shell:new-tab', (event) => {
+    AppWindow.fromShell(event.sender)?.openEditorTab();
   });
 
   createWindow();

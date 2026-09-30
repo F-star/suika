@@ -3,8 +3,16 @@ export interface DesktopFile {
   name: string;
 }
 
+export interface DesktopDocumentContent {
+  content: string;
+  historyId: string;
+}
+
 interface DesktopFileService {
-  openDocument(): Promise<DesktopFile | null>;
+  /** Lets the user pick a document and opens it in a new tab. */
+  openDocument(): Promise<void>;
+  /** Content of the file this tab was opened with, or null for a new document. */
+  getInitialDocument(): Promise<string | null>;
   openSvg(): Promise<DesktopFile | null>;
   saveDocument(
     content: string,
@@ -16,7 +24,8 @@ interface DesktopFileService {
   /** Sets the current history cursor as the saved baseline after opening/creating. */
   markDocumentLoaded(historyId: string): void;
   saveExport(data: Uint8Array, suggestedName: string): Promise<string | null>;
-  onMenuCommand(callback: (command: string) => void): () => void;
+  /** Answers the desktop host when it needs the document, e.g. to save it. */
+  onContentRequest(provider: () => DesktopDocumentContent): () => void;
 }
 
 declare global {

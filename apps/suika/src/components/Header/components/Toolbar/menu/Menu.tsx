@@ -325,14 +325,13 @@ export const Menu: FC<IProps> = ({ onClearCanvas }) => {
         break;
       case 'import':
         {
-          (async () => {
-            const file = await desktopFileService()?.openDocument();
-            if (file) {
-              importService.importOriginText(editor, file.content);
-            } else if (!desktopFileService()) {
-              importService.importOriginFile(editor);
-            }
-          })();
+          const desktop = desktopFileService();
+          if (desktop) {
+            // Opens in a new tab.
+            desktop.openDocument();
+          } else {
+            importService.importOriginFile(editor);
+          }
         }
         break;
       case 'export':

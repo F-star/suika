@@ -1,7 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import type { DocumentContent } from './document-session';
+
 contextBridge.exposeInMainWorld('suikaDesktop', {
   openDocument: () => ipcRenderer.invoke('document:open'),
+  getInitialDocument: () => ipcRenderer.invoke('document:get-initial'),
   openSvg: () => ipcRenderer.invoke('svg:open'),
   saveDocument: (content: string, historyId: string, saveAs: boolean) =>
     ipcRenderer.invoke('document:save', content, historyId, saveAs),
@@ -11,10 +14,11 @@ contextBridge.exposeInMainWorld('suikaDesktop', {
     ipcRenderer.send('document:loaded', historyId),
   saveExport: (data: Uint8Array, suggestedName: string) =>
     ipcRenderer.invoke('export:save', data, suggestedName),
-  onMenuCommand: (callback: (command: string) => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, command: string) =>
-      callback(command);
-    ipcRenderer.on('menu:command', handler);
-    return () => ipcRenderer.removeListener('menu:command', handler);
+  onContentRequest: (provider: () => DocumentContent) => {
+    const handler = (_event: Electron.IpcRendererEvent, requestId: number) =>
+      ipcRenderer.send('document:content', requestId, provider());
+    ipcRenderer.on('document:content-request', handler);
+    return () =>
+      ipcRenderer.removeListener('document:content-request', handler);
   },
 });
