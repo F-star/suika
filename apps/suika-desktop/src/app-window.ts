@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 
 import {
+  app,
   BaseWindow,
   type BaseWindowConstructorOptions,
   dialog,
@@ -20,6 +21,14 @@ import {
 const TAB_BAR_HEIGHT = 40;
 
 const devServerUrl = process.env.SUIKA_DEV_SERVER_URL;
+
+/**
+ * Packaged builds get the icon from electron-builder; an unpackaged app would
+ * show the default Electron icon.
+ */
+export const devIconPath = app.isPackaged
+  ? undefined
+  : path.join(__dirname, '../resources/icon.png');
 
 export interface TabInfo {
   id: string;
@@ -131,6 +140,7 @@ export class AppWindow {
       minWidth: 1024,
       minHeight: 700,
       title: 'Suika',
+      icon: devIconPath,
       ...titleBarOptions,
     });
     this.shellView = createView('preload-shell.cjs');

@@ -11,7 +11,7 @@ import {
   shell,
 } from 'electron';
 
-import { AppWindow } from './app-window';
+import { AppWindow, devIconPath } from './app-window';
 import {
   type DocumentContent,
   getDocumentSession,
@@ -258,6 +258,7 @@ app.on('before-quit', (event) => {
 app.whenReady().then(() => {
   if (!hasSingleInstanceLock) return;
 
+  if (devIconPath) app.dock?.setIcon(devIconPath);
   Menu.setApplicationMenu(buildMenu());
 
   ipcMain.handle('document:open', (event) =>
