@@ -7,6 +7,7 @@
     "dev": "pnpm --filter @suika/core build && pnpm build:main && cross-env SUIKA_DEV_SERVER_URL=http://localhost:6167 concurrently -k \"pnpm --filter @suika/suika dev\" \"wait-on http://localhost:6167 && electron .\"",
     "build:main": "esbuild src/main.ts src/preload.ts src/preload-shell.ts --bundle --platform=node --target=node20 --external:electron --outdir=dist --out-extension:.js=.cjs",
     "clean": "node -e \"for (const d of ['dist', 'release']) require('fs').rmSync(d, { recursive: true, force: true })\"",
+    "icons": "electron scripts/generate-icons.cjs",
     "build": "pnpm clean && pnpm --filter @suika/suika build && pnpm build:main && electron-builder"
   },
   "build": {

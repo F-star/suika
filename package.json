@@ -18,6 +18,7 @@
     "desktop:dev": "pnpm --filter @suika/suika-desktop dev",
     "desktop:build": "pnpm --filter @suika/suika-desktop build",
     "desktop:clean": "pnpm --filter @suika/suika-desktop clean",
+    "desktop:icons": "pnpm --filter @suika/suika-desktop icons",
     "storybook": "pnpm --filter @suika/components storybook",
     "components:build": "pnpm --filter @suika/components build",
     "common:dev": "pnpm -F @suika/common dev",
